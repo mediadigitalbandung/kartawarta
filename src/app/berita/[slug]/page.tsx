@@ -131,7 +131,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               <div className="mb-4 flex items-center gap-3">
                 <Link
                   href={`/kategori/${article.category.slug}`}
-                  className="badge-green"
+                  className="text-xs font-bold uppercase tracking-wide text-goto-green hover:underline"
                 >
                   {article.category.name}
                 </Link>
@@ -235,7 +235,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                   <Link
                     key={tag.slug}
                     href={`/tag/${tag.slug}`}
-                    className="badge-green text-xs"
+                    className="text-xs font-medium text-goto-green border border-border rounded px-2 py-1 hover:bg-surface-secondary transition-colors"
                   >
                     #{tag.name}
                   </Link>
