@@ -5,6 +5,7 @@ import ArticleCard from "@/components/artikel/ArticleCard";
 import NewsTicker from "@/components/layout/NewsTicker";
 import HeadlineSlider from "@/components/slider/HeadlineSlider";
 import BreakingSlider from "@/components/slider/BreakingSlider";
+import PopularCarousel from "@/components/slider/PopularCarousel";
 import SimulationBadge from "@/components/SimulationBadge";
 import { Scale, BookOpen, Gavel, Shield, Users, Landmark, LucideIcon, Globe, Monitor, Building2, FileText, AlertTriangle, Radio, BarChart3, Calendar, Play, Vote, TrendingUp } from "lucide-react";
 import { prisma } from "@/lib/prisma";
@@ -82,7 +83,7 @@ export default async function HomePage() {
       where: { status: "PUBLISHED" },
       include: { author: true, category: true },
       orderBy: { viewCount: "desc" },
-      take: 5,
+      take: 10,
     }),
     prisma.article.findMany({
       where: { status: "PUBLISHED" },
@@ -153,6 +154,21 @@ export default async function HomePage() {
                 <ArticleCard key={a.slug} {...a} variant="standard" />
               ))}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Berita Terpopuler — carousel */}
+      {trendingArticles.length > 0 && (
+        <section className="bg-surface-secondary py-8">
+          <div className="container-main">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
+                <TrendingUp size={18} className="mr-2 text-goto-green" />
+                Berita Terpopuler
+              </h2>
+            </div>
+            <PopularCarousel items={JSON.parse(JSON.stringify(trendingArticles))} />
           </div>
         </section>
       )}
