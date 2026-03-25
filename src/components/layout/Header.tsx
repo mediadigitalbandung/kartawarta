@@ -7,321 +7,268 @@ import {
   Menu,
   X,
   Search,
-  Moon,
-  Sun,
   User,
   LogOut,
   LayoutDashboard,
   ChevronRight,
+  ChevronDown,
 } from "lucide-react";
 
-const categories = [
-  { name: "Hukum Pidana", slug: "hukum-pidana" },
-  { name: "Hukum Perdata", slug: "hukum-perdata" },
-  { name: "Hukum Tata Negara", slug: "hukum-tata-negara" },
-  { name: "HAM", slug: "ham" },
-  { name: "Opini", slug: "opini" },
-  { name: "Berita Bandung", slug: "berita-bandung" },
+const navItems = [
+  { name: "Beranda", href: "/" },
+  { name: "Hukum Pidana", href: "/kategori/hukum-pidana" },
+  { name: "Hukum Perdata", href: "/kategori/hukum-perdata" },
+  { name: "Hukum Tata Negara", href: "/kategori/hukum-tata-negara" },
+  { name: "HAM", href: "/kategori/ham" },
+  { name: "Opini", href: "/kategori/opini" },
+];
+
+const moreItems = [
+  { name: "Berita Bandung", href: "/kategori/berita-bandung" },
+  { name: "Analisis", href: "/kategori/analisis" },
 ];
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const { data: session } = useSession();
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    document.documentElement.classList.toggle("dark");
-  };
-
   return (
-    <header className="sticky top-0 z-50">
-      {/* Gradient top bar */}
-      <div className="bg-primary-gradient text-white">
-        <div className="container-main flex items-center justify-between py-2 text-xs">
-          <span className="font-medium tracking-wide opacity-90">
-            {new Date().toLocaleDateString("id-ID", {
-              weekday: "long",
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
-          </span>
-          <div className="flex items-center gap-4">
-            {session ? (
-              <div className="flex items-center gap-3">
-                {/* Avatar initial badge */}
-                <div className="flex items-center gap-2">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-[10px] font-bold backdrop-blur-sm">
-                    {session.user?.name?.charAt(0)?.toUpperCase() || "U"}
-                  </div>
-                  <span className="hidden font-medium sm:inline">
-                    {session.user?.name || "User"}
-                  </span>
-                </div>
-                <div className="h-3 w-px bg-white/30" />
-                <Link
-                  href="/panel/dashboard"
-                  className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 font-medium backdrop-blur-sm transition-all duration-200 hover:bg-white/20"
-                >
-                  <LayoutDashboard size={12} />
-                  Panel
-                </Link>
+    <header className="sticky top-0 z-50 border-b border-border bg-bg">
+      <div className="container-main">
+        <div className="flex items-center justify-between py-3">
+          {/* Logo */}
+          <Link href="/" className="group flex shrink-0 items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand text-sm font-extrabold text-white">
+              JH
+            </div>
+            <div className="hidden sm:block">
+              <span className="text-base font-bold leading-tight text-text-primary">
+                Jurnalis Hukum
+              </span>
+              <span className="ml-1.5 text-sm text-text-muted">Bandung</span>
+            </div>
+          </Link>
+
+          {/* Center nav - desktop */}
+          <nav className="hidden lg:block">
+            <ul className="flex items-center gap-1">
+              {navItems.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="relative px-3 py-1.5 text-sm font-medium text-text-secondary transition-colors duration-200 hover:text-white"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+              {/* Lainnya dropdown */}
+              <li className="relative">
                 <button
-                  onClick={() => signOut()}
-                  className="flex items-center gap-1.5 rounded-full px-2 py-1 font-medium transition-all duration-200 hover:bg-white/10"
+                  onClick={() => setMoreOpen(!moreOpen)}
+                  className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-text-secondary transition-colors duration-200 hover:text-white"
                 >
-                  <LogOut size={12} />
-                  Keluar
+                  Lainnya
+                  <ChevronDown size={14} />
                 </button>
+                {moreOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setMoreOpen(false)}
+                    />
+                    <div className="absolute left-0 top-full z-20 mt-1 w-48 rounded-lg border border-border bg-bg-card py-1 shadow-lg">
+                      {moreItems.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className="block px-4 py-2 text-sm text-text-secondary transition-colors hover:bg-bg-hover hover:text-white"
+                          onClick={() => setMoreOpen(false)}
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </li>
+            </ul>
+          </nav>
+
+          {/* Right actions */}
+          <div className="flex items-center gap-1">
+            {/* Search toggle */}
+            <button
+              onClick={() => setSearchOpen(!searchOpen)}
+              className={`rounded-lg p-2 transition-colors duration-200 ${
+                searchOpen
+                  ? "bg-bg-hover text-white"
+                  : "text-text-secondary hover:bg-bg-hover hover:text-white"
+              }`}
+              aria-label="Search"
+            >
+              <Search size={20} />
+            </button>
+
+            {/* User area */}
+            {session ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-xs font-bold text-white transition-opacity hover:opacity-90"
+                >
+                  {session.user?.name?.charAt(0)?.toUpperCase() || "U"}
+                </button>
+                {userMenuOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setUserMenuOpen(false)}
+                    />
+                    <div className="absolute right-0 top-full z-20 mt-2 w-48 rounded-lg border border-border bg-bg-card py-1 shadow-lg">
+                      <div className="border-b border-border px-4 py-2">
+                        <p className="text-sm font-medium text-white">
+                          {session.user?.name || "User"}
+                        </p>
+                      </div>
+                      <Link
+                        href="/panel/dashboard"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-text-secondary transition-colors hover:bg-bg-hover hover:text-white"
+                        onClick={() => setUserMenuOpen(false)}
+                      >
+                        <LayoutDashboard size={14} />
+                        Panel
+                      </Link>
+                      <button
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          signOut();
+                        }}
+                        className="flex w-full items-center gap-2 px-4 py-2 text-sm text-text-secondary transition-colors hover:bg-bg-hover hover:text-white"
+                      >
+                        <LogOut size={14} />
+                        Keluar
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             ) : (
               <Link
                 href="/login"
-                className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 font-medium backdrop-blur-sm transition-all duration-200 hover:bg-white/20"
+                className="ml-2 rounded-lg bg-brand px-4 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
               >
-                <User size={12} />
                 Masuk
               </Link>
             )}
+
+            {/* Mobile menu toggle */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="rounded-lg p-2 text-text-secondary transition-colors hover:bg-bg-hover hover:text-white lg:hidden"
+              aria-label="Menu"
+            >
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Main header with glassmorphism */}
-      <div className="border-b border-gray-200/60 bg-white/80 backdrop-blur-xl dark:border-gray-800/60 dark:bg-gray-900/80">
-        <div className="container-main py-4">
-          <div className="flex items-center justify-between">
-            {/* Logo with gradient background */}
-            <Link href="/" className="group flex items-center gap-3">
-              <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-primary-gradient text-lg font-extrabold text-white shadow-md shadow-primary-500/25 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary-500/30 group-hover:-translate-y-0.5">
-                JH
-                <div className="absolute -inset-px rounded-xl bg-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              </div>
-              <div>
-                <h1 className="text-lg font-extrabold leading-tight tracking-tight text-gray-900 dark:text-white">
-                  Jurnalis Hukum
-                </h1>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary-500 dark:text-primary-400">
-                  Bandung
-                </p>
-              </div>
-            </Link>
-
-            {/* Action buttons */}
-            <div className="flex items-center gap-1.5">
-              {/* Search toggle */}
-              <button
-                onClick={() => setSearchOpen(!searchOpen)}
-                className={`rounded-xl p-2.5 transition-all duration-200 ${
-                  searchOpen
-                    ? "bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400"
-                    : "text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-                }`}
-                aria-label="Search"
-              >
-                <Search size={20} strokeWidth={2.5} />
-              </button>
-
-              {/* Dark mode toggle with smooth icon transition */}
-              <button
-                onClick={toggleDarkMode}
-                className="relative rounded-xl p-2.5 text-gray-500 transition-all duration-200 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-                aria-label="Toggle dark mode"
-              >
-                <div className="relative h-5 w-5">
-                  <Sun
-                    size={20}
-                    strokeWidth={2.5}
-                    className={`absolute inset-0 transition-all duration-300 ${
-                      darkMode
-                        ? "rotate-0 scale-100 opacity-100"
-                        : "rotate-90 scale-0 opacity-0"
-                    }`}
-                  />
-                  <Moon
-                    size={20}
-                    strokeWidth={2.5}
-                    className={`absolute inset-0 transition-all duration-300 ${
-                      darkMode
-                        ? "-rotate-90 scale-0 opacity-0"
-                        : "rotate-0 scale-100 opacity-100"
-                    }`}
-                  />
-                </div>
-              </button>
-
-              {/* Mobile menu toggle */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="rounded-xl p-2.5 text-gray-500 transition-all duration-200 hover:bg-gray-100 hover:text-gray-700 md:hidden dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-                aria-label="Menu"
-              >
-                <div className="relative h-5 w-5">
-                  <X
-                    size={20}
-                    strokeWidth={2.5}
-                    className={`absolute inset-0 transition-all duration-300 ${
-                      mobileMenuOpen
-                        ? "rotate-0 scale-100 opacity-100"
-                        : "rotate-90 scale-0 opacity-0"
-                    }`}
-                  />
-                  <Menu
-                    size={20}
-                    strokeWidth={2.5}
-                    className={`absolute inset-0 transition-all duration-300 ${
-                      mobileMenuOpen
-                        ? "-rotate-90 scale-0 opacity-0"
-                        : "rotate-0 scale-100 opacity-100"
-                    }`}
-                  />
-                </div>
-              </button>
-            </div>
-          </div>
-
-          {/* Animated search bar */}
-          <div
-            className={`grid transition-all duration-300 ease-in-out ${
-              searchOpen
-                ? "mt-4 grid-rows-[1fr] opacity-100"
-                : "grid-rows-[0fr] opacity-0"
-            }`}
-          >
-            <div className="overflow-hidden">
-              <form action="/search" className="relative">
-                <Search
-                  size={18}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                />
-                <input
-                  type="text"
-                  name="q"
-                  placeholder="Cari berita hukum..."
-                  className="input pl-11 pr-4"
-                  autoFocus={searchOpen}
-                />
-              </form>
-            </div>
-          </div>
-        </div>
-
-        {/* Pill-shaped navigation */}
-        <div className="container-main pb-3">
-          <nav>
-            <ul className="hidden items-center gap-1 md:flex">
-              <li>
-                <Link
-                  href="/"
-                  className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-semibold text-gray-600 transition-all duration-200 hover:bg-primary-50 hover:text-primary-700 dark:text-gray-300 dark:hover:bg-primary-900/20 dark:hover:text-primary-400"
-                >
-                  Beranda
-                </Link>
-              </li>
-              {categories.map((cat) => (
-                <li key={cat.slug}>
-                  <Link
-                    href={`/kategori/${cat.slug}`}
-                    className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-semibold text-gray-600 transition-all duration-200 hover:bg-primary-50 hover:text-primary-700 dark:text-gray-300 dark:hover:bg-primary-900/20 dark:hover:text-primary-400"
-                  >
-                    {cat.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
-      </div>
-
-      {/* Modern mobile menu with slide-in animation */}
+      {/* Search bar slide-down */}
       <div
-        className={`fixed inset-0 top-0 z-40 md:hidden transition-all duration-300 ${
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+          searchOpen ? "max-h-16" : "max-h-0"
+        }`}
+      >
+        <div className="container-main pb-3">
+          <form action="/search" className="relative">
+            <Search
+              size={18}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
+            />
+            <input
+              type="text"
+              name="q"
+              placeholder="Cari berita hukum..."
+              className="w-full rounded-lg border border-border bg-bg-secondary py-2 pl-10 pr-4 text-sm text-text-primary placeholder:text-text-muted focus:border-brand focus:outline-none"
+              autoFocus={searchOpen}
+            />
+          </form>
+        </div>
+      </div>
+
+      {/* Mobile slide-in panel */}
+      <div
+        className={`fixed inset-0 top-0 z-40 lg:hidden transition-all duration-300 ${
           mobileMenuOpen ? "visible" : "invisible"
         }`}
       >
         {/* Backdrop */}
         <div
-          className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
+          className={`absolute inset-0 bg-black/60 transition-opacity duration-300 ${
             mobileMenuOpen ? "opacity-100" : "opacity-0"
           }`}
           onClick={() => setMobileMenuOpen(false)}
         />
 
-        {/* Slide-in panel */}
+        {/* Panel */}
         <div
-          className={`absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-white shadow-2xl transition-transform duration-300 ease-out dark:bg-gray-900 ${
+          className={`absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-bg-card transition-transform duration-300 ease-out ${
             mobileMenuOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >
-          {/* Mobile menu header */}
-          <div className="flex items-center justify-between border-b border-gray-200/60 px-6 py-4 dark:border-gray-800/60">
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-gradient text-sm font-extrabold text-white shadow-md shadow-primary-500/25">
+          {/* Mobile header */}
+          <div className="flex items-center justify-between border-b border-border px-5 py-4">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-sm font-bold text-white">
                 JH
               </div>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">
-                Menu
-              </span>
+              <span className="text-sm font-bold text-white">Menu</span>
             </div>
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="rounded-xl p-2 text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+              className="rounded-lg p-1.5 text-text-secondary transition-colors hover:bg-bg-hover hover:text-white"
             >
-              <X size={20} strokeWidth={2.5} />
+              <X size={20} />
             </button>
           </div>
 
-          {/* Mobile menu items */}
-          <ul className="space-y-1 px-4 py-4">
-            <li>
-              <Link
-                href="/"
-                className="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition-all duration-200 hover:bg-primary-50 hover:text-primary-700 dark:text-gray-300 dark:hover:bg-primary-900/20 dark:hover:text-primary-400"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Beranda
-                <ChevronRight
-                  size={16}
-                  className="text-gray-400 dark:text-gray-600"
-                />
-              </Link>
-            </li>
-            {categories.map((cat) => (
-              <li key={cat.slug}>
+          {/* Mobile nav items */}
+          <ul className="space-y-0.5 px-3 py-3">
+            {navItems.map((item) => (
+              <li key={item.href}>
                 <Link
-                  href={`/kategori/${cat.slug}`}
-                  className="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition-all duration-200 hover:bg-primary-50 hover:text-primary-700 dark:text-gray-300 dark:hover:bg-primary-900/20 dark:hover:text-primary-400"
+                  href={item.href}
+                  className="flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:bg-bg-hover hover:text-white"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  {cat.name}
-                  <ChevronRight
-                    size={16}
-                    className="text-gray-400 dark:text-gray-600"
-                  />
+                  {item.name}
+                  <ChevronRight size={16} className="text-text-muted" />
+                </Link>
+              </li>
+            ))}
+            {moreItems.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className="flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:bg-bg-hover hover:text-white"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {item.name}
+                  <ChevronRight size={16} className="text-text-muted" />
                 </Link>
               </li>
             ))}
           </ul>
 
-          {/* Mobile menu footer */}
-          <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200/60 px-6 py-4 dark:border-gray-800/60">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-gray-400">
-                Jurnalis Hukum Bandung
-              </span>
-              <button
-                onClick={toggleDarkMode}
-                className="rounded-xl p-2 text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
-              >
-                {darkMode ? (
-                  <Sun size={18} strokeWidth={2.5} />
-                ) : (
-                  <Moon size={18} strokeWidth={2.5} />
-                )}
-              </button>
-            </div>
+          {/* Mobile footer */}
+          <div className="absolute bottom-0 left-0 right-0 border-t border-border px-5 py-4">
+            <span className="text-xs text-text-muted">
+              Jurnalis Hukum Bandung
+            </span>
           </div>
         </div>
       </div>
