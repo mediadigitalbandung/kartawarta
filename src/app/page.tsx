@@ -111,9 +111,6 @@ export default async function HomePage() {
   }
   const categoryEntries = Object.entries(articlesByCategory);
 
-  // Real stats
-  const totalArticles = await prisma.article.count({ where: { status: "PUBLISHED" } });
-
   return (
     <>
       <NewsTicker items={tickerItems} />
@@ -336,34 +333,6 @@ export default async function HomePage() {
                   </div>
                 ))}
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div className="border-b border-border" />
-
-      {/* Statistik Ringkas — DATA REAL */}
-      <section className="bg-surface py-8">
-        <div className="container-main">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
-            <div>
-              <span className="text-3xl font-extrabold text-goto-green">{totalArticles}</span>
-              <span className="block text-xs text-txt-secondary mt-1">Artikel Dipublikasi</span>
-            </div>
-            <div>
-              <span className="text-3xl font-extrabold text-goto-green">{categories.length}</span>
-              <span className="block text-xs text-txt-secondary mt-1">Kategori Hukum</span>
-            </div>
-            <div>
-              <span className="text-3xl font-extrabold text-goto-green">3</span>
-              <span className="block text-xs text-txt-secondary mt-1">Jurnalis Aktif</span>
-            </div>
-            <div>
-              <span className="text-3xl font-extrabold text-goto-green flex items-center justify-center gap-1">
-                24/7
-              </span>
-              <span className="block text-xs text-txt-secondary mt-1">Liputan Hukum</span>
             </div>
           </div>
         </div>
