@@ -72,7 +72,7 @@ export default async function HomePage() {
       where: { status: "PUBLISHED" },
       include: { author: true, category: true },
       orderBy: { publishedAt: "desc" },
-      take: 20,
+      take: 30,
     }),
     prisma.category.findMany({
       include: { _count: { select: { articles: true } } },
@@ -93,7 +93,8 @@ export default async function HomePage() {
 
   const headlineArticles = articles.slice(0, 5);  // For headline slider
   const breakingArticles = articles.slice(5, 10); // For breaking news slider
-  const restArticles = articles.slice(5);
+  const terkiniArticles = articles.slice(10, 22); // Berita Terkini: 4x3 grid = max 12
+  const restArticles = articles.slice(22);
 
   const tickerItems = tickerArticles.map((a) => ({
     title: a.title,
@@ -132,6 +133,29 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <div className="border-b border-border" />
+
+      {/* Berita Terkini — 4x3 grid */}
+      {terkiniArticles.length > 0 && (
+        <section className="bg-surface py-8">
+          <div className="container-main">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
+                Berita Terkini
+              </h2>
+              <Link href="/berita" className="text-sm font-medium text-goto-green hover:underline">
+                Lihat Semua
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {terkiniArticles.map((a) => (
+                <ArticleCard key={a.slug} {...a} variant="standard" />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className="border-b border-border" />
 
