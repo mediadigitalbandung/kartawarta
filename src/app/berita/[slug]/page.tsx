@@ -111,77 +111,77 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         articleTitle={article.title}
       />
 
-      <div className="bg-bg min-h-screen">
+      <div className="bg-newsprint min-h-screen">
         <div className="container-main py-8">
           {/* Breadcrumb */}
-          <nav className="mb-6 flex items-center gap-2 text-xs text-text-muted">
-            <Link href="/" className="transition-colors hover:text-white">Beranda</Link>
+          <nav className="mb-6 flex items-center gap-2 font-mono text-meta text-ink">
+            <Link href="/" className="transition-colors hover:text-forest">Beranda</Link>
             <span>&gt;</span>
-            <Link href={`/kategori/${article.category.slug}`} className="transition-colors hover:text-white">
+            <Link href={`/kategori/${article.category.slug}`} className="transition-colors hover:text-forest">
               {article.category.name}
             </Link>
             <span>&gt;</span>
-            <span className="truncate max-w-[200px] text-text-muted">{article.title}</span>
+            <span className="truncate max-w-[200px] text-ink">{article.title}</span>
           </nav>
 
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
             {/* Article */}
             <article className="lg:col-span-2">
-              {/* Category & verification */}
+              {/* Kicker & verification */}
               <div className="mb-4 flex items-center gap-3">
                 <Link
                   href={`/kategori/${article.category.slug}`}
-                  className="badge-live rounded px-3 py-1 text-xs font-bold uppercase tracking-wide"
+                  className="font-mono text-kicker uppercase text-forest tracking-widest"
                 >
                   {article.category.name}
                 </Link>
                 {article.verificationLabel === "VERIFIED" && (
-                  <span className="flex items-center gap-1 text-xs text-green-400">
+                  <span className="flex items-center gap-1 font-mono text-caption text-forest">
                     <CheckCircle size={12} /> Terverifikasi
                   </span>
                 )}
               </div>
 
               {/* Title */}
-              <h1 className="text-2xl font-extrabold leading-tight text-white sm:text-3xl">
+              <h1 className="font-serif text-3xl font-bold leading-tight text-press sm:text-4xl">
                 {article.title}
               </h1>
 
-              {/* Meta */}
-              <div className="mt-4 flex flex-wrap items-center gap-1 text-xs text-text-muted">
-                <span className="flex items-center gap-1">
-                  <User size={12} />
-                  {article.author.name}
-                </span>
-                <span>|</span>
-                <span className="flex items-center gap-1">
-                  <Calendar size={12} />
+              {/* Deck / excerpt */}
+              {article.excerpt && (
+                <p className="mt-3 text-lg text-ink">
+                  {article.excerpt}
+                </p>
+              )}
+
+              {/* Meta bar */}
+              <div className="mt-4 font-mono text-meta text-ink">
+                <span>{article.author.name}</span>
+                <span className="mx-2">&middot;</span>
+                <span>
                   {article.publishedAt
                     ? new Date(article.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
                     : "-"}
                 </span>
-                <span>|</span>
-                <span className="flex items-center gap-1">
-                  <Clock size={12} /> {article.readTime ?? 0} menit baca
-                </span>
-                <span>|</span>
-                <span className="flex items-center gap-1">
-                  <Eye size={12} /> {article.viewCount.toLocaleString("id-ID")} views
-                </span>
+                <span className="mx-2">&middot;</span>
+                <span>{article.readTime ?? 0} menit baca</span>
               </div>
+
+              {/* Thin divider */}
+              <div className="mt-4 h-px bg-border" />
 
               {/* Featured Image */}
               {article.featuredImage && (
-                <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-lg">
+                <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-card">
                   <Image src={article.featuredImage} alt={article.title} fill className="object-cover" />
                 </div>
               )}
 
               {/* Share buttons */}
-              <div className="mt-6 flex items-center gap-3 rounded-lg bg-bg-card p-3">
-                <div className="flex items-center gap-2 text-text-muted">
+              <div className="mt-6 flex items-center gap-3 rounded-card border border-border bg-paper p-3">
+                <div className="flex items-center gap-2 text-ink">
                   <Share2 size={14} />
-                  <span className="text-xs font-semibold uppercase tracking-wider">Bagikan</span>
+                  <span className="font-mono text-caption uppercase tracking-wider">Bagikan</span>
                 </div>
                 <div className="flex gap-2">
                   {(Object.entries(shareLinks) as [string, string][]).map(([platform, url]) => (
@@ -190,10 +190,10 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-ghost rounded-lg px-3 py-1.5 text-xs"
+                      className="btn-ghost rounded-card px-3 py-1.5 text-xs"
                       title={platform}
                     >
-                      <span className="mr-1 inline-flex h-5 w-5 items-center justify-center rounded bg-bg-secondary text-[10px] font-bold text-text-secondary">
+                      <span className="mr-1 inline-flex h-5 w-5 items-center justify-center rounded-sm bg-paper text-[10px] font-bold text-press border border-border">
                         {sharePlatformLetters[platform]}
                       </span>
                       {platform}
@@ -203,7 +203,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               </div>
 
               {/* Article content */}
-              <div className="mt-8">
+              <div className="mt-8 max-w-3xl">
                 <div
                   className="article-content text-[17px] leading-[1.8]"
                   dangerouslySetInnerHTML={{ __html: sanitizedContent }}
@@ -212,15 +212,15 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
               {/* Sources */}
               {article.sources.length > 0 && (
-                <div className="mt-8 rounded-lg bg-bg-card p-4">
-                  <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-white">
+                <div className="mt-8 rounded-card border border-border bg-paper p-5">
+                  <h3 className="mb-3 font-mono text-kicker uppercase tracking-widest text-press">
                     Sumber &amp; Narasumber
                   </h3>
                   <ul className="space-y-2">
                     {article.sources.map((source, i) => (
-                      <li key={i} className="rounded-lg bg-bg-secondary px-4 py-2.5 text-sm text-text-secondary">
-                        <strong className="text-white">{source.name}</strong>
-                        {source.title && ` — ${source.title}`}
+                      <li key={i} className="text-sm text-ink">
+                        <strong className="text-press">{source.name}</strong>
+                        {source.title && ` -- ${source.title}`}
                         {source.institution && `, ${source.institution}`}
                       </li>
                     ))}
@@ -230,12 +230,12 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
               {/* Tags */}
               <div className="mt-8 flex flex-wrap items-center gap-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Tags</span>
+                <span className="font-mono text-caption uppercase tracking-wider text-ink">Tags</span>
                 {article.tags.map((tag) => (
                   <Link
                     key={tag.slug}
                     href={`/tag/${tag.slug}`}
-                    className="rounded bg-bg-card px-3 py-1 text-xs text-text-secondary transition-colors hover:bg-bg-hover hover:text-white"
+                    className="font-mono text-caption uppercase text-forest border border-border rounded-sm px-2 py-1 transition-colors hover:bg-paper"
                   >
                     #{tag.name}
                   </Link>
@@ -244,27 +244,27 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
               {/* Report button */}
               <div className="mt-8 border-t border-border pt-5">
-                <button className="btn-ghost text-xs text-text-muted hover:text-red-400">
+                <button className="btn-ghost text-xs text-ink hover:text-red-600">
                   <Flag size={13} />
                   Laporkan Berita Ini
                 </button>
               </div>
 
               {/* Author box */}
-              <div id="author" className="mt-8 rounded-lg bg-bg-card p-5">
+              <div id="author" className="mt-8 rounded-card bg-paper p-6">
                 <div className="flex gap-5">
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-brand text-2xl font-extrabold text-white">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-forest text-xl font-bold text-newsprint">
                     {article.author.name.charAt(0)}
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-bold text-white">{article.author.name}</h3>
-                    <p className="text-sm text-gold">Jurnalis</p>
-                    <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+                    <h3 className="text-lg font-semibold text-press">{article.author.name}</h3>
+                    <p className="font-mono text-meta text-gold">Jurnalis</p>
+                    <p className="mt-2 text-sm leading-relaxed text-ink">
                       {article.author.bio}
                     </p>
                     <Link
                       href={`/penulis/${slugify(article.author.name)}`}
-                      className="mt-3 inline-block text-sm font-semibold text-gold transition-colors hover:text-gold-light"
+                      className="mt-3 inline-block text-sm font-medium text-forest transition-colors hover:text-canopy"
                     >
                       Lihat semua artikel &rarr;
                     </Link>
@@ -276,11 +276,16 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               {relatedArticles.length > 0 && (
                 <section className="mt-10">
                   <div className="section-header">
-                    <h2 className="section-title">Berita Terkait</h2>
+                    <h2 className="section-title">Artikel Terkait</h2>
                   </div>
-                  <div className="scroll-row">
-                    {relatedArticles.map((related) => (
-                      <ArticleCard key={related.slug} {...related} />
+                  <div className="flex flex-col">
+                    {relatedArticles.map((related, i) => (
+                      <div key={related.slug}>
+                        <ArticleCard {...related} />
+                        {i < relatedArticles.length - 1 && (
+                          <div className="my-6 h-px bg-border" />
+                        )}
+                      </div>
                     ))}
                   </div>
                 </section>

@@ -37,8 +37,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id" suppressHydrationWarning>
-      <body className="flex min-h-screen flex-col font-sans">
+    <html lang="id">
+      <body className="flex min-h-screen flex-col font-sans bg-newsprint">
         <Providers>
           <Header />
           <main className="flex-1">{children}</main>

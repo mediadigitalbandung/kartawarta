@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Clock, Eye, User } from "lucide-react";
-import { timeAgo, truncate } from "@/lib/utils";
+import { truncate } from "@/lib/utils";
 
 interface ArticleCardProps {
   title: string;
@@ -17,12 +16,25 @@ interface ArticleCardProps {
   variant?: "default" | "featured" | "compact";
 }
 
-const verificationBadge: Record<string, { label: string; class: string }> = {
-  VERIFIED: { label: "Terverifikasi", class: "badge-verified" },
-  UNVERIFIED: { label: "Belum Diverifikasi", class: "badge-unverified" },
-  OPINION: { label: "Opini", class: "badge-opinion" },
-  CORRECTION: { label: "Koreksi", class: "badge-correction" },
-};
+function formatDate(date: Date | string | null): string {
+  if (!date) return "-";
+  const d = new Date(date);
+  return d.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function kickerSuffix(verificationLabel?: string): React.ReactNode {
+  if (verificationLabel === "OPINION") {
+    return <span className="italic"> (Opini)</span>;
+  }
+  if (verificationLabel === "CORRECTION") {
+    return <span className="text-red-600"> (Koreksi)</span>;
+  }
+  return null;
+}
 
 export default function ArticleCard({
   title,
@@ -37,12 +49,10 @@ export default function ArticleCard({
   verificationLabel = "UNVERIFIED",
   variant = "default",
 }: ArticleCardProps) {
-  const badge = verificationBadge[verificationLabel];
-
   if (variant === "featured") {
     return (
-      <article className="group relative overflow-hidden rounded-lg">
-        <div className="aspect-[2/1] w-full">
+      <article className="group relative overflow-hidden rounded-card">
+        <div className="aspect-[16/7] w-full">
           {featuredImage ? (
             <Image
               src={featuredImage}
@@ -51,48 +61,33 @@ export default function ArticleCard({
               className="object-cover transition-transform duration-700 group-hover:scale-105"
             />
           ) : (
-            <div className="h-full w-full bg-bg-card" />
+            <div className="h-full w-full bg-paper" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-press/70 via-press/30 to-transparent" />
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8">
-          <div className="mb-3 flex items-center gap-2">
+          <div className="mb-3">
             <Link
               href={`/kategori/${category.slug}`}
-              className="rounded bg-white/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-white backdrop-blur"
+              className="font-mono text-kicker uppercase tracking-widest text-wheat"
             >
               {category.name}
+              {kickerSuffix(verificationLabel)}
             </Link>
-            {badge && (
-              <span className={`rounded px-2 py-0.5 text-[11px] font-medium text-white ${badge.class}`}>
-                {badge.label}
-              </span>
-            )}
           </div>
           <Link href={`/berita/${slug}`}>
-            <h2 className="text-2xl font-extrabold leading-tight text-white sm:text-3xl">
+            <h2 className="font-serif text-3xl font-bold leading-tight text-newsprint sm:text-4xl">
               {title}
             </h2>
           </Link>
           {excerpt && (
-            <p className="mt-2 hidden max-w-2xl text-sm leading-relaxed text-text-muted sm:block">
+            <p className="mt-2 hidden max-w-2xl text-sm leading-relaxed text-newsprint/70 sm:block">
               {truncate(excerpt, 150)}
             </p>
           )}
-          <div className="mt-3 flex items-center gap-3 text-xs text-text-muted">
-            <span className="flex items-center gap-1">
-              <User size={12} /> {author.name}
-            </span>
-            <span className="h-3 w-px bg-white/20" />
-            <span>{publishedAt ? timeAgo(publishedAt) : "-"}</span>
-            {readTime && (
-              <>
-                <span className="h-3 w-px bg-white/20" />
-                <span className="flex items-center gap-1">
-                  <Clock size={12} /> {readTime} menit
-                </span>
-              </>
-            )}
+          <div className="mt-3 font-mono text-meta text-newsprint/50">
+            {formatDate(publishedAt)}
+            {readTime && <span> &middot; {readTime} menit baca</span>}
           </div>
         </div>
       </article>
@@ -102,32 +97,33 @@ export default function ArticleCard({
   if (variant === "compact") {
     return (
       <article className="group flex gap-3">
-        <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded">
+        <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-card">
           {featuredImage ? (
             <Image src={featuredImage} alt={title} fill className="object-cover" />
           ) : (
-            <div className="h-full w-full bg-bg-card" />
+            <div className="h-full w-full bg-paper" />
           )}
         </div>
         <div className="flex flex-1 flex-col justify-center">
           <Link
             href={`/berita/${slug}`}
-            className="line-clamp-2 text-sm text-text-secondary transition-colors duration-200 group-hover:text-white"
+            className="line-clamp-2 text-sm font-semibold leading-snug text-press transition-colors duration-200 group-hover:text-forest"
           >
             {title}
           </Link>
-          <p className="mt-1 text-xs text-text-muted">
-            {publishedAt ? timeAgo(publishedAt) : "-"}
+          <p className="mt-1 font-mono text-meta text-ink">
+            {formatDate(publishedAt)}
           </p>
         </div>
       </article>
     );
   }
 
-  // Default variant — landscape card for scroll rows
+  // Default variant — horizontal editorial list card
   return (
-    <article className="group w-[280px] shrink-0 overflow-hidden rounded-lg bg-bg-card transition-colors duration-200 hover:bg-bg-hover sm:w-[300px]">
-      <div className="relative aspect-[16/9] w-full overflow-hidden">
+    <article className="group flex gap-4 border-b border-border pb-5 mb-5">
+      {/* Thumbnail */}
+      <div className="relative aspect-[4/3] w-[240px] shrink-0 overflow-hidden rounded-card">
         {featuredImage ? (
           <Image
             src={featuredImage}
@@ -136,26 +132,32 @@ export default function ArticleCard({
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="h-full w-full bg-bg-secondary" />
+          <div className="h-full w-full bg-paper" />
         )}
-        <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/40 to-transparent" />
       </div>
-      <div className="p-3">
-        <div className="mb-1.5 flex items-center gap-2 text-[11px] text-text-muted">
-          <Link
-            href={`/kategori/${category.slug}`}
-            className="transition-colors hover:text-white"
-          >
-            {category.name}
-          </Link>
-          <span className="h-3 w-px bg-border" />
-          <span>{publishedAt ? timeAgo(publishedAt) : "-"}</span>
-        </div>
+      {/* Content */}
+      <div className="flex flex-1 flex-col justify-center">
+        <Link
+          href={`/kategori/${category.slug}`}
+          className="font-mono text-kicker uppercase tracking-widest text-forest mb-1.5"
+        >
+          {category.name}
+          {kickerSuffix(verificationLabel)}
+        </Link>
         <Link href={`/berita/${slug}`}>
-          <h3 className="line-clamp-2 text-sm font-semibold text-white">
+          <h3 className="line-clamp-2 text-base font-semibold leading-snug text-press transition-colors duration-200 group-hover:text-forest">
             {title}
           </h3>
         </Link>
+        {excerpt && (
+          <p className="mt-1.5 line-clamp-2 text-sm text-ink">
+            {truncate(excerpt, 120)}
+          </p>
+        )}
+        <div className="mt-2 font-mono text-meta text-ink">
+          {formatDate(publishedAt)}
+          {readTime && <span> &middot; {readTime} menit baca</span>}
+        </div>
       </div>
     </article>
   );

@@ -5,54 +5,46 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: {
-          DEFAULT: "#0a0a0a",
-          secondary: "#141414",
-          tertiary: "#1a1a1a",
-          card: "#1e1e1e",
-          hover: "#252525",
-          elevated: "#2a2a2a",
+        forest: {
+          DEFAULT: "#1B4332",
+          light: "#2D6A4F",
         },
-        brand: {
-          DEFAULT: "#0d7c4a",
-          dark: "#095e38",
-          light: "#10b068",
-        },
+        canopy: "#2D6A4F",
+        sage: "#52B788",
         gold: {
-          DEFAULT: "#c9a84c",
-          dark: "#a68a3a",
-          light: "#dfc06a",
-          pale: "#f5ecd0",
+          DEFAULT: "#D4A017",
+          light: "#F0C040",
         },
-        accent: {
-          blue: "#0ea5e9",
-          green: "#10b068",
-          yellow: "#c9a84c",
-          purple: "#a855f7",
-        },
-        text: {
-          primary: "#ffffff",
-          secondary: "#a1a1aa",
-          muted: "#71717a",
-          dim: "#52525b",
-        },
+        wheat: "#F0C040",
+        press: "#111110",
+        newsprint: "#FAFCF8",
+        paper: "#F3F5F0",
+        ink: "#6B7280",
         border: {
-          DEFAULT: "#27272a",
-          light: "#3f3f46",
-          hover: "#52525b",
+          DEFAULT: "#E5E7EB",
+          dark: "#D1D5DB",
         },
       },
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', '"Inter"', "system-ui", "sans-serif"],
-        serif: ['"Merriweather"', "Georgia", "serif"],
+        sans: ['"DM Sans"', "system-ui", "sans-serif"],
+        serif: ['"Cormorant Garamond"', "Georgia", "serif"],
+        mono: ['"DM Mono"', "ui-monospace", "monospace"],
+      },
+      fontSize: {
+        kicker: ["10px", { lineHeight: "1.4", letterSpacing: "0.08em", fontWeight: "500" }],
+        meta: ["11px", { lineHeight: "1.4", fontWeight: "400" }],
+        caption: ["10px", { lineHeight: "1.4", fontWeight: "400" }],
+      },
+      borderWidth: {
+        thin: "0.5px",
+      },
+      borderRadius: {
+        card: "4px",
       },
       animation: {
         "fade-in": "fadeIn 0.4s ease-out",
         "fade-up": "fadeUp 0.5s ease-out",
-        "slide-left": "slideLeft 0.3s ease-out",
-        "slide-right": "slideRight 0.3s ease-out",
-        shimmer: "shimmer 2s infinite linear",
-        "scroll-x": "scrollX 30s linear infinite",
+        "scroll-x": "scrollX 35s linear infinite",
       },
       keyframes: {
         fadeIn: {
@@ -60,20 +52,8 @@ const config: Config = {
           "100%": { opacity: "1" },
         },
         fadeUp: {
-          "0%": { opacity: "0", transform: "translateY(16px)" },
+          "0%": { opacity: "0", transform: "translateY(12px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        slideLeft: {
-          "0%": { transform: "translateX(100%)" },
-          "100%": { transform: "translateX(0)" },
-        },
-        slideRight: {
-          "0%": { transform: "translateX(-100%)" },
-          "100%": { transform: "translateX(0)" },
-        },
-        shimmer: {
-          "0%": { backgroundPosition: "-200% 0" },
-          "100%": { backgroundPosition: "200% 0" },
         },
         scrollX: {
           "0%": { transform: "translateX(100%)" },

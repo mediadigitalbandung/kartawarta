@@ -36,34 +36,34 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg px-4">
-      <div className="w-full max-w-sm rounded-lg border border-border bg-bg-card p-8">
+    <div className="flex min-h-screen items-center justify-center bg-paper px-4">
+      <div className="w-full max-w-sm rounded-card border border-border bg-newsprint p-8 shadow-sm">
         {/* Logo */}
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-brand text-lg font-extrabold text-white">
-            JH
+          <div className="mb-4">
+            <span className="font-serif text-2xl font-bold text-forest">JHB</span>
           </div>
-          <h1 className="text-xl font-bold text-white">
+          <h1 className="text-xl font-semibold text-press">
             Masuk ke Panel
           </h1>
-          <p className="mt-2 text-sm text-text-muted">
+          <p className="mt-2 text-sm text-ink">
             Jurnalis Hukum Bandung
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          <div className="mb-6 rounded-card bg-red-50 px-4 py-3 text-sm text-red-600">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="email" className="mb-1.5 block text-sm font-semibold text-white">
+            <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-press">
               Email
             </label>
             <div className="relative">
-              <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
+              <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-ink" />
               <input
                 id="email"
                 type="email"
@@ -77,11 +77,11 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="mb-1.5 block text-sm font-semibold text-white">
+            <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-press">
               Password
             </label>
             <div className="relative">
-              <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
+              <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-ink" />
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
@@ -94,7 +94,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted transition-colors hover:text-white"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-ink transition-colors hover:text-press"
               >
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
@@ -110,10 +110,10 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="mt-8 text-center text-xs text-text-muted">
+        <p className="mt-8 text-center text-xs text-ink">
           Hanya untuk jurnalis dan redaksi terdaftar.
           <br />
-          <Link href="/kontak" className="mt-1 inline-block text-gold transition-colors hover:text-gold-light hover:underline">
+          <Link href="/kontak" className="mt-1 inline-block text-forest transition-colors hover:text-canopy hover:underline">
             Hubungi admin
           </Link>{" "}
           untuk registrasi akun.
