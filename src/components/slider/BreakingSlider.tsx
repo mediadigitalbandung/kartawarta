@@ -93,9 +93,9 @@ export default function BreakingSlider({ items }: BreakingSliderProps) {
             >
               {/* Background image with Ken Burns */}
               <div
-                className="absolute inset-0"
+                className="absolute -inset-1"
                 style={{
-                  transform: isActive ? "scale(1.06)" : "scale(1)",
+                  transform: isActive ? "scale(1.04)" : "scale(1.01)",
                   transition: isActive ? "transform 6s ease-out" : "none",
                 }}
               >
@@ -107,12 +107,12 @@ export default function BreakingSlider({ items }: BreakingSliderProps) {
                     className="object-cover"
                   />
                 ) : (
-                  <div className="h-full w-full bg-gradient-to-br from-gray-800 to-surface-dark" />
+                  <div className="h-full w-full bg-surface-dark" />
                 )}
               </div>
 
-              {/* Dark overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/30" />
+              {/* Dark overlay — single smooth gradient */}
+              <div className="absolute -inset-1 bg-gradient-to-t from-black/90 from-10% via-black/50 via-50% to-black/20" />
 
               {/* Content — slide up */}
               <div
