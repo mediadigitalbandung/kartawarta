@@ -14,19 +14,36 @@ interface SidebarProps {
   popular?: SidebarArticle[];
 }
 
+function formatTime(dateStr: string): string {
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 60) return `${diffMins}m yang lalu`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}j yang lalu`;
+  return d.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+  });
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="border-l-[3px] border-goto-green pl-3 text-sm font-bold uppercase tracking-wide text-txt-primary">
+      {children}
+    </h3>
+  );
+}
+
 export default function Sidebar({ trending = [], recent = [], popular = [] }: SidebarProps) {
   return (
-    <aside className="space-y-5">
+    <aside className="space-y-8">
       {/* Trending */}
       {trending.length > 0 && (
-        <div className="rounded-[12px] border border-border bg-surface p-5 shadow-card">
-          <div className="mb-4">
-            <h3 className="text-sm font-bold uppercase tracking-wide text-txt-primary">
-              Trending
-            </h3>
-            <div className="mt-1.5 h-0.5 w-8 rounded-full bg-goto-green" />
-          </div>
-          <ul>
+        <div>
+          <SectionTitle>Trending</SectionTitle>
+          <ul className="mt-4">
             {trending.map((article, i) => (
               <li
                 key={article.slug}
@@ -40,11 +57,11 @@ export default function Sidebar({ trending = [], recent = [], popular = [] }: Si
                 <div className="flex-1">
                   <Link
                     href={`/berita/${article.slug}`}
-                    className="text-sm font-semibold leading-snug text-txt-primary transition-colors duration-200 hover:text-goto-green"
+                    className="text-sm font-semibold leading-snug text-txt-primary hover:underline"
                   >
                     {article.title}
                   </Link>
-                  <p className="mt-1 text-xs text-txt-secondary">{article.category}</p>
+                  <p className="mt-1 text-xs text-txt-muted">{article.category}</p>
                 </div>
               </li>
             ))}
@@ -54,14 +71,9 @@ export default function Sidebar({ trending = [], recent = [], popular = [] }: Si
 
       {/* Terbaru */}
       {recent.length > 0 && (
-        <div className="rounded-[12px] border border-border bg-surface p-5 shadow-card">
-          <div className="mb-4">
-            <h3 className="text-sm font-bold uppercase tracking-wide text-txt-primary">
-              Terbaru
-            </h3>
-            <div className="mt-1.5 h-0.5 w-8 rounded-full bg-goto-green" />
-          </div>
-          <ul>
+        <div>
+          <SectionTitle>Terbaru</SectionTitle>
+          <ul className="mt-4">
             {recent.map((article, i) => (
               <li
                 key={article.slug}
@@ -71,11 +83,13 @@ export default function Sidebar({ trending = [], recent = [], popular = [] }: Si
               >
                 <Link
                   href={`/berita/${article.slug}`}
-                  className="text-sm font-semibold leading-snug text-txt-primary transition-colors duration-200 hover:text-goto-green"
+                  className="text-sm font-semibold leading-snug text-txt-primary hover:underline"
                 >
                   {article.title}
                 </Link>
-                <p className="mt-1 text-xs text-txt-secondary">{article.publishedAt}</p>
+                <p className="mt-1 text-xs text-txt-muted">
+                  {formatTime(article.publishedAt)}
+                </p>
               </li>
             ))}
           </ul>
@@ -84,14 +98,9 @@ export default function Sidebar({ trending = [], recent = [], popular = [] }: Si
 
       {/* Paling Dibaca */}
       {popular.length > 0 && (
-        <div className="rounded-[12px] border border-border bg-surface p-5 shadow-card">
-          <div className="mb-4">
-            <h3 className="text-sm font-bold uppercase tracking-wide text-txt-primary">
-              Paling Dibaca
-            </h3>
-            <div className="mt-1.5 h-0.5 w-8 rounded-full bg-goto-green" />
-          </div>
-          <ul>
+        <div>
+          <SectionTitle>Paling Dibaca</SectionTitle>
+          <ul className="mt-4">
             {popular.map((article, i) => (
               <li
                 key={article.slug}
@@ -101,11 +110,11 @@ export default function Sidebar({ trending = [], recent = [], popular = [] }: Si
               >
                 <Link
                   href={`/berita/${article.slug}`}
-                  className="text-sm font-semibold leading-snug text-txt-primary transition-colors duration-200 hover:text-goto-green"
+                  className="text-sm font-semibold leading-snug text-txt-primary hover:underline"
                 >
                   {article.title}
                 </Link>
-                <div className="mt-1 flex items-center gap-2 text-xs text-txt-secondary">
+                <div className="mt-1 flex items-center gap-2 text-xs text-txt-muted">
                   <span>{article.category}</span>
                   {article.viewCount && (
                     <>

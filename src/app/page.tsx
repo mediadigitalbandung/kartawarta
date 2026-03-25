@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import ArticleCard from "@/components/artikel/ArticleCard";
 import NewsTicker from "@/components/layout/NewsTicker";
-import { Scale, BookOpen, Gavel, Shield, Users, Landmark, LucideIcon, Newspaper, Globe, Monitor, Building2, FileText, AlertTriangle } from "lucide-react";
+import { Scale, BookOpen, Gavel, Shield, Users, Landmark, LucideIcon, Globe, Monitor, Building2, FileText, AlertTriangle } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 const categoryIconMap: Record<string, LucideIcon> = {
@@ -52,6 +52,7 @@ export default async function HomePage() {
   ]);
 
   const featured = articles[0];
+  const heroSidebar = articles.slice(1, 4);
   const restArticles = articles.slice(1);
 
   const tickerItems = tickerArticles.map((a) => ({
@@ -59,93 +60,109 @@ export default async function HomePage() {
     slug: a.slug,
   }));
 
-  // Stats
-  const totalArticles = await prisma.article.count({ where: { status: "PUBLISHED" } });
-  const totalCategories = categories.length;
-  const totalAuthors = await prisma.user.count({ where: { role: { in: ["SENIOR_JOURNALIST", "JOURNALIST", "CONTRIBUTOR", "EDITOR", "CHIEF_EDITOR"] } } });
+  // Group remaining articles by category for category sections
+  const articlesByCategory: Record<string, { categorySlug: string; articles: typeof restArticles }> = {};
+  for (const article of restArticles) {
+    const catName = article.category.name;
+    if (!articlesByCategory[catName]) {
+      articlesByCategory[catName] = {
+        categorySlug: article.category.slug,
+        articles: [],
+      };
+    }
+    articlesByCategory[catName].articles.push(article);
+  }
+
+  const categoryEntries = Object.entries(articlesByCategory);
 
   return (
     <>
       <NewsTicker items={tickerItems} />
 
-      {/* Hero: Featured Article */}
+      {/* Hero Section */}
       {featured && (
-        <section className="bg-surface-dark py-12">
+        <section className="bg-surface py-8">
           <div className="container-main">
-            <ArticleCard {...featured} variant="featured" />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left: Hero article */}
+              <div className="lg:col-span-2">
+                <ArticleCard {...featured} variant="hero" />
+              </div>
+              {/* Right: Compact stacked cards */}
+              {heroSidebar.length > 0 && (
+                <div className="lg:col-span-1 divide-y divide-border">
+                  {heroSidebar.map((a) => (
+                    <ArticleCard key={a.slug} {...a} variant="compact" />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </section>
       )}
 
-      {/* Stats Section */}
-      <section className="bg-surface py-12">
-        <div className="container-main">
-          <div className="grid grid-cols-3 gap-6 text-center">
-            <div>
-              <div className="stat-number">{totalArticles}</div>
-              <div className="stat-label">Total Artikel</div>
-            </div>
-            <div>
-              <div className="stat-number">{totalCategories}</div>
-              <div className="stat-label">Kategori</div>
-            </div>
-            <div>
-              <div className="stat-number">{totalAuthors}</div>
-              <div className="stat-label">Penulis</div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Thin separator */}
+      <div className="border-b border-border" />
 
-      {/* Berita Terkini */}
-      <section className="bg-surface-secondary py-12">
-        <div className="container-main">
-          <div className="section-header">
-            <h2 className="section-title">Berita Terkini</h2>
-            <Link href="/berita" className="section-link">Lihat Semua</Link>
-          </div>
-
-          {restArticles.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {restArticles.map((a) => (
-                <ArticleCard key={a.slug} {...a} />
+      {/* Category Sections */}
+      {categoryEntries.map(([categoryName, { categorySlug, articles: catArticles }], idx) => (
+        <section
+          key={categorySlug}
+          className={`py-8 ${idx % 2 === 0 ? "bg-surface" : "bg-surface-secondary"}`}
+        >
+          <div className="container-main">
+            {/* Section header with green left border */}
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
+                {categoryName}
+              </h2>
+              <Link
+                href={`/kategori/${categorySlug}`}
+                className="text-sm font-medium text-goto-green hover:underline"
+              >
+                Selengkapnya
+              </Link>
+            </div>
+            {/* Grid of standard cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {catArticles.map((a) => (
+                <ArticleCard key={a.slug} {...a} variant="standard" />
               ))}
             </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-surface-tertiary">
-                <Newspaper className="h-8 w-8 text-txt-secondary" />
-              </div>
-              <h3 className="text-base font-semibold text-txt-primary">Belum ada berita</h3>
-              <p className="mt-1 text-sm text-txt-secondary">Berita terbaru akan segera hadir.</p>
-            </div>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      ))}
 
-      {/* Kategori */}
-      <section className="bg-surface py-12">
+      {/* Thin separator */}
+      <div className="border-b border-border" />
+
+      {/* Kategori Links */}
+      <section className="bg-surface py-8">
         <div className="container-main">
-          <div className="section-header">
-            <h2 className="section-title">Kategori</h2>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
+              Kategori
+            </h2>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {categories.map((cat) => {
               const Icon = categoryIconMap[cat.slug] || defaultIcon;
               return (
                 <Link
                   key={cat.slug}
                   href={`/kategori/${cat.slug}`}
-                  className="group rounded-[12px] border border-border bg-surface p-6 transition-all duration-300 hover:shadow-card-hover hover:border-goto-green/30"
+                  className="group flex items-center gap-3 rounded-lg border border-border bg-surface p-4 transition-all duration-200 hover:border-goto-green/40 hover:shadow-sm"
                 >
-                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-goto-light text-goto-green">
-                    <Icon size={20} />
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-goto-light text-goto-green">
+                    <Icon size={18} />
                   </div>
-                  <span className="block text-sm font-semibold text-txt-primary">
-                    {cat.name}
-                  </span>
-                  <span className="block text-sm text-txt-secondary mt-1">{cat._count.articles} artikel</span>
+                  <div className="min-w-0">
+                    <span className="block text-sm font-semibold text-txt-primary truncate group-hover:text-goto-green transition-colors">
+                      {cat.name}
+                    </span>
+                    <span className="block text-xs text-txt-muted">{cat._count.articles} artikel</span>
+                  </div>
                 </Link>
               );
             })}
