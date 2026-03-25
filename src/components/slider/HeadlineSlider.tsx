@@ -112,7 +112,7 @@ export default function HeadlineSlider({ items }: HeadlineSliderProps) {
 
               {/* Content — slides up on enter */}
               <div
-                className="absolute bottom-0 left-0 right-0 p-5 sm:p-8"
+                className="absolute bottom-0 left-0 right-0 px-5 pt-5 pb-9 sm:px-8 sm:pt-8 sm:pb-12"
                 style={{
                   transform: isActive && transitioning ? "translateY(0)" : isActive ? "translateY(0)" : "translateY(20px)",
                   opacity: isActive ? 1 : 0,
@@ -174,54 +174,24 @@ export default function HeadlineSlider({ items }: HeadlineSliderProps) {
         </>
       )}
 
-      {/* Dots + progress bar */}
+      {/* Dots — positioned above content, centered */}
       {total > 1 && (
-        <div className="absolute bottom-0 left-0 right-0">
-          {/* Dots */}
-          <div className="flex items-center justify-center gap-1.5 pb-2.5">
-            {items.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => goToSlide(i)}
-                className={`rounded-full transition-all duration-300 ${
-                  i === current
-                    ? "h-2 w-2 bg-white"
-                    : "h-1.5 w-1.5 bg-white/30 hover:bg-white/50"
-                }`}
-                aria-label={`Slide ${i + 1}`}
-              />
-            ))}
-          </div>
-          {/* Thin progress bar */}
-          <div className="flex gap-px">
-            {items.map((_, i) => (
-              <div
-                key={i}
-                className="relative h-[2px] flex-1 bg-white/10 overflow-hidden cursor-pointer"
-                onClick={() => goToSlide(i)}
-              >
-                <div
-                  className={`absolute inset-y-0 left-0 bg-white/60 ${
-                    i === current ? "animate-progress" : i < current ? "w-full" : "w-0"
-                  }`}
-                  ref={i === current ? progressRef : undefined}
-                />
-              </div>
-            ))}
-          </div>
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+          {items.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => goToSlide(i)}
+              className={`rounded-full transition-all duration-300 ${
+                i === current
+                  ? "h-2.5 w-2.5 bg-white shadow-[0_0_6px_rgba(255,255,255,0.4)]"
+                  : "h-2 w-2 bg-white/30 hover:bg-white/60"
+              }`}
+              aria-label={`Slide ${i + 1}`}
+            />
+          ))}
         </div>
       )}
 
-      {/* Progress bar animation */}
-      <style jsx>{`
-        @keyframes progressFill {
-          from { width: 0%; }
-          to { width: 100%; }
-        }
-        .animate-progress {
-          animation: progressFill 7s linear forwards;
-        }
-      `}</style>
     </div>
   );
 }
