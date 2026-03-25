@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface BreakingItem {
   title: string;
@@ -42,6 +43,14 @@ export default function BreakingSlider({ items }: BreakingSliderProps) {
       goToSlide((current + 1) % total);
     }, 5000);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [current, total, goToSlide]);
+
+  const next = useCallback(() => {
+    goToSlide((current + 1) % total);
+  }, [current, total, goToSlide]);
+
+  const prev = useCallback(() => {
+    goToSlide((current - 1 + total) % total);
   }, [current, total, goToSlide]);
 
   if (total === 0) return null;
@@ -135,6 +144,26 @@ export default function BreakingSlider({ items }: BreakingSliderProps) {
           </span>
         </div>
       </div>
+
+      {/* Arrows — always visible, elegant */}
+      {total > 1 && (
+        <>
+          <button
+            onClick={prev}
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/50 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
+            aria-label="Previous"
+          >
+            <ChevronLeft size={16} strokeWidth={1.5} />
+          </button>
+          <button
+            onClick={next}
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/50 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
+            aria-label="Next"
+          >
+            <ChevronRight size={16} strokeWidth={1.5} />
+          </button>
+        </>
+      )}
 
       {/* Dot indicators */}
       {total > 1 && (

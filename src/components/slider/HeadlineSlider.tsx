@@ -154,22 +154,22 @@ export default function HeadlineSlider({ items }: HeadlineSliderProps) {
         })}
       </div>
 
-      {/* Arrows — appear on hover */}
+      {/* Arrows — always visible, elegant */}
       {total > 1 && (
         <>
           <button
             onClick={prev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/60 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/20 hover:text-white"
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/50 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
             aria-label="Previous"
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft size={18} strokeWidth={1.5} />
           </button>
           <button
             onClick={next}
-            className="absolute right-4 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/60 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/20 hover:text-white"
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/50 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
             aria-label="Next"
           >
-            <ChevronRight size={20} />
+            <ChevronRight size={18} strokeWidth={1.5} />
           </button>
         </>
       )}
