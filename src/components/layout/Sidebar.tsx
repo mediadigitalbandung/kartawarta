@@ -17,29 +17,32 @@ interface SidebarProps {
 
 export default function Sidebar({ trending = [], recent = [], popular = [] }: SidebarProps) {
   return (
-    <aside className="space-y-6">
+    <aside className="space-y-8">
       {/* Trending */}
       {trending.length > 0 && (
-        <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-          <h3 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-white">
-            <TrendingUp size={16} className="text-accent" />
+        <div className="card-flat p-6">
+          <h3 className="section-title mb-5 flex items-center gap-2">
+            <TrendingUp size={18} className="text-accent" />
             Trending
           </h3>
-          <ul className="space-y-3">
+          <ul className="space-y-0">
             {trending.map((article, i) => (
-              <li key={article.slug} className="flex gap-3">
-                <span className="shrink-0 text-2xl font-bold text-gray-200 dark:text-gray-700">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div>
-                  <Link
-                    href={`/berita/${article.slug}`}
-                    className="text-sm font-medium leading-snug text-gray-800 hover:text-primary-500 dark:text-gray-200"
-                  >
-                    {article.title}
-                  </Link>
-                  <p className="mt-0.5 text-xs text-gray-500">{article.category}</p>
+              <li key={article.slug}>
+                <div className="flex gap-4 py-4">
+                  <span className="shrink-0 text-3xl font-extrabold text-gradient leading-none">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div className="flex-1">
+                    <Link
+                      href={`/berita/${article.slug}`}
+                      className="text-sm font-semibold leading-snug text-gray-800 transition-colors duration-200 hover:text-primary-500 dark:text-gray-200"
+                    >
+                      {article.title}
+                    </Link>
+                    <p className="mt-1 text-xs text-gray-500">{article.category}</p>
+                  </div>
                 </div>
+                {i < trending.length - 1 && <div className="divider-gradient" />}
               </li>
             ))}
           </ul>
@@ -48,63 +51,68 @@ export default function Sidebar({ trending = [], recent = [], popular = [] }: Si
 
       {/* Terbaru */}
       {recent.length > 0 && (
-        <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-          <h3 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-white">
-            <Clock size={16} className="text-primary-500" />
+        <div className="card-flat p-6">
+          <h3 className="section-title mb-5 flex items-center gap-2">
+            <Clock size={18} className="text-primary-500" />
             Terbaru
           </h3>
-          <ul className="space-y-3">
-            {recent.map((article) => (
-              <li key={article.slug} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0 dark:border-gray-800">
-                <Link
-                  href={`/berita/${article.slug}`}
-                  className="text-sm font-medium text-gray-800 hover:text-primary-500 dark:text-gray-200"
-                >
-                  {article.title}
-                </Link>
-                <p className="mt-0.5 text-xs text-gray-500">{article.publishedAt}</p>
+          <ul className="space-y-0">
+            {recent.map((article, i) => (
+              <li key={article.slug}>
+                <div className="py-4">
+                  <Link
+                    href={`/berita/${article.slug}`}
+                    className="text-sm font-semibold text-gray-800 transition-colors duration-200 hover:text-primary-500 dark:text-gray-200"
+                  >
+                    {article.title}
+                  </Link>
+                  <p className="mt-1 text-xs text-gray-500">{article.publishedAt}</p>
+                </div>
+                {i < recent.length - 1 && <div className="divider-gradient" />}
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      {/* Populer */}
+      {/* Paling Dibaca */}
       {popular.length > 0 && (
-        <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-          <h3 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-gray-900 dark:text-white">
-            <Eye size={16} className="text-green-500" />
+        <div className="card-flat p-6">
+          <h3 className="section-title mb-5 flex items-center gap-2">
+            <Eye size={18} className="text-emerald-500" />
             Paling Dibaca
           </h3>
-          <ul className="space-y-3">
-            {popular.map((article) => (
-              <li key={article.slug} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0 dark:border-gray-800">
-                <Link
-                  href={`/berita/${article.slug}`}
-                  className="text-sm font-medium text-gray-800 hover:text-primary-500 dark:text-gray-200"
-                >
-                  {article.title}
-                </Link>
-                <div className="mt-0.5 flex items-center gap-2 text-xs text-gray-500">
-                  <span>{article.category}</span>
-                  {article.viewCount && (
-                    <>
-                      <span>&middot;</span>
-                      <span>{article.viewCount.toLocaleString("id-ID")} views</span>
-                    </>
-                  )}
+          <ul className="space-y-0">
+            {popular.map((article, i) => (
+              <li key={article.slug}>
+                <div className="flex gap-4 py-4">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-gradient text-xs font-bold text-white shadow-md shadow-primary-500/20">
+                    {i + 1}
+                  </div>
+                  <div className="flex-1">
+                    <Link
+                      href={`/berita/${article.slug}`}
+                      className="text-sm font-semibold text-gray-800 transition-colors duration-200 hover:text-primary-500 dark:text-gray-200"
+                    >
+                      {article.title}
+                    </Link>
+                    <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
+                      <span>{article.category}</span>
+                      {article.viewCount && (
+                        <>
+                          <span className="h-3 w-px bg-gray-300 dark:bg-gray-600" />
+                          <span>{article.viewCount.toLocaleString("id-ID")} views</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </div>
+                {i < popular.length - 1 && <div className="divider-gradient" />}
               </li>
             ))}
           </ul>
         </div>
       )}
-
-      {/* Ad slot - Sidebar */}
-      <div className="rounded-lg border-2 border-dashed border-gray-200 bg-gray-50 p-4 text-center dark:border-gray-700 dark:bg-gray-800">
-        <p className="text-xs text-gray-400">IKLAN - 300x250</p>
-        <div className="mx-auto mt-2 h-[250px] w-[300px] bg-gray-200 dark:bg-gray-700" />
-      </div>
     </aside>
   );
 }

@@ -2,133 +2,159 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap");
 
 @layer base {
+  * {
+    @apply border-gray-200 dark:border-gray-800;
+  }
   body {
-    @apply bg-white text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100;
+    @apply bg-surface-secondary text-gray-900 antialiased dark:bg-surface-dark dark:text-gray-100;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  ::selection {
+    @apply bg-primary-500/20 text-primary-900 dark:text-primary-100;
   }
 }
 
 @layer components {
+  /* Modern container */
   .container-main {
     @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 
-  .news-ticker {
-    @apply overflow-hidden whitespace-nowrap;
+  /* Glass morphism card */
+  .glass {
+    @apply bg-white/80 backdrop-blur-xl border border-white/20 dark:bg-gray-900/80 dark:border-gray-700/30;
+  }
+  .glass-strong {
+    @apply bg-white/95 backdrop-blur-2xl border border-gray-200/50 shadow-glass dark:bg-gray-900/95 dark:border-gray-700/50;
   }
 
-  .news-ticker-content {
-    display: inline-block;
-    animation: ticker 30s linear infinite;
+  /* Modern cards */
+  .card {
+    @apply rounded-2xl border border-gray-200/60 bg-white shadow-soft transition-all duration-300 dark:border-gray-800/60 dark:bg-gray-900;
+  }
+  .card:hover {
+    @apply shadow-soft-lg -translate-y-0.5 border-gray-300/60 dark:border-gray-700/60;
+  }
+  .card-flat {
+    @apply rounded-2xl border border-gray-200/60 bg-white dark:border-gray-800/60 dark:bg-gray-900;
   }
 
-  .article-content h2 {
-    @apply mt-8 mb-4 text-xl font-bold text-gray-900 dark:text-white;
-  }
-
-  .article-content h3 {
-    @apply mt-6 mb-3 text-lg font-bold text-gray-900 dark:text-white;
-  }
-
-  .article-content p {
-    @apply mb-4;
-  }
-
-  .article-content blockquote {
-    @apply my-6 border-l-4 border-primary-500 bg-gray-50 px-6 py-4 italic text-gray-700 dark:bg-gray-800/50 dark:text-gray-300;
-  }
-
-  .article-content ul, .article-content ol {
-    @apply mb-4 ml-6 space-y-2;
-  }
-
-  .article-content ul {
-    @apply list-disc;
-  }
-
-  .article-content ol {
-    @apply list-decimal;
-  }
-
-  .article-content li {
-    @apply text-gray-700 dark:text-gray-300;
-  }
-
-  .article-content img {
-    @apply my-4 rounded-lg;
-  }
-
-  .article-content a {
-    @apply text-primary-500 underline hover:text-primary-600;
-  }
-
-  .article-content table {
-    @apply my-4 w-full border-collapse border border-gray-200 dark:border-gray-700;
-  }
-
-  .article-content th, .article-content td {
-    @apply border border-gray-200 px-4 py-2 text-left dark:border-gray-700;
-  }
-
-  .article-content th {
-    @apply bg-gray-50 font-semibold dark:bg-gray-800;
-  }
-
+  /* Modern badges */
   .badge {
-    @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium;
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider;
   }
-
   .badge-verified {
-    @apply bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400;
+    @apply bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:ring-emerald-800;
   }
-
   .badge-unverified {
-    @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200;
+    @apply bg-amber-50 text-amber-700 ring-1 ring-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-800;
   }
-
   .badge-opinion {
-    @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200;
+    @apply bg-blue-50 text-blue-700 ring-1 ring-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:ring-blue-800;
   }
-
   .badge-correction {
-    @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200;
+    @apply bg-rose-50 text-rose-700 ring-1 ring-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:ring-rose-800;
   }
 
+  /* Modern buttons */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-primary-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-primary-500/25 transition-all duration-200 hover:shadow-lg hover:shadow-primary-500/30 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:shadow-none disabled:translate-y-0;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition-all duration-200 hover:bg-gray-50 hover:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700;
+  }
+  .btn-accent {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-accent-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-red-500/25 transition-all duration-200 hover:shadow-lg hover:shadow-red-500/30 hover:-translate-y-0.5;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-gray-600 transition-all duration-200 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800;
+  }
+
+  /* Section headers */
+  .section-title {
+    @apply text-lg font-bold text-gray-900 dark:text-white;
+  }
+  .section-title::after {
+    content: "";
+    @apply mt-2 block h-1 w-10 rounded-full bg-primary-gradient;
+  }
+
+  /* News ticker */
+  .news-ticker {
+    overflow: hidden;
+    position: relative;
+  }
+  .news-ticker-content {
+    display: flex;
+    white-space: nowrap;
+    animation: ticker-scroll 35s linear infinite;
+  }
+  .news-ticker:hover .news-ticker-content {
+    animation-play-state: paused;
+  }
+
+  /* Loading skeleton */
   .skeleton {
-    @apply animate-pulse rounded bg-gray-200 dark:bg-gray-700;
+    @apply animate-pulse rounded-xl bg-gray-200 dark:bg-gray-800;
+  }
+  .skeleton-shimmer {
+    @apply relative overflow-hidden rounded-xl bg-gray-200 dark:bg-gray-800;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite linear;
+  }
+
+  /* Modern input */
+  .input {
+    @apply w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm transition-all duration-200 placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-4 focus:ring-primary-500/10 dark:border-gray-700 dark:bg-gray-800/50 dark:focus:ring-primary-400/10;
+  }
+
+  /* Gradient text */
+  .text-gradient {
+    @apply bg-primary-gradient bg-clip-text text-transparent;
+  }
+
+  /* Divider */
+  .divider-gradient {
+    @apply h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-700;
   }
 }
 
-@keyframes ticker {
-  0% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
+/* Article content typography */
+.article-content h2 {
+  @apply mt-10 mb-4 text-xl font-bold text-gray-900 dark:text-white relative pl-4 border-l-4 border-primary-500;
 }
+.article-content h3 {
+  @apply mt-8 mb-3 text-lg font-bold text-gray-900 dark:text-white;
+}
+.article-content p {
+  @apply mb-5 leading-relaxed;
+}
+.article-content blockquote {
+  @apply my-8 rounded-r-xl border-l-4 border-primary-500 bg-primary-50/50 px-6 py-5 italic text-gray-700 dark:bg-primary-900/10 dark:text-gray-300;
+}
+.article-content ul, .article-content ol {
+  @apply mb-5 ml-6 space-y-2;
+}
+.article-content ul { @apply list-disc; }
+.article-content ol { @apply list-decimal; }
+.article-content li { @apply text-gray-700 dark:text-gray-300 leading-relaxed; }
+.article-content a { @apply text-primary-500 underline decoration-primary-300 underline-offset-2 hover:text-primary-600 hover:decoration-primary-500 transition-colors; }
+.article-content img { @apply my-6 rounded-2xl shadow-soft; }
+.article-content table { @apply my-6 w-full border-collapse overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700; }
+.article-content th, .article-content td { @apply border border-gray-200 px-4 py-3 text-left dark:border-gray-700; }
+.article-content th { @apply bg-gray-50 font-semibold text-gray-900 dark:bg-gray-800 dark:text-white; }
 
-/* News ticker animation enhancements */
-.news-ticker {
-  overflow: hidden;
-  position: relative;
-}
-.news-ticker-content {
-  display: flex;
-  white-space: nowrap;
-  animation: ticker-scroll 30s linear infinite;
-}
+/* Keyframes */
 @keyframes ticker-scroll {
   0% { transform: translateX(100%); }
   100% { transform: translateX(-100%); }
 }
-.news-ticker:hover .news-ticker-content {
-  animation-play-state: paused;
-}
 
-/* Copy protection overlay text */
-::selection {
-  background-color: rgba(30, 64, 175, 0.3);
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }

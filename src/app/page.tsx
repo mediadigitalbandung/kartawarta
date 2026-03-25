@@ -4,7 +4,7 @@ import Link from "next/link";
 import ArticleCard from "@/components/artikel/ArticleCard";
 import Sidebar from "@/components/layout/Sidebar";
 import NewsTicker from "@/components/layout/NewsTicker";
-import { Scale, BookOpen, Gavel, Shield, Users, Landmark, LucideIcon } from "lucide-react";
+import { Scale, BookOpen, Gavel, Shield, Users, Landmark, LucideIcon, Newspaper } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 const categoryIconMap: Record<string, LucideIcon> = {
@@ -68,76 +68,114 @@ export default async function HomePage() {
     <>
       <NewsTicker items={tickerItems} />
 
+      {/* Hero gradient section */}
+      <div className="relative overflow-hidden bg-primary-gradient">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
+        <div className="container-main relative py-10">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
+              <Scale className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-extrabold tracking-tight text-white sm:text-2xl">
+                Jurnalis Hukum Bandung
+              </h1>
+              <p className="text-sm text-white/70">Portal berita hukum terpercaya</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Header Banner Ad Slot */}
       {headerAds.length > 0 && (
         <div className="border-b border-gray-200 bg-gray-50 py-3 text-center dark:border-gray-800 dark:bg-gray-900">
           <div className="container-main">
-            <div className="mx-auto h-[90px] max-w-[728px] rounded border-2 border-dashed border-gray-300 bg-gray-100 flex items-center justify-center dark:border-gray-600 dark:bg-gray-800">
+            <div className="mx-auto h-[90px] max-w-[728px] rounded-xl border-2 border-dashed border-gray-300 bg-gray-100 flex items-center justify-center dark:border-gray-600 dark:bg-gray-800">
               <span className="text-xs text-gray-400">IKLAN BANNER - 728x90</span>
             </div>
           </div>
         </div>
       )}
 
-      <div className="container-main py-8">
+      <div className="container-main py-10">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Main content */}
           <div className="lg:col-span-2">
             {/* Featured article */}
             {featured && (
-              <section className="mb-8">
+              <section className="mb-10 animate-fade-up">
                 <ArticleCard {...featured} variant="featured" />
               </section>
             )}
 
+            <div className="divider-gradient mb-10" />
+
             {/* Latest articles grid */}
             <section>
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="section-title">
                   Berita Terkini
                 </h2>
                 <Link
                   href="/berita"
-                  className="text-sm text-primary-500 hover:underline"
+                  className="btn-ghost text-primary-500 text-sm"
                 >
                   Lihat Semua &rarr;
                 </Link>
               </div>
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                {restArticles.map((article) => (
-                  <ArticleCard key={article.slug} {...article} />
-                ))}
-              </div>
+
+              {restArticles.length > 0 ? (
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  {restArticles.map((article, index) => (
+                    <div
+                      key={article.slug}
+                      className="animate-fade-up"
+                      style={{ animationDelay: `${index * 100}ms`, animationFillMode: "both" }}
+                    >
+                      <ArticleCard {...article} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="card-flat flex flex-col items-center justify-center py-16 text-center">
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800">
+                    <Newspaper className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300">
+                    Belum ada berita
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-400">
+                    Berita terbaru akan segera hadir.
+                  </p>
+                </div>
+              )}
             </section>
 
-            {/* In-article ad */}
-            <div className="my-8 rounded border-2 border-dashed border-gray-200 bg-gray-50 p-4 text-center dark:border-gray-700 dark:bg-gray-800">
-              <span className="text-xs text-gray-400">IKLAN IN-ARTICLE - 728x90</span>
-              <div className="mx-auto mt-2 h-[90px] max-w-[728px] bg-gray-200 dark:bg-gray-700" />
-            </div>
+            <div className="divider-gradient my-10" />
 
             {/* Categories section */}
-            <section className="mt-8">
-              <h2 className="mb-4 text-lg font-bold text-gray-900 dark:text-white">
+            <section>
+              <h2 className="section-title mb-6">
                 Kategori Hukum
               </h2>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {categories.map((cat) => {
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                {categories.map((cat, index) => {
                   const Icon = categoryIconMap[cat.slug] || defaultIcon;
                   return (
                     <Link
                       key={cat.slug}
                       href={`/kategori/${cat.slug}`}
-                      className="group flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-all hover:border-primary-500 hover:shadow-sm dark:border-gray-800 dark:bg-gray-900"
+                      className="group card-flat flex flex-col items-center gap-3 p-6 text-center transition-all duration-300 hover:shadow-glow hover:border-primary-300 dark:hover:border-primary-700 animate-fade-up"
+                      style={{ animationDelay: `${index * 80}ms`, animationFillMode: "both" }}
                     >
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-500 transition-colors group-hover:bg-primary-500 group-hover:text-white dark:bg-primary-900/30">
-                        <Icon size={20} />
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary-gradient text-white shadow-md shadow-primary-500/20 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">
+                        <Icon size={24} />
                       </div>
                       <div>
-                        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-white">
                           {cat.name}
                         </h3>
-                        <p className="text-xs text-gray-500">{cat._count.articles} artikel</p>
+                        <p className="mt-0.5 text-xs text-gray-500">{cat._count.articles} artikel</p>
                       </div>
                     </Link>
                   );
