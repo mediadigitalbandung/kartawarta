@@ -19,17 +19,19 @@
 
 ## 2. Tech Stack
 
-| Layer | Teknologi | Keterangan |
-|-------|-----------|------------|
-| Frontend | Next.js 14+ (App Router) | SSR/SSG, SEO-friendly |
-| Styling | Tailwind CSS | Responsive, utility-first |
-| Database | PostgreSQL (Supabase/Neon) | Relational, scalable |
-| ORM | Prisma | Type-safe database access |
-| Auth | NextAuth.js / Supabase Auth | Multi-role authentication |
-| Storage | Supabase Storage / Cloudinary | Gambar & media |
-| Deploy | Vercel | CI/CD otomatis dari GitHub |
-| Email | Resend / SendGrid | Notifikasi & newsletter |
-| Analytics | Vercel Analytics + PostHog | Traffic & user behavior |
+| Layer | Teknologi | Status |
+|-------|-----------|--------|
+| Frontend | Next.js 14 (App Router) + TypeScript | ✅ Implemented |
+| Styling | Tailwind CSS | ✅ Implemented |
+| Database | PostgreSQL (Supabase - Seoul) | ✅ Connected |
+| ORM | Prisma 5 | ✅ Implemented |
+| Auth | NextAuth.js (Credentials) | ✅ Implemented |
+| Rich Editor | TipTap (React) | ✅ Implemented |
+| Icons | Lucide React | ✅ Implemented |
+| Deploy | Vercel (CI/CD dari GitHub) | ✅ Deployed |
+| Storage | Supabase Storage | 🔲 Planned |
+| Email | Resend / SendGrid | 🔲 Planned |
+| Analytics | Vercel Analytics + PostHog | 🔲 Planned |
 
 ---
 
@@ -38,575 +40,356 @@
 ```
 [Vercel - Frontend & API]
         |
-   Next.js App
+   Next.js 14 App (App Router)
    /     |     \
-  SSR   API    ISR
+  SSR   API    Static
   Pages Routes Pages
         |
    [Prisma ORM]
         |
-  [PostgreSQL - Supabase/Neon]
-        |
-  [Supabase Storage / Cloudinary]
+  [PostgreSQL - Supabase (ap-northeast-2)]
 ```
 
-### Struktur Folder
+### Struktur Folder (Aktual)
 ```
 jurnalis-hukum-bandung/
 ├── src/
-│   ├── app/                    # Next.js App Router
-│   │   ├── (public)/           # Halaman publik (berita, kategori, dll)
-│   │   ├── (auth)/             # Login, register, lupa password
-│   │   ├── panel/              # Panel Jurnalis (protected)
-│   │   │   ├── dashboard/
-│   │   │   ├── artikel/
-│   │   │   ├── media/
-│   │   │   └── settings/
-│   │   ├── admin/              # Admin Panel (protected)
-│   │   │   ├── users/
-│   │   │   ├── iklan/
-│   │   │   ├── kategori/
-│   │   │   └── analytics/
-│   │   └── api/                # API Routes
+│   ├── app/
+│   │   ├── page.tsx                  # Homepage
+│   │   ├── layout.tsx                # Root layout (SEO, fonts, security headers)
+│   │   ├── login/page.tsx            # Login page
+│   │   ├── search/page.tsx           # Search page
+│   │   ├── berita/[slug]/page.tsx    # Article detail (SSR)
+│   │   ├── kategori/[slug]/page.tsx  # Category page (SSR)
+│   │   ├── penulis/[slug]/page.tsx   # Author profile (SSR)
+│   │   ├── tentang/page.tsx          # About page
+│   │   ├── kode-etik/page.tsx        # Journalism ethics
+│   │   ├── kontak/page.tsx           # Contact page
+│   │   ├── redaksi/page.tsx          # Editorial team
+│   │   ├── pedoman-media/page.tsx    # Media guidelines
+│   │   ├── panel/                    # Protected editorial panel
+│   │   │   ├── layout.tsx            # Panel layout with sidebar
+│   │   │   ├── dashboard/page.tsx    # Stats dashboard
+│   │   │   ├── artikel/page.tsx      # Articles list (CRUD)
+│   │   │   ├── artikel/baru/page.tsx # New article editor
+│   │   │   ├── pengguna/page.tsx     # User management (admin)
+│   │   │   ├── iklan/page.tsx        # Ad management (admin)
+│   │   │   └── laporan/page.tsx      # Reports management
+│   │   └── api/
+│   │       ├── auth/[...nextauth]/   # NextAuth API
+│   │       ├── articles/route.ts     # Articles CRUD
+│   │       ├── articles/[id]/route.ts# Article by ID
+│   │       ├── categories/route.ts   # Categories API
+│   │       ├── users/route.ts        # Users API
+│   │       ├── ads/route.ts          # Ads API
+│   │       ├── reports/route.ts      # Reports API
+│   │       ├── search/route.ts       # Search API
+│   │       └── setup/route.ts        # One-time DB seed
 │   ├── components/
-│   │   ├── ui/                 # Komponen UI dasar
-│   │   ├── layout/             # Header, Footer, Sidebar
-│   │   ├── artikel/            # Komponen artikel
-│   │   ├── iklan/              # Komponen banner iklan
-│   │   └── editor/             # Rich text editor
-│   ├── lib/                    # Utilities, helpers
-│   ├── hooks/                  # Custom React hooks
-│   └── styles/                 # Global styles
+│   │   ├── layout/
+│   │   │   ├── Header.tsx            # Navigation header
+│   │   │   ├── Footer.tsx            # Site footer
+│   │   │   ├── Sidebar.tsx           # Sidebar (trending/popular)
+│   │   │   └── NewsTicker.tsx        # Breaking news ticker
+│   │   ├── artikel/
+│   │   │   ├── ArticleCard.tsx       # Article card component
+│   │   │   └── CopyProtection.tsx    # Anti copy-paste protection
+│   │   ├── editor/
+│   │   │   └── RichTextEditor.tsx    # TipTap rich text editor
+│   │   └── Providers.tsx             # NextAuth session provider
+│   └── lib/
+│       ├── prisma.ts                 # Prisma client singleton
+│       ├── auth.ts                   # NextAuth configuration
+│       ├── utils.ts                  # Utility functions (cn, slugify, etc)
+│       └── api-utils.ts             # API helpers (auth, errors, audit)
 ├── prisma/
-│   └── schema.prisma           # Database schema
-├── public/                     # Static assets
-├── .env.local                  # Environment variables
-└── next.config.js
+│   └── schema.prisma                 # Database schema (12 tables)
+├── public/                           # Static assets
+├── tailwind.config.ts
+├── next.config.js                    # Security headers configured
+├── tsconfig.json
+└── package.json
 ```
 
 ---
 
-## 4. Fitur Detail
+## 4. Fitur Yang Sudah Diimplementasi
 
-### 4.1 UI/UX - Desain Modern Media Hukum
+### 4.1 UI/UX - Halaman Publik ✅
 
 **Homepage:**
-- Hero section dengan breaking news / berita utama
+- Hero section dengan berita utama
 - Ticker berita berjalan (news ticker)
-- Grid berita terbaru (responsive: 1/2/3/4 kolom)
+- Grid berita terbaru (responsive)
 - Sidebar: berita populer, trending, terbaru
-- Kategori hukum: Pidana, Perdata, Tata Usaha Negara, Konstitusi, dll
-- Section khusus: Opini, Analisis Hukum, Infografis
-- Dark mode / Light mode toggle
-- Font yang nyaman dibaca (serif untuk body artikel)
+- Kategori hukum dengan navigasi
 
-**Halaman Artikel:**
-- Layout bersih, fokus pada konten
-- Breadcrumb navigation
-- Info penulis (foto, nama, bio singkat)
-- Tanggal publish & update
-- Estimasi waktu baca
-- Share buttons (WhatsApp, Twitter/X, Facebook, Telegram, Copy Link)
-- Related articles
-- Komentar (moderasi otomatis)
-- Tag & kategori
-- Navigasi artikel sebelum/sesudah
+**Halaman Artikel (`/berita/[slug]`):**
+- Layout bersih, fokus konten
+- Info penulis (nama, bio)
+- Tanggal publish & estimasi waktu baca
+- Label verifikasi berita (Terverifikasi/Opini/dll)
+- Sumber berita yang dikutip
+- Copy protection dengan atribusi otomatis
+- SEO meta tags per artikel
 
-**Halaman Kategori & Tag:**
-- Filter dan sorting (terbaru, populer, relevan)
-- Pagination atau infinite scroll
-- Jumlah artikel per kategori
+**Halaman Kategori (`/kategori/[slug]`):**
+- List artikel per kategori
+- Info kategori (nama, deskripsi, jumlah artikel)
 
-**Halaman Penulis/Jurnalis:**
-- Profil jurnalis dengan foto, bio, spesialisasi
+**Halaman Penulis (`/penulis/[slug]`):**
+- Profil jurnalis
 - Daftar artikel oleh jurnalis tersebut
-- Statistik artikel (jumlah, views)
 
-**Responsive Design:**
-- Mobile-first approach
-- Hamburger menu untuk mobile
-- Optimasi gambar (next/image, WebP, lazy loading)
-- Core Web Vitals: LCP < 2.5s, FID < 100ms, CLS < 0.1
+**Halaman Pencarian (`/search`):**
+- Full-text search across articles
+- Filter berdasarkan query
 
----
-
-### 4.2 Panel Jurnalis (Dashboard Editorial)
-
-**Role & Permissions:**
-
-| Role | Hak Akses |
-|------|-----------|
-| Super Admin | Semua akses, kelola user, iklan, settings |
-| Editor Kepala | Approve/reject artikel, assign jurnalis, edit semua artikel |
-| Editor | Review & edit artikel di kategori yang ditugaskan |
-| Jurnalis Senior | Tulis artikel, edit sendiri, publish langsung |
-| Jurnalis | Tulis artikel, edit sendiri, perlu approval editor |
-| Kontributor | Tulis artikel draft saja, perlu approval |
-
-**Editorial Workflow:**
-```
-[Draft] → [Review] → [Editor Approval] → [Published]
-                ↓              ↓
-           [Revisi]       [Rejected]
-                              ↓
-                         [Kembali ke Draft]
-```
-
-**Fitur Panel:**
-- Dashboard dengan statistik personal (artikel, views, pending review)
-- Rich Text Editor (TipTap / Editor.js) dengan:
-  - Heading, bold, italic, underline
-  - Insert gambar & video (YouTube embed)
-  - Blockquote untuk kutipan hukum/undang-undang
-  - Table untuk data
-  - Link embed
-  - Code block (untuk pasal-pasal)
-- Media Library (upload, crop, resize gambar)
-- SEO tools per artikel (meta title, description, slug)
-- Jadwal publish (schedule)
-- Revisi history (track changes)
-- Notifikasi real-time (artikel di-approve, komentar baru, dll)
-- Kolaborasi (assign co-author)
+**Halaman Statis:**
+- Tentang Kami (`/tentang`)
+- Kode Etik Jurnalistik (`/kode-etik`)
+- Susunan Redaksi (`/redaksi`)
+- Pedoman Media Siber (`/pedoman-media`)
+- Kontak (`/kontak`) - dengan form kontak
 
 ---
 
-### 4.3 Backend + Banner Iklan
+### 4.2 Panel Jurnalis (Dashboard Editorial) ✅
 
-**API Endpoints (REST):**
-```
-POST   /api/auth/login
-POST   /api/auth/register
-POST   /api/auth/forgot-password
+**Authentication & Authorization:**
+- Login via email/password (NextAuth.js Credentials)
+- 6 role: Super Admin, Chief Editor, Editor, Senior Journalist, Journalist, Contributor
+- Role-based access control pada semua API
 
-GET    /api/articles              # List artikel (public)
-GET    /api/articles/:slug        # Detail artikel
-POST   /api/articles              # Buat artikel baru (auth)
-PUT    /api/articles/:id          # Update artikel (auth)
-DELETE /api/articles/:id          # Hapus artikel (auth)
-PATCH  /api/articles/:id/status   # Ubah status (review/approve/reject)
+**Panel Pages:**
+- `/panel/dashboard` — Statistik personal (total artikel, published, draft, views)
+- `/panel/artikel` — Daftar artikel dengan filter status, aksi edit/hapus
+- `/panel/artikel/baru` — Rich text editor (TipTap) untuk tulis artikel baru
+- `/panel/pengguna` — Kelola pengguna (CRUD, assign role) - admin only
+- `/panel/iklan` — Kelola banner iklan (CRUD, scheduling)
+- `/panel/laporan` — Review laporan berita dari pembaca
 
-GET    /api/categories
-GET    /api/tags
-GET    /api/authors/:id
-
-POST   /api/media/upload          # Upload media
-GET    /api/media                 # List media
-
-GET    /api/ads                   # List iklan aktif
-POST   /api/ads                   # Buat iklan (admin)
-PUT    /api/ads/:id               # Update iklan
-DELETE /api/ads/:id               # Hapus iklan
-
-GET    /api/analytics/overview    # Dashboard analytics
-GET    /api/analytics/articles    # Statistik per artikel
-```
-
-**Sistem Banner Iklan:**
-- Slot iklan yang dapat dikonfigurasi:
-  - Header banner (728x90 / responsive)
-  - Sidebar banner (300x250)
-  - In-article banner (setelah paragraf ke-3)
-  - Footer banner
-  - Popup/interstitial (dengan frequency cap)
-  - Floating bottom banner (mobile)
-- Admin panel untuk kelola iklan:
-  - Upload banner (gambar/HTML)
-  - Set tanggal tayang (mulai - selesai)
-  - Target halaman/kategori
-  - Statistik: impressions, clicks, CTR
-  - Priority/weight system
-- Support: gambar statis, GIF, HTML embed (Google Ads, dll)
+**Rich Text Editor (TipTap):**
+- Heading (H1-H3), bold, italic, underline, strikethrough
+- Blockquote (untuk kutipan hukum/UU)
+- Ordered & unordered lists
+- Image insert (via URL)
+- YouTube video embed
+- Link embed
+- Text alignment (left, center, right, justify)
+- SEO fields: meta title, meta description
+- Category & status selection
 
 ---
 
-### 4.4 Security & Proteksi Konten
+### 4.3 Backend API ✅
 
-**Proteksi Konten (Anti Copy-Paste):**
+| Endpoint | Method | Deskripsi | Auth |
+|----------|--------|-----------|------|
+| `/api/articles` | GET | List artikel publik (filter: status, category, author) | No |
+| `/api/articles` | POST | Buat artikel baru | Yes |
+| `/api/articles/[id]` | GET | Detail artikel by ID | No |
+| `/api/articles/[id]` | PUT | Update artikel | Yes |
+| `/api/articles/[id]` | DELETE | Hapus artikel | Yes |
+| `/api/categories` | GET | List semua kategori | No |
+| `/api/users` | GET | List users | Admin |
+| `/api/users` | POST | Buat user baru | Admin |
+| `/api/ads` | GET | List iklan aktif | No |
+| `/api/ads` | POST | Buat iklan baru | Admin |
+| `/api/reports` | GET | List laporan | Editor+ |
+| `/api/reports` | POST | Kirim laporan berita | No |
+| `/api/search` | GET | Full-text search artikel | No |
+| `/api/setup` | GET | One-time database seeding | Setup Key |
+
+---
+
+### 4.4 Security & Proteksi Konten ✅
+
+**Copy Protection:**
 - Disable right-click pada konten artikel
-- Custom copy handler: saat user copy text, otomatis append:
+- Custom copy handler — append atribusi otomatis:
   ```
   ---
   Sumber: Jurnalis Hukum Bandung
-  Penulis: [Nama Penulis]
   Link: [URL Artikel]
   © 2026 Jurnalis Hukum Bandung. Seluruh hak cipta dilindungi.
   ```
-- Watermark pada gambar (server-side)
-- Disable print screen detection (best effort)
-- Canonical URL & structured data untuk klaim kepemilikan di search engine
+- Disable drag pada gambar
 
-**Keamanan Aplikasi:**
-- HTTPS enforced
-- Rate limiting pada API (express-rate-limit / Vercel Edge)
-- CSRF protection
-- XSS prevention (sanitize semua input)
-- SQL injection prevention (Prisma parameterized queries)
-- Content Security Policy (CSP) headers
-- Helmet.js security headers
+**Security Headers (next.config.js):**
+- `X-Content-Type-Options: nosniff`
+- `X-Frame-Options: DENY`
+- `X-XSS-Protection: 1; mode=block`
+- `Referrer-Policy: origin-when-cross-origin`
+- `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+
+**Application Security:**
+- Password hashing (bcrypt, 12 rounds)
+- Prisma parameterized queries (SQL injection prevention)
 - Input validation (Zod)
-- Password hashing (bcrypt)
-- JWT token rotation
-- IP-based brute force protection
-- DDoS protection (Vercel + Cloudflare)
-- File upload validation (type, size, malware scan)
-- Audit log (siapa melakukan apa, kapan)
-
-**Keamanan Akun:**
-- Two-factor authentication (2FA) untuk admin & editor
-- Session management (auto logout setelah idle)
-- Password policy (min 8 char, uppercase, lowercase, number)
-- Login attempt limiting & temporary lockout
+- Role-based API protection
+- Audit logging (user actions tracked)
 
 ---
 
-### 4.5 Standar Media & Anti-Hoax
+### 4.5 Standar Media & Anti-Hoax ✅
 
-**Fitur Anti-Hoax / Kredibilitas:**
-- **Label Verifikasi Berita:**
-  - Terverifikasi (fact-checked)
-  - Belum Diverifikasi
-  - Klarifikasi / Koreksi
-  - Opini (bukan berita fakta)
+**Label Verifikasi Berita:**
+- ✅ Terverifikasi (VERIFIED) — fact-checked
+- ⚪ Belum Diverifikasi (UNVERIFIED)
+- 🔄 Koreksi (CORRECTION)
+- 💭 Opini (OPINION)
 
-- **Sumber & Referensi:**
-  - Wajib cantumkan minimal 1 sumber pada setiap artikel berita
-  - Field khusus untuk sumber: nama, jabatan, institusi
-  - Link ke dokumen resmi (jika ada)
-  - Inline citation (footnotes)
+**Sumber & Referensi:**
+- Field sumber wajib: nama, jabatan, institusi
+- Ditampilkan pada halaman artikel
 
-- **Koreksi & Transparansi:**
-  - Halaman koreksi publik (jika ada kesalahan berita)
-  - Riwayat edit artikel (publik, kapan & apa yang diubah)
-  - Disclaimer otomatis pada artikel opini
-
-- **Standar Jurnalistik:**
-  - Checklist sebelum publish:
-    - [ ] Judul tidak clickbait / sensasional berlebihan
-    - [ ] Minimal 1 sumber terverifikasi
-    - [ ] Cover both sides (jika ada 2 pihak)
-    - [ ] Tidak mengandung SARA
-    - [ ] Bahasa sesuai PUEBI
-  - Badge "Telah Diverifikasi" pada artikel yang lolos checklist
-  - Halaman "Tentang Kami" + Pedoman Media + Kode Etik Jurnalistik
-
-- **Pelaporan Publik:**
-  - Tombol "Laporkan Berita Ini" pada setiap artikel
-  - Form aduan dengan kategori: hoax, tidak akurat, SARA, dll
-  - Dashboard admin untuk review laporan
+**Pelaporan Publik:**
+- Tombol "Laporkan Berita" pada setiap artikel
+- Form aduan: Hoax, Tidak Akurat, SARA, Pencemaran Nama Baik, Lainnya
+- Dashboard admin untuk review laporan (`/panel/laporan`)
 
 ---
 
-## 5. Database Schema (Prisma)
+## 5. Database Schema
 
-```prisma
-model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  password      String
-  name          String
-  avatar        String?
-  bio           String?
-  role          Role      @default(JOURNALIST)
-  specialization String?
-  phone         String?
-  isActive      Boolean   @default(true)
-  twoFactorEnabled Boolean @default(false)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  articles      Article[]
-  auditLogs     AuditLog[]
-}
+**Database:** PostgreSQL (Supabase)
+**Region:** ap-northeast-2 (Seoul)
+**Project Ref:** `rbjlasipbucuzegdzboa`
 
-model Article {
-  id            String    @id @default(cuid())
-  title         String
-  slug          String    @unique
-  content       String    @db.Text
-  excerpt       String?
-  featuredImage String?
-  status        ArticleStatus @default(DRAFT)
-  verificationLabel VerificationLabel @default(UNVERIFIED)
-  readTime      Int?
-  viewCount     Int       @default(0)
-  publishedAt   DateTime?
-  scheduledAt   DateTime?
-  sources       Source[]
-  corrections   Correction[]
-  reports       Report[]
-  author        User      @relation(fields: [authorId], references: [id])
-  authorId      String
-  category      Category  @relation(fields: [categoryId], references: [id])
-  categoryId    String
-  tags          Tag[]
-  revisions     Revision[]
-  adPlacements  AdPlacement[]
-  seoTitle      String?
-  seoDescription String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-}
+### Tables (12 total)
 
-model Category {
-  id          String    @id @default(cuid())
-  name        String    @unique
-  slug        String    @unique
-  description String?
-  icon        String?
-  articles    Article[]
-}
+| Table | Deskripsi | Records |
+|-------|-----------|---------|
+| `users` | Akun pengguna (admin, editor, jurnalis) | 3 (seeded) |
+| `articles` | Artikel berita | 1 (sample) |
+| `categories` | Kategori hukum | 10 (seeded) |
+| `tags` | Tag artikel | 0 |
+| `sources` | Sumber berita per artikel | 1 |
+| `corrections` | Koreksi artikel | 0 |
+| `revisions` | Riwayat revisi | 0 |
+| `reports` | Laporan berita dari pembaca | 0 |
+| `ads` | Banner iklan | 0 |
+| `audit_logs` | Log aktivitas user | 0 |
+| `_ArticleToTag` | Relasi many-to-many artikel-tag | 0 |
+| `_prisma_migrations` | Tracking migrasi Prisma | 0 |
 
-model Tag {
-  id       String    @id @default(cuid())
-  name     String    @unique
-  slug     String    @unique
-  articles Article[]
-}
+### Seeded Accounts
 
-model Source {
-  id          String  @id @default(cuid())
-  name        String
-  title       String?
-  institution String?
-  url         String?
-  article     Article @relation(fields: [articleId], references: [id])
-  articleId   String
-}
+| Role | Email | Password |
+|------|-------|----------|
+| Super Admin | admin@jurnalishukumbandung.com | Admin@JHB2026! |
+| Chief Editor | editor@jurnalishukumbandung.com | Editor@JHB2026! |
+| Senior Journalist | jurnalis@jurnalishukumbandung.com | Jurnalis@JHB2026! |
 
-model Correction {
-  id          String   @id @default(cuid())
-  description String
-  article     Article  @relation(fields: [articleId], references: [id])
-  articleId   String
-  createdAt   DateTime @default(now())
-}
+> ⚠️ **SEGERA GANTI PASSWORD setelah login pertama kali!**
 
-model Revision {
-  id        String   @id @default(cuid())
-  content   String   @db.Text
-  changedBy String
-  article   Article  @relation(fields: [articleId], references: [id])
-  articleId String
-  createdAt DateTime @default(now())
-}
-
-model Report {
-  id        String       @id @default(cuid())
-  reason    ReportReason
-  detail    String?
-  email     String?
-  status    ReportStatus @default(PENDING)
-  article   Article      @relation(fields: [articleId], references: [id])
-  articleId String
-  createdAt DateTime     @default(now())
-}
-
-model Ad {
-  id          String   @id @default(cuid())
-  name        String
-  type        AdType
-  imageUrl    String?
-  htmlCode    String?  @db.Text
-  targetUrl   String?
-  slot        AdSlot
-  startDate   DateTime
-  endDate     DateTime
-  isActive    Boolean  @default(true)
-  priority    Int      @default(0)
-  impressions Int      @default(0)
-  clicks      Int      @default(0)
-  targetPages String[] @default([])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model AdPlacement {
-  id        String  @id @default(cuid())
-  article   Article @relation(fields: [articleId], references: [id])
-  articleId String
-  slot      AdSlot
-  adId      String
-}
-
-model AuditLog {
-  id        String   @id @default(cuid())
-  action    String
-  entity    String
-  entityId  String
-  detail    String?
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  ip        String?
-  createdAt DateTime @default(now())
-}
-
-enum Role {
-  SUPER_ADMIN
-  CHIEF_EDITOR
-  EDITOR
-  SENIOR_JOURNALIST
-  JOURNALIST
-  CONTRIBUTOR
-}
-
-enum ArticleStatus {
-  DRAFT
-  IN_REVIEW
-  APPROVED
-  PUBLISHED
-  REJECTED
-  ARCHIVED
-}
-
-enum VerificationLabel {
-  VERIFIED
-  UNVERIFIED
-  CORRECTION
-  OPINION
-}
-
-enum ReportReason {
-  HOAX
-  INACCURATE
-  SARA
-  DEFAMATION
-  OTHER
-}
-
-enum ReportStatus {
-  PENDING
-  REVIEWED
-  RESOLVED
-  DISMISSED
-}
-
-enum AdType {
-  IMAGE
-  GIF
-  HTML
-}
-
-enum AdSlot {
-  HEADER
-  SIDEBAR
-  IN_ARTICLE
-  FOOTER
-  POPUP
-  FLOATING_BOTTOM
-}
-```
-
----
-
-## 6. Migrasi dari WordPress
-
-### Langkah Migrasi:
-1. **Export WordPress** — Gunakan WP REST API atau WP-CLI untuk export semua:
-   - Posts (judul, konten, slug, tanggal, status, featured image)
-   - Categories & Tags
-   - Users (nama, email, role)
-   - Media files (gambar)
-2. **Transform data** — Script migrasi untuk konversi format WP ke schema baru
-3. **Import ke PostgreSQL** — Seed database dengan data yang sudah ditransformasi
-4. **Upload media** — Migrasi gambar ke Supabase Storage / Cloudinary
-5. **Redirect mapping** — Setup redirect dari URL WordPress lama ke URL baru (301)
-6. **Testing** — Verifikasi semua konten termigrasi dengan benar
-
----
-
-## 7. Deployment & DevOps
-
-```
-GitHub Repository
-       |
-   Push / PR
-       |
-  Vercel CI/CD
-  (auto build & deploy)
-       |
-   ┌───┴───┐
-Preview  Production
-(branch)  (main)
-       |
-  PostgreSQL (Supabase/Neon)
-       |
-  Cloudflare (DNS + CDN + DDoS protection)
-```
-
-### Environment:
-- **Development:** localhost:3000
-- **Staging:** preview deployments di Vercel (per branch/PR)
-- **Production:** jurnalishukumbandung.com (Vercel + custom domain)
-
----
-
-## 8. Kategori Hukum Default
+### Kategori Default (10)
 
 1. Hukum Pidana
 2. Hukum Perdata
-3. Hukum Tata Usaha Negara
-4. Hukum Konstitusi
-5. Hukum Bisnis & Korporasi
+3. Hukum Tata Negara
+4. Hukum Bisnis
+5. HAM
 6. Hukum Lingkungan
-7. Hukum Ketenagakerjaan
-8. Hak Asasi Manusia (HAM)
-9. Hukum Adat
-10. Opini & Analisis
-11. Infografis Hukum
-12. Berita Daerah Bandung
+7. Ketenagakerjaan
+8. Opini
+9. Infografis
+10. Berita Bandung
 
 ---
 
-## 9. Roadmap
+## 6. Deployment
 
-### Phase 1 — Foundation (MVP)
-- [ ] Setup Next.js + Prisma + PostgreSQL
-- [ ] Implementasi auth (login, register, role-based)
-- [ ] CRUD artikel dengan rich text editor
-- [ ] Halaman publik: homepage, detail artikel, kategori
-- [ ] Basic SEO (meta tags, sitemap, robots.txt)
-- [ ] Deploy ke Vercel
+### Infrastructure
 
-### Phase 2 — Editorial Workflow
-- [ ] Panel jurnalis lengkap (dashboard, statistik)
-- [ ] Workflow editorial (draft → review → approve → publish)
-- [ ] Media library
-- [ ] Revisi history
-- [ ] Notifikasi (email + in-app)
+| Service | Detail |
+|---------|--------|
+| Hosting | Vercel (bonelades-projects) |
+| Database | Supabase PostgreSQL (Seoul) |
+| Repository | github.com/bonelade/Jurnalis-Hukum-Bandung |
+| Branch | `master` (auto-deploy) |
+| Build | `next build` with `prisma generate` on postinstall |
 
-### Phase 3 — Security & Anti-Hoax
-- [ ] Copy protection dengan atribusi penulis
-- [ ] Watermark gambar
-- [ ] Label verifikasi berita
+### Environment Variables (Vercel)
+
+| Variable | Set |
+|----------|-----|
+| `DATABASE_URL` | ✅ |
+| `DIRECT_URL` | ✅ |
+| `NEXTAUTH_SECRET` | ✅ |
+| `NEXTAUTH_URL` | ✅ |
+| `NEXT_PUBLIC_APP_URL` | ✅ |
+| `NEXT_PUBLIC_APP_NAME` | ✅ |
+| `SETUP_KEY` | ✅ |
+
+### Deployment URL
+- **Production:** https://jurnalis-hukum-bandung-bonelades-projects.vercel.app
+- **Custom Domain:** jurnalishukumbandung.com (belum dikonfigurasi)
+
+---
+
+## 7. Roadmap
+
+### Phase 1 — Foundation (MVP) ✅ DONE
+- [x] Setup Next.js 14 + TypeScript + Tailwind CSS
+- [x] Setup Prisma + PostgreSQL (Supabase)
+- [x] Implementasi auth (NextAuth.js, role-based)
+- [x] CRUD artikel dengan rich text editor (TipTap)
+- [x] Halaman publik: homepage, detail artikel, kategori, penulis, search
+- [x] Halaman statis: tentang, kode etik, redaksi, pedoman media, kontak
+- [x] Panel editorial: dashboard, artikel, pengguna, iklan, laporan
+- [x] Copy protection & security headers
+- [x] API routes lengkap (articles, categories, users, ads, reports, search)
+- [x] Deploy ke Vercel + Supabase database connected
+- [x] Seed database (categories, users, sample article)
+
+### Phase 2 — Editorial Workflow Enhancement 🔲
+- [ ] Edit artikel existing (`/panel/artikel/[id]/edit`)
+- [ ] Workflow editorial lengkap (draft → review → approve → publish)
+- [ ] Media library (upload gambar ke Supabase Storage)
+- [ ] Revisi history (track changes)
+- [ ] Notifikasi email (Resend/SendGrid)
+- [ ] Notifikasi in-app (real-time)
+- [ ] Dark mode toggle
+- [ ] Infinite scroll / pagination pada list artikel
+
+### Phase 3 — Security & Anti-Hoax Advanced 🔲
+- [ ] Watermark gambar (server-side)
 - [ ] Checklist publish (anti-clickbait, sumber wajib)
 - [ ] Halaman koreksi publik
-- [ ] Tombol "Laporkan Berita"
-- [ ] 2FA untuk admin/editor
-- [ ] Audit log
+- [ ] Two-factor authentication (2FA) untuk admin/editor
+- [ ] Rate limiting pada API
+- [ ] CSRF protection
+- [ ] Content Security Policy (CSP) headers
 
-### Phase 4 — Monetisasi & Analytics
-- [ ] Sistem banner iklan (CRUD, scheduling, statistik)
-- [ ] Ad slot management
-- [ ] Analytics dashboard (views, trending, engagement)
+### Phase 4 — Monetisasi & Analytics 🔲
+- [ ] Ad slot management (preview, scheduling, targeting)
+- [ ] Ad statistics (impressions, clicks, CTR)
+- [ ] Vercel Analytics integration
+- [ ] PostHog user behavior tracking
 - [ ] Newsletter integration
+- [ ] Google AdSense / custom ad network
 
-### Phase 5 — Migrasi & Launch
+### Phase 5 — Migrasi WordPress & Launch 🔲
 - [ ] Export data WordPress lama
 - [ ] Migrasi konten ke database baru
-- [ ] URL redirect mapping
-- [ ] DNS migration ke Vercel
+- [ ] URL redirect mapping (301 redirects)
+- [ ] Custom domain setup (jurnalishukumbandung.com)
+- [ ] Cloudflare DNS + CDN + DDoS protection
 - [ ] Go-live
 
 ---
 
-## 10. Kontak & Tim
+## 8. Kontak & Tim
 
 - **Project:** Jurnalis Hukum Bandung
 - **Organisasi:** Aureon
 - **Domain:** jurnalishukumbandung.com
-- **Repository:** GitHub (TBD)
-- **Tech Lead:** -
-- **Status:** Perencanaan
+- **Repository:** github.com/bonelade/Jurnalis-Hukum-Bandung
+- **Status:** Phase 1 Complete — MVP Deployed
 
 ---
 
 *Dokumen ini adalah living document yang akan terus diperbarui seiring perkembangan project.*
+*Last updated: 25 Maret 2026*
