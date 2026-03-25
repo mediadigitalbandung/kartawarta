@@ -56,3 +56,5 @@ etc/
 
 # Old WordPress files (will be replaced by Next.js)
 www/
+
+.vercel
