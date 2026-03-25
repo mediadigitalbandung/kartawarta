@@ -48,7 +48,7 @@ export default function Header() {
               <span className="text-base font-bold leading-tight text-text-primary">
                 Jurnalis Hukum
               </span>
-              <span className="ml-1.5 text-sm text-text-muted">Bandung</span>
+              <span className="ml-1.5 text-sm text-gold">Bandung</span>
             </div>
           </Link>
 

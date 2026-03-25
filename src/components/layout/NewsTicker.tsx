@@ -19,14 +19,14 @@ export default function NewsTicker({ items }: NewsTickerProps) {
       <div className="container-main flex items-center py-1.5">
         <div className="flex shrink-0 items-center gap-2 pr-4">
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-gold" />
           </span>
-          <span className="text-xs font-bold uppercase tracking-wider text-white">
+          <span className="text-xs font-bold uppercase tracking-wider text-gold">
             Breaking
           </span>
         </div>
-        <div className="h-4 w-px bg-white/30" />
+        <div className="h-4 w-px bg-gold/30" />
         <div className="news-ticker ml-3 flex-1 overflow-hidden">
           <div className="news-ticker-content">
             {items.map((item, i) => (

@@ -40,7 +40,7 @@ export default function Footer() {
                 <span className="text-sm font-bold text-white">
                   Jurnalis Hukum
                 </span>
-                <p className="text-xs text-text-muted">Bandung</p>
+                <p className="text-xs text-gold">Bandung</p>
               </div>
             </div>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-text-muted">

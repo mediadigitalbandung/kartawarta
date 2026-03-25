@@ -106,7 +106,7 @@ export default async function HomePage() {
                   href={`/kategori/${cat.slug}`}
                   className="flex w-[160px] shrink-0 flex-col items-center gap-2 rounded-lg bg-bg-card p-4 transition-colors hover:bg-bg-hover"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand/10 text-brand">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold/10 text-gold">
                     <Icon size={20} />
                   </div>
                   <span className="text-sm font-medium text-white">{cat.name}</span>

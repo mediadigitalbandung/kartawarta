@@ -113,7 +113,7 @@ export default function LoginPage() {
         <p className="mt-8 text-center text-xs text-text-muted">
           Hanya untuk jurnalis dan redaksi terdaftar.
           <br />
-          <Link href="/kontak" className="mt-1 inline-block text-brand transition-colors hover:text-white hover:underline">
+          <Link href="/kontak" className="mt-1 inline-block text-gold transition-colors hover:text-gold-light hover:underline">
             Hubungi admin
           </Link>{" "}
           untuk registrasi akun.

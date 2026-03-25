@@ -33,7 +33,7 @@ export default function Sidebar({ trending = [], recent = [], popular = [] }: Si
                   i < trending.length - 1 ? "border-b border-border" : ""
                 }`}
               >
-                <span className="shrink-0 text-2xl font-bold leading-none text-brand">
+                <span className="shrink-0 text-2xl font-bold leading-none text-gold">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <div className="flex-1">

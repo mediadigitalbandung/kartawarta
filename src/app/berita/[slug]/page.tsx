@@ -258,13 +258,13 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                   </div>
                   <div className="flex-1">
                     <h3 className="text-lg font-bold text-white">{article.author.name}</h3>
-                    <p className="text-sm text-brand">Jurnalis</p>
+                    <p className="text-sm text-gold">Jurnalis</p>
                     <p className="mt-2 text-sm leading-relaxed text-text-secondary">
                       {article.author.bio}
                     </p>
                     <Link
                       href={`/penulis/${slugify(article.author.name)}`}
-                      className="mt-3 inline-block text-sm font-semibold text-brand transition-colors hover:text-white"
+                      className="mt-3 inline-block text-sm font-semibold text-gold transition-colors hover:text-gold-light"
                     >
                       Lihat semua artikel &rarr;
                     </Link>

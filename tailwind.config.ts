@@ -14,14 +14,20 @@ const config: Config = {
           elevated: "#2a2a2a",
         },
         brand: {
-          DEFAULT: "#e50914",
-          dark: "#b20710",
-          light: "#ff3d47",
+          DEFAULT: "#0d7c4a",
+          dark: "#095e38",
+          light: "#10b068",
+        },
+        gold: {
+          DEFAULT: "#c9a84c",
+          dark: "#a68a3a",
+          light: "#dfc06a",
+          pale: "#f5ecd0",
         },
         accent: {
           blue: "#0ea5e9",
-          green: "#22c55e",
-          yellow: "#eab308",
+          green: "#10b068",
+          yellow: "#c9a84c",
           purple: "#a855f7",
         },
         text: {
