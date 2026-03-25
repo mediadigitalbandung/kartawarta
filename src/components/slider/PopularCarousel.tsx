@@ -25,6 +25,7 @@ export default function PopularCarousel({ items }: PopularCarouselProps) {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const autoRef = useRef<NodeJS.Timeout | null>(null);
+  const total = items.length;
 
   const checkScroll = useCallback(() => {
     const el = scrollRef.current;
@@ -33,42 +34,60 @@ export default function PopularCarousel({ items }: PopularCarouselProps) {
     setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
   }, []);
 
+  // Custom smooth scroll with easeInOutCubic
+  const smoothScrollTo = useCallback((target: number, duration = 800) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const start = el.scrollLeft;
+    const distance = target - start;
+    let startTime: number | null = null;
+
+    const easeInOutCubic = (t: number) =>
+      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      el.scrollLeft = start + distance * easeInOutCubic(progress);
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, []);
+
   const scroll = useCallback((dir: "left" | "right") => {
     const el = scrollRef.current;
     if (!el) return;
-    // Scroll by roughly 1 card width + gap
     const cardWidth = el.clientWidth / 4 + 20;
-    el.scrollBy({ left: dir === "right" ? cardWidth : -cardWidth, behavior: "smooth" });
-  }, []);
+    const target = dir === "right"
+      ? el.scrollLeft + cardWidth
+      : el.scrollLeft - cardWidth;
+    smoothScrollTo(target, 700);
+  }, [smoothScrollTo]);
 
-  // Auto-scroll right every 4s
+  // Auto-scroll
+  const startAuto = useCallback(() => {
+    if (autoRef.current) clearInterval(autoRef.current);
+    autoRef.current = setInterval(() => {
+      const el = scrollRef.current;
+      if (!el) return;
+      if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 10) {
+        smoothScrollTo(0, 1000);
+      } else {
+        const cardWidth = el.clientWidth / 4 + 20;
+        smoothScrollTo(el.scrollLeft + cardWidth, 700);
+      }
+    }, 4000);
+  }, [smoothScrollTo]);
+
   useEffect(() => {
-    autoRef.current = setInterval(() => {
-      const el = scrollRef.current;
-      if (!el) return;
-      if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 10) {
-        // Reset to start
-        el.scrollTo({ left: 0, behavior: "smooth" });
-      } else {
-        scroll("right");
-      }
-    }, 4000);
+    if (total <= 4) return;
+    startAuto();
     return () => { if (autoRef.current) clearInterval(autoRef.current); };
-  }, [scroll]);
+  }, [startAuto, total]);
 
-  // Pause auto on hover
   const pauseAuto = () => { if (autoRef.current) clearInterval(autoRef.current); };
-  const resumeAuto = () => {
-    autoRef.current = setInterval(() => {
-      const el = scrollRef.current;
-      if (!el) return;
-      if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 10) {
-        el.scrollTo({ left: 0, behavior: "smooth" });
-      } else {
-        scroll("right");
-      }
-    }, 4000);
-  };
+  const resumeAuto = () => { startAuto(); };
 
   useEffect(() => {
     const el = scrollRef.current;
