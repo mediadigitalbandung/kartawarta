@@ -174,25 +174,39 @@ export default function HeadlineSlider({ items }: HeadlineSliderProps) {
         </>
       )}
 
-      {/* Bottom progress bar + dots */}
+      {/* Dots + progress bar */}
       {total > 1 && (
         <div className="absolute bottom-0 left-0 right-0">
-          {/* Thin progress segments */}
-          <div className="flex gap-px">
+          {/* Dots */}
+          <div className="flex items-center justify-center gap-1.5 pb-2.5">
             {items.map((_, i) => (
               <button
                 key={i}
                 onClick={() => goToSlide(i)}
-                className="relative h-[3px] flex-1 bg-white/10 overflow-hidden"
+                className={`rounded-full transition-all duration-300 ${
+                  i === current
+                    ? "h-2 w-2 bg-white"
+                    : "h-1.5 w-1.5 bg-white/30 hover:bg-white/50"
+                }`}
                 aria-label={`Slide ${i + 1}`}
+              />
+            ))}
+          </div>
+          {/* Thin progress bar */}
+          <div className="flex gap-px">
+            {items.map((_, i) => (
+              <div
+                key={i}
+                className="relative h-[2px] flex-1 bg-white/10 overflow-hidden cursor-pointer"
+                onClick={() => goToSlide(i)}
               >
                 <div
-                  className={`absolute inset-y-0 left-0 bg-white/70 ${
+                  className={`absolute inset-y-0 left-0 bg-white/60 ${
                     i === current ? "animate-progress" : i < current ? "w-full" : "w-0"
                   }`}
                   ref={i === current ? progressRef : undefined}
                 />
-              </button>
+              </div>
             ))}
           </div>
         </div>
