@@ -48,7 +48,14 @@ export async function GET(request: NextRequest) {
 
     const where: Record<string, unknown> = {};
 
-    if (status === "PUBLISHED") {
+    if (status === "ALL") {
+      // Fetch all statuses — requires auth (admin panel)
+      const session = await requireAuth();
+      if (authorId && authorId !== session.user.id) {
+        where.authorId = session.user.id;
+      }
+      // No status filter — return all
+    } else if (status === "PUBLISHED") {
       where.status = "PUBLISHED";
     } else {
       // Non-public statuses require auth

@@ -1,93 +1,90 @@
+export const dynamic = "force-dynamic";
+
 import { Metadata } from "next";
 import ArticleCard from "@/components/artikel/ArticleCard";
 import { FileText, Eye, Calendar } from "lucide-react";
+import { prisma } from "@/lib/prisma";
+import { notFound } from "next/navigation";
+import { slugify } from "@/lib/utils";
 
-// Demo data
-const demoAuthor = {
-  name: "Ahmad Fauzi",
-  bio: "Jurnalis hukum senior dengan pengalaman 10 tahun meliput berita hukum di wilayah Bandung. Spesialisasi: Hukum Tata Negara dan Konstitusi.",
-  role: "Jurnalis Senior",
-  specialization: "Hukum Tata Negara",
-  totalArticles: 45,
-  totalViews: 24500,
-  joinedDate: "Januari 2026",
-};
-
-const demoArticles = [
-  {
-    title: "MK Putuskan Uji Materi UU Cipta Kerja di Bandung",
-    slug: "mk-putuskan-uji-materi-uu-cipta-kerja",
-    excerpt: "MK memutuskan hasil uji materi terhadap beberapa pasal dalam UU Cipta Kerja.",
-    featuredImage: null,
-    category: { name: "Hukum Tata Negara", slug: "hukum-tata-negara" },
-    author: { name: "Ahmad Fauzi" },
-    publishedAt: new Date().toISOString(),
-    readTime: 5,
-    viewCount: 1250,
-    verificationLabel: "VERIFIED",
-  },
-  {
-    title: "Sidang Uji Formil UU Omnibus Law Dimulai",
-    slug: "sidang-uji-formil-uu-omnibus",
-    excerpt: "MK mulai menggelar sidang uji formil terhadap UU Omnibus Law.",
-    featuredImage: null,
-    category: { name: "Hukum Tata Negara", slug: "hukum-tata-negara" },
-    author: { name: "Ahmad Fauzi" },
-    publishedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-    readTime: 6,
-    viewCount: 890,
-    verificationLabel: "VERIFIED",
-  },
-];
+async function getAuthorBySlug(slug: string) {
+  const users = await prisma.user.findMany({ where: { isActive: true } });
+  return users.find((u) => slugify(u.name) === slug) || null;
+}
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const author = await getAuthorBySlug(params.slug);
+  if (!author) return { title: "Penulis Tidak Ditemukan" };
+
   return {
-    title: `${demoAuthor.name} - Penulis`,
-    description: demoAuthor.bio,
+    title: `${author.name} - Penulis`,
+    description: author.bio || `Profil penulis ${author.name} di Jurnalis Hukum Bandung.`,
   };
 }
 
-export default function PenulisPage({ params }: { params: { slug: string } }) {
+export default async function PenulisPage({ params }: { params: { slug: string } }) {
+  const author = await getAuthorBySlug(params.slug);
+  if (!author) notFound();
+
+  const [articles, viewAgg] = await Promise.all([
+    prisma.article.findMany({
+      where: { status: "PUBLISHED", authorId: author.id },
+      include: { author: true, category: true },
+      orderBy: { publishedAt: "desc" },
+    }),
+    prisma.article.aggregate({
+      where: { status: "PUBLISHED", authorId: author.id },
+      _sum: { viewCount: true },
+    }),
+  ]);
+
+  const totalArticles = articles.length;
+  const totalViews = viewAgg._sum.viewCount || 0;
+  const joinedDate = author.createdAt.toLocaleDateString("id-ID", {
+    month: "long",
+    year: "numeric",
+  });
+
   return (
     <div className="container-main py-8">
       {/* Author profile */}
       <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
           <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-primary-100 text-4xl font-bold text-primary-500">
-            {demoAuthor.name.charAt(0)}
+            {author.name.charAt(0)}
           </div>
           <div className="flex-1 text-center sm:text-left">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {demoAuthor.name}
+              {author.name}
             </h1>
-            <p className="mt-1 text-sm text-primary-500">{demoAuthor.role}</p>
-            {demoAuthor.specialization && (
+            <p className="mt-1 text-sm text-primary-500">{author.role.replace(/_/g, " ")}</p>
+            {author.specialization && (
               <p className="text-sm text-gray-500">
-                Spesialisasi: {demoAuthor.specialization}
+                Spesialisasi: {author.specialization}
               </p>
             )}
             <p className="mt-3 max-w-xl text-sm text-gray-600 dark:text-gray-400">
-              {demoAuthor.bio}
+              {author.bio}
             </p>
 
             <div className="mt-4 flex justify-center gap-6 sm:justify-start">
               <div className="flex items-center gap-1.5 text-sm text-gray-500">
                 <FileText size={14} />
                 <span className="font-semibold text-gray-900 dark:text-white">
-                  {demoAuthor.totalArticles}
+                  {totalArticles}
                 </span>{" "}
                 artikel
               </div>
               <div className="flex items-center gap-1.5 text-sm text-gray-500">
                 <Eye size={14} />
                 <span className="font-semibold text-gray-900 dark:text-white">
-                  {demoAuthor.totalViews.toLocaleString("id-ID")}
+                  {totalViews.toLocaleString("id-ID")}
                 </span>{" "}
                 views
               </div>
               <div className="flex items-center gap-1.5 text-sm text-gray-500">
                 <Calendar size={14} />
-                Bergabung {demoAuthor.joinedDate}
+                Bergabung {joinedDate}
               </div>
             </div>
           </div>
@@ -97,10 +94,10 @@ export default function PenulisPage({ params }: { params: { slug: string } }) {
       {/* Articles by author */}
       <div className="mt-8">
         <h2 className="mb-4 text-lg font-bold text-gray-900 dark:text-white">
-          Artikel oleh {demoAuthor.name}
+          Artikel oleh {author.name}
         </h2>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {demoArticles.map((article) => (
+          {articles.map((article) => (
             <ArticleCard key={article.slug} {...article} />
           ))}
         </div>

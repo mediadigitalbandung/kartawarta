@@ -1,60 +1,71 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Search as SearchIcon } from "lucide-react";
 import ArticleCard from "@/components/artikel/ArticleCard";
 
-const demoResults = [
-  {
-    title: "Mahkamah Konstitusi Putuskan Uji Materi UU Cipta Kerja",
-    slug: "mk-putuskan-uji-materi-uu-cipta-kerja",
-    excerpt: "MK memutuskan hasil uji materi terhadap beberapa pasal dalam UU Cipta Kerja.",
-    featuredImage: null,
-    category: { name: "Hukum Tata Negara", slug: "hukum-tata-negara" },
-    author: { name: "Ahmad Fauzi" },
-    publishedAt: new Date().toISOString(),
-    readTime: 5,
-    viewCount: 1250,
-    verificationLabel: "VERIFIED",
-  },
-  {
-    title: "Kasus Penipuan Online di Bandung Meningkat 40%",
-    slug: "kasus-penipuan-online-bandung-meningkat",
-    excerpt: "Data Polrestabes Bandung menunjukkan peningkatan signifikan kasus penipuan online.",
-    featuredImage: null,
-    category: { name: "Hukum Pidana", slug: "hukum-pidana" },
-    author: { name: "Siti Nurhaliza" },
-    publishedAt: new Date(Date.now() - 3600000).toISOString(),
-    readTime: 4,
-    viewCount: 890,
-    verificationLabel: "VERIFIED",
-  },
-];
+interface SearchResult {
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  featuredImage: string | null;
+  category: { name: string; slug: string };
+  author: { name: string };
+  publishedAt: string;
+  readTime: number | null;
+  viewCount: number;
+  verificationLabel: string;
+}
 
 function SearchContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const initialQuery = searchParams.get("q") || "";
   const [query, setQuery] = useState(initialQuery);
-  const [results, setResults] = useState(demoResults);
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
+
+  const fetchResults = async (q: string) => {
+    if (q.length < 2) {
+      setResults([]);
+      setTotal(0);
+      setSearched(false);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+      const json = await res.json();
+      if (json.success) {
+        setResults(json.data.articles || []);
+        setTotal(json.data.pagination?.total || json.data.articles?.length || 0);
+      } else {
+        setResults([]);
+        setTotal(0);
+      }
+    } catch {
+      setResults([]);
+      setTotal(0);
+    } finally {
+      setLoading(false);
+      setSearched(true);
+    }
+  };
 
   useEffect(() => {
     if (initialQuery) {
-      setResults(
-        demoResults.filter((a) =>
-          a.title.toLowerCase().includes(initialQuery.toLowerCase())
-        )
-      );
+      fetchResults(initialQuery);
     }
   }, [initialQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setResults(
-      demoResults.filter((a) =>
-        a.title.toLowerCase().includes(query.toLowerCase())
-      )
-    );
+    router.push(`/search?q=${encodeURIComponent(query)}`);
+    fetchResults(query);
   };
 
   return (
@@ -76,19 +87,27 @@ function SearchContent() {
         </div>
       </form>
 
-      {query && (
+      {loading && (
+        <div className="mt-8 flex justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" />
+        </div>
+      )}
+
+      {!loading && searched && query && (
         <p className="mt-4 text-sm text-gray-500">
-          {results.length} hasil ditemukan untuk &quot;{query}&quot;
+          {total} hasil ditemukan untuk &quot;{query}&quot;
         </p>
       )}
 
-      <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {results.map((article) => (
-          <ArticleCard key={article.slug} {...article} />
-        ))}
-      </div>
+      {!loading && (
+        <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {results.map((article) => (
+            <ArticleCard key={article.slug} {...article} />
+          ))}
+        </div>
+      )}
 
-      {results.length === 0 && query && (
+      {!loading && results.length === 0 && searched && query && (
         <div className="py-16 text-center">
           <SearchIcon size={48} className="mx-auto text-gray-300" />
           <p className="mt-4 text-gray-500">

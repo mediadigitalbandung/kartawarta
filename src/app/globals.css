@@ -25,47 +25,63 @@
   }
 
   .article-content h2 {
-    @apply mb-3 mt-8 text-2xl font-bold;
+    @apply mt-8 mb-4 text-xl font-bold text-gray-900 dark:text-white;
   }
 
   .article-content h3 {
-    @apply mb-2 mt-6 text-xl font-bold;
+    @apply mt-6 mb-3 text-lg font-bold text-gray-900 dark:text-white;
   }
 
   .article-content p {
-    @apply mb-4 leading-relaxed;
+    @apply mb-4;
   }
 
   .article-content blockquote {
-    @apply my-6 border-l-4 border-primary-500 bg-gray-50 py-4 pl-6 pr-4 italic dark:bg-gray-900;
+    @apply my-6 border-l-4 border-primary-500 bg-gray-50 px-6 py-4 italic text-gray-700 dark:bg-gray-800/50 dark:text-gray-300;
+  }
+
+  .article-content ul, .article-content ol {
+    @apply mb-4 ml-6 space-y-2;
   }
 
   .article-content ul {
-    @apply mb-4 list-disc pl-6;
+    @apply list-disc;
   }
 
   .article-content ol {
-    @apply mb-4 list-decimal pl-6;
+    @apply list-decimal;
   }
 
   .article-content li {
-    @apply mb-1;
+    @apply text-gray-700 dark:text-gray-300;
   }
 
   .article-content img {
-    @apply my-6 rounded-lg;
+    @apply my-4 rounded-lg;
   }
 
   .article-content a {
     @apply text-primary-500 underline hover:text-primary-600;
   }
 
+  .article-content table {
+    @apply my-4 w-full border-collapse border border-gray-200 dark:border-gray-700;
+  }
+
+  .article-content th, .article-content td {
+    @apply border border-gray-200 px-4 py-2 text-left dark:border-gray-700;
+  }
+
+  .article-content th {
+    @apply bg-gray-50 font-semibold dark:bg-gray-800;
+  }
+
   .badge {
-    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+    @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium;
   }
 
   .badge-verified {
-    @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200;
+    @apply bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400;
   }
 
   .badge-unverified {
@@ -79,6 +95,10 @@
   .badge-correction {
     @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200;
   }
+
+  .skeleton {
+    @apply animate-pulse rounded bg-gray-200 dark:bg-gray-700;
+  }
 }
 
 @keyframes ticker {
@@ -88,6 +108,24 @@
   100% {
     transform: translateX(-100%);
   }
+}
+
+/* News ticker animation enhancements */
+.news-ticker {
+  overflow: hidden;
+  position: relative;
+}
+.news-ticker-content {
+  display: flex;
+  white-space: nowrap;
+  animation: ticker-scroll 30s linear infinite;
+}
+@keyframes ticker-scroll {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+.news-ticker:hover .news-ticker-content {
+  animation-play-state: paused;
 }
 
 /* Copy protection overlay text */

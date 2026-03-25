@@ -13,13 +13,13 @@ const footerLinks = {
     { name: "Redaksi", href: "/redaksi" },
     { name: "Kode Etik", href: "/kode-etik" },
     { name: "Pedoman Media", href: "/pedoman-media" },
-    { name: "Koreksi & Klarifikasi", href: "/koreksi" },
+    { name: "Koreksi & Klarifikasi", href: "/kode-etik" },
   ],
   lainnya: [
     { name: "Kontak", href: "/kontak" },
     { name: "Kebijakan Privasi", href: "/privasi" },
     { name: "Syarat & Ketentuan", href: "/syarat-ketentuan" },
-    { name: "Pasang Iklan", href: "/iklan" },
+    { name: "Pasang Iklan", href: "/kontak" },
   ],
 };
 

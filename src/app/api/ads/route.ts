@@ -76,3 +76,35 @@ export async function POST(request: NextRequest) {
     return errorResponse(error);
   }
 }
+
+// DELETE /api/ads — admin only
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await requireRole(["SUPER_ADMIN"]);
+
+    const { searchParams } = new URL(request.url);
+    let id = searchParams.get("id");
+
+    if (!id) {
+      const body = await request.json().catch(() => null);
+      id = body?.id || null;
+    }
+
+    if (!id) {
+      return errorResponse({ message: "ID iklan wajib diisi", statusCode: 400 });
+    }
+
+    const existing = await prisma.ad.findUnique({ where: { id } });
+    if (!existing) {
+      return errorResponse({ message: "Iklan tidak ditemukan", statusCode: 404 });
+    }
+
+    await prisma.ad.delete({ where: { id } });
+
+    await logAudit(session.user.id, "DELETE", "ad", id, `Menghapus iklan: ${existing.name} (${existing.slot})`);
+
+    return successResponse({ message: "Iklan berhasil dihapus" });
+  } catch (error) {
+    return errorResponse(error);
+  }
+}

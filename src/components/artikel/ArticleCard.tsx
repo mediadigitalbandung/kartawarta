@@ -10,7 +10,7 @@ interface ArticleCardProps {
   featuredImage?: string | null;
   category: { name: string; slug: string };
   author: { name: string };
-  publishedAt: Date | string;
+  publishedAt: Date | string | null;
   readTime?: number | null;
   viewCount?: number;
   verificationLabel?: string;
@@ -79,7 +79,7 @@ export default function ArticleCard({
             <span className="flex items-center gap-1">
               <User size={12} /> {author.name}
             </span>
-            <span>{timeAgo(publishedAt)}</span>
+            <span>{publishedAt ? timeAgo(publishedAt) : "-"}</span>
             {readTime && (
               <span className="flex items-center gap-1">
                 <Clock size={12} /> {readTime} menit
@@ -108,7 +108,7 @@ export default function ArticleCard({
           >
             {title}
           </Link>
-          <p className="mt-1 text-xs text-gray-500">{timeAgo(publishedAt)}</p>
+          <p className="mt-1 text-xs text-gray-500">{publishedAt ? timeAgo(publishedAt) : "-"}</p>
         </div>
       </article>
     );
@@ -155,7 +155,7 @@ export default function ArticleCard({
               <User size={12} /> {author.name}
             </span>
             <span>&middot;</span>
-            <span>{timeAgo(publishedAt)}</span>
+            <span>{publishedAt ? timeAgo(publishedAt) : "-"}</span>
           </div>
           <div className="flex items-center gap-2">
             {readTime && (

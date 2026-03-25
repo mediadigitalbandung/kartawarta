@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import Image from "next/image";
 import { Metadata } from "next";
@@ -14,83 +16,92 @@ import {
 import CopyProtection from "@/components/artikel/CopyProtection";
 import Sidebar from "@/components/layout/Sidebar";
 import ArticleCard from "@/components/artikel/ArticleCard";
+import { prisma } from "@/lib/prisma";
+import { notFound } from "next/navigation";
+import DOMPurify from "isomorphic-dompurify";
+import { slugify } from "@/lib/utils";
 
-// Demo - akan diganti dengan fetch dari database
-const demoArticle = {
-  title: "Mahkamah Konstitusi Putuskan Uji Materi UU Cipta Kerja di Bandung",
-  slug: "mk-putuskan-uji-materi-uu-cipta-kerja",
-  content: `
-    <p>BANDUNG - Mahkamah Konstitusi Republik Indonesia telah memutuskan hasil uji materi terhadap beberapa pasal dalam Undang-Undang Cipta Kerja yang diajukan oleh serikat pekerja di Bandung. Putusan ini menjadi perhatian luas karena berdampak pada jutaan pekerja di seluruh Indonesia.</p>
-
-    <h2>Latar Belakang Gugatan</h2>
-    <p>Gugatan ini diajukan oleh Konfederasi Serikat Pekerja Bandung (KSPB) yang mewakili lebih dari 50.000 pekerja di wilayah Bandung Raya. Mereka menilai beberapa pasal dalam UU Cipta Kerja bertentangan dengan UUD 1945, khususnya terkait hak-hak pekerja.</p>
-
-    <blockquote>"Kami mengajukan gugatan ini demi melindungi hak-hak fundamental pekerja yang dijamin oleh konstitusi. Beberapa pasal dalam UU Cipta Kerja telah merugikan posisi tawar pekerja," ujar Ketua KSPB, Ahmad Fauzi.</blockquote>
-
-    <h2>Isi Putusan MK</h2>
-    <p>Dalam putusannya, MK memutuskan bahwa tiga dari lima pasal yang digugat dinyatakan bertentangan dengan UUD 1945. Putusan ini dibacakan oleh Ketua MK dalam sidang pleno yang dihadiri oleh sembilan hakim konstitusi.</p>
-
-    <p>Pasal-pasal yang dibatalkan antara lain:</p>
-    <ol>
-      <li>Pasal 59 ayat (2) tentang perjanjian kerja waktu tertentu</li>
-      <li>Pasal 66 ayat (1) tentang alih daya (outsourcing)</li>
-      <li>Pasal 77 ayat (3) tentang waktu kerja lembur</li>
-    </ol>
-
-    <h2>Dampak Putusan</h2>
-    <p>Putusan MK ini memiliki dampak signifikan terhadap dunia ketenagakerjaan di Indonesia, khususnya di Bandung sebagai salah satu kota industri terbesar di Jawa Barat. Para ahli hukum ketenagakerjaan menilai putusan ini sebagai langkah maju dalam perlindungan hak pekerja.</p>
-
-    <p>Prof. Dr. Hendra Wijaya, pakar hukum ketenagakerjaan dari Universitas Padjadjaran, menjelaskan bahwa putusan ini akan memaksa pemerintah untuk merevisi beberapa regulasi turunan dari UU Cipta Kerja.</p>
-
-    <blockquote>"Putusan MK ini menegaskan bahwa hak-hak pekerja tidak bisa dikurangi melalui undang-undang yang prosesnya bermasalah. Ini adalah kemenangan bagi demokrasi dan konstitusionalisme," kata Prof. Hendra.</blockquote>
-
-    <h2>Reaksi Pihak Terkait</h2>
-    <p>Pemerintah melalui Kementerian Ketenagakerjaan menyatakan akan menghormati putusan MK dan segera melakukan penyesuaian regulasi. Sementara itu, kalangan pengusaha menyatakan kekhawatiran terhadap dampak putusan ini terhadap iklim investasi.</p>
-
-    <p>Asosiasi Pengusaha Indonesia (APINDO) Jabar meminta agar implementasi putusan MK dilakukan secara bertahap untuk menghindari gejolak di sektor industri.</p>
-  `,
-  excerpt: "Mahkamah Konstitusi RI memutuskan hasil uji materi terhadap beberapa pasal dalam UU Cipta Kerja yang diajukan oleh serikat pekerja di Bandung.",
-  featuredImage: null,
-  category: { name: "Hukum Tata Negara", slug: "hukum-tata-negara" },
-  author: { name: "Ahmad Fauzi", bio: "Jurnalis hukum senior dengan pengalaman 10 tahun meliput berita hukum di wilayah Bandung.", avatar: null },
-  publishedAt: new Date().toISOString(),
-  readTime: 5,
-  viewCount: 1250,
-  verificationLabel: "VERIFIED" as const,
-  sources: [
-    { name: "Ahmad Fauzi", title: "Ketua KSPB", institution: "Konfederasi Serikat Pekerja Bandung" },
-    { name: "Prof. Dr. Hendra Wijaya", title: "Pakar Hukum Ketenagakerjaan", institution: "Universitas Padjadjaran" },
-  ],
-  tags: [
-    { name: "Mahkamah Konstitusi", slug: "mahkamah-konstitusi" },
-    { name: "UU Cipta Kerja", slug: "uu-cipta-kerja" },
-    { name: "Ketenagakerjaan", slug: "ketenagakerjaan" },
-  ],
-};
+async function getArticle(slug: string) {
+  const article = await prisma.article.findUnique({
+    where: { slug },
+    include: { author: true, category: true, sources: true, tags: true },
+  });
+  return article;
+}
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const article = await getArticle(params.slug);
+  if (!article) return { title: "Artikel Tidak Ditemukan" };
+
   return {
-    title: demoArticle.title,
-    description: demoArticle.excerpt,
+    title: article.title,
+    description: article.excerpt || "",
     openGraph: {
-      title: demoArticle.title,
-      description: demoArticle.excerpt || "",
+      title: article.seoTitle || article.title,
+      description: article.seoDescription || article.excerpt || "",
       type: "article",
-      publishedTime: demoArticle.publishedAt,
-      authors: [demoArticle.author.name],
+      publishedTime: article.publishedAt?.toISOString(),
+      authors: [article.author.name],
     },
   };
 }
 
-export default function ArticlePage({ params }: { params: { slug: string } }) {
-  const article = demoArticle;
+export default async function ArticlePage({ params }: { params: { slug: string } }) {
+  const article = await getArticle(params.slug);
+  if (!article) notFound();
+
+  // Increment view count
+  await prisma.article.update({
+    where: { slug: params.slug },
+    data: { viewCount: { increment: 1 } },
+  });
+
+  // Fetch related articles (same category, exclude current)
+  const relatedArticles = await prisma.article.findMany({
+    where: {
+      status: "PUBLISHED",
+      categoryId: article.categoryId,
+      id: { not: article.id },
+    },
+    include: { author: true, category: true },
+    orderBy: { publishedAt: "desc" },
+    take: 3,
+  });
+
+  // Fetch trending for sidebar
+  const trendingArticles = await prisma.article.findMany({
+    where: { status: "PUBLISHED" },
+    include: { category: true },
+    orderBy: { viewCount: "desc" },
+    take: 5,
+  });
+
+  const sidebarTrending = trendingArticles.map((a) => ({
+    title: a.title,
+    slug: a.slug,
+    category: a.category.name,
+    publishedAt: a.publishedAt
+      ? new Date(a.publishedAt).toLocaleDateString("id-ID")
+      : "",
+    viewCount: a.viewCount,
+  }));
+
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://jurnalishukumbandung.com";
+  const articleUrl = `${appUrl}/berita/${params.slug}`;
+  const sanitizedContent = DOMPurify.sanitize(article.content);
+
+  const shareLinks = {
+    WhatsApp: `https://wa.me/?text=${encodeURIComponent(article.title + " " + articleUrl)}`,
+    Twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(articleUrl)}`,
+    Facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}`,
+    Telegram: `https://t.me/share/url?url=${encodeURIComponent(articleUrl)}&text=${encodeURIComponent(article.title)}`,
+  };
 
   return (
     <>
       <CopyProtection
         authorName={article.author.name}
-        articleUrl={`${appUrl}/berita/${params.slug}`}
+        articleUrl={articleUrl}
         articleTitle={article.title}
       />
 
@@ -139,10 +150,12 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
               </span>
               <span className="flex items-center gap-1.5">
                 <Calendar size={14} />
-                {new Date(article.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                {article.publishedAt
+                  ? new Date(article.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
+                  : "-"}
               </span>
               <span className="flex items-center gap-1.5">
-                <Clock size={14} /> {article.readTime} menit baca
+                <Clock size={14} /> {article.readTime ?? 0} menit baca
               </span>
               <span className="flex items-center gap-1.5">
                 <Eye size={14} /> {article.viewCount.toLocaleString("id-ID")} views
@@ -161,13 +174,16 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
               <Share2 size={14} className="text-gray-500" />
               <span className="text-xs font-medium text-gray-500">BAGIKAN:</span>
               <div className="flex gap-1.5">
-                {["WhatsApp", "Twitter", "Facebook", "Telegram"].map((platform) => (
-                  <button
+                {(Object.entries(shareLinks) as [string, string][]).map(([platform, url]) => (
+                  <a
                     key={platform}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 hover:bg-primary-500 hover:text-white dark:bg-gray-800 dark:text-gray-400"
                   >
                     {platform}
-                  </button>
+                  </a>
                 ))}
               </div>
             </div>
@@ -175,7 +191,7 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
             {/* Article content */}
             <div
               className="article-content mt-6 font-serif text-[17px] leading-[1.8] text-gray-800 dark:text-gray-200"
-              dangerouslySetInnerHTML={{ __html: article.content }}
+              dangerouslySetInnerHTML={{ __html: sanitizedContent }}
             />
 
             {/* Sources */}
@@ -231,7 +247,7 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
                     {article.author.bio}
                   </p>
                   <Link
-                    href={`/penulis/${article.author.name.toLowerCase().replace(/\s+/g, "-")}`}
+                    href={`/penulis/${slugify(article.author.name)}`}
                     className="mt-2 inline-block text-sm text-primary-500 hover:underline"
                   >
                     Lihat semua artikel &rarr;
@@ -239,17 +255,25 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
                 </div>
               </div>
             </div>
+
+            {/* Related articles */}
+            {relatedArticles.length > 0 && (
+              <section className="mt-8">
+                <h2 className="mb-4 text-lg font-bold text-gray-900 dark:text-white">
+                  Berita Terkait
+                </h2>
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+                  {relatedArticles.map((related) => (
+                    <ArticleCard key={related.slug} {...related} />
+                  ))}
+                </div>
+              </section>
+            )}
           </article>
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <Sidebar
-              trending={[
-                { title: "Kasus Penipuan Online Meningkat", slug: "kasus-penipuan", category: "Hukum Pidana", publishedAt: "25 Mar 2026" },
-                { title: "Sengketa Lahan Bandung Utara", slug: "sengketa-lahan", category: "Hukum Perdata", publishedAt: "25 Mar 2026" },
-                { title: "LBH Soroti Pelanggaran HAM", slug: "lbh-pelanggaran", category: "HAM", publishedAt: "24 Mar 2026" },
-              ]}
-            />
+            <Sidebar trending={sidebarTrending} />
           </div>
         </div>
       </div>
