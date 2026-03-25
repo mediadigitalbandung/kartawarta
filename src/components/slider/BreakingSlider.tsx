@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface BreakingItem {
   title: string;
@@ -72,22 +72,9 @@ export default function BreakingSlider({ items }: BreakingSliderProps) {
           </span>
         </div>
         {total > 1 && (
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={prev}
-              className="flex h-6 w-6 items-center justify-center rounded-full text-white/40 transition-colors hover:bg-white/10 hover:text-white"
-              aria-label="Previous"
-            >
-              <ChevronUp size={14} />
-            </button>
-            <button
-              onClick={next}
-              className="flex h-6 w-6 items-center justify-center rounded-full text-white/40 transition-colors hover:bg-white/10 hover:text-white"
-              aria-label="Next"
-            >
-              <ChevronDown size={14} />
-            </button>
-          </div>
+          <span className="text-[10px] tabular-nums text-white/30 font-medium">
+            {String(current + 1).padStart(2, "0")}<span className="mx-0.5 text-white/15">/</span>{String(total).padStart(2, "0")}
+          </span>
         )}
       </div>
 
@@ -163,6 +150,26 @@ export default function BreakingSlider({ items }: BreakingSliderProps) {
             </div>
           );
         })}
+
+        {/* Hover arrows */}
+        {total > 1 && (
+          <>
+            <button
+              onClick={prev}
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/50 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/20 hover:text-white"
+              aria-label="Previous"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button
+              onClick={next}
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/50 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/20 hover:text-white"
+              aria-label="Next"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </>
+        )}
       </div>
 
       {/* Bottom progress bar */}
