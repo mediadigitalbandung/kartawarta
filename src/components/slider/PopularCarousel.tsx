@@ -1,5 +1,9 @@
+"use client";
+
+import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PopularItem {
   title: string;
@@ -17,59 +21,137 @@ interface PopularCarouselProps {
 }
 
 export default function PopularCarousel({ items }: PopularCarouselProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 10);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", checkScroll, { passive: true });
+    checkScroll();
+    // Recheck on resize
+    window.addEventListener("resize", checkScroll);
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+    };
+  }, [checkScroll]);
+
+  const scroll = useCallback((dir: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardWidth = el.querySelector("article")?.offsetWidth || 280;
+    const gap = 20;
+    const distance = (cardWidth + gap) * 4; // scroll 4 cards at a time
+    const start = el.scrollLeft;
+    const target = dir === "right" ? start + distance : start - distance;
+    // Smooth with rAF
+    let startTime: number | null = null;
+    const duration = 500;
+    const ease = (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const step = (ts: number) => {
+      if (!startTime) startTime = ts;
+      const progress = Math.min((ts - startTime) / duration, 1);
+      el.scrollLeft = start + (target - start) * ease(progress);
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, []);
+
   if (items.length === 0) return null;
 
   const formatDate = (d: Date | string | null) =>
     d ? new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : "";
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-      {items.slice(0, 8).map((article, i) => (
-        <article key={article.slug} className="group flex gap-3">
-          {/* Rank number — large elegant typography */}
-          <span className="shrink-0 w-8 text-right font-serif text-[2.5rem] font-bold leading-none text-border select-none">
-            {i + 1}
-          </span>
-
-          <div className="flex-1 min-w-0">
-            {/* Image */}
-            <Link href={`/berita/${article.slug}`} className="block">
-              <div className="relative aspect-[16/10] w-full overflow-hidden rounded-sm">
-                {article.featuredImage ? (
-                  <Image
-                    src={article.featuredImage}
-                    alt={article.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="h-full w-full bg-surface-tertiary" />
-                )}
-              </div>
-            </Link>
-            {/* Content */}
-            <div className="mt-2">
-              <span className="text-[11px] font-bold uppercase tracking-wide text-goto-green">
-                {article.category.name}
+    <div className="relative">
+      {/* Scrollable row — 4 visible, manual scroll only */}
+      <div
+        ref={scrollRef}
+        className="flex gap-5 overflow-x-auto scrollbar-hide"
+      >
+        {items.map((article, i) => (
+          <article
+            key={article.slug}
+            className="group w-[calc(25%-15px)] min-w-[220px] shrink-0"
+          >
+            <div className="flex gap-3">
+              {/* Rank number */}
+              <span className="shrink-0 w-7 text-right font-serif text-[2rem] font-bold leading-none text-border/80 select-none">
+                {i + 1}
               </span>
-              <Link href={`/berita/${article.slug}`}>
-                <h3 className="mt-0.5 text-sm font-bold leading-snug text-txt-primary line-clamp-2 group-hover:underline">
-                  {article.title}
-                </h3>
-              </Link>
-              <div className="mt-1 flex items-center gap-2 text-[11px] text-txt-muted">
-                <span>{formatDate(article.publishedAt)}</span>
-                {article.viewCount !== undefined && article.viewCount > 0 && (
-                  <>
-                    <span className="h-2.5 w-px bg-border" />
-                    <span>{article.viewCount.toLocaleString("id-ID")} views</span>
-                  </>
-                )}
+
+              <div className="flex-1 min-w-0">
+                {/* Image */}
+                <Link href={`/berita/${article.slug}`} className="block">
+                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-sm">
+                    {article.featuredImage ? (
+                      <Image
+                        src={article.featuredImage}
+                        alt={article.title}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-surface-tertiary" />
+                    )}
+                  </div>
+                </Link>
+                {/* Content */}
+                <div className="mt-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wide text-goto-green">
+                    {article.category.name}
+                  </span>
+                  <Link href={`/berita/${article.slug}`}>
+                    <h3 className="mt-0.5 text-sm font-bold leading-snug text-txt-primary line-clamp-2 group-hover:underline">
+                      {article.title}
+                    </h3>
+                  </Link>
+                  <div className="mt-1 flex items-center gap-2 text-[11px] text-txt-muted">
+                    <span>{formatDate(article.publishedAt)}</span>
+                    {article.viewCount !== undefined && article.viewCount > 0 && (
+                      <>
+                        <span className="h-2.5 w-px bg-border" />
+                        <span>{article.viewCount.toLocaleString("id-ID")} views</span>
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </article>
-      ))}
+          </article>
+        ))}
+      </div>
+
+      {/* Left arrow */}
+      {canScrollLeft && (
+        <button
+          onClick={() => scroll("left")}
+          className="absolute -left-4 top-[25%] -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-txt-secondary shadow-card transition-all duration-200 hover:border-txt-muted hover:text-txt-primary hover:shadow-card-hover hover:scale-110"
+          aria-label="Scroll left"
+        >
+          <ChevronLeft size={18} strokeWidth={1.5} />
+        </button>
+      )}
+
+      {/* Right arrow */}
+      {canScrollRight && (
+        <button
+          onClick={() => scroll("right")}
+          className="absolute -right-4 top-[25%] -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-txt-secondary shadow-card transition-all duration-200 hover:border-txt-muted hover:text-txt-primary hover:shadow-card-hover hover:scale-110"
+          aria-label="Scroll right"
+        >
+          <ChevronRight size={18} strokeWidth={1.5} />
+        </button>
+      )}
     </div>
   );
 }
