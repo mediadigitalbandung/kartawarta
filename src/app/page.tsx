@@ -3,6 +3,8 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import ArticleCard from "@/components/artikel/ArticleCard";
 import NewsTicker from "@/components/layout/NewsTicker";
+import HeadlineSlider from "@/components/slider/HeadlineSlider";
+import BreakingSlider from "@/components/slider/BreakingSlider";
 import SimulationBadge from "@/components/SimulationBadge";
 import { Scale, BookOpen, Gavel, Shield, Users, Landmark, LucideIcon, Globe, Monitor, Building2, FileText, AlertTriangle, Radio, BarChart3, Calendar, Play, Vote, TrendingUp } from "lucide-react";
 import { prisma } from "@/lib/prisma";
@@ -89,9 +91,9 @@ export default async function HomePage() {
     }),
   ]);
 
-  const featured = articles[0];
-  const heroSidebar = articles.slice(1, 4);
-  const restArticles = articles.slice(4);
+  const headlineArticles = articles.slice(0, 5);  // For headline slider
+  const breakingArticles = articles.slice(5, 10); // For breaking news slider
+  const restArticles = articles.slice(5);
 
   const tickerItems = tickerArticles.map((a) => ({
     title: a.title,
@@ -115,25 +117,21 @@ export default async function HomePage() {
     <>
       <NewsTicker items={tickerItems} />
 
-      {/* Hero Section — DATA REAL */}
-      {featured && (
-        <section className="bg-surface py-8">
-          <div className="container-main">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <ArticleCard {...featured} variant="hero" />
-              </div>
-              {heroSidebar.length > 0 && (
-                <div className="lg:col-span-1 divide-y divide-border">
-                  {heroSidebar.map((a) => (
-                    <ArticleCard key={a.slug} {...a} variant="compact" />
-                  ))}
-                </div>
-              )}
+      {/* Headline News Slider + Breaking News */}
+      <section className="bg-surface py-6">
+        <div className="container-main">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Headline Slider — 2/3 width */}
+            <div className="lg:col-span-2">
+              <HeadlineSlider items={JSON.parse(JSON.stringify(headlineArticles))} />
+            </div>
+            {/* Breaking News Slider — 1/3 width */}
+            <div className="lg:col-span-1">
+              <BreakingSlider items={JSON.parse(JSON.stringify(breakingArticles))} />
             </div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       <div className="border-b border-border" />
 
