@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-// no arrow icons needed
 
 interface BreakingItem {
   title: string;
@@ -36,14 +35,6 @@ export default function BreakingSlider({ items }: BreakingSliderProps) {
     }, 700);
   }, [current, transitioning]);
 
-  const next = useCallback(() => {
-    goToSlide((current + 1) % total);
-  }, [current, total, goToSlide]);
-
-  const prev = useCallback(() => {
-    goToSlide((current - 1 + total) % total);
-  }, [current, total, goToSlide]);
-
   useEffect(() => {
     if (total <= 1) return;
     if (timerRef.current) clearInterval(timerRef.current);
@@ -59,9 +50,81 @@ export default function BreakingSlider({ items }: BreakingSliderProps) {
     d ? new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : "";
 
   return (
-    <div className="group relative overflow-hidden rounded-lg bg-surface-dark h-full flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-surface-dark border-b border-white/10">
+    <div className="group relative overflow-hidden rounded-lg bg-surface-dark h-full min-h-[320px]">
+      {/* Slides — full bleed, no gap */}
+      {items.map((article, i) => {
+        const isActive = i === current;
+        const isLeaving = i === previous;
+        const isVisible = isActive || isLeaving;
+
+        return (
+          <div
+            key={article.slug}
+            className="absolute inset-0"
+            style={{
+              zIndex: isActive ? 2 : isLeaving ? 1 : 0,
+              opacity: isVisible ? 1 : 0,
+              visibility: isVisible ? "visible" : "hidden",
+              transition: "opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1)",
+            }}
+          >
+            {/* Background image — full bleed with Ken Burns */}
+            <div
+              className="absolute inset-0"
+              style={{
+                transform: isActive ? "scale(1.04)" : "scale(1)",
+                transition: isActive ? "transform 6s ease-out" : "none",
+              }}
+            >
+              {article.featuredImage ? (
+                <Image
+                  src={article.featuredImage}
+                  alt={article.title}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="h-full w-full bg-surface-dark" />
+              )}
+            </div>
+
+            {/* Gradient overlay — top dark for header, bottom dark for text */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/20 to-black/80" />
+
+            {/* Content at bottom */}
+            <div
+              className="absolute bottom-0 left-0 right-0 px-4 pb-9 pt-4"
+              style={{
+                transform: isActive ? "translateY(0)" : "translateY(12px)",
+                opacity: isActive ? 1 : 0,
+                transition: isActive
+                  ? "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s, opacity 0.5s ease 0.1s"
+                  : "transform 0.3s ease, opacity 0.2s ease",
+              }}
+            >
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-white/50">
+                {article.category.name}
+              </span>
+              <Link href={`/berita/${article.slug}`}>
+                <h3 className="mt-1 text-[15px] font-bold leading-snug text-white line-clamp-3">
+                  {article.title}
+                </h3>
+              </Link>
+              {article.excerpt && (
+                <p className="mt-1.5 text-xs leading-relaxed text-white/40 line-clamp-2">
+                  {article.excerpt}
+                </p>
+              )}
+              <span className="mt-2 block text-[10px] text-white/30">
+                {formatDate(article.publishedAt)}
+              </span>
+            </div>
+          </div>
+        );
+      })}
+
+      {/* Header overlay — floats on top of image */}
+      <div className="absolute top-0 left-0 right-0 z-10 flex items-center px-4 py-2.5">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
@@ -73,98 +136,23 @@ export default function BreakingSlider({ items }: BreakingSliderProps) {
         </div>
       </div>
 
-      {/* Slides — crossfade with image background */}
-      <div className="relative flex-1 min-h-[280px]">
-        {items.map((article, i) => {
-          const isActive = i === current;
-          const isLeaving = i === previous;
-          const isVisible = isActive || isLeaving;
-
-          return (
-            <div
-              key={article.slug}
-              className="absolute inset-0"
-              style={{
-                zIndex: isActive ? 2 : isLeaving ? 1 : 0,
-                opacity: isVisible ? 1 : 0,
-                visibility: isVisible ? "visible" : "hidden",
-                transition: "opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1)",
-              }}
-            >
-              {/* Background image with Ken Burns */}
-              <div
-                className="absolute -inset-1"
-                style={{
-                  transform: isActive ? "scale(1.04)" : "scale(1.01)",
-                  transition: isActive ? "transform 6s ease-out" : "none",
-                }}
-              >
-                {article.featuredImage ? (
-                  <Image
-                    src={article.featuredImage}
-                    alt={article.title}
-                    fill
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="h-full w-full bg-surface-dark" />
-                )}
-              </div>
-
-              {/* Dark overlay — single smooth gradient */}
-              <div className="absolute -inset-1 bg-gradient-to-t from-black/90 from-10% via-black/50 via-50% to-black/20" />
-
-              {/* Content — slide up */}
-              <div
-                className="absolute bottom-0 left-0 right-0 px-4 pt-4 pb-8"
-                style={{
-                  transform: isActive ? "translateY(0)" : "translateY(12px)",
-                  opacity: isActive ? 1 : 0,
-                  transition: isActive
-                    ? "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s, opacity 0.5s ease 0.1s"
-                    : "transform 0.3s ease, opacity 0.2s ease",
-                }}
-              >
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-white/50">
-                  {article.category.name}
-                </span>
-                <Link href={`/berita/${article.slug}`}>
-                  <h3 className="mt-1 text-[15px] font-bold leading-snug text-white line-clamp-3">
-                    {article.title}
-                  </h3>
-                </Link>
-                {article.excerpt && (
-                  <p className="mt-1.5 text-xs leading-relaxed text-white/40 line-clamp-2">
-                    {article.excerpt}
-                  </p>
-                )}
-                <span className="mt-2 block text-[10px] text-white/30">
-                  {formatDate(article.publishedAt)}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-
-        {/* Dot indicators */}
-        {total > 1 && (
-          <div className="absolute bottom-3 left-0 right-0 z-10 flex items-center justify-center gap-1.5">
-            {items.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => goToSlide(i)}
-                className={`rounded-full transition-all duration-300 ${
-                  i === current
-                    ? "h-2 w-2 bg-white"
-                    : "h-1.5 w-1.5 bg-white/30 hover:bg-white/50"
-                }`}
-                aria-label={`Slide ${i + 1}`}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
+      {/* Dot indicators */}
+      {total > 1 && (
+        <div className="absolute bottom-3 left-0 right-0 z-10 flex items-center justify-center gap-1.5">
+          {items.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => goToSlide(i)}
+              className={`rounded-full transition-all duration-300 ${
+                i === current
+                  ? "h-2 w-2 bg-white"
+                  : "h-1.5 w-1.5 bg-white/30 hover:bg-white/50"
+              }`}
+              aria-label={`Slide ${i + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
