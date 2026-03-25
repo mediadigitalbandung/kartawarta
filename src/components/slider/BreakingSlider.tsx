@@ -102,7 +102,7 @@ export default function BreakingSlider({ items }: BreakingSliderProps) {
 
             {/* Content at bottom */}
             <div
-              className="absolute bottom-0 left-0 right-0 px-4 pb-9 pt-4"
+              className="absolute bottom-0 left-0 right-0 px-12 pb-9 pt-4"
               style={{
                 transform: isActive ? "translateY(0)" : "translateY(12px)",
                 opacity: isActive ? 1 : 0,

@@ -112,7 +112,7 @@ export default function HeadlineSlider({ items }: HeadlineSliderProps) {
 
               {/* Content — slides up on enter */}
               <div
-                className="absolute bottom-0 left-0 right-0 px-5 pt-5 pb-9 sm:px-8 sm:pt-8 sm:pb-12"
+                className="absolute bottom-0 left-0 right-0 px-14 pt-5 pb-9 sm:px-16 sm:pt-8 sm:pb-12"
                 style={{
                   transform: isActive && transitioning ? "translateY(0)" : isActive ? "translateY(0)" : "translateY(20px)",
                   opacity: isActive ? 1 : 0,
@@ -126,7 +126,7 @@ export default function HeadlineSlider({ items }: HeadlineSliderProps) {
                 </span>
 
                 <Link href={`/berita/${article.slug}`}>
-                  <h2 className="mt-2 text-xl font-extrabold leading-[1.15] text-white sm:text-2xl lg:text-[2.1rem] max-w-[90%]">
+                  <h2 className="mt-2 text-lg font-extrabold leading-[1.2] text-white sm:text-xl lg:text-2xl">
                     {article.title}
                   </h2>
                 </Link>
