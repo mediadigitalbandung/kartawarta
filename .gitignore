@@ -1,0 +1,58 @@
+# WordPress sensitive files
+www/wp-config.php
+www/wp-content/debug.log
+www/wp-content/cache/
+www/wp-content/uploads/
+www/wp-content/upgrade/
+www/wp-content/backups/
+www/wp-content/backup-db/
+www/wp-content/advanced-cache.php
+www/wp-content/wp-cache-config.php
+www/wp-content/plugins/backuply-pro/
+www/wp-content/plugins/cookieadmin-pro/
+www/wp-content/plugins/gosmtp-pro/
+www/wp-content/plugins/loginizer-security/
+www/wp-content/plugins/pagelayer-pro/
+www/wp-content/plugins/siteseo-pro/
+www/wp-content/plugins/socialfeeds-pro/
+www/wp-content/plugins/speedycache-pro/
+
+# Environment
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Node (untuk project Next.js nanti)
+node_modules/
+.next/
+out/
+.vercel/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Hosting directories (sensitive)
+access-logs/
+db/
+logs/
+mail/
+public_html/
+ssl/
+tmp/
+etc/
+
+# Old WordPress files (will be replaced by Next.js)
+www/
