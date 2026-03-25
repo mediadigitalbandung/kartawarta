@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+// no arrow icons needed
 
 interface BreakingItem {
   title: string;
@@ -71,11 +71,6 @@ export default function BreakingSlider({ items }: BreakingSliderProps) {
             Breaking News
           </span>
         </div>
-        {total > 1 && (
-          <span className="text-[10px] tabular-nums text-white/30 font-medium">
-            {String(current + 1).padStart(2, "0")}<span className="mx-0.5 text-white/15">/</span>{String(total).padStart(2, "0")}
-          </span>
-        )}
       </div>
 
       {/* Slides — crossfade with image background */}
@@ -121,7 +116,7 @@ export default function BreakingSlider({ items }: BreakingSliderProps) {
 
               {/* Content — slide up */}
               <div
-                className="absolute bottom-0 left-0 right-0 p-4"
+                className="absolute bottom-0 left-0 right-0 px-4 pt-4 pb-8"
                 style={{
                   transform: isActive ? "translateY(0)" : "translateY(12px)",
                   opacity: isActive ? 1 : 0,
@@ -151,56 +146,25 @@ export default function BreakingSlider({ items }: BreakingSliderProps) {
           );
         })}
 
-        {/* Hover arrows */}
+        {/* Dot indicators */}
         {total > 1 && (
-          <>
-            <button
-              onClick={prev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/50 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/20 hover:text-white"
-              aria-label="Previous"
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <button
-              onClick={next}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/50 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white/20 hover:text-white"
-              aria-label="Next"
-            >
-              <ChevronRight size={16} />
-            </button>
-          </>
+          <div className="absolute bottom-3 left-0 right-0 z-10 flex items-center justify-center gap-1.5">
+            {items.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => goToSlide(i)}
+                className={`rounded-full transition-all duration-300 ${
+                  i === current
+                    ? "h-2 w-2 bg-white"
+                    : "h-1.5 w-1.5 bg-white/30 hover:bg-white/50"
+                }`}
+                aria-label={`Slide ${i + 1}`}
+              />
+            ))}
+          </div>
         )}
       </div>
 
-      {/* Bottom progress bar */}
-      {total > 1 && (
-        <div className="flex gap-px bg-surface-dark">
-          {items.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => goToSlide(i)}
-              className="relative h-[2px] flex-1 bg-white/10 overflow-hidden"
-              aria-label={`Slide ${i + 1}`}
-            >
-              <div
-                className={`absolute inset-y-0 left-0 bg-red-500 ${
-                  i === current ? "animate-breaking-progress" : i < current ? "w-full" : "w-0"
-                }`}
-              />
-            </button>
-          ))}
-        </div>
-      )}
-
-      <style jsx>{`
-        @keyframes breakingProgress {
-          from { width: 0%; }
-          to { width: 100%; }
-        }
-        .animate-breaking-progress {
-          animation: breakingProgress 5s linear forwards;
-        }
-      `}</style>
     </div>
   );
 }
