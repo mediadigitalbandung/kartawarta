@@ -1,9 +1,5 @@
-"use client";
-
-import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PopularItem {
   title: string;
@@ -21,105 +17,21 @@ interface PopularCarouselProps {
 }
 
 export default function PopularCarousel({ items }: PopularCarouselProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-  const autoRef = useRef<NodeJS.Timeout | null>(null);
-  const total = items.length;
-
-  const checkScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 10);
-    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
-  }, []);
-
-  // Custom smooth scroll with easeInOutCubic
-  const smoothScrollTo = useCallback((target: number, duration = 800) => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const start = el.scrollLeft;
-    const distance = target - start;
-    let startTime: number | null = null;
-
-    const easeInOutCubic = (t: number) =>
-      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-
-    const step = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const elapsed = timestamp - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      el.scrollLeft = start + distance * easeInOutCubic(progress);
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, []);
-
-  const scroll = useCallback((dir: "left" | "right") => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const cardWidth = el.clientWidth / 4 + 20;
-    const target = dir === "right"
-      ? el.scrollLeft + cardWidth
-      : el.scrollLeft - cardWidth;
-    smoothScrollTo(target, 700);
-  }, [smoothScrollTo]);
-
-  // Auto-scroll
-  const startAuto = useCallback(() => {
-    if (autoRef.current) clearInterval(autoRef.current);
-    autoRef.current = setInterval(() => {
-      const el = scrollRef.current;
-      if (!el) return;
-      if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 10) {
-        smoothScrollTo(0, 1000);
-      } else {
-        const cardWidth = el.clientWidth / 4 + 20;
-        smoothScrollTo(el.scrollLeft + cardWidth, 700);
-      }
-    }, 4000);
-  }, [smoothScrollTo]);
-
-  useEffect(() => {
-    if (total <= 4) return;
-    startAuto();
-    return () => { if (autoRef.current) clearInterval(autoRef.current); };
-  }, [startAuto, total]);
-
-  const pauseAuto = () => { if (autoRef.current) clearInterval(autoRef.current); };
-  const resumeAuto = () => { startAuto(); };
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.addEventListener("scroll", checkScroll, { passive: true });
-    checkScroll();
-    return () => el.removeEventListener("scroll", checkScroll);
-  }, [checkScroll]);
-
   if (items.length === 0) return null;
 
   const formatDate = (d: Date | string | null) =>
     d ? new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : "";
 
   return (
-    <div
-      className="relative group"
-      onMouseEnter={pauseAuto}
-      onMouseLeave={resumeAuto}
-    >
-      {/* Scrollable container */}
-      <div
-        ref={scrollRef}
-        className="flex gap-5 overflow-x-auto scrollbar-hide scroll-smooth"
-        style={{ scrollSnapType: "x mandatory" }}
-      >
-        {items.map((article, i) => (
-          <article
-            key={article.slug}
-            className="w-[calc(25%-15px)] min-w-[240px] shrink-0"
-            style={{ scrollSnapAlign: "start" }}
-          >
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {items.slice(0, 8).map((article, i) => (
+        <article key={article.slug} className="group flex gap-3">
+          {/* Rank number — large elegant typography */}
+          <span className="shrink-0 w-8 text-right font-serif text-[2.5rem] font-bold leading-none text-border select-none">
+            {i + 1}
+          </span>
+
+          <div className="flex-1 min-w-0">
             {/* Image */}
             <Link href={`/berita/${article.slug}`} className="block">
               <div className="relative aspect-[16/10] w-full overflow-hidden rounded-sm">
@@ -128,28 +40,24 @@ export default function PopularCarousel({ items }: PopularCarouselProps) {
                     src={article.featuredImage}
                     alt={article.title}
                     fill
-                    className="object-cover transition-transform duration-500 hover:scale-105"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 ) : (
                   <div className="h-full w-full bg-surface-tertiary" />
                 )}
-                {/* Rank badge */}
-                <div className="absolute top-2 left-2 flex h-6 w-6 items-center justify-center rounded-full bg-goto-green text-[11px] font-bold text-white">
-                  {i + 1}
-                </div>
               </div>
             </Link>
             {/* Content */}
-            <div className="mt-2.5">
+            <div className="mt-2">
               <span className="text-[11px] font-bold uppercase tracking-wide text-goto-green">
                 {article.category.name}
               </span>
               <Link href={`/berita/${article.slug}`}>
-                <h3 className="mt-1 text-sm font-bold leading-snug text-txt-primary line-clamp-2 hover:underline">
+                <h3 className="mt-0.5 text-sm font-bold leading-snug text-txt-primary line-clamp-2 group-hover:underline">
                   {article.title}
                 </h3>
               </Link>
-              <div className="mt-1.5 flex items-center gap-2 text-[11px] text-txt-muted">
+              <div className="mt-1 flex items-center gap-2 text-[11px] text-txt-muted">
                 <span>{formatDate(article.publishedAt)}</span>
                 {article.viewCount !== undefined && article.viewCount > 0 && (
                   <>
@@ -159,31 +67,9 @@ export default function PopularCarousel({ items }: PopularCarouselProps) {
                 )}
               </div>
             </div>
-          </article>
-        ))}
-      </div>
-
-      {/* Left arrow */}
-      {canScrollLeft && (
-        <button
-          onClick={() => scroll("left")}
-          className="absolute left-0 top-[30%] -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-txt-secondary shadow-card transition-all duration-200 hover:border-txt-muted hover:text-txt-primary hover:shadow-card-hover hover:scale-110"
-          aria-label="Scroll left"
-        >
-          <ChevronLeft size={18} strokeWidth={1.5} />
-        </button>
-      )}
-
-      {/* Right arrow */}
-      {canScrollRight && (
-        <button
-          onClick={() => scroll("right")}
-          className="absolute right-0 top-[30%] -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-txt-secondary shadow-card transition-all duration-200 hover:border-txt-muted hover:text-txt-primary hover:shadow-card-hover hover:scale-110"
-          aria-label="Scroll right"
-        >
-          <ChevronRight size={18} strokeWidth={1.5} />
-        </button>
-      )}
+          </div>
+        </article>
+      ))}
     </div>
   );
 }
