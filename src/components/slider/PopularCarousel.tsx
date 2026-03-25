@@ -83,28 +83,26 @@ export default function PopularCarousel({ items }: PopularCarouselProps) {
             key={article.slug}
             className="group w-[calc(25%-15px)] min-w-[220px] shrink-0"
           >
-            <div className="flex gap-3">
-              {/* Rank number */}
-              <span className="shrink-0 w-7 text-right font-serif text-[2rem] font-bold leading-none text-border/80 select-none">
-                {i + 1}
-              </span>
-
-              <div className="flex-1 min-w-0">
-                {/* Image */}
-                <Link href={`/berita/${article.slug}`} className="block">
-                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-sm">
-                    {article.featuredImage ? (
-                      <Image
-                        src={article.featuredImage}
-                        alt={article.title}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="h-full w-full bg-surface-tertiary" />
-                    )}
+            <div>
+              {/* Image with rank overlay */}
+              <Link href={`/berita/${article.slug}`} className="block">
+                <div className="relative aspect-[16/10] w-full overflow-hidden rounded-sm">
+                  {article.featuredImage ? (
+                    <Image
+                      src={article.featuredImage}
+                      alt={article.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-surface-tertiary" />
+                  )}
+                  {/* Rank number overlay */}
+                  <div className="absolute bottom-0 left-0 flex h-10 w-10 items-center justify-center bg-goto-green">
+                    <span className="text-lg font-extrabold text-white">{i + 1}</span>
                   </div>
-                </Link>
+                </div>
+              </Link>
                 {/* Content */}
                 <div className="mt-2">
                   <span className="text-[11px] font-bold uppercase tracking-wide text-goto-green">
@@ -125,7 +123,6 @@ export default function PopularCarousel({ items }: PopularCarouselProps) {
                     )}
                   </div>
                 </div>
-              </div>
             </div>
           </article>
         ))}
