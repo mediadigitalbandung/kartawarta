@@ -27,20 +27,20 @@ const footerLinks = {
 
 export default function Footer() {
   return (
-    <footer className="bg-press text-newsprint">
-      <div className="container-main py-12">
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+    <footer className="bg-surface-dark text-txt-inverse">
+      <div className="container-main py-16">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div>
-            <div>
-              <span className="font-sans text-lg text-newsprint font-normal">
-                Jurnalis Hukum
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-goto-green text-sm font-bold text-white">
+                JH
               </span>
-              <span className="ml-1.5 font-sans text-lg text-newsprint font-bold">
-                Bandung
+              <span className="text-lg font-bold text-txt-inverse">
+                Jurnalis Hukum Bandung
               </span>
             </div>
-            <p className="mt-3 max-w-xs text-sm font-serif italic leading-relaxed text-newsprint/50">
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-txt-inverse/50">
               Media hukum digital terpercaya untuk wilayah Bandung dan
               sekitarnya. Menyajikan berita hukum yang akurat, berimbang, dan
               terverifikasi.
@@ -49,15 +49,15 @@ export default function Footer() {
 
           {/* Kategori */}
           <div>
-            <h4 className="mb-4 font-mono text-kicker uppercase tracking-widest text-newsprint/40">
+            <h4 className="mb-4 text-xs font-semibold uppercase tracking-wider text-txt-inverse/40">
               Kategori
             </h4>
-            <ul className="space-y-2">
+            <ul className="space-y-2.5">
               {footerLinks.kategori.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-newsprint/60 transition-colors duration-200 hover:text-sage"
+                    className="text-sm text-txt-inverse/60 transition-colors duration-200 hover:text-goto-green"
                   >
                     {link.name}
                   </Link>
@@ -68,15 +68,15 @@ export default function Footer() {
 
           {/* Tentang */}
           <div>
-            <h4 className="mb-4 font-mono text-kicker uppercase tracking-widest text-newsprint/40">
+            <h4 className="mb-4 text-xs font-semibold uppercase tracking-wider text-txt-inverse/40">
               Tentang
             </h4>
-            <ul className="space-y-2">
+            <ul className="space-y-2.5">
               {footerLinks.tentang.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-newsprint/60 transition-colors duration-200 hover:text-sage"
+                    className="text-sm text-txt-inverse/60 transition-colors duration-200 hover:text-goto-green"
                   >
                     {link.name}
                   </Link>
@@ -87,15 +87,15 @@ export default function Footer() {
 
           {/* Kontak */}
           <div>
-            <h4 className="mb-4 font-mono text-kicker uppercase tracking-widest text-newsprint/40">
+            <h4 className="mb-4 text-xs font-semibold uppercase tracking-wider text-txt-inverse/40">
               Kontak
             </h4>
-            <ul className="space-y-2">
+            <ul className="space-y-2.5">
               {footerLinks.kontak.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-newsprint/60 transition-colors duration-200 hover:text-sage"
+                    className="text-sm text-txt-inverse/60 transition-colors duration-200 hover:text-goto-green"
                   >
                     {link.name}
                   </Link>
@@ -106,15 +106,15 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-10 border-t border-newsprint/10 pt-6">
+        <div className="mt-12 border-t border-txt-inverse/10 pt-6">
           <div className="flex flex-col items-center justify-between gap-2 sm:flex-row">
-            <p className="text-sm text-newsprint/40">
+            <p className="text-sm text-txt-inverse/40">
               &copy; {new Date().getFullYear()} Jurnalis Hukum Bandung. Seluruh
               hak cipta dilindungi.
             </p>
-            <p className="text-sm text-newsprint/40">
+            <p className="text-sm text-txt-inverse/40">
               Anggota{" "}
-              <span className="font-medium text-newsprint/60">
+              <span className="font-medium text-txt-inverse/60">
                 Dewan Pers Indonesia
               </span>
             </p>

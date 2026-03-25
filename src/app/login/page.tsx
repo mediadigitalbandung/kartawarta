@@ -36,34 +36,34 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-paper px-4">
-      <div className="w-full max-w-sm rounded-card border border-border bg-newsprint p-8 shadow-sm">
+    <div className="flex min-h-screen items-center justify-center bg-surface-secondary px-4">
+      <div className="w-full max-w-sm rounded-[12px] border border-border bg-surface p-8 shadow-card">
         {/* Logo */}
         <div className="mb-8 text-center">
-          <div className="mb-4">
-            <span className="font-serif text-2xl font-bold text-forest">JHB</span>
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-goto-green">
+            <span className="text-lg font-bold text-white">JH</span>
           </div>
-          <h1 className="text-xl font-semibold text-press">
+          <h1 className="text-xl font-bold text-txt-primary">
             Masuk ke Panel
           </h1>
-          <p className="mt-2 text-sm text-ink">
+          <p className="mt-2 text-sm text-txt-secondary">
             Jurnalis Hukum Bandung
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 rounded-card bg-red-50 px-4 py-3 text-sm text-red-600">
+          <div className="mb-6 rounded-[12px] bg-red-50 px-4 py-3 text-sm text-red-600">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-press">
+            <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-txt-primary">
               Email
             </label>
             <div className="relative">
-              <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-ink" />
+              <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-txt-muted" />
               <input
                 id="email"
                 type="email"
@@ -77,11 +77,11 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-press">
+            <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-txt-primary">
               Password
             </label>
             <div className="relative">
-              <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-ink" />
+              <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-txt-muted" />
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
@@ -94,7 +94,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-ink transition-colors hover:text-press"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-txt-muted transition-colors hover:text-txt-primary"
               >
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
@@ -110,10 +110,10 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="mt-8 text-center text-xs text-ink">
+        <p className="mt-8 text-center text-xs text-txt-secondary">
           Hanya untuk jurnalis dan redaksi terdaftar.
           <br />
-          <Link href="/kontak" className="mt-1 inline-block text-forest transition-colors hover:text-canopy hover:underline">
+          <Link href="/kontak" className="mt-1 inline-block text-goto-green transition-colors hover:text-goto-dark hover:underline">
             Hubungi admin
           </Link>{" "}
           untuk registrasi akun.

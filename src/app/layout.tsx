@@ -38,7 +38,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className="flex min-h-screen flex-col font-sans bg-newsprint">
+      <body className="flex min-h-screen flex-col font-sans bg-surface text-txt-primary">
         <Providers>
           <Header />
           <main className="flex-1">{children}</main>

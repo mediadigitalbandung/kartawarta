@@ -16,15 +16,15 @@ interface SidebarProps {
 
 export default function Sidebar({ trending = [], recent = [], popular = [] }: SidebarProps) {
   return (
-    <aside className="space-y-6">
+    <aside className="space-y-5">
       {/* Trending */}
       {trending.length > 0 && (
-        <div className="rounded-card border border-border bg-paper p-5">
+        <div className="rounded-[12px] border border-border bg-surface p-5 shadow-card">
           <div className="mb-4">
-            <h3 className="font-mono text-kicker uppercase tracking-widest text-forest">
+            <h3 className="text-sm font-bold uppercase tracking-wide text-txt-primary">
               Trending
             </h3>
-            <div className="mt-1 h-px w-8 bg-forest" />
+            <div className="mt-1.5 h-0.5 w-8 rounded-full bg-goto-green" />
           </div>
           <ul>
             {trending.map((article, i) => (
@@ -34,17 +34,17 @@ export default function Sidebar({ trending = [], recent = [], popular = [] }: Si
                   i < trending.length - 1 ? "border-b border-border" : ""
                 }`}
               >
-                <span className="shrink-0 font-serif text-2xl font-bold leading-none text-forest/30">
+                <span className="shrink-0 text-2xl font-extrabold leading-none text-goto-green/20">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <div className="flex-1">
                   <Link
                     href={`/berita/${article.slug}`}
-                    className="text-sm font-semibold leading-snug text-press transition-colors duration-200 hover:text-forest"
+                    className="text-sm font-semibold leading-snug text-txt-primary transition-colors duration-200 hover:text-goto-green"
                   >
                     {article.title}
                   </Link>
-                  <p className="mt-1 font-mono text-meta text-ink">{article.category}</p>
+                  <p className="mt-1 text-xs text-txt-secondary">{article.category}</p>
                 </div>
               </li>
             ))}
@@ -54,12 +54,12 @@ export default function Sidebar({ trending = [], recent = [], popular = [] }: Si
 
       {/* Terbaru */}
       {recent.length > 0 && (
-        <div className="rounded-card border border-border bg-paper p-5">
+        <div className="rounded-[12px] border border-border bg-surface p-5 shadow-card">
           <div className="mb-4">
-            <h3 className="font-mono text-kicker uppercase tracking-widest text-forest">
+            <h3 className="text-sm font-bold uppercase tracking-wide text-txt-primary">
               Terbaru
             </h3>
-            <div className="mt-1 h-px w-8 bg-forest" />
+            <div className="mt-1.5 h-0.5 w-8 rounded-full bg-goto-green" />
           </div>
           <ul>
             {recent.map((article, i) => (
@@ -71,11 +71,11 @@ export default function Sidebar({ trending = [], recent = [], popular = [] }: Si
               >
                 <Link
                   href={`/berita/${article.slug}`}
-                  className="text-sm font-semibold leading-snug text-press transition-colors duration-200 hover:text-forest"
+                  className="text-sm font-semibold leading-snug text-txt-primary transition-colors duration-200 hover:text-goto-green"
                 >
                   {article.title}
                 </Link>
-                <p className="mt-1 font-mono text-meta text-ink">{article.publishedAt}</p>
+                <p className="mt-1 text-xs text-txt-secondary">{article.publishedAt}</p>
               </li>
             ))}
           </ul>
@@ -84,12 +84,12 @@ export default function Sidebar({ trending = [], recent = [], popular = [] }: Si
 
       {/* Paling Dibaca */}
       {popular.length > 0 && (
-        <div className="rounded-card border border-border bg-paper p-5">
+        <div className="rounded-[12px] border border-border bg-surface p-5 shadow-card">
           <div className="mb-4">
-            <h3 className="font-mono text-kicker uppercase tracking-widest text-forest">
+            <h3 className="text-sm font-bold uppercase tracking-wide text-txt-primary">
               Paling Dibaca
             </h3>
-            <div className="mt-1 h-px w-8 bg-forest" />
+            <div className="mt-1.5 h-0.5 w-8 rounded-full bg-goto-green" />
           </div>
           <ul>
             {popular.map((article, i) => (
@@ -101,11 +101,11 @@ export default function Sidebar({ trending = [], recent = [], popular = [] }: Si
               >
                 <Link
                   href={`/berita/${article.slug}`}
-                  className="text-sm font-semibold leading-snug text-press transition-colors duration-200 hover:text-forest"
+                  className="text-sm font-semibold leading-snug text-txt-primary transition-colors duration-200 hover:text-goto-green"
                 >
                   {article.title}
                 </Link>
-                <div className="mt-1 flex items-center gap-2 font-mono text-meta text-ink">
+                <div className="mt-1 flex items-center gap-2 text-xs text-txt-secondary">
                   <span>{article.category}</span>
                   {article.viewCount && (
                     <>

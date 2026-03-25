@@ -5,41 +5,42 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        forest: {
-          DEFAULT: "#1B4332",
-          light: "#2D6A4F",
+        goto: {
+          green: "#00AA13",
+          dark: "#008C10",
+          light: "#E6F9E8",
+          50: "#F0FFF1",
         },
-        canopy: "#2D6A4F",
-        sage: "#52B788",
-        gold: {
-          DEFAULT: "#D4A017",
-          light: "#F0C040",
+        surface: {
+          DEFAULT: "#FFFFFF",
+          secondary: "#F7F7F8",
+          tertiary: "#F0F1F3",
+          dark: "#1C1C1E",
         },
-        wheat: "#F0C040",
-        press: "#111110",
-        newsprint: "#FAFCF8",
-        paper: "#F3F5F0",
-        ink: "#6B7280",
+        txt: {
+          primary: "#1C1C1E",
+          secondary: "#6B7280",
+          muted: "#9CA3AF",
+          inverse: "#FFFFFF",
+        },
         border: {
           DEFAULT: "#E5E7EB",
-          dark: "#D1D5DB",
+          light: "#F3F4F6",
         },
       },
       fontFamily: {
-        sans: ['"DM Sans"', "system-ui", "sans-serif"],
-        serif: ['"Cormorant Garamond"', "Georgia", "serif"],
-        mono: ['"DM Mono"', "ui-monospace", "monospace"],
-      },
-      fontSize: {
-        kicker: ["10px", { lineHeight: "1.4", letterSpacing: "0.08em", fontWeight: "500" }],
-        meta: ["11px", { lineHeight: "1.4", fontWeight: "400" }],
-        caption: ["10px", { lineHeight: "1.4", fontWeight: "400" }],
-      },
-      borderWidth: {
-        thin: "0.5px",
+        sans: ['"Inter"', '"DM Sans"', "system-ui", "sans-serif"],
       },
       borderRadius: {
-        card: "4px",
+        DEFAULT: "12px",
+        sm: "8px",
+        xs: "6px",
+        full: "9999px",
+      },
+      boxShadow: {
+        card: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+        "card-hover": "0 10px 25px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04)",
+        nav: "0 1px 3px rgba(0,0,0,0.05)",
       },
       animation: {
         "fade-in": "fadeIn 0.4s ease-out",
@@ -52,7 +53,7 @@ const config: Config = {
           "100%": { opacity: "1" },
         },
         fadeUp: {
-          "0%": { opacity: "0", transform: "translateY(12px)" },
+          "0%": { opacity: "0", transform: "translateY(16px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
         scrollX: {

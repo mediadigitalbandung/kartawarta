@@ -111,51 +111,51 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         articleTitle={article.title}
       />
 
-      <div className="bg-newsprint min-h-screen">
+      <div className="bg-surface min-h-screen">
         <div className="container-main py-8">
           {/* Breadcrumb */}
-          <nav className="mb-6 flex items-center gap-2 font-mono text-meta text-ink">
-            <Link href="/" className="transition-colors hover:text-forest">Beranda</Link>
+          <nav className="mb-6 flex items-center gap-2 text-sm text-txt-secondary">
+            <Link href="/" className="transition-colors hover:text-goto-green">Beranda</Link>
             <span>&gt;</span>
-            <Link href={`/kategori/${article.category.slug}`} className="transition-colors hover:text-forest">
+            <Link href={`/kategori/${article.category.slug}`} className="transition-colors hover:text-goto-green">
               {article.category.name}
             </Link>
             <span>&gt;</span>
-            <span className="truncate max-w-[200px] text-ink">{article.title}</span>
+            <span className="truncate max-w-[200px] text-txt-muted">{article.title}</span>
           </nav>
 
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
             {/* Article */}
             <article className="lg:col-span-2">
-              {/* Kicker & verification */}
+              {/* Category badge & verification */}
               <div className="mb-4 flex items-center gap-3">
                 <Link
                   href={`/kategori/${article.category.slug}`}
-                  className="font-mono text-kicker uppercase text-forest tracking-widest"
+                  className="badge-green"
                 >
                   {article.category.name}
                 </Link>
                 {article.verificationLabel === "VERIFIED" && (
-                  <span className="flex items-center gap-1 font-mono text-caption text-forest">
+                  <span className="flex items-center gap-1 text-xs font-medium text-goto-green">
                     <CheckCircle size={12} /> Terverifikasi
                   </span>
                 )}
               </div>
 
               {/* Title */}
-              <h1 className="font-serif text-3xl font-bold leading-tight text-press sm:text-4xl">
+              <h1 className="text-3xl font-extrabold leading-tight text-txt-primary tracking-tight sm:text-4xl">
                 {article.title}
               </h1>
 
-              {/* Deck / excerpt */}
+              {/* Excerpt */}
               {article.excerpt && (
-                <p className="mt-3 text-lg text-ink">
+                <p className="mt-3 text-lg text-txt-secondary">
                   {article.excerpt}
                 </p>
               )}
 
               {/* Meta bar */}
-              <div className="mt-4 font-mono text-meta text-ink">
+              <div className="mt-4 text-sm text-txt-muted">
                 <span>{article.author.name}</span>
                 <span className="mx-2">&middot;</span>
                 <span>
@@ -167,40 +167,15 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                 <span>{article.readTime ?? 0} menit baca</span>
               </div>
 
-              {/* Thin divider */}
-              <div className="mt-4 h-px bg-border" />
+              {/* Divider */}
+              <div className="mt-6 h-px bg-border" />
 
               {/* Featured Image */}
               {article.featuredImage && (
-                <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-card">
+                <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-[12px]">
                   <Image src={article.featuredImage} alt={article.title} fill className="object-cover" />
                 </div>
               )}
-
-              {/* Share buttons */}
-              <div className="mt-6 flex items-center gap-3 rounded-card border border-border bg-paper p-3">
-                <div className="flex items-center gap-2 text-ink">
-                  <Share2 size={14} />
-                  <span className="font-mono text-caption uppercase tracking-wider">Bagikan</span>
-                </div>
-                <div className="flex gap-2">
-                  {(Object.entries(shareLinks) as [string, string][]).map(([platform, url]) => (
-                    <a
-                      key={platform}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-ghost rounded-card px-3 py-1.5 text-xs"
-                      title={platform}
-                    >
-                      <span className="mr-1 inline-flex h-5 w-5 items-center justify-center rounded-sm bg-paper text-[10px] font-bold text-press border border-border">
-                        {sharePlatformLetters[platform]}
-                      </span>
-                      {platform}
-                    </a>
-                  ))}
-                </div>
-              </div>
 
               {/* Article content */}
               <div className="mt-8 max-w-3xl">
@@ -210,16 +185,41 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                 />
               </div>
 
+              {/* Share bar */}
+              <div className="mt-8 flex items-center gap-3 rounded-[12px] bg-surface-secondary p-4">
+                <div className="flex items-center gap-2 text-txt-secondary">
+                  <Share2 size={14} />
+                  <span className="text-xs font-semibold uppercase tracking-wider">Bagikan</span>
+                </div>
+                <div className="flex gap-2">
+                  {(Object.entries(shareLinks) as [string, string][]).map(([platform, url]) => (
+                    <a
+                      key={platform}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-ghost rounded-full px-3 py-1.5 text-xs"
+                      title={platform}
+                    >
+                      <span className="mr-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-surface text-[10px] font-bold text-txt-primary border border-border">
+                        {sharePlatformLetters[platform]}
+                      </span>
+                      {platform}
+                    </a>
+                  ))}
+                </div>
+              </div>
+
               {/* Sources */}
               {article.sources.length > 0 && (
-                <div className="mt-8 rounded-card border border-border bg-paper p-5">
-                  <h3 className="mb-3 font-mono text-kicker uppercase tracking-widest text-press">
+                <div className="mt-8 rounded-[12px] border border-border bg-surface p-6 shadow-card">
+                  <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-txt-primary">
                     Sumber &amp; Narasumber
                   </h3>
                   <ul className="space-y-2">
                     {article.sources.map((source, i) => (
-                      <li key={i} className="text-sm text-ink">
-                        <strong className="text-press">{source.name}</strong>
+                      <li key={i} className="text-sm text-txt-secondary">
+                        <strong className="text-txt-primary">{source.name}</strong>
                         {source.title && ` -- ${source.title}`}
                         {source.institution && `, ${source.institution}`}
                       </li>
@@ -230,12 +230,12 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
               {/* Tags */}
               <div className="mt-8 flex flex-wrap items-center gap-2">
-                <span className="font-mono text-caption uppercase tracking-wider text-ink">Tags</span>
+                <span className="text-xs font-semibold uppercase tracking-wider text-txt-secondary">Tags</span>
                 {article.tags.map((tag) => (
                   <Link
                     key={tag.slug}
                     href={`/tag/${tag.slug}`}
-                    className="font-mono text-caption uppercase text-forest border border-border rounded-sm px-2 py-1 transition-colors hover:bg-paper"
+                    className="badge-green text-xs"
                   >
                     #{tag.name}
                   </Link>
@@ -244,27 +244,27 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
               {/* Report button */}
               <div className="mt-8 border-t border-border pt-5">
-                <button className="btn-ghost text-xs text-ink hover:text-red-600">
+                <button className="btn-ghost text-xs text-txt-secondary hover:text-red-600">
                   <Flag size={13} />
                   Laporkan Berita Ini
                 </button>
               </div>
 
               {/* Author box */}
-              <div id="author" className="mt-8 rounded-card bg-paper p-6">
+              <div id="author" className="mt-8 rounded-[12px] border border-border bg-surface p-6 shadow-card">
                 <div className="flex gap-5">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-forest text-xl font-bold text-newsprint">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-goto-green text-xl font-bold text-white">
                     {article.author.name.charAt(0)}
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-press">{article.author.name}</h3>
-                    <p className="font-mono text-meta text-gold">Jurnalis</p>
-                    <p className="mt-2 text-sm leading-relaxed text-ink">
+                    <h3 className="text-lg font-semibold text-txt-primary">{article.author.name}</h3>
+                    <p className="text-sm text-goto-green font-medium">Jurnalis</p>
+                    <p className="mt-2 text-sm leading-relaxed text-txt-secondary">
                       {article.author.bio}
                     </p>
                     <Link
                       href={`/penulis/${slugify(article.author.name)}`}
-                      className="mt-3 inline-block text-sm font-medium text-forest transition-colors hover:text-canopy"
+                      className="mt-3 inline-block text-sm font-medium text-goto-green transition-colors hover:text-goto-dark"
                     >
                       Lihat semua artikel &rarr;
                     </Link>
@@ -278,14 +278,9 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                   <div className="section-header">
                     <h2 className="section-title">Artikel Terkait</h2>
                   </div>
-                  <div className="flex flex-col">
-                    {relatedArticles.map((related, i) => (
-                      <div key={related.slug}>
-                        <ArticleCard {...related} />
-                        {i < relatedArticles.length - 1 && (
-                          <div className="my-6 h-px bg-border" />
-                        )}
-                      </div>
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {relatedArticles.map((related) => (
+                      <ArticleCard key={related.slug} {...related} />
                     ))}
                   </div>
                 </section>
