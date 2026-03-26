@@ -135,7 +135,7 @@ export default async function HomePage() {
               {subHeadlines.length > 0 && (
                 <div className="grid grid-cols-2 gap-4 mt-4">
                   {subHeadlines.map((a) => (
-                    <ArticleCard key={a.slug} {...a} variant="compact" />
+                    <ArticleCard key={a.slug} {...a} variant="standard" />
                   ))}
                 </div>
               )}
