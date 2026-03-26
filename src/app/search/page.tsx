@@ -74,14 +74,14 @@ function SearchContent() {
         <div className="relative">
           <SearchIcon
             size={20}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-txt-muted"
           />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Cari berita hukum..."
-            className="w-full rounded-xl border border-gray-200 py-3 pl-12 pr-4 text-lg focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-800 dark:bg-gray-900"
+            className="input w-full py-3 pl-12 pr-4 text-lg"
             autoFocus
           />
         </div>
@@ -89,12 +89,12 @@ function SearchContent() {
 
       {loading && (
         <div className="mt-8 flex justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-goto-green border-t-transparent" />
         </div>
       )}
 
       {!loading && searched && query && (
-        <p className="mt-4 text-sm text-gray-500">
+        <p className="mt-4 text-sm text-txt-muted">
           {total} hasil ditemukan untuk &quot;{query}&quot;
         </p>
       )}
@@ -109,11 +109,11 @@ function SearchContent() {
 
       {!loading && results.length === 0 && searched && query && (
         <div className="py-16 text-center">
-          <SearchIcon size={48} className="mx-auto text-gray-300" />
-          <p className="mt-4 text-gray-500">
+          <SearchIcon size={48} className="mx-auto text-border" />
+          <p className="mt-4 text-txt-secondary">
             Tidak ada hasil untuk &quot;{query}&quot;
           </p>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-txt-muted">
             Coba kata kunci lain atau periksa ejaan
           </p>
         </div>
@@ -124,19 +124,22 @@ function SearchContent() {
 
 export default function SearchPage() {
   return (
-    <div className="container-main py-8">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-        Pencarian
-      </h1>
-      <Suspense
-        fallback={
-          <div className="mt-8 flex justify-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" />
-          </div>
-        }
-      >
-        <SearchContent />
-      </Suspense>
+    <div className="bg-surface min-h-screen">
+      <div className="container-main py-8">
+        <h1 className="flex items-center gap-3 text-2xl font-bold text-txt-primary">
+          <span className="block h-7 w-[3px] rounded-full bg-goto-green" />
+          Pencarian
+        </h1>
+        <Suspense
+          fallback={
+            <div className="mt-8 flex justify-center">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-goto-green border-t-transparent" />
+            </div>
+          }
+        >
+          <SearchContent />
+        </Suspense>
+      </div>
     </div>
   );
 }
