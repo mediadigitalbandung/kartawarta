@@ -220,10 +220,6 @@ export default async function HomePage() {
                     </div>
                   ))}
                 </div>
-                {/* Sidebar Ad */}
-                <div className="mt-5">
-                  <SidebarAd />
-                </div>
               </div>
             )}
           </div>
