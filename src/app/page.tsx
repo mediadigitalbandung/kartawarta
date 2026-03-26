@@ -86,7 +86,7 @@ export default async function HomePage() {
       where: { status: "PUBLISHED" },
       include: { author: true, category: true },
       orderBy: { publishedAt: "desc" },
-      take: 30,
+      take: 80,
     }),
     prisma.category.findMany({
       include: { _count: { select: { articles: true } } },
