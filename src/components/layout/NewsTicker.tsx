@@ -23,8 +23,9 @@ export default function NewsTicker({ items }: NewsTickerProps) {
               <Link
                 key={i}
                 href={`/berita/${item.slug}`}
-                className="mx-12 inline-flex items-center text-base font-medium text-txt-primary/70 transition-colors duration-300 hover:text-goto-green"
+                className="mx-12 inline-flex items-center gap-2.5 text-base font-medium text-txt-primary/70 transition-colors duration-300 hover:text-goto-green"
               >
+                <span className="h-1.5 w-1.5 rounded-full bg-goto-green shrink-0" />
                 {item.title}
               </Link>
             ))}
