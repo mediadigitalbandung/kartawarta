@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
+import Image from "next/image";
 import ArticleCard from "@/components/artikel/ArticleCard";
 import NewsTicker from "@/components/layout/NewsTicker";
 import HeadlineSlider from "@/components/slider/HeadlineSlider";
@@ -167,22 +168,38 @@ export default async function HomePage() {
                     Terpopuler
                   </h2>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-0 divide-y divide-border">
                   {trendingArticles.slice(0, 8).map((article, i) => (
-                    <div key={article.slug} className="group flex gap-3">
-                      {/* Rank */}
-                      <span className="shrink-0 w-7 text-center text-2xl font-extrabold leading-none text-goto-green/20 select-none pt-1" style={{ fontFamily: "Georgia, serif" }}>
+                    <div key={article.slug} className="group flex items-start gap-3 py-3 first:pt-0">
+                      {/* Rank number */}
+                      <span className="shrink-0 w-5 pt-1 text-center text-lg font-extrabold text-goto-green select-none">
                         {i + 1}
                       </span>
-                      <div className="flex-1 min-w-0 pb-4 border-b border-border last:border-0">
+                      {/* Thumbnail */}
+                      <Link href={`/berita/${article.slug}`} className="shrink-0">
+                        <div className="relative h-14 w-20 overflow-hidden rounded-sm">
+                          {article.featuredImage ? (
+                            <Image
+                              src={article.featuredImage}
+                              alt={article.title}
+                              fill
+                              className="object-cover transition-transform duration-300 group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="h-full w-full bg-surface-tertiary" />
+                          )}
+                        </div>
+                      </Link>
+                      {/* Text */}
+                      <div className="flex-1 min-w-0">
                         <Link href={`/berita/${article.slug}`}>
-                          <h3 className="text-sm font-bold leading-snug text-txt-primary line-clamp-2 group-hover:text-goto-green transition-colors">
+                          <h3 className="text-[13px] font-bold leading-snug text-txt-primary line-clamp-2 group-hover:text-goto-green transition-colors">
                             {article.title}
                           </h3>
                         </Link>
-                        <div className="mt-1 flex items-center gap-2 text-[11px] text-txt-muted">
+                        <div className="mt-1 flex items-center gap-1.5 text-[10px] text-txt-muted">
                           <span className="text-goto-green font-semibold">{article.category.name}</span>
-                          <span className="h-2.5 w-px bg-border" />
+                          <span className="h-2 w-px bg-border" />
                           <span>{article.viewCount?.toLocaleString("id-ID")} views</span>
                         </div>
                       </div>
