@@ -95,7 +95,7 @@ export default async function HomePage() {
 
   const headlineArticles = articles.slice(0, 5);  // For headline slider
   const breakingArticles = articles.slice(5, 10); // For breaking news slider
-  const terkiniArticles = articles.slice(10, 22); // Berita Terkini: 4x3 grid = max 12
+  const terkiniArticles = articles.slice(10, 16); // Berita Terkini: 3x2 grid = 6
   const restArticles = articles.slice(22);
 
   const tickerItems = tickerArticles.map((a) => ({
