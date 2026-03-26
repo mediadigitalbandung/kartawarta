@@ -19,9 +19,12 @@ const categoryNav = [
   { name: "Hukum Perdata", href: "/kategori/hukum-perdata" },
   { name: "Tata Negara", href: "/kategori/hukum-tata-negara" },
   { name: "HAM", href: "/kategori/ham" },
+  { name: "Hukum Bisnis", href: "/kategori/hukum-bisnis" },
+  { name: "Lingkungan", href: "/kategori/hukum-lingkungan" },
+  { name: "Ketenagakerjaan", href: "/kategori/ketenagakerjaan" },
   { name: "Opini", href: "/kategori/opini" },
   { name: "Daerah", href: "/kategori/berita-bandung" },
-  { name: "Nasional", href: "/kategori/nasional" },
+  { name: "Infografis", href: "/kategori/infografis" },
 ];
 
 const mobileExtraLinks = [
@@ -114,25 +117,7 @@ export default function Header() {
                     </>
                   )}
                 </div>
-              ) : (
-                <Link
-                  href="/login"
-                  className="hidden items-center gap-1.5 rounded px-3 py-1.5 text-sm font-medium text-white/70 transition-colors hover:text-white sm:inline-flex"
-                >
-                  <User size={15} />
-                  Masuk
-                </Link>
-              )}
-
-              {/* Mobile: login icon fallback */}
-              {!session && (
-                <Link
-                  href="/login"
-                  className="rounded-full p-2 text-white/70 transition-colors hover:text-white sm:hidden"
-                >
-                  <User size={18} />
-                </Link>
-              )}
+              ) : null}
 
               {/* Mobile menu toggle */}
               <button
@@ -161,7 +146,7 @@ export default function Header() {
               <input
                 type="text"
                 name="q"
-                placeholder="Cari berita hukum..."
+                placeholder="Cari berita, topik, atau kata kunci di sini..."
                 className="w-full rounded border border-white/20 bg-white/10 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/40 focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green/30"
                 autoFocus={searchOpen}
               />
@@ -267,16 +252,7 @@ export default function Header() {
 
           {/* Mobile footer */}
           <div className="absolute bottom-0 left-0 right-0 border-t border-border px-5 py-4">
-            {!session && (
-              <Link
-                href="/login"
-                className="block w-full rounded bg-goto-green px-4 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-goto-dark"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Masuk
-              </Link>
-            )}
-            <span className="mt-2 block text-center text-xs text-txt-muted">
+            <span className="block text-center text-xs text-txt-muted">
               Jurnalis Hukum Bandung
             </span>
           </div>
