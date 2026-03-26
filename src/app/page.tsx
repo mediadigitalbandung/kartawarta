@@ -10,7 +10,7 @@ import PopularCarousel from "@/components/slider/PopularCarousel";
 import SubHeadlineSlider from "@/components/slider/SubHeadlineSlider";
 import BannerAd, { SidebarAd } from "@/components/ads/BannerAd";
 import SimulationBadge from "@/components/SimulationBadge";
-import { Scale, BookOpen, Gavel, Shield, Users, Landmark, LucideIcon, Globe, Monitor, Building2, FileText, AlertTriangle, Radio, BarChart3, Calendar, Play, Vote, TrendingUp, ChevronRight } from "lucide-react";
+import { Scale, BookOpen, Gavel, Shield, Users, Landmark, LucideIcon, Globe, Monitor, Building2, FileText, AlertTriangle, Radio, BarChart3, Calendar, Play, Vote, TrendingUp } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 const categoryIconMap: Record<string, LucideIcon> = {
@@ -176,11 +176,14 @@ export default async function HomePage() {
             {/* Right: Berita Terpopuler — vertical list */}
             {trendingArticles.length > 0 && (
               <div className="flex flex-col">
-                <div className="flex items-center mb-5">
+                <div className="flex items-center justify-between mb-5">
                   <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
                     <TrendingUp size={18} className="mr-2 text-goto-green" />
                     Terpopuler
                   </h2>
+                  <Link href="/berita?sort=popular" className="text-sm font-medium text-goto-green hover:underline">
+                    Lihat Semua
+                  </Link>
                 </div>
                 <div className="space-y-0 divide-y divide-border flex-1">
                   {trendingArticles.slice(0, 8).map((article, i) => (
@@ -220,14 +223,6 @@ export default async function HomePage() {
                     </div>
                   ))}
                 </div>
-                {/* Lihat Selanjutnya button */}
-                <Link
-                  href="/berita?sort=popular"
-                  className="mt-4 flex items-center justify-center gap-2 rounded-lg border border-border py-2.5 text-sm font-semibold text-txt-secondary transition-all hover:border-goto-green hover:text-goto-green"
-                >
-                  Lihat Selanjutnya
-                  <ChevronRight size={16} />
-                </Link>
               </div>
             )}
           </div>
