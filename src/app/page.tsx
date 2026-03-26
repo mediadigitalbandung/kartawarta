@@ -236,7 +236,6 @@ export default async function HomePage() {
             <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
               <Calendar size={18} className="mr-2 text-goto-green" />
               Jadwal Sidang Mendatang
-              <SimulationBadge />
             </h2>
             <Link href="/jadwal-sidang" className="text-sm font-medium text-goto-green hover:underline">
               Lihat Semua
