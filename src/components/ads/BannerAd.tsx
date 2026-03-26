@@ -7,16 +7,16 @@ interface BannerAdProps {
 
 const sizeConfig = {
   leaderboard: {
-    width: "728px",
+    width: "100%",
     height: "90px",
-    label: "728 x 90",
-    containerClass: "py-4",
+    label: "Leaderboard Ad",
+    containerClass: "py-3",
   },
   billboard: {
-    width: "970px",
+    width: "100%",
     height: "250px",
-    label: "970 x 250",
-    containerClass: "py-6",
+    label: "Billboard Ad",
+    containerClass: "py-4",
   },
   sidebar: {
     width: "100%",
