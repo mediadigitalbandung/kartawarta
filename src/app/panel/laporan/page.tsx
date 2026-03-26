@@ -19,18 +19,18 @@ interface Report {
 }
 
 const reasonLabels: Record<string, { label: string; color: string }> = {
-  HOAX: { label: "Hoax", color: "bg-red-100 text-red-700" },
-  INACCURATE: { label: "Tidak Akurat", color: "bg-yellow-100 text-yellow-700" },
-  SARA: { label: "SARA", color: "bg-orange-100 text-orange-700" },
-  DEFAMATION: { label: "Pencemaran Nama Baik", color: "bg-purple-100 text-purple-700" },
-  OTHER: { label: "Lainnya", color: "bg-gray-100 text-gray-700" },
+  HOAX: { label: "Hoax", color: "bg-red-50 text-red-600" },
+  INACCURATE: { label: "Tidak Akurat", color: "bg-yellow-50 text-yellow-600" },
+  SARA: { label: "SARA", color: "bg-orange-50 text-orange-600" },
+  DEFAMATION: { label: "Pencemaran Nama Baik", color: "bg-purple-50 text-purple-600" },
+  OTHER: { label: "Lainnya", color: "bg-surface-tertiary text-txt-secondary" },
 };
 
 const statusConfig: Record<string, { label: string; icon: React.ElementType; color: string }> = {
   PENDING: { label: "Menunggu", icon: Clock, color: "text-yellow-600" },
-  REVIEWED: { label: "Sedang Ditinjau", icon: Eye, color: "text-blue-600" },
-  RESOLVED: { label: "Selesai", icon: CheckCircle, color: "text-green-600" },
-  DISMISSED: { label: "Ditolak", icon: XCircle, color: "text-gray-500" },
+  REVIEWED: { label: "Sedang Ditinjau", icon: Eye, color: "text-goto-green" },
+  RESOLVED: { label: "Selesai", icon: CheckCircle, color: "text-goto-green" },
+  DISMISSED: { label: "Ditolak", icon: XCircle, color: "text-txt-muted" },
 };
 
 function formatDate(dateStr: string): string {
@@ -43,22 +43,22 @@ function LoadingSkeleton() {
     <div className="animate-pulse">
       <div className="mb-6 grid grid-cols-4 gap-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-            <div className="h-4 w-24 rounded bg-gray-200 dark:bg-gray-700" />
-            <div className="mt-2 h-7 w-8 rounded bg-gray-200 dark:bg-gray-700" />
+          <div key={i} className="rounded-[12px] border border-border bg-surface p-4 shadow-card">
+            <div className="h-4 w-24 rounded bg-surface-tertiary" />
+            <div className="mt-2 h-7 w-8 rounded bg-surface-tertiary" />
           </div>
         ))}
       </div>
       <div className="space-y-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
+          <div key={i} className="rounded-[12px] border border-border bg-surface p-5 shadow-card">
             <div className="flex items-center gap-2 mb-2">
-              <div className="h-5 w-16 rounded-full bg-gray-200 dark:bg-gray-700" />
-              <div className="h-4 w-20 rounded bg-gray-200 dark:bg-gray-700" />
-              <div className="h-3 w-24 rounded bg-gray-100 dark:bg-gray-800" />
+              <div className="h-5 w-16 rounded-full bg-surface-tertiary" />
+              <div className="h-4 w-20 rounded bg-surface-tertiary" />
+              <div className="h-3 w-24 rounded bg-surface-secondary" />
             </div>
-            <div className="h-5 w-2/3 rounded bg-gray-200 dark:bg-gray-700" />
-            <div className="mt-2 h-4 w-full rounded bg-gray-100 dark:bg-gray-800" />
+            <div className="h-5 w-2/3 rounded bg-surface-tertiary" />
+            <div className="mt-2 h-4 w-full rounded bg-surface-secondary" />
           </div>
         ))}
       </div>
@@ -125,16 +125,16 @@ export default function LaporanPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-2xl font-bold text-txt-primary">
           Laporan Berita
         </h1>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-txt-secondary">
           {loading ? "Memuat..." : `${pendingCount} laporan menunggu ditinjau`}
         </p>
       </div>
 
       {error && (
-        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4 text-center text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+        <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4 text-center text-sm text-red-700">
           {error}
         </div>
       )}
@@ -149,11 +149,11 @@ export default function LaporanPage() {
               const Icon = config.icon;
               const count = reports.filter((r) => r.status === key).length;
               return (
-                <div key={key} className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+                <div key={key} className="rounded-[12px] border border-border bg-surface p-4 shadow-card">
                   <div className={`flex items-center gap-2 text-sm ${config.color}`}>
                     <Icon size={16} /> {config.label}
                   </div>
-                  <p className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{count}</p>
+                  <p className="mt-1 text-2xl font-bold text-txt-primary">{count}</p>
                 </div>
               );
             })}
@@ -162,18 +162,18 @@ export default function LaporanPage() {
           {/* Reports list */}
           <div className="space-y-3">
             {reports.length === 0 ? (
-              <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500 dark:border-gray-800 dark:bg-gray-900">
+              <div className="rounded-[12px] border border-border bg-surface p-8 text-center text-txt-secondary shadow-card">
                 Belum ada laporan.
               </div>
             ) : (
               reports.map((report) => {
-                const reason = reasonLabels[report.reason] || { label: report.reason, color: "bg-gray-100 text-gray-700" };
+                const reason = reasonLabels[report.reason] || { label: report.reason, color: "bg-surface-tertiary text-txt-secondary" };
                 const status = statusConfig[report.status] || statusConfig.PENDING;
                 const StatusIcon = status.icon;
                 return (
                   <div
                     key={report.id}
-                    className="rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900"
+                    className="rounded-[12px] border border-border bg-surface p-5 shadow-card"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -186,16 +186,16 @@ export default function LaporanPage() {
                             <StatusIcon size={12} />
                             {status.label}
                           </span>
-                          <span className="text-xs text-gray-400">{formatDate(report.createdAt)}</span>
+                          <span className="text-xs text-txt-muted">{formatDate(report.createdAt)}</span>
                         </div>
-                        <h3 className="font-medium text-gray-900 dark:text-white">
+                        <h3 className="font-medium text-txt-primary">
                           {report.article?.title || "Artikel tidak ditemukan"}
                         </h3>
-                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                        <p className="mt-1 text-sm text-txt-secondary">
                           {report.detail || "Tidak ada detail."}
                         </p>
                         {report.email && (
-                          <p className="mt-1 text-xs text-gray-400">
+                          <p className="mt-1 text-xs text-txt-muted">
                             Pelapor: {report.email}
                           </p>
                         )}
@@ -205,14 +205,14 @@ export default function LaporanPage() {
                           <button
                             onClick={() => handleUpdateStatus(report.id, "REVIEWED")}
                             disabled={updating === report.id}
-                            className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-100 disabled:opacity-50"
+                            className="rounded-[12px] bg-goto-light px-3 py-1.5 text-xs font-medium text-goto-green hover:bg-goto-green/20 disabled:opacity-50"
                           >
                             {updating === report.id ? "..." : "Tinjau"}
                           </button>
                           <button
                             onClick={() => handleUpdateStatus(report.id, "DISMISSED")}
                             disabled={updating === report.id}
-                            className="rounded-lg bg-gray-50 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                            className="rounded-[12px] bg-surface-tertiary px-3 py-1.5 text-xs font-medium text-txt-secondary hover:bg-border disabled:opacity-50"
                           >
                             {updating === report.id ? "..." : "Tolak"}
                           </button>

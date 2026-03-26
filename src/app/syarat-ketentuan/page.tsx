@@ -9,13 +9,13 @@ export default function SyaratKetentuanPage() {
   return (
     <div className="container-main py-12">
       <div className="mx-auto max-w-3xl">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Syarat & Ketentuan</h1>
-        <div className="mt-2 h-1 w-16 bg-accent" />
-        <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+        <h1 className="text-3xl font-bold text-txt-primary">Syarat & Ketentuan</h1>
+        <div className="mt-2 h-1 w-16 bg-goto-green" />
+        <p className="mt-4 text-sm text-txt-muted">
           Terakhir diperbarui: 1 Januari 2026
         </p>
 
-        <div className="mt-8 space-y-8 font-serif text-[17px] leading-relaxed text-gray-700 dark:text-gray-300">
+        <div className="mt-8 space-y-8 font-serif text-[17px] leading-relaxed text-txt-secondary">
           <p>
             Dengan mengakses dan menggunakan situs <strong>Jurnalis Hukum Bandung</strong>, Anda
             menyetujui dan terikat oleh syarat dan ketentuan berikut. Jika Anda tidak menyetujui
@@ -24,7 +24,7 @@ export default function SyaratKetentuanPage() {
 
           {/* Ketentuan Umum */}
           <section>
-            <h2 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">1. Ketentuan Umum</h2>
+            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">1. Ketentuan Umum</h2>
             <ul className="ml-6 list-disc space-y-2">
               <li>
                 Jurnalis Hukum Bandung adalah platform media digital yang menyajikan berita dan
@@ -47,7 +47,7 @@ export default function SyaratKetentuanPage() {
 
           {/* Penggunaan Konten */}
           <section>
-            <h2 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">2. Penggunaan Konten</h2>
+            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">2. Penggunaan Konten</h2>
             <ul className="ml-6 list-disc space-y-2">
               <li>
                 Seluruh konten yang tersedia di situs ini ditujukan untuk keperluan informasi dan
@@ -74,7 +74,7 @@ export default function SyaratKetentuanPage() {
 
           {/* Hak Cipta */}
           <section>
-            <h2 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">3. Hak Cipta</h2>
+            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">3. Hak Cipta</h2>
             <p>
               Seluruh konten yang dipublikasikan di Jurnalis Hukum Bandung, termasuk namun tidak
               terbatas pada artikel, foto, grafis, video, dan desain, dilindungi oleh hukum hak
@@ -98,7 +98,7 @@ export default function SyaratKetentuanPage() {
 
           {/* Komentar & Interaksi */}
           <section>
-            <h2 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">4. Komentar & Interaksi</h2>
+            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">4. Komentar & Interaksi</h2>
             <p>Pengguna yang memberikan komentar atau berinteraksi di platform wajib:</p>
             <ul className="ml-6 mt-2 list-disc space-y-2">
               <li>Menggunakan bahasa yang sopan dan tidak mengandung unsur SARA, ujaran kebencian,
@@ -116,7 +116,7 @@ export default function SyaratKetentuanPage() {
 
           {/* Pelaporan Konten */}
           <section>
-            <h2 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">5. Pelaporan Konten</h2>
+            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">5. Pelaporan Konten</h2>
             <p>
               Kami menyediakan mekanisme bagi pembaca untuk melaporkan konten yang dianggap tidak
               akurat, melanggar hukum, atau bertentangan dengan kode etik jurnalistik.
@@ -142,7 +142,7 @@ export default function SyaratKetentuanPage() {
 
           {/* Batasan Tanggung Jawab */}
           <section>
-            <h2 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">6. Batasan Tanggung Jawab</h2>
+            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">6. Batasan Tanggung Jawab</h2>
             <ul className="ml-6 list-disc space-y-2">
               <li>
                 Jurnalis Hukum Bandung berusaha menyajikan informasi yang akurat dan terkini, namun
@@ -171,7 +171,7 @@ export default function SyaratKetentuanPage() {
 
           {/* Perubahan Ketentuan */}
           <section>
-            <h2 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">7. Perubahan Ketentuan</h2>
+            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">7. Perubahan Ketentuan</h2>
             <p>
               Jurnalis Hukum Bandung berhak mengubah syarat dan ketentuan ini kapan saja.
               Perubahan akan berlaku efektif setelah dipublikasikan di halaman ini.
@@ -187,12 +187,12 @@ export default function SyaratKetentuanPage() {
           </section>
 
           {/* Kontak */}
-          <div className="mt-8 rounded-xl bg-gray-50 p-6 dark:bg-gray-900">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Hubungi Kami</h2>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          <div className="mt-8 rounded-[12px] bg-surface-secondary p-6">
+            <h2 className="text-lg font-bold text-txt-primary">Hubungi Kami</h2>
+            <p className="mt-2 text-sm text-txt-secondary">
               Jika Anda memiliki pertanyaan mengenai syarat dan ketentuan ini, silakan hubungi:
             </p>
-            <div className="mt-3 space-y-1 text-sm text-gray-600 dark:text-gray-400">
+            <div className="mt-3 space-y-1 text-sm text-txt-secondary">
               <p><strong>Email:</strong> redaksi@jurnalishukumbandung.com</p>
               <p><strong>Alamat:</strong> Bandung, Jawa Barat, Indonesia</p>
             </div>

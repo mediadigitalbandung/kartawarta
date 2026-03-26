@@ -31,12 +31,12 @@ interface StatsItem {
 }
 
 const statusColors: Record<string, string> = {
-  PUBLISHED: "bg-green-100 text-green-700",
-  IN_REVIEW: "bg-yellow-100 text-yellow-700",
-  DRAFT: "bg-gray-100 text-gray-700",
-  REJECTED: "bg-red-100 text-red-700",
-  APPROVED: "bg-blue-100 text-blue-700",
-  ARCHIVED: "bg-gray-100 text-gray-500",
+  PUBLISHED: "bg-goto-light text-goto-green",
+  IN_REVIEW: "bg-yellow-50 text-yellow-600",
+  DRAFT: "bg-surface-tertiary text-txt-secondary",
+  REJECTED: "bg-red-50 text-red-600",
+  APPROVED: "bg-blue-50 text-blue-600",
+  ARCHIVED: "bg-surface-tertiary text-txt-muted",
 };
 
 const statusLabels: Record<string, string> = {
@@ -55,31 +55,31 @@ function LoadingSkeleton() {
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900"
+            className="rounded-[12px] border border-border bg-surface p-4 shadow-card"
           >
-            <div className="h-8 w-8 rounded-lg bg-gray-200 dark:bg-gray-700" />
-            <div className="mt-2 h-7 w-16 rounded bg-gray-200 dark:bg-gray-700" />
-            <div className="mt-1 h-3 w-20 rounded bg-gray-100 dark:bg-gray-800" />
+            <div className="h-8 w-8 rounded-[12px] bg-surface-tertiary" />
+            <div className="mt-2 h-7 w-16 rounded bg-surface-tertiary" />
+            <div className="mt-1 h-3 w-20 rounded bg-surface-secondary" />
           </div>
         ))}
       </div>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
-          <div className="border-b border-gray-200 px-5 py-4 dark:border-gray-800">
-            <div className="h-5 w-32 rounded bg-gray-200 dark:bg-gray-700" />
+        <div className="rounded-[12px] border border-border bg-surface shadow-card">
+          <div className="border-b border-border px-5 py-4">
+            <div className="h-5 w-32 rounded bg-surface-tertiary" />
           </div>
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="flex items-center justify-between px-5 py-3">
               <div className="flex-1">
-                <div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" />
-                <div className="mt-1 h-3 w-24 rounded bg-gray-100 dark:bg-gray-800" />
+                <div className="h-4 w-3/4 rounded bg-surface-tertiary" />
+                <div className="mt-1 h-3 w-24 rounded bg-surface-secondary" />
               </div>
-              <div className="ml-4 h-5 w-20 rounded-full bg-gray-200 dark:bg-gray-700" />
+              <div className="ml-4 h-5 w-20 rounded-full bg-surface-tertiary" />
             </div>
           ))}
         </div>
-        <div className="rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
-          <div className="h-5 w-24 rounded bg-gray-200 dark:bg-gray-700" />
+        <div className="rounded-[12px] border border-border bg-surface p-5 shadow-card">
+          <div className="h-5 w-24 rounded bg-surface-tertiary" />
         </div>
       </div>
     </div>
@@ -146,9 +146,9 @@ export default function DashboardPage() {
 
         setStats([
           { label: "Total Artikel", value: formatNumber(totalArticles), icon: FileText, color: "text-blue-500 bg-blue-50" },
-          { label: "Total Views", value: formatNumber(totalViews), icon: Eye, color: "text-green-500 bg-green-50" },
+          { label: "Total Views", value: formatNumber(totalViews), icon: Eye, color: "text-goto-green bg-goto-light" },
           { label: "Menunggu Review", value: pendingReview.toString(), icon: Clock, color: "text-yellow-500 bg-yellow-50" },
-          { label: "Dipublikasikan", value: formatNumber(published), icon: CheckCircle, color: "text-emerald-500 bg-emerald-50" },
+          { label: "Dipublikasikan", value: formatNumber(published), icon: CheckCircle, color: "text-goto-green bg-goto-light" },
           { label: "Laporan Masuk", value: reportsPending.toString(), icon: AlertTriangle, color: "text-red-500 bg-red-50" },
           { label: "Views Hari Ini", value: formatNumber(todayViews), icon: TrendingUp, color: "text-purple-500 bg-purple-50" },
         ]);
@@ -173,10 +173,10 @@ export default function DashboardPage() {
     return (
       <div>
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-txt-primary">
             Dashboard
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-txt-secondary">
             Selamat datang kembali, {session?.user?.name}!
           </p>
         </div>
@@ -189,14 +189,14 @@ export default function DashboardPage() {
     return (
       <div>
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-txt-primary">
             Dashboard
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-txt-secondary">
             Selamat datang kembali, {session?.user?.name}!
           </p>
         </div>
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+        <div className="rounded-[12px] border border-red-200 bg-red-50 p-6 text-center text-red-700">
           {error}
         </div>
       </div>
@@ -207,10 +207,10 @@ export default function DashboardPage() {
     <div>
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-2xl font-bold text-txt-primary">
           Dashboard
         </h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-txt-secondary">
           Selamat datang kembali, {session?.user?.name}!
         </p>
       </div>
@@ -222,15 +222,15 @@ export default function DashboardPage() {
           return (
             <div
               key={stat.label}
-              className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900"
+              className="rounded-[12px] border border-border bg-surface p-4 shadow-card"
             >
-              <div className={`inline-flex rounded-lg p-2 ${stat.color}`}>
+              <div className={`inline-flex rounded-[12px] p-2 ${stat.color}`}>
                 <Icon size={18} />
               </div>
-              <p className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="mt-2 text-3xl font-extrabold text-txt-primary">
                 {stat.value}
               </p>
-              <p className="text-xs text-gray-500">{stat.label}</p>
+              <p className="text-xs text-txt-secondary">{stat.label}</p>
             </div>
           );
         })}
@@ -238,33 +238,33 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Recent articles */}
-        <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
-          <div className="border-b border-gray-200 px-5 py-4 dark:border-gray-800">
-            <h2 className="font-semibold text-gray-900 dark:text-white">
+        <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
+          <div className="border-b border-border bg-surface-secondary px-5 py-4">
+            <h2 className="font-semibold text-txt-primary">
               Artikel Terbaru
             </h2>
           </div>
-          <div className="divide-y divide-gray-100 dark:divide-gray-800">
+          <div className="divide-y divide-border">
             {recentArticles.length === 0 ? (
-              <div className="px-5 py-8 text-center text-sm text-gray-500">
+              <div className="px-5 py-8 text-center text-sm text-txt-secondary">
                 Belum ada artikel.
               </div>
             ) : (
               recentArticles.map((article) => (
-                <div key={article.id} className="flex items-center justify-between px-5 py-3">
+                <div key={article.id} className="flex items-center justify-between px-5 py-3 hover:bg-surface-secondary">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                    <p className="truncate text-sm font-medium text-txt-primary">
                       {article.title}
                     </p>
-                    <p className="text-xs text-gray-500">{formatDate(article.createdAt)}</p>
+                    <p className="text-xs text-txt-secondary">{formatDate(article.createdAt)}</p>
                   </div>
                   <div className="ml-4 flex items-center gap-3">
                     {article.viewCount > 0 && (
-                      <span className="flex items-center gap-1 text-xs text-gray-400">
+                      <span className="flex items-center gap-1 text-xs text-txt-muted">
                         <Eye size={12} /> {article.viewCount}
                       </span>
                     )}
-                    <span className={`badge ${statusColors[article.status] || "bg-gray-100 text-gray-700"}`}>
+                    <span className={`badge ${statusColors[article.status] || "bg-surface-tertiary text-txt-secondary"}`}>
                       {statusLabels[article.status] || article.status}
                     </span>
                   </div>
@@ -275,46 +275,46 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick actions */}
-        <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
-          <div className="border-b border-gray-200 px-5 py-4 dark:border-gray-800">
-            <h2 className="font-semibold text-gray-900 dark:text-white">
+        <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
+          <div className="border-b border-border bg-surface-secondary px-5 py-4">
+            <h2 className="font-semibold text-txt-primary">
               Aksi Cepat
             </h2>
           </div>
           <div className="grid grid-cols-2 gap-3 p-5">
             <a
               href="/panel/artikel/baru"
-              className="flex flex-col items-center gap-2 rounded-xl border-2 border-dashed border-gray-200 p-6 text-center transition-colors hover:border-primary-500 hover:bg-primary-50 dark:border-gray-700"
+              className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
             >
-              <FileText size={24} className="text-primary-500" />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <FileText size={24} className="text-goto-green" />
+              <span className="text-sm font-medium text-txt-secondary">
                 Tulis Artikel Baru
               </span>
             </a>
             <a
               href="/panel/artikel"
-              className="flex flex-col items-center gap-2 rounded-xl border-2 border-dashed border-gray-200 p-6 text-center transition-colors hover:border-primary-500 hover:bg-primary-50 dark:border-gray-700"
+              className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
             >
               <Clock size={24} className="text-yellow-500" />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-sm font-medium text-txt-secondary">
                 Review Artikel
               </span>
             </a>
             <a
               href="/panel/statistik"
-              className="flex flex-col items-center gap-2 rounded-xl border-2 border-dashed border-gray-200 p-6 text-center transition-colors hover:border-primary-500 hover:bg-primary-50 dark:border-gray-700"
+              className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
             >
-              <TrendingUp size={24} className="text-green-500" />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <TrendingUp size={24} className="text-goto-green" />
+              <span className="text-sm font-medium text-txt-secondary">
                 Lihat Statistik
               </span>
             </a>
             <a
               href="/panel/laporan"
-              className="flex flex-col items-center gap-2 rounded-xl border-2 border-dashed border-gray-200 p-6 text-center transition-colors hover:border-primary-500 hover:bg-primary-50 dark:border-gray-700"
+              className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
             >
               <AlertTriangle size={24} className="text-red-500" />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-sm font-medium text-txt-secondary">
                 Cek Laporan
               </span>
             </a>
@@ -323,12 +323,12 @@ export default function DashboardPage() {
       </div>
 
       {/* Editorial checklist reminder */}
-      <div className="mt-6 rounded-xl border border-blue-200 bg-blue-50 p-5 dark:border-blue-900 dark:bg-blue-950">
-        <h3 className="flex items-center gap-2 font-semibold text-blue-800 dark:text-blue-300">
+      <div className="mt-6 rounded-[12px] border border-goto-green/20 bg-goto-50 p-5">
+        <h3 className="flex items-center gap-2 font-semibold text-goto-dark">
           <CheckCircle size={18} />
           Pengingat Standar Jurnalistik
         </h3>
-        <ul className="mt-2 space-y-1 text-sm text-blue-700 dark:text-blue-400">
+        <ul className="mt-2 space-y-1 text-sm text-goto-green">
           <li>&#10003; Pastikan setiap artikel memiliki minimal 1 sumber terverifikasi</li>
           <li>&#10003; Judul tidak clickbait atau sensasional berlebihan</li>
           <li>&#10003; Cover both sides — berikan perspektif berimbang</li>

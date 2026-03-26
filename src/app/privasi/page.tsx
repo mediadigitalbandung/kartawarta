@@ -9,13 +9,13 @@ export default function PrivasiPage() {
   return (
     <div className="container-main py-12">
       <div className="mx-auto max-w-3xl">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Kebijakan Privasi</h1>
-        <div className="mt-2 h-1 w-16 bg-accent" />
-        <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+        <h1 className="text-3xl font-bold text-txt-primary">Kebijakan Privasi</h1>
+        <div className="mt-2 h-1 w-16 bg-goto-green" />
+        <p className="mt-4 text-sm text-txt-muted">
           Terakhir diperbarui: 1 Januari 2026
         </p>
 
-        <div className="mt-8 space-y-8 font-serif text-[17px] leading-relaxed text-gray-700 dark:text-gray-300">
+        <div className="mt-8 space-y-8 font-serif text-[17px] leading-relaxed text-txt-secondary">
           <p>
             <strong>Jurnalis Hukum Bandung</strong> menghormati privasi pengunjung dan pengguna
             platform kami. Kebijakan privasi ini menjelaskan bagaimana kami mengumpulkan, menggunakan,
@@ -24,7 +24,7 @@ export default function PrivasiPage() {
 
           {/* Pengumpulan Data */}
           <section>
-            <h2 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">1. Pengumpulan Data</h2>
+            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">1. Pengumpulan Data</h2>
             <p>Kami dapat mengumpulkan informasi berikut dari pengguna:</p>
             <ul className="ml-6 mt-2 list-disc space-y-2">
               <li>
@@ -48,7 +48,7 @@ export default function PrivasiPage() {
 
           {/* Penggunaan Data */}
           <section>
-            <h2 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">2. Penggunaan Data</h2>
+            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">2. Penggunaan Data</h2>
             <p>Data yang kami kumpulkan digunakan untuk:</p>
             <ul className="ml-6 mt-2 list-disc space-y-2">
               <li>Menyediakan dan meningkatkan layanan platform berita kami.</li>
@@ -62,7 +62,7 @@ export default function PrivasiPage() {
 
           {/* Cookies */}
           <section>
-            <h2 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">3. Cookies</h2>
+            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">3. Cookies</h2>
             <p>
               Situs kami menggunakan cookies dan teknologi serupa untuk meningkatkan pengalaman
               browsing Anda. Cookies yang kami gunakan meliputi:
@@ -89,7 +89,7 @@ export default function PrivasiPage() {
 
           {/* Pihak Ketiga */}
           <section>
-            <h2 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">4. Pihak Ketiga</h2>
+            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">4. Pihak Ketiga</h2>
             <p>
               Kami tidak menjual, memperdagangkan, atau memindahkan informasi pribadi Anda kepada
               pihak ketiga tanpa persetujuan Anda, kecuali dalam situasi berikut:
@@ -113,7 +113,7 @@ export default function PrivasiPage() {
 
           {/* Keamanan Data */}
           <section>
-            <h2 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">5. Keamanan Data</h2>
+            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">5. Keamanan Data</h2>
             <p>
               Kami menerapkan langkah-langkah keamanan teknis dan organisasional yang wajar untuk
               melindungi data pribadi Anda dari akses tidak sah, pengubahan, pengungkapan, atau
@@ -133,7 +133,7 @@ export default function PrivasiPage() {
 
           {/* Hak Pengguna */}
           <section>
-            <h2 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">6. Hak Pengguna</h2>
+            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">6. Hak Pengguna</h2>
             <p>Sebagai pengguna, Anda memiliki hak untuk:</p>
             <ul className="ml-6 mt-2 list-disc space-y-2">
               <li>
@@ -165,12 +165,12 @@ export default function PrivasiPage() {
 
           {/* Kontak */}
           <section>
-            <h2 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">7. Kontak</h2>
+            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">7. Kontak</h2>
             <p>
               Jika Anda memiliki pertanyaan, keluhan, atau permintaan terkait kebijakan privasi ini,
               silakan hubungi kami:
             </p>
-            <div className="mt-4 rounded-xl bg-gray-50 p-6 dark:bg-gray-900">
+            <div className="mt-4 rounded-[12px] bg-surface-secondary p-6">
               <div className="space-y-2 text-sm">
                 <p><strong>Jurnalis Hukum Bandung</strong></p>
                 <p><strong>Email:</strong> privasi@jurnalishukumbandung.com</p>
@@ -179,7 +179,7 @@ export default function PrivasiPage() {
             </div>
           </section>
 
-          <p className="mt-8 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-8 text-sm text-txt-muted">
             Kami berhak memperbarui kebijakan privasi ini sewaktu-waktu. Perubahan akan diumumkan
             melalui halaman ini dengan memperbarui tanggal &quot;Terakhir diperbarui&quot; di atas.
             Kami menyarankan Anda untuk meninjau halaman ini secara berkala.

@@ -16,7 +16,7 @@ import {
 
 const RichTextEditor = dynamic(
   () => import("@/components/editor/RichTextEditor"),
-  { ssr: false, loading: () => <div className="h-[500px] animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800" /> }
+  { ssr: false, loading: () => <div className="h-[500px] animate-pulse rounded-[12px] bg-surface-secondary" /> }
 );
 
 const categories = [
@@ -139,10 +139,10 @@ export default function NewArticlePage() {
     <div className="mx-auto max-w-5xl">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-txt-primary">
             Tulis Artikel Baru
           </h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-txt-secondary">
             Pastikan mengikuti standar jurnalistik
           </p>
         </div>
@@ -150,7 +150,7 @@ export default function NewArticlePage() {
           <button
             onClick={() => handleSubmit("DRAFT")}
             disabled={saving}
-            className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-700 dark:text-gray-300"
+            className="btn-secondary flex items-center gap-1.5 px-4 py-2 text-sm font-medium disabled:opacity-50"
           >
             <Save size={16} />
             Simpan Draft
@@ -158,7 +158,7 @@ export default function NewArticlePage() {
           <button
             onClick={() => handleSubmit("IN_REVIEW")}
             disabled={saving}
-            className="flex items-center gap-1.5 rounded-lg bg-primary-500 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-600 disabled:opacity-50"
+            className="btn-primary flex items-center gap-1.5 px-4 py-2 text-sm font-semibold disabled:opacity-50"
           >
             <Send size={16} />
             Kirim untuk Review
@@ -167,7 +167,7 @@ export default function NewArticlePage() {
       </div>
 
       {error && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-900/30 dark:text-red-400">
+        <div className="mb-4 flex items-center gap-2 rounded-[12px] bg-red-50 px-4 py-3 text-sm text-red-700">
           <AlertCircle size={16} />
           {error}
         </div>
@@ -182,49 +182,51 @@ export default function NewArticlePage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Judul Artikel"
-            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-xl font-bold focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-800 dark:bg-gray-900"
+            className="input w-full px-4 py-3 text-xl font-bold"
           />
 
           {/* Editor */}
-          <RichTextEditor content={content} onChange={setContent} />
+          <div className="rounded-[12px] border border-border overflow-hidden">
+            <RichTextEditor content={content} onChange={setContent} />
+          </div>
 
           {/* Sources */}
-          <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+          <div className="rounded-[12px] border border-border bg-surface p-6">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
+              <h3 className="text-sm font-medium text-txt-primary uppercase tracking-wider">
                 Sumber & Narasumber
               </h3>
               <button
                 type="button"
                 onClick={addSource}
-                className="flex items-center gap-1 text-xs text-primary-500 hover:underline"
+                className="flex items-center gap-1 text-xs text-goto-green hover:underline"
               >
                 <Plus size={14} /> Tambah Sumber
               </button>
             </div>
             <div className="space-y-3">
               {sources.map((source, i) => (
-                <div key={i} className="grid grid-cols-2 gap-2 rounded-lg border border-gray-100 p-3 dark:border-gray-800">
+                <div key={i} className="grid grid-cols-2 gap-2 rounded-[12px] border border-border p-3">
                   <input
                     type="text"
                     placeholder="Nama narasumber *"
                     value={source.name}
                     onChange={(e) => updateSource(i, "name", e.target.value)}
-                    className="rounded border border-gray-200 px-3 py-1.5 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800"
+                    className="input text-sm"
                   />
                   <input
                     type="text"
                     placeholder="Jabatan"
                     value={source.title}
                     onChange={(e) => updateSource(i, "title", e.target.value)}
-                    className="rounded border border-gray-200 px-3 py-1.5 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800"
+                    className="input text-sm"
                   />
                   <input
                     type="text"
                     placeholder="Institusi"
                     value={source.institution}
                     onChange={(e) => updateSource(i, "institution", e.target.value)}
-                    className="rounded border border-gray-200 px-3 py-1.5 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800"
+                    className="input text-sm"
                   />
                   <div className="flex gap-2">
                     <input
@@ -232,13 +234,13 @@ export default function NewArticlePage() {
                       placeholder="URL referensi"
                       value={source.url}
                       onChange={(e) => updateSource(i, "url", e.target.value)}
-                      className="flex-1 rounded border border-gray-200 px-3 py-1.5 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800"
+                      className="input flex-1 text-sm"
                     />
                     {sources.length > 1 && (
                       <button
                         type="button"
                         onClick={() => removeSource(i)}
-                        className="rounded p-1.5 text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"
+                        className="rounded p-1.5 text-red-400 hover:bg-red-50"
                       >
                         <Trash2 size={14} />
                       </button>
@@ -250,37 +252,37 @@ export default function NewArticlePage() {
           </div>
 
           {/* SEO Settings */}
-          <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+          <div className="rounded-[12px] border border-border bg-surface">
             <button
               type="button"
               onClick={() => setShowSeo(!showSeo)}
-              className="flex w-full items-center justify-between px-4 py-3 text-sm font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300"
+              className="flex w-full items-center justify-between px-6 py-3 text-sm font-medium text-txt-primary uppercase tracking-wider"
             >
               Pengaturan SEO
               <ChevronDown size={16} className={showSeo ? "rotate-180" : ""} />
             </button>
             {showSeo && (
-              <div className="space-y-3 border-t border-gray-200 px-4 py-3 dark:border-gray-800">
+              <div className="space-y-3 border-t border-border px-6 py-4">
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-gray-500">SEO Title ({seoTitle.length}/70)</label>
+                  <label className="mb-1 block text-sm font-medium text-txt-primary">SEO Title ({seoTitle.length}/70)</label>
                   <input
                     type="text"
                     value={seoTitle}
                     onChange={(e) => setSeoTitle(e.target.value)}
                     maxLength={70}
                     placeholder={title || "Judul untuk mesin pencari"}
-                    className="w-full rounded border border-gray-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800"
+                    className="input w-full text-sm"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-gray-500">Meta Description ({seoDescription.length}/160)</label>
+                  <label className="mb-1 block text-sm font-medium text-txt-primary">Meta Description ({seoDescription.length}/160)</label>
                   <textarea
                     value={seoDescription}
                     onChange={(e) => setSeoDescription(e.target.value)}
                     maxLength={160}
                     rows={2}
                     placeholder="Deskripsi singkat untuk hasil pencarian"
-                    className="w-full rounded border border-gray-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800"
+                    className="input w-full text-sm"
                   />
                 </div>
               </div>
@@ -291,14 +293,14 @@ export default function NewArticlePage() {
         {/* Sidebar */}
         <div className="space-y-4">
           {/* Category */}
-          <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-            <h3 className="mb-2 text-sm font-bold text-gray-700 dark:text-gray-300">
+          <div className="rounded-[12px] border border-border bg-surface p-6">
+            <label className="mb-2 block text-sm font-medium text-txt-primary">
               Kategori *
-            </h3>
+            </label>
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800"
+              className="input w-full"
             >
               <option value="">Pilih Kategori</option>
               {categories.map((cat) => (
@@ -310,54 +312,54 @@ export default function NewArticlePage() {
           </div>
 
           {/* Tags */}
-          <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-            <h3 className="mb-2 text-sm font-bold text-gray-700 dark:text-gray-300">Tags</h3>
+          <div className="rounded-[12px] border border-border bg-surface p-6">
+            <label className="mb-2 block text-sm font-medium text-txt-primary">Tags</label>
             <input
               type="text"
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               placeholder="Tag1, Tag2, Tag3"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800"
+              className="input w-full"
             />
-            <p className="mt-1 text-xs text-gray-400">Pisahkan dengan koma</p>
+            <p className="mt-1 text-xs text-txt-muted">Pisahkan dengan koma</p>
           </div>
 
           {/* Excerpt */}
-          <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-            <h3 className="mb-2 text-sm font-bold text-gray-700 dark:text-gray-300">Ringkasan</h3>
+          <div className="rounded-[12px] border border-border bg-surface p-6">
+            <label className="mb-2 block text-sm font-medium text-txt-primary">Ringkasan</label>
             <textarea
               value={excerpt}
               onChange={(e) => setExcerpt(e.target.value)}
               rows={3}
               placeholder="Ringkasan singkat artikel"
               maxLength={500}
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800"
+              className="input w-full"
             />
           </div>
 
           {/* Featured Image */}
-          <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-            <h3 className="mb-2 text-sm font-bold text-gray-700 dark:text-gray-300">
+          <div className="rounded-[12px] border border-border bg-surface p-6">
+            <label className="mb-2 block text-sm font-medium text-txt-primary">
               Gambar Utama
-            </h3>
+            </label>
             <input
               type="url"
               value={featuredImage}
               onChange={(e) => setFeaturedImage(e.target.value)}
               placeholder="URL gambar utama"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800"
+              className="input w-full"
             />
           </div>
 
           {/* Verification Label */}
-          <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-            <h3 className="mb-2 text-sm font-bold text-gray-700 dark:text-gray-300">
+          <div className="rounded-[12px] border border-border bg-surface p-6">
+            <label className="mb-2 block text-sm font-medium text-txt-primary">
               Label Verifikasi
-            </h3>
+            </label>
             <select
               value={verificationLabel}
               onChange={(e) => setVerificationLabel(e.target.value)}
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800"
+              className="input w-full"
             >
               <option value="UNVERIFIED">Belum Diverifikasi</option>
               <option value="VERIFIED">Terverifikasi</option>
@@ -367,11 +369,11 @@ export default function NewArticlePage() {
           </div>
 
           {/* Journalism Checklist */}
-          <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950">
+          <div className="rounded-[12px] border border-goto-green/20 bg-goto-50 p-4">
             <button
               type="button"
               onClick={() => setShowChecklist(!showChecklist)}
-              className="flex w-full items-center justify-between text-sm font-bold text-blue-800 dark:text-blue-300"
+              className="flex w-full items-center justify-between text-sm font-bold text-goto-dark"
             >
               <span className="flex items-center gap-1.5">
                 <CheckCircle size={16} />
@@ -388,7 +390,7 @@ export default function NewArticlePage() {
                   { key: "noSara" as const, label: "Tidak mengandung unsur SARA" },
                   { key: "properLanguage" as const, label: "Bahasa sesuai PUEBI" },
                 ].map((item) => (
-                  <label key={item.key} className="flex items-start gap-2 text-xs text-blue-700 dark:text-blue-400">
+                  <label key={item.key} className="flex items-start gap-2 text-xs text-goto-green">
                     <input
                       type="checkbox"
                       checked={checklist[item.key]}
@@ -401,7 +403,7 @@ export default function NewArticlePage() {
                   </label>
                 ))}
                 {allChecked && (
-                  <p className="mt-2 flex items-center gap-1 text-xs font-medium text-green-600">
+                  <p className="mt-2 flex items-center gap-1 text-xs font-medium text-goto-green">
                     <CheckCircle size={12} /> Semua checklist terpenuhi
                   </p>
                 )}

@@ -35,7 +35,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   if (status === "loading") {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-goto-green border-t-transparent" />
       </div>
     );
   }
@@ -47,14 +47,14 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   const isAdmin = session.user.role === "SUPER_ADMIN" || session.user.role === "CHIEF_EDITOR";
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen bg-surface-secondary">
       <div className="flex">
         {/* Sidebar */}
-        <aside className="fixed left-0 top-0 z-40 hidden h-screen w-60 border-r border-gray-200 bg-white pt-16 dark:border-gray-800 dark:bg-gray-900 lg:block">
+        <aside className="fixed left-0 top-0 z-40 hidden h-screen w-60 bg-surface-dark pt-16 lg:block">
           <div className="flex h-full flex-col px-3 py-4">
             <Link
               href="/"
-              className="mb-4 flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="mb-4 flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/60 hover:text-white hover:bg-white/5"
             >
               <ChevronLeft size={16} />
               Kembali ke Situs
@@ -73,8 +73,8 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
                       className={cn(
                         "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                         isActive
-                          ? "bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400"
-                          : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+                          ? "bg-goto-green/10 text-goto-green"
+                          : "text-white/60 hover:text-white hover:bg-white/5"
                       )}
                     >
                       <Icon size={18} />
@@ -85,16 +85,16 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             </nav>
 
             {/* User info */}
-            <div className="border-t border-gray-200 pt-3 dark:border-gray-800">
+            <div className="border-t border-white/10 pt-3">
               <div className="flex items-center gap-3 rounded-lg px-3 py-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-sm font-bold text-primary-600">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-goto-green text-sm font-bold text-white">
                   {session.user.name?.charAt(0)}
                 </div>
                 <div className="truncate">
-                  <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                  <p className="truncate text-sm font-medium text-white">
                     {session.user.name}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-white/50">
                     {session.user.role.replace(/_/g, " ")}
                   </p>
                 </div>
@@ -105,6 +105,8 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
         {/* Main content */}
         <main className="flex-1 lg:ml-60">
+          {/* Top bar */}
+          <div className="sticky top-0 z-30 bg-surface border-b border-border h-14 lg:hidden" />
           <div className="p-6">{children}</div>
         </main>
       </div>
