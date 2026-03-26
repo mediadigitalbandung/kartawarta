@@ -154,6 +154,19 @@ export default function HeadlineSlider({ items }: HeadlineSliderProps) {
         })}
       </div>
 
+      {/* Tag — top left like breaking news */}
+      <div className="absolute top-0 left-0 z-10 flex items-center px-4 py-2.5">
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-goto-green opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-goto-green" />
+          </span>
+          <span className="text-[11px] font-bold uppercase tracking-widest text-white">
+            Headline News
+          </span>
+        </div>
+      </div>
+
       {/* Arrows — always visible, elegant */}
       {total > 1 && (
         <>
