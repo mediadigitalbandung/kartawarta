@@ -411,6 +411,20 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* 3 Banner Ads */}
+      <div className="bg-surface py-4">
+        <div className="container-main">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="rounded-lg bg-gradient-to-br from-surface-tertiary to-surface-secondary flex items-center justify-center overflow-hidden relative" style={{ height: "200px" }}>
+                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
+                <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan {n}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="border-b border-border" />
 
       {/* Category Sections — Kumparan-style layout */}
