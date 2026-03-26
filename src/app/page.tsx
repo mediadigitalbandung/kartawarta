@@ -7,6 +7,7 @@ import NewsTicker from "@/components/layout/NewsTicker";
 import HeadlineSlider from "@/components/slider/HeadlineSlider";
 import BreakingSlider from "@/components/slider/BreakingSlider";
 import PopularCarousel from "@/components/slider/PopularCarousel";
+import SubHeadlineSlider from "@/components/slider/SubHeadlineSlider";
 import BannerAd, { SidebarAd } from "@/components/ads/BannerAd";
 import SimulationBadge from "@/components/SimulationBadge";
 import { Scale, BookOpen, Gavel, Shield, Users, Landmark, LucideIcon, Globe, Monitor, Building2, FileText, AlertTriangle, Radio, BarChart3, Calendar, Play, Vote, TrendingUp } from "lucide-react";
@@ -95,8 +96,8 @@ export default async function HomePage() {
   ]);
 
   const headlineArticles = articles.slice(0, 5);  // For headline slider
-  const subHeadlines = articles.slice(5, 7);      // 2 small cards below headline
-  const breakingArticles = articles.slice(7, 12); // For breaking news slider
+  const subHeadlines = articles.slice(5, 11);     // 6 items = 3 pages x 2 cards for sub-headline slider
+  const breakingArticles = articles.slice(11, 16); // For breaking news slider
   const terkiniArticles = articles.slice(12, 18); // Berita Terkini: 2x3 grid = 6
   const restArticles = articles.slice(22);
 
@@ -133,10 +134,8 @@ export default async function HomePage() {
             <div className="lg:col-span-2">
               <HeadlineSlider items={JSON.parse(JSON.stringify(headlineArticles))} />
               {subHeadlines.length > 0 && (
-                <div className="grid grid-cols-2 gap-4 mt-4">
-                  {subHeadlines.map((a) => (
-                    <ArticleCard key={a.slug} {...a} variant="standard" />
-                  ))}
+                <div className="mt-4">
+                  <SubHeadlineSlider items={JSON.parse(JSON.stringify(subHeadlines))} />
                 </div>
               )}
             </div>
