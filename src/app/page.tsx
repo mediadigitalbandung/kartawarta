@@ -155,7 +155,7 @@ export default async function HomePage() {
       {/* Berita Terkini + Terpopuler side by side */}
       <section className="bg-surface py-8">
         <div className="container-main">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
             {/* Left: Berita Terkini — 2 columns x 3 rows */}
             <div className="lg:col-span-2">
               <div className="flex items-center justify-between mb-5">
@@ -183,7 +183,7 @@ export default async function HomePage() {
                   </h2>
                 </div>
                 <div className="space-y-0 divide-y divide-border">
-                  {trendingArticles.slice(0, 10).map((article, i) => (
+                  {trendingArticles.slice(0, 6).map((article, i) => (
                     <div key={article.slug} className="group flex items-start gap-3 py-4 first:pt-0">
                       {/* Rank number */}
                       <span className="shrink-0 w-7 pt-0.5 text-center text-2xl font-extrabold text-goto-green select-none">
