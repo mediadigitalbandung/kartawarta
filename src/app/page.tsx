@@ -95,8 +95,9 @@ export default async function HomePage() {
   ]);
 
   const headlineArticles = articles.slice(0, 5);  // For headline slider
-  const breakingArticles = articles.slice(5, 10); // For breaking news slider
-  const terkiniArticles = articles.slice(10, 16); // Berita Terkini: 3x2 grid = 6
+  const subHeadlines = articles.slice(5, 7);      // 2 small cards below headline
+  const breakingArticles = articles.slice(7, 12); // For breaking news slider
+  const terkiniArticles = articles.slice(12, 18); // Berita Terkini: 2x3 grid = 6
   const restArticles = articles.slice(22);
 
   const tickerItems = tickerArticles.map((a) => ({
@@ -128,9 +129,16 @@ export default async function HomePage() {
       <section className="bg-surface py-6">
         <div className="container-main">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Headline Slider — 2/3 width */}
+            {/* Headline Slider + 2 sub-headlines — 2/3 width */}
             <div className="lg:col-span-2">
               <HeadlineSlider items={JSON.parse(JSON.stringify(headlineArticles))} />
+              {subHeadlines.length > 0 && (
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  {subHeadlines.map((a) => (
+                    <ArticleCard key={a.slug} {...a} variant="compact" />
+                  ))}
+                </div>
+              )}
             </div>
             {/* Breaking News Slider — 1/3 width */}
             <div className="lg:col-span-1">
