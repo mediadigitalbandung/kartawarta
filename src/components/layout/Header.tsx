@@ -170,18 +170,18 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Row 2: Category navigation bar — NOT sticky, scrolls with page */}
-      <nav className="border-b border-border bg-surface">
+      {/* Row 2: Category navigation — sleek dark bar */}
+      <nav className="bg-surface-dark/95 backdrop-blur-sm border-b border-white/5">
         <div className="container-main">
           <ul className="flex items-center gap-0 overflow-x-auto scrollbar-hide">
             {categoryNav.map((item, i) => (
               <li key={item.href} className="shrink-0">
                 <Link
                   href={item.href}
-                  className={`inline-block px-4 py-3 text-sm font-medium transition-colors duration-200 ${
+                  className={`relative inline-block px-4 py-2.5 text-[13px] font-medium transition-all duration-200 ${
                     i === 0
-                      ? "border-b-2 border-goto-green text-goto-green"
-                      : "text-txt-secondary hover:text-goto-green"
+                      ? "text-white after:absolute after:bottom-0 after:left-4 after:right-4 after:h-[2px] after:rounded-full after:bg-goto-green"
+                      : "text-white/50 hover:text-white"
                   }`}
                 >
                   {item.name}
