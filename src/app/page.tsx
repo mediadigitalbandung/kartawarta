@@ -264,20 +264,40 @@ export default async function HomePage() {
 
       <div className="border-b border-border" />
 
-      {/* Live Sidang — SIMULASI */}
+      {/* Live Sidang — Video + Info Cards */}
       <section className="bg-surface-secondary py-6">
         <div className="container-main">
           <div className="flex items-center justify-between mb-4">
             <h2 className="border-l-[3px] border-red-500 pl-3 text-lg font-bold text-txt-primary flex items-center">
               <Radio size={18} className="mr-2 text-red-500 animate-pulse" />
               Live Sidang Hari Ini
-              <SimulationBadge />
             </h2>
             <Link href="/live-sidang" className="text-sm font-medium text-goto-green hover:underline">
               Lihat Semua
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+          {/* Video Player */}
+          <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-surface-dark mb-5">
+            {/* Placeholder — ganti dengan iframe YouTube/embed nanti */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-600 shadow-lg shadow-red-600/30 cursor-pointer hover:bg-red-500 transition-colors">
+                <Play size={28} className="text-white ml-1" />
+              </div>
+              <p className="mt-4 text-white font-bold text-lg">Sidang Praperadilan Kasus Korupsi Bandung Barat</p>
+              <p className="mt-1 text-white/50 text-sm">PN Bandung &middot; Majelis Hakim: Dr. H. Ahmad S., S.H., M.H.</p>
+              <div className="mt-3 flex items-center gap-2">
+                <span className="flex items-center gap-1.5 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white">
+                  <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+                  LIVE
+                </span>
+                <span className="text-xs text-white/40">Dimulai pukul 10:00 WIB</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 3 Info Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {liveSidangData.map((sidang) => (
               <div key={sidang.id} className="rounded-lg border border-border bg-surface p-4 transition-shadow hover:shadow-card">
                 <div className="flex items-center justify-between mb-2">
