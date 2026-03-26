@@ -183,7 +183,7 @@ export default async function HomePage() {
                   </h2>
                 </div>
                 <div className="space-y-0 divide-y divide-border flex-1">
-                  {trendingArticles.slice(0, 6).map((article, i) => (
+                  {trendingArticles.slice(0, 8).map((article, i) => (
                     <div key={article.slug} className="group flex items-start gap-4 py-4 first:pt-0">
                       {/* Rank number */}
                       <span className="shrink-0 w-8 pt-2 text-center text-3xl font-extrabold text-goto-green select-none">
