@@ -36,7 +36,6 @@ const mobileExtraLinks = [
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { data: session } = useSession();
 
@@ -45,13 +44,13 @@ export default function Header() {
       {/* Row 1: Top bar — sticky dark header */}
       <header className="sticky top-0 z-50 bg-surface-dark">
         <div className="container-main">
-          <div className="flex items-center justify-between py-3">
+          <div className="flex items-center gap-4 py-3">
             {/* Logo */}
             <Link href="/" className="group flex shrink-0 items-center gap-2.5">
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-goto-green text-xs font-bold text-white">
                 JH
               </span>
-              <span className="flex items-baseline gap-1.5">
+              <span className="hidden items-baseline gap-1.5 sm:flex">
                 <span className="text-base font-bold text-white sm:text-lg">
                   Jurnalis Hukum
                 </span>
@@ -59,21 +58,22 @@ export default function Header() {
               </span>
             </Link>
 
-            {/* Right actions */}
-            <div className="flex items-center gap-1">
-              {/* Search toggle */}
-              <button
-                onClick={() => setSearchOpen(!searchOpen)}
-                className={`rounded-full p-2 transition-colors duration-200 ${
-                  searchOpen
-                    ? "bg-white/10 text-goto-green"
-                    : "text-white/70 hover:text-white"
-                }`}
-                aria-label="Search"
-              >
-                <Search size={18} />
-              </button>
+            {/* Search bar — inline, takes remaining space */}
+            <form action="/search" className="relative flex-1 max-w-2xl">
+              <Search
+                size={16}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30"
+              />
+              <input
+                type="text"
+                name="q"
+                placeholder="Cari berita, topik, atau kata kunci di sini..."
+                className="w-full rounded-full border border-white/15 bg-white/8 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/35 transition-all focus:border-goto-green/50 focus:bg-white/12 focus:outline-none focus:ring-1 focus:ring-goto-green/20"
+              />
+            </form>
 
+            {/* Right actions */}
+            <div className="flex items-center gap-1 shrink-0">
               {/* User area */}
               {session ? (
                 <div className="relative">
@@ -128,29 +128,6 @@ export default function Header() {
                 {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
             </div>
-          </div>
-        </div>
-
-        {/* Search bar slide-down */}
-        <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${
-            searchOpen ? "max-h-16" : "max-h-0"
-          }`}
-        >
-          <div className="container-main pb-3">
-            <form action="/search" className="relative">
-              <Search
-                size={18}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40"
-              />
-              <input
-                type="text"
-                name="q"
-                placeholder="Cari berita, topik, atau kata kunci di sini..."
-                className="w-full rounded border border-white/20 bg-white/10 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/40 focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green/30"
-                autoFocus={searchOpen}
-              />
-            </form>
           </div>
         </div>
       </header>
