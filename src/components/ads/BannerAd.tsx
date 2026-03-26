@@ -52,7 +52,7 @@ export default function BannerAd({ size, className = "" }: BannerAdProps) {
 
 export function SidebarAd() {
   return (
-    <div className="rounded-lg bg-gradient-to-b from-surface-tertiary to-surface-secondary flex items-center justify-center overflow-hidden relative" style={{ height: "280px" }}>
+    <div className="rounded-lg bg-gradient-to-b from-surface-tertiary to-surface-secondary flex items-center justify-center overflow-hidden relative h-full min-h-[150px]">
       <div className="absolute inset-0 opacity-[0.03]" style={{
         backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)",
       }} />
