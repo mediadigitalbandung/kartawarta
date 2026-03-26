@@ -141,9 +141,9 @@ export default async function HomePage() {
       {/* Berita Terkini + Terpopuler side by side */}
       <section className="bg-surface py-8">
         <div className="container-main">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Left: Berita Terkini — 3 columns */}
-            <div className="lg:col-span-3">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left: Berita Terkini — 2 columns x 3 rows */}
+            <div className="lg:col-span-2">
               <div className="flex items-center justify-between mb-5">
                 <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
                   Berita Terkini
@@ -152,7 +152,7 @@ export default async function HomePage() {
                   Lihat Semua
                 </Link>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {terkiniArticles.map((a) => (
                   <ArticleCard key={a.slug} {...a} variant="standard" />
                 ))}
