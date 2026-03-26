@@ -57,10 +57,10 @@ const indeksHukumData = [
 ];
 
 const jadwalSidangData = [
-  { date: "27 Mar", day: "Kamis", cases: 12, highlight: "Sidang Tipikor Bupati Garut" },
-  { date: "28 Mar", day: "Jumat", cases: 8, highlight: "Putusan Sengketa Pilkada" },
-  { date: "31 Mar", day: "Senin", cases: 15, highlight: "Sidang Perdana Kasus Narkotika" },
-  { date: "01 Apr", day: "Selasa", cases: 10, highlight: "Mediasi Sengketa Tanah Lembang" },
+  { date: "27 Mar", day: "Kamis", time: "09:00 WIB", cases: 12, highlight: "Sidang Tipikor Bupati Garut" },
+  { date: "28 Mar", day: "Jumat", time: "10:00 WIB", cases: 8, highlight: "Putusan Sengketa Pilkada" },
+  { date: "31 Mar", day: "Senin", time: "09:30 WIB", cases: 15, highlight: "Sidang Perdana Kasus Narkotika" },
+  { date: "01 Apr", day: "Selasa", time: "13:00 WIB", cases: 10, highlight: "Mediasi Sengketa Tanah Lembang" },
 ];
 
 const videoData = [
@@ -255,6 +255,7 @@ export default async function HomePage() {
                   </div>
                 </div>
                 <p className="text-sm font-medium text-txt-primary leading-snug line-clamp-2">{j.highlight}</p>
+                <p className="text-xs font-semibold text-goto-green mt-1.5">{j.time}</p>
               </div>
             ))}
           </div>
