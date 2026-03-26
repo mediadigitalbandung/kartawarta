@@ -226,9 +226,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Banner Ad — Billboard */}
-      <BannerAd size="billboard" className="bg-surface-secondary" />
-
       {/* Live Sidang — SIMULASI */}
       <section className="bg-surface-secondary py-6">
         <div className="container-main">
