@@ -7,6 +7,7 @@ import NewsTicker from "@/components/layout/NewsTicker";
 import HeadlineSlider from "@/components/slider/HeadlineSlider";
 import BreakingSlider from "@/components/slider/BreakingSlider";
 import PopularCarousel from "@/components/slider/PopularCarousel";
+import BannerAd, { SidebarAd } from "@/components/ads/BannerAd";
 import SimulationBadge from "@/components/SimulationBadge";
 import { Scale, BookOpen, Gavel, Shield, Users, Landmark, LucideIcon, Globe, Monitor, Building2, FileText, AlertTriangle, Radio, BarChart3, Calendar, Play, Vote, TrendingUp } from "lucide-react";
 import { prisma } from "@/lib/prisma";
@@ -136,7 +137,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <div className="border-b border-border" />
+      {/* Banner Ad — Leaderboard */}
+      <BannerAd size="leaderboard" className="bg-surface-secondary" />
 
       {/* Berita Terkini + Terpopuler side by side */}
       <section className="bg-surface py-8">
@@ -206,13 +208,18 @@ export default async function HomePage() {
                     </div>
                   ))}
                 </div>
+                {/* Sidebar Ad */}
+                <div className="mt-5">
+                  <SidebarAd />
+                </div>
               </div>
             )}
           </div>
         </div>
       </section>
 
-      <div className="border-b border-border" />
+      {/* Banner Ad — Billboard */}
+      <BannerAd size="billboard" className="bg-surface-secondary" />
 
       {/* Live Sidang — SIMULASI */}
       <section className="bg-surface-secondary py-6">
@@ -281,7 +288,8 @@ export default async function HomePage() {
         </section>
       ))}
 
-      <div className="border-b border-border" />
+      {/* Banner Ad — Leaderboard */}
+      <BannerAd size="leaderboard" className="bg-surface" />
 
       {/* Polling Hukum — SIMULASI */}
       <section className="bg-surface py-8">
