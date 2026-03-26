@@ -59,7 +59,7 @@ export default function BreakingSlider({ items }: BreakingSliderProps) {
     d ? new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : "";
 
   return (
-    <div className="group relative overflow-hidden rounded-lg bg-surface-dark h-full min-h-[270px]">
+    <div className="group relative overflow-hidden rounded-lg bg-surface-dark min-h-[270px]">
       {/* Slides — full bleed, no gap */}
       {items.map((article, i) => {
         const isActive = i === current;
