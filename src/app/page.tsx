@@ -9,8 +9,7 @@ import BreakingSlider from "@/components/slider/BreakingSlider";
 import PopularCarousel from "@/components/slider/PopularCarousel";
 import SubHeadlineSlider from "@/components/slider/SubHeadlineSlider";
 import BannerAd, { SidebarAd } from "@/components/ads/BannerAd";
-import SimulationBadge from "@/components/SimulationBadge";
-import { Scale, BookOpen, Gavel, Shield, Users, Landmark, LucideIcon, Globe, Monitor, Building2, FileText, AlertTriangle, Radio, BarChart3, Calendar, Play, Vote, TrendingUp } from "lucide-react";
+import { Scale, BookOpen, Gavel, Shield, Users, Landmark, LucideIcon, Globe, Monitor, Building2, FileText, AlertTriangle, Radio,Calendar, Play, Vote, TrendingUp } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 const categoryIconMap: Record<string, LucideIcon> = {
@@ -71,13 +70,6 @@ const pollingData = [
     ],
     totalVotes: 6521,
   },
-];
-
-const indeksHukumData = [
-  { label: "Kepercayaan Publik terhadap Peradilan", value: 62, change: +3.2 },
-  { label: "Indeks Penegakan Hukum Jabar", value: 71, change: +1.8 },
-  { label: "Transparansi Kebijakan Kota Bandung", value: 58, change: -2.1 },
-  { label: "Akses Bantuan Hukum", value: 45, change: +5.4 },
 ];
 
 const jadwalSidangData = [
@@ -340,38 +332,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <div className="border-b border-border" />
-
-      {/* Category Sections — DATA REAL */}
-      {categoryEntries.map(([categoryName, { categorySlug, articles: catArticles }], idx) => (
-        <section
-          key={categorySlug}
-          className={`py-8 ${idx % 2 === 0 ? "bg-surface" : "bg-surface-secondary"}`}
-        >
-          <div className="container-main">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
-                {categoryName}
-              </h2>
-              <Link
-                href={`/kategori/${categorySlug}`}
-                className="text-sm font-medium text-goto-green hover:underline"
-              >
-                Selengkapnya
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {catArticles.map((a) => (
-                <ArticleCard key={a.slug} {...a} variant="standard" />
-              ))}
-            </div>
-          </div>
-        </section>
-      ))}
-
-      {/* Banner Ad — Leaderboard */}
-      <BannerAd size="leaderboard" className="bg-surface" />
-
       {/* Polling Hukum */}
       <section className="bg-surface py-8">
         <div className="container-main">
@@ -405,42 +365,40 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-
-            {/* Indeks Hukum */}
-            <div>
-              <div className="flex items-center mb-4">
-                <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
-                  <BarChart3 size={18} className="mr-2 text-goto-green" />
-                  Indeks Hukum
-                  <SimulationBadge />
-                </h2>
-              </div>
-              <div className="space-y-3">
-                {indeksHukumData.map((item) => (
-                  <div key={item.label} className="rounded-lg border border-border bg-surface-secondary p-4 flex items-center justify-between">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-txt-primary">{item.label}</p>
-                      <div className="mt-1.5 h-1.5 rounded-full bg-border w-full">
-                        <div className="h-1.5 rounded-full bg-goto-green" style={{ width: `${item.value}%` }} />
-                      </div>
-                    </div>
-                    <div className="ml-4 text-right shrink-0">
-                      <span className="text-2xl font-extrabold text-txt-primary">{item.value}</span>
-                      <span className={`block text-xs font-semibold ${item.change > 0 ? "text-green-600" : "text-red-500"}`}>
-                        {item.change > 0 ? "+" : ""}{item.change}%
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
       <div className="border-b border-border" />
+
+      {/* Category Sections — DATA REAL */}
+      {categoryEntries.map(([categoryName, { categorySlug, articles: catArticles }], idx) => (
+        <section
+          key={categorySlug}
+          className={`py-8 ${idx % 2 === 0 ? "bg-surface" : "bg-surface-secondary"}`}
+        >
+          <div className="container-main">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
+                {categoryName}
+              </h2>
+              <Link
+                href={`/kategori/${categorySlug}`}
+                className="text-sm font-medium text-goto-green hover:underline"
+              >
+                Selengkapnya
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {catArticles.map((a) => (
+                <ArticleCard key={a.slug} {...a} variant="standard" />
+              ))}
+            </div>
+          </div>
+        </section>
+      ))}
+
+      {/* Banner Ad — Leaderboard */}
+      <BannerAd size="leaderboard" className="bg-surface" />
 
       {/* Kategori Links — DATA REAL */}
       <section className="bg-surface-secondary py-8">
