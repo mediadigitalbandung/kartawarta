@@ -10,7 +10,7 @@ import PopularCarousel from "@/components/slider/PopularCarousel";
 import SubHeadlineSlider from "@/components/slider/SubHeadlineSlider";
 import BannerAd, { SidebarAd } from "@/components/ads/BannerAd";
 import SimulationBadge from "@/components/SimulationBadge";
-import { Scale, BookOpen, Gavel, Shield, Users, Landmark, LucideIcon, Globe, Monitor, Building2, FileText, AlertTriangle, Radio, BarChart3, Calendar, Play, Vote, TrendingUp } from "lucide-react";
+import { Scale, BookOpen, Gavel, Shield, Users, Landmark, LucideIcon, Globe, Monitor, Building2, FileText, AlertTriangle, Radio, BarChart3, Calendar, Play, Vote, TrendingUp, ChevronRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 const categoryIconMap: Record<string, LucideIcon> = {
@@ -98,7 +98,7 @@ export default async function HomePage() {
   const headlineArticles = articles.slice(0, 5);  // For headline slider
   const subHeadlines = articles.slice(5, 11);     // 6 items = 3 pages x 2 cards for sub-headline slider
   const breakingArticles = articles.slice(11, 16); // For breaking news slider
-  const terkiniArticles = articles.slice(12, 18); // Berita Terkini: 2x3 grid = 6
+  const terkiniArticles = articles.slice(16, 24); // Berita Terkini: 2x4 grid = 8
   const restArticles = articles.slice(22);
 
   const tickerItems = tickerArticles.map((a) => ({
@@ -175,23 +175,23 @@ export default async function HomePage() {
 
             {/* Right: Berita Terpopuler — vertical list */}
             {trendingArticles.length > 0 && (
-              <div className="lg:col-span-1">
+              <div className="lg:col-span-1 flex flex-col">
                 <div className="flex items-center mb-5">
                   <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
                     <TrendingUp size={18} className="mr-2 text-goto-green" />
                     Terpopuler
                   </h2>
                 </div>
-                <div className="space-y-0 divide-y divide-border">
-                  {trendingArticles.slice(0, 6).map((article, i) => (
-                    <div key={article.slug} className="group flex items-start gap-3 py-4 first:pt-0">
+                <div className="space-y-0 divide-y divide-border flex-1">
+                  {trendingArticles.slice(0, 8).map((article, i) => (
+                    <div key={article.slug} className="group flex items-start gap-3 py-3.5 first:pt-0">
                       {/* Rank number */}
                       <span className="shrink-0 w-7 pt-0.5 text-center text-2xl font-extrabold text-goto-green select-none">
                         {i + 1}
                       </span>
                       {/* Thumbnail */}
                       <Link href={`/berita/${article.slug}`} className="shrink-0">
-                        <div className="relative h-[72px] w-[100px] overflow-hidden rounded-sm">
+                        <div className="relative h-[64px] w-[90px] overflow-hidden rounded-sm">
                           {article.featuredImage ? (
                             <Image
                               src={article.featuredImage}
@@ -207,11 +207,11 @@ export default async function HomePage() {
                       {/* Text */}
                       <div className="flex-1 min-w-0">
                         <Link href={`/berita/${article.slug}`}>
-                          <h3 className="text-sm font-bold leading-snug text-txt-primary line-clamp-2 group-hover:text-goto-green transition-colors">
+                          <h3 className="text-[13px] font-bold leading-snug text-txt-primary line-clamp-2 group-hover:text-goto-green transition-colors">
                             {article.title}
                           </h3>
                         </Link>
-                        <div className="mt-1.5 flex items-center gap-2 text-[11px] text-txt-muted">
+                        <div className="mt-1 flex items-center gap-2 text-[11px] text-txt-muted">
                           <span className="text-goto-green font-semibold">{article.category.name}</span>
                           <span className="h-2.5 w-px bg-border" />
                           <span>{article.viewCount?.toLocaleString("id-ID")} views</span>
@@ -220,6 +220,14 @@ export default async function HomePage() {
                     </div>
                   ))}
                 </div>
+                {/* Lihat Selanjutnya button */}
+                <Link
+                  href="/berita?sort=popular"
+                  className="mt-4 flex items-center justify-center gap-2 rounded-lg border border-border py-2.5 text-sm font-semibold text-txt-secondary transition-all hover:border-goto-green hover:text-goto-green"
+                >
+                  Lihat Selanjutnya
+                  <ChevronRight size={16} />
+                </Link>
               </div>
             )}
           </div>
