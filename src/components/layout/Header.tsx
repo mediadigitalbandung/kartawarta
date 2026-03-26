@@ -12,18 +12,23 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-const categoryNav = [
+const categoryNavMain = [
   { name: "Terkini", href: "/" },
   { name: "Hukum Pidana", href: "/kategori/hukum-pidana" },
   { name: "Hukum Perdata", href: "/kategori/hukum-perdata" },
   { name: "Tata Negara", href: "/kategori/hukum-tata-negara" },
   { name: "HAM", href: "/kategori/ham" },
   { name: "Hukum Bisnis", href: "/kategori/hukum-bisnis" },
-  { name: "Lingkungan", href: "/kategori/hukum-lingkungan" },
-  { name: "Ketenagakerjaan", href: "/kategori/ketenagakerjaan" },
   { name: "Opini", href: "/kategori/opini" },
   { name: "Daerah", href: "/kategori/berita-bandung" },
+];
+
+const categoryNavMore = [
+  { name: "Lingkungan", href: "/kategori/hukum-lingkungan" },
+  { name: "Ketenagakerjaan", href: "/kategori/ketenagakerjaan" },
   { name: "Infografis", href: "/kategori/infografis" },
+  { name: "Hukum Administrasi", href: "/kategori/hukum-administrasi" },
+  { name: "Koreksi & Klarifikasi", href: "/kode-etik" },
 ];
 
 const mobileExtraLinks = [
@@ -36,6 +41,7 @@ const mobileExtraLinks = [
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const { data: session } = useSession();
 
   return (
@@ -133,8 +139,8 @@ export default function Header() {
       {/* Row 2: Category navigation — prominent white bar */}
       <nav className="bg-surface border-b border-border">
         <div className="container-main">
-          <ul className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
-            {categoryNav.map((item, i) => (
+          <ul className="flex items-center gap-1">
+            {categoryNavMain.map((item, i) => (
               <li key={item.href} className="shrink-0">
                 <Link
                   href={item.href}
@@ -148,6 +154,33 @@ export default function Header() {
                 </Link>
               </li>
             ))}
+            {/* Lainnya dropdown */}
+            <li className="relative shrink-0">
+              <button
+                onClick={() => setMoreOpen(!moreOpen)}
+                className="inline-flex items-center gap-1 px-4 py-3 text-sm font-semibold text-txt-secondary hover:text-goto-green transition-colors"
+              >
+                Lainnya
+                <ChevronRight size={14} className={`transition-transform duration-200 ${moreOpen ? "rotate-90" : ""}`} />
+              </button>
+              {moreOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setMoreOpen(false)} />
+                  <div className="absolute left-0 top-full z-20 mt-0 w-52 rounded-lg border border-border bg-surface py-1 shadow-lg">
+                    {categoryNavMore.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className="block px-4 py-2.5 text-sm text-txt-primary hover:bg-surface-secondary hover:text-goto-green transition-colors"
+                        onClick={() => setMoreOpen(false)}
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              )}
+            </li>
           </ul>
         </div>
       </nav>
@@ -191,7 +224,7 @@ export default function Header() {
               </span>
             </div>
             <ul className="space-y-0.5 px-3 pb-3">
-              {categoryNav.map((item) => (
+              {[...categoryNavMain, ...categoryNavMore].map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
