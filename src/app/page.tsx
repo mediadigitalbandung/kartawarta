@@ -370,32 +370,138 @@ export default async function HomePage() {
 
       <div className="border-b border-border" />
 
-      {/* Category Sections — DATA REAL */}
-      {categoryEntries.map(([categoryName, { categorySlug, articles: catArticles }], idx) => (
-        <section
-          key={categorySlug}
-          className={`py-8 ${idx % 2 === 0 ? "bg-surface" : "bg-surface-secondary"}`}
-        >
-          <div className="container-main">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
-                {categoryName}
-              </h2>
-              <Link
-                href={`/kategori/${categorySlug}`}
-                className="text-sm font-medium text-goto-green hover:underline"
-              >
-                Selengkapnya
-              </Link>
+      {/* Category Sections — Kumparan-style layout */}
+      {categoryEntries.map(([categoryName, { categorySlug, articles: catArticles }], idx) => {
+        const featured = catArticles[0];
+        const trending = catArticles.slice(1, 3);
+        const terbaru = catArticles.slice(3, 6);
+
+        return (
+          <section
+            key={categorySlug}
+            className={`py-8 ${idx % 2 === 0 ? "bg-surface" : "bg-surface-secondary"}`}
+          >
+            <div className="container-main">
+              {/* Section header */}
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
+                  {categoryName}
+                </h2>
+                <Link
+                  href={`/kategori/${categorySlug}`}
+                  className="text-sm font-medium text-goto-green hover:underline"
+                >
+                  Lihat lainnya &rarr;
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left: Featured article — large card with image overlay */}
+                {featured && (
+                  <div className="lg:col-span-1">
+                    <Link href={`/berita/${featured.slug}`} className="group block">
+                      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-surface-dark">
+                        {featured.featuredImage ? (
+                          <Image
+                            src={featured.featuredImage}
+                            alt={featured.title}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="h-full w-full bg-surface-tertiary" />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                        <div className="absolute bottom-0 left-0 right-0 p-5">
+                          <h3 className="text-lg font-bold leading-tight text-white line-clamp-3">
+                            {featured.title}
+                          </h3>
+                          <div className="mt-2 flex items-center gap-2 text-xs text-white/50">
+                            <span className="text-goto-green font-semibold">{featured.author.name}</span>
+                            <span>{featured.publishedAt ? new Date(featured.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : ""}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+                )}
+
+                {/* Center: Trending */}
+                {trending.length > 0 && (
+                  <div className="lg:col-span-1">
+                    <h3 className="border-l-[3px] border-goto-green pl-3 text-sm font-bold text-txt-primary mb-4">
+                      Trending di {categoryName}
+                    </h3>
+                    <div className="space-y-4">
+                      {trending.map((a) => (
+                        <div key={a.slug} className="group">
+                          <span className="text-[11px] text-txt-muted">
+                            {a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : ""}
+                          </span>
+                          <div className="flex gap-3 mt-1">
+                            <div className="flex-1 min-w-0">
+                              <Link href={`/berita/${a.slug}`}>
+                                <h4 className="text-sm font-bold text-txt-primary leading-snug line-clamp-3 group-hover:text-goto-green transition-colors">
+                                  {a.title}
+                                </h4>
+                              </Link>
+                              <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-txt-muted">
+                                <span className="text-goto-green font-semibold">{a.author.name}</span>
+                              </div>
+                            </div>
+                            {a.featuredImage && (
+                              <Link href={`/berita/${a.slug}`} className="shrink-0">
+                                <div className="relative h-[72px] w-[100px] overflow-hidden rounded">
+                                  <Image src={a.featuredImage} alt={a.title} fill className="object-cover" />
+                                </div>
+                              </Link>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Right: Terbaru */}
+                {terbaru.length > 0 && (
+                  <div className="lg:col-span-1">
+                    <h3 className="border-l-[3px] border-goto-green pl-3 text-sm font-bold text-txt-primary mb-4">
+                      Terbaru di {categoryName}
+                    </h3>
+                    <div className="space-y-4">
+                      {terbaru.map((a) => (
+                        <div key={a.slug} className="group flex gap-3">
+                          <div className="flex-1 min-w-0">
+                            <Link href={`/berita/${a.slug}`}>
+                              <h4 className="text-sm font-bold text-txt-primary leading-snug line-clamp-2 group-hover:text-goto-green transition-colors">
+                                {a.title}
+                              </h4>
+                            </Link>
+                            <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-txt-muted">
+                              <span className="text-goto-green font-semibold">{a.author.name}</span>
+                              <span>
+                                {a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : ""}
+                              </span>
+                            </div>
+                          </div>
+                          {a.featuredImage && (
+                            <Link href={`/berita/${a.slug}`} className="shrink-0">
+                              <div className="relative h-[64px] w-[90px] overflow-hidden rounded">
+                                <Image src={a.featuredImage} alt={a.title} fill className="object-cover" />
+                              </div>
+                            </Link>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {catArticles.map((a) => (
-                <ArticleCard key={a.slug} {...a} variant="standard" />
-              ))}
-            </div>
-          </div>
-        </section>
-      ))}
+          </section>
+        );
+      })}
 
       {/* Banner Ad — Leaderboard */}
       <BannerAd size="leaderboard" className="bg-surface" />
