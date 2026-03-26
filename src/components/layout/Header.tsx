@@ -7,7 +7,6 @@ import {
   Menu,
   X,
   Search,
-  User,
   LogOut,
   LayoutDashboard,
   ChevronRight,
@@ -44,7 +43,7 @@ export default function Header() {
       {/* Row 1: Top bar — sticky dark header */}
       <header className="sticky top-0 z-50 bg-surface-dark">
         <div className="container-main">
-          <div className="flex items-center gap-4 py-3">
+          <div className="flex items-center justify-between py-3">
             {/* Logo */}
             <Link href="/" className="group flex shrink-0 items-center gap-2.5">
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-goto-green text-xs font-bold text-white">
@@ -58,8 +57,9 @@ export default function Header() {
               </span>
             </Link>
 
-            {/* Search bar — inline, takes remaining space */}
-            <form action="/search" className="relative flex-1 max-w-md">
+            {/* Right side: Search + actions */}
+            <div className="flex items-center gap-2">
+            <form action="/search" className="relative w-64 sm:w-80">
               <Search
                 size={16}
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30"
@@ -72,8 +72,6 @@ export default function Header() {
               />
             </form>
 
-            {/* Right actions */}
-            <div className="flex items-center gap-1 shrink-0">
               {/* User area */}
               {session ? (
                 <div className="relative">
