@@ -37,17 +37,41 @@ const liveSidangData = [
   { id: 3, title: "Pembacaan Putusan Kasus Penipuan Online", court: "PN Bandung", time: "14:00 WIB", status: "Menunggu", judge: "Majelis Hakim: Drs. Bambang P., S.H., M.H." },
 ];
 
-const pollingData = {
-  question: "Apakah Anda setuju dengan revisi UU ITE terbaru?",
-  options: [
-    { label: "Sangat Setuju", percentage: 32 },
-    { label: "Setuju", percentage: 28 },
-    { label: "Netral", percentage: 18 },
-    { label: "Tidak Setuju", percentage: 15 },
-    { label: "Sangat Tidak Setuju", percentage: 7 },
-  ],
-  totalVotes: 2847,
-};
+const pollingData = [
+  {
+    question: "Apakah Anda setuju dengan revisi UU ITE terbaru?",
+    options: [
+      { label: "Sangat Setuju", percentage: 32 },
+      { label: "Setuju", percentage: 28 },
+      { label: "Netral", percentage: 18 },
+      { label: "Tidak Setuju", percentage: 15 },
+      { label: "Sangat Tidak Setuju", percentage: 7 },
+    ],
+    totalVotes: 2847,
+  },
+  {
+    question: "Bagaimana penilaian Anda terhadap kinerja KPK saat ini?",
+    options: [
+      { label: "Sangat Baik", percentage: 18 },
+      { label: "Baik", percentage: 25 },
+      { label: "Cukup", percentage: 30 },
+      { label: "Buruk", percentage: 20 },
+      { label: "Sangat Buruk", percentage: 7 },
+    ],
+    totalVotes: 4213,
+  },
+  {
+    question: "Perlukah hukuman mati untuk koruptor di Indonesia?",
+    options: [
+      { label: "Sangat Perlu", percentage: 45 },
+      { label: "Perlu", percentage: 22 },
+      { label: "Netral", percentage: 15 },
+      { label: "Tidak Perlu", percentage: 12 },
+      { label: "Sangat Tidak Perlu", percentage: 6 },
+    ],
+    totalVotes: 6521,
+  },
+];
 
 const indeksHukumData = [
   { label: "Kepercayaan Publik terhadap Peradilan", value: 62, change: +3.2 },
@@ -348,40 +372,41 @@ export default async function HomePage() {
       {/* Banner Ad — Leaderboard */}
       <BannerAd size="leaderboard" className="bg-surface" />
 
-      {/* Polling Hukum — SIMULASI */}
+      {/* Polling Hukum */}
       <section className="bg-surface py-8">
         <div className="container-main">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Polling */}
-            <div>
-              <div className="flex items-center mb-4">
-                <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
-                  <Vote size={18} className="mr-2 text-goto-green" />
-                  Polling Hukum
-                  <SimulationBadge />
-                </h2>
-              </div>
-              <div className="rounded-lg border border-border bg-surface-secondary p-5">
-                <p className="text-base font-semibold text-txt-primary mb-4">{pollingData.question}</p>
-                <div className="space-y-3">
-                  {pollingData.options.map((opt) => (
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
+              <Vote size={18} className="mr-2 text-goto-green" />
+              Polling Hukum
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {pollingData.map((poll, idx) => (
+              <div key={idx} className="rounded-lg border border-border bg-surface-secondary p-5">
+                <p className="text-sm font-semibold text-txt-primary mb-4">{poll.question}</p>
+                <div className="space-y-2.5">
+                  {poll.options.map((opt: { label: string; percentage: number }) => (
                     <div key={opt.label}>
                       <div className="flex items-center justify-between text-sm mb-1">
-                        <span className="text-txt-primary">{opt.label}</span>
-                        <span className="font-bold text-txt-primary">{opt.percentage}%</span>
+                        <span className="text-txt-primary text-xs">{opt.label}</span>
+                        <span className="font-bold text-txt-primary text-xs">{opt.percentage}%</span>
                       </div>
-                      <div className="h-2 rounded-full bg-border">
+                      <div className="h-1.5 rounded-full bg-border">
                         <div
-                          className="h-2 rounded-full bg-goto-green transition-all"
+                          className="h-1.5 rounded-full bg-goto-green transition-all"
                           style={{ width: `${opt.percentage}%` }}
                         />
                       </div>
                     </div>
                   ))}
                 </div>
-                <p className="text-xs text-txt-muted mt-4">{pollingData.totalVotes.toLocaleString("id-ID")} suara</p>
+                <p className="text-[11px] text-txt-muted mt-3">{poll.totalVotes.toLocaleString("id-ID")} suara</p>
               </div>
-            </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
 
             {/* Indeks Hukum */}
             <div>
