@@ -62,12 +62,6 @@ const jadwalSidangData = [
   { date: "31 Mar", day: "Senin", time: "09:30 WIB", cases: 15, highlight: "Sidang Perdana Kasus Narkotika" },
   { date: "01 Apr", day: "Selasa", time: "13:00 WIB", cases: 10, highlight: "Mediasi Sengketa Tanah Lembang" },
 ];
-
-const videoData = [
-  { title: "Wawancara Eksklusif: Ketua PN Bandung", duration: "12:34", views: "3.2rb" },
-  { title: "Bedah Kasus: Sengketa Lahan di Jabar", duration: "18:21", views: "1.8rb" },
-  { title: "Opini Hukum: Dampak Omnibus Law", duration: "15:07", views: "2.5rb" },
-];
 // --- END SIMULATION DATA ---
 
 export default async function HomePage() {
@@ -412,71 +406,6 @@ export default async function HomePage() {
                       <span className={`block text-xs font-semibold ${item.change > 0 ? "text-green-600" : "text-red-500"}`}>
                         {item.change > 0 ? "+" : ""}{item.change}%
                       </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div className="border-b border-border" />
-
-      {/* Jadwal Sidang + Video — SIMULASI */}
-      <section className="bg-surface-secondary py-8">
-        <div className="container-main">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Jadwal Sidang */}
-            <div className="lg:col-span-2">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
-                  <Calendar size={18} className="mr-2 text-goto-green" />
-                  Jadwal Sidang
-                  <SimulationBadge />
-                </h2>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {jadwalSidangData.map((j) => (
-                  <div key={j.date} className="rounded-lg border border-border bg-surface p-4 flex gap-4 items-start">
-                    <div className="text-center shrink-0 w-14">
-                      <span className="block text-xl font-extrabold text-goto-green leading-none">{j.date.split(" ")[0]}</span>
-                      <span className="block text-[10px] font-medium text-txt-muted uppercase">{j.date.split(" ")[1]}</span>
-                      <span className="block text-[10px] text-txt-muted">{j.day}</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-txt-primary truncate">{j.highlight}</p>
-                      <p className="text-xs text-txt-muted mt-1">+ {j.cases - 1} sidang lainnya</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Video */}
-            <div className="lg:col-span-1">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
-                  <Play size={18} className="mr-2 text-goto-green" />
-                  Video
-                  <SimulationBadge />
-                </h2>
-              </div>
-              <div className="space-y-3">
-                {videoData.map((v) => (
-                  <div key={v.title} className="rounded-lg border border-border bg-surface p-4 group cursor-pointer transition-shadow hover:shadow-card">
-                    <div className="flex items-start gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-goto-light text-goto-green">
-                        <Play size={16} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-txt-primary group-hover:text-goto-green transition-colors leading-snug">{v.title}</p>
-                        <div className="flex items-center gap-2 mt-1.5 text-xs text-txt-muted">
-                          <span>{v.duration}</span>
-                          <span className="h-3 w-px bg-border" />
-                          <span>{v.views} views</span>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 ))}
