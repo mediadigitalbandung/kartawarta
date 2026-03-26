@@ -68,7 +68,7 @@ export default function Header() {
                 type="text"
                 name="q"
                 placeholder="Cari di sini..."
-                className="w-full rounded-full border border-white/15 bg-white/8 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/35 transition-all focus:border-goto-green/50 focus:bg-white/12 focus:outline-none focus:ring-1 focus:ring-goto-green/20"
+                className="w-full rounded-full border border-white/20 bg-white/10 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/60 transition-all focus:border-goto-green/50 focus:bg-white/15 focus:outline-none focus:ring-1 focus:ring-goto-green/20"
               />
             </form>
 
