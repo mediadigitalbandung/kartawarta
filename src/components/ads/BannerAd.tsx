@@ -38,30 +38,28 @@ export default function BannerAd({ size, className = "" }: BannerAdProps) {
   return (
     <div className={`${config.containerClass} ${className}`}>
       <div className="container-main">
-        <div className="flex flex-col items-center">
-          <div
-            className="relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center"
-            style={{ maxWidth: config.width, height: config.height }}
-          >
-            {/* Decorative pattern */}
-            <div className="absolute inset-0 opacity-[0.03]" style={{
-              backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)",
-            }} />
+        <div
+          className="relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center"
+          style={{ height: config.height }}
+        >
+          {/* Decorative pattern */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{
+            backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)",
+          }} />
 
-            {/* Content */}
-            <div className="relative text-center">
-              <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">
-                Iklan
-              </p>
-              <p className="mt-0.5 text-[10px] text-txt-muted/40">
-                {config.label}
-              </p>
-            </div>
+          {/* Content */}
+          <div className="relative text-center">
+            <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">
+              Iklan
+            </p>
+            <p className="mt-0.5 text-[10px] text-txt-muted/40">
+              {config.label}
+            </p>
           </div>
-          <div className="mt-1 flex items-center">
-            <span className="text-[9px] text-txt-muted/40 uppercase tracking-wider">Advertisement</span>
-            <SimulationBadge />
-          </div>
+        </div>
+        <div className="mt-1 flex justify-center items-center">
+          <span className="text-[9px] text-txt-muted/40 uppercase tracking-wider">Advertisement</span>
+          <SimulationBadge />
         </div>
       </div>
     </div>
