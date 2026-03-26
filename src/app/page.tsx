@@ -137,41 +137,63 @@ export default async function HomePage() {
 
       <div className="border-b border-border" />
 
-      {/* Berita Terkini — 4x3 grid */}
-      {terkiniArticles.length > 0 && (
-        <section className="bg-surface py-8">
-          <div className="container-main">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
-                Berita Terkini
-              </h2>
-              <Link href="/berita" className="text-sm font-medium text-goto-green hover:underline">
-                Lihat Semua
-              </Link>
+      {/* Berita Terkini + Terpopuler side by side */}
+      <section className="bg-surface py-8">
+        <div className="container-main">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Left: Berita Terkini — 3 columns */}
+            <div className="lg:col-span-3">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
+                  Berita Terkini
+                </h2>
+                <Link href="/berita" className="text-sm font-medium text-goto-green hover:underline">
+                  Lihat Semua
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {terkiniArticles.map((a) => (
+                  <ArticleCard key={a.slug} {...a} variant="standard" />
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {terkiniArticles.map((a) => (
-                <ArticleCard key={a.slug} {...a} variant="standard" />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
-      {/* Berita Terpopuler — carousel */}
-      {trendingArticles.length > 0 && (
-        <section className="bg-surface-secondary py-8">
-          <div className="container-main">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
-                <TrendingUp size={18} className="mr-2 text-goto-green" />
-                Berita Terpopuler
-              </h2>
-            </div>
-            <PopularCarousel items={JSON.parse(JSON.stringify(trendingArticles))} />
+            {/* Right: Berita Terpopuler — vertical list */}
+            {trendingArticles.length > 0 && (
+              <div className="lg:col-span-1">
+                <div className="flex items-center mb-5">
+                  <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
+                    <TrendingUp size={18} className="mr-2 text-goto-green" />
+                    Terpopuler
+                  </h2>
+                </div>
+                <div className="space-y-4">
+                  {trendingArticles.slice(0, 8).map((article, i) => (
+                    <div key={article.slug} className="group flex gap-3">
+                      {/* Rank */}
+                      <span className="shrink-0 w-7 text-center text-2xl font-extrabold leading-none text-goto-green/20 select-none pt-1" style={{ fontFamily: "Georgia, serif" }}>
+                        {i + 1}
+                      </span>
+                      <div className="flex-1 min-w-0 pb-4 border-b border-border last:border-0">
+                        <Link href={`/berita/${article.slug}`}>
+                          <h3 className="text-sm font-bold leading-snug text-txt-primary line-clamp-2 group-hover:text-goto-green transition-colors">
+                            {article.title}
+                          </h3>
+                        </Link>
+                        <div className="mt-1 flex items-center gap-2 text-[11px] text-txt-muted">
+                          <span className="text-goto-green font-semibold">{article.category.name}</span>
+                          <span className="h-2.5 w-px bg-border" />
+                          <span>{article.viewCount?.toLocaleString("id-ID")} views</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       <div className="border-b border-border" />
 
