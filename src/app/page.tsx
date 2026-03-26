@@ -141,7 +141,9 @@ export default async function HomePage() {
             </div>
             {/* Breaking News Slider — 1/3 width */}
             <div className="lg:col-span-1 flex flex-col gap-4">
-              <BreakingSlider items={JSON.parse(JSON.stringify(breakingArticles))} />
+              <div className="flex-1">
+                <BreakingSlider items={JSON.parse(JSON.stringify(breakingArticles))} />
+              </div>
               <SidebarAd />
             </div>
           </div>
