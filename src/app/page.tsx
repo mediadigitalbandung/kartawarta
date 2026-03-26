@@ -229,6 +229,41 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Jadwal Sidang Mendatang — SIMULASI */}
+      <section className="bg-surface py-6">
+        <div className="container-main">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
+              <Calendar size={18} className="mr-2 text-goto-green" />
+              Jadwal Sidang Mendatang
+              <SimulationBadge />
+            </h2>
+            <Link href="/jadwal-sidang" className="text-sm font-medium text-goto-green hover:underline">
+              Lihat Semua
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {jadwalSidangData.map((j) => (
+              <div key={j.date} className="rounded-lg border border-border bg-surface-secondary p-4 hover:border-goto-green/40 transition-colors">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex h-12 w-12 flex-col items-center justify-center rounded-lg bg-goto-green text-white">
+                    <span className="text-lg font-extrabold leading-none">{j.date.split(" ")[0]}</span>
+                    <span className="text-[9px] font-medium uppercase">{j.date.split(" ")[1]}</span>
+                  </div>
+                  <div>
+                    <span className="block text-sm font-semibold text-txt-primary">{j.day}</span>
+                    <span className="block text-xs text-txt-muted">{j.cases} perkara</span>
+                  </div>
+                </div>
+                <p className="text-sm font-medium text-txt-primary leading-snug line-clamp-2">{j.highlight}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="border-b border-border" />
+
       {/* Live Sidang — SIMULASI */}
       <section className="bg-surface-secondary py-6">
         <div className="container-main">
