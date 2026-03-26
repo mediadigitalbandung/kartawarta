@@ -121,6 +121,9 @@ export default async function HomePage() {
     <>
       <NewsTicker items={tickerItems} />
 
+      {/* Banner Ad — Leaderboard (above headline) */}
+      <BannerAd size="leaderboard" className="bg-surface" />
+
       {/* Headline News Slider + Breaking News */}
       <section className="bg-surface py-6">
         <div className="container-main">
@@ -136,9 +139,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Banner Ad — Leaderboard */}
-      <BannerAd size="leaderboard" className="bg-surface-secondary" />
 
       {/* Berita Terkini + Terpopuler side by side */}
       <section className="bg-surface py-8">
