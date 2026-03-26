@@ -170,18 +170,18 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Row 2: Category navigation — sleek dark bar */}
-      <nav className="bg-surface-dark/95 backdrop-blur-sm border-b border-white/5">
+      {/* Row 2: Category navigation — prominent white bar */}
+      <nav className="bg-surface border-b border-border">
         <div className="container-main">
-          <ul className="flex items-center gap-0 overflow-x-auto scrollbar-hide">
+          <ul className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
             {categoryNav.map((item, i) => (
               <li key={item.href} className="shrink-0">
                 <Link
                   href={item.href}
-                  className={`relative inline-block px-4 py-2.5 text-[13px] font-medium transition-all duration-200 ${
+                  className={`relative inline-block px-4 py-3 text-sm font-semibold transition-all duration-200 ${
                     i === 0
-                      ? "text-white after:absolute after:bottom-0 after:left-4 after:right-4 after:h-[2px] after:rounded-full after:bg-goto-green"
-                      : "text-white/50 hover:text-white"
+                      ? "text-goto-green after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[3px] after:rounded-full after:bg-goto-green"
+                      : "text-txt-primary hover:text-goto-green"
                   }`}
                 >
                   {item.name}
