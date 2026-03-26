@@ -59,7 +59,7 @@ export default function Header() {
             </Link>
 
             {/* Search bar — inline, takes remaining space */}
-            <form action="/search" className="relative flex-1 max-w-2xl">
+            <form action="/search" className="relative flex-1 max-w-md">
               <Search
                 size={16}
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30"
