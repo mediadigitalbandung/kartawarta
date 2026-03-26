@@ -139,7 +139,7 @@ export default function Header() {
       {/* Row 2: Category navigation — prominent white bar */}
       <nav className="bg-surface border-b border-border">
         <div className="container-main">
-          <ul className="flex items-center gap-1">
+          <ul className="flex items-center justify-between">
             {categoryNavMain.map((item, i) => (
               <li key={item.href} className="shrink-0">
                 <Link
