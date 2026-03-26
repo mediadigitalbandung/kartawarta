@@ -5,7 +5,7 @@ interface BannerAdProps {
 
 const sizeConfig = {
   leaderboard: {
-    height: "120px",
+    height: "180px",
     label: "Leaderboard Ad",
     containerClass: "py-3",
   },
