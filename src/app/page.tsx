@@ -395,6 +395,9 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Banner Ad — above Video Story */}
+      <BannerAd size="leaderboard" className="bg-surface" />
+
       {/* Video Story — horizontal scroll */}
       <section className="bg-surface-secondary py-8">
         <div className="container-main">
