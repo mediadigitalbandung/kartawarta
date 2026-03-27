@@ -6,7 +6,9 @@ import { ChevronRight, Vote } from "lucide-react";
 import ArticleCard from "@/components/artikel/ArticleCard";
 import Sidebar from "@/components/layout/Sidebar";
 import HeadlineSlider from "@/components/slider/HeadlineSlider";
+import VideoStory from "@/components/slider/VideoStory";
 import BannerAd, { SidebarAd } from "@/components/ads/BannerAd";
+import { videoStoryData } from "@/lib/video-data";
 
 type Poll = { question: string; options: { label: string; percentage: number }[]; totalVotes: number };
 const categoryPolling: Record<string, Poll[]> = {
@@ -221,6 +223,19 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         <div className="mb-6 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ height: "135px" }}>
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
           <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
+        </div>
+
+        {/* Video Story */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
+              Video Story
+            </h2>
+            <Link href="/video" className="text-sm font-medium text-goto-green hover:underline">
+              Lihat Semua &rarr;
+            </Link>
+          </div>
+          <VideoStory items={videoStoryData} />
         </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
