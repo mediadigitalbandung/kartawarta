@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ChevronRight, Vote } from "lucide-react";
 import ArticleCard from "@/components/artikel/ArticleCard";
 import Sidebar from "@/components/layout/Sidebar";
+import HeadlineSlider from "@/components/slider/HeadlineSlider";
 import BannerAd, { SidebarAd } from "@/components/ads/BannerAd";
 
 type Poll = { question: string; options: { label: string; percentage: number }[]; totalVotes: number };
@@ -132,17 +133,24 @@ export default async function CategoryPage({ params }: { params: { slug: string 
           <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
         </div>
 
+        {/* Headline Slider — top 5 articles */}
+        {articles.length >= 3 && (
+          <div className="mb-8">
+            <HeadlineSlider items={JSON.parse(JSON.stringify(articles.slice(0, 5)))} />
+          </div>
+        )}
+
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            {/* First 6 articles */}
+            {/* Articles grid (skip first 5 used in headline) */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              {articles.slice(0, 6).map((article) => (
+              {articles.slice(5, 11).map((article) => (
                 <ArticleCard key={article.slug} {...article} />
               ))}
             </div>
 
             {/* Inline ad between rows */}
-            {articles.length > 6 && (
+            {articles.length > 11 && (
               <div className="my-6">
                 <div className="rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ height: "120px" }}>
                   <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
@@ -152,9 +160,9 @@ export default async function CategoryPage({ params }: { params: { slug: string 
             )}
 
             {/* Remaining articles */}
-            {articles.length > 6 && (
+            {articles.length > 11 && (
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                {articles.slice(6).map((article) => (
+                {articles.slice(11).map((article) => (
                   <ArticleCard key={article.slug} {...article} />
                 ))}
               </div>
