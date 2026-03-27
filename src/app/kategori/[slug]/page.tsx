@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ChevronRight, Vote } from "lucide-react";
 import ArticleCard from "@/components/artikel/ArticleCard";
 import Sidebar from "@/components/layout/Sidebar";
@@ -140,16 +141,44 @@ export default async function CategoryPage({ params }: { params: { slug: string 
             <div className="lg:col-span-2">
               <HeadlineSlider items={JSON.parse(JSON.stringify(articles.slice(0, 5)))} />
             </div>
-            {/* Middle 25%: 3 stacked cards */}
-            <div className="flex flex-col gap-4">
+            {/* Middle 25%: 3 stacked cards — stretch to fill height */}
+            <div className="flex flex-col gap-3">
               {articles.slice(5, 8).map((article) => (
-                <ArticleCard key={article.slug} {...article} variant="compact" />
+                <div key={article.slug} className="group flex flex-1 gap-3 overflow-hidden rounded-sm">
+                  <div className="relative w-24 shrink-0 overflow-hidden rounded-sm">
+                    {article.featuredImage ? (
+                      <Image src={article.featuredImage} alt={article.title} fill className="object-cover" />
+                    ) : (
+                      <div className="h-full w-full bg-surface-secondary" />
+                    )}
+                  </div>
+                  <div className="flex flex-1 flex-col justify-center min-w-0 py-1">
+                    <Link href={`/berita/${article.slug}`} className="line-clamp-2 text-sm font-semibold leading-snug text-txt-primary hover:underline">
+                      {article.title}
+                    </Link>
+                    <p className="mt-1 text-xs text-txt-muted">{article.publishedAt ? new Date(article.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : ""}</p>
+                  </div>
+                </div>
               ))}
             </div>
-            {/* Right 25%: 3 stacked cards */}
-            <div className="flex flex-col gap-4">
+            {/* Right 25%: 3 stacked cards — stretch to fill height */}
+            <div className="flex flex-col gap-3">
               {articles.slice(8, 11).map((article) => (
-                <ArticleCard key={article.slug} {...article} variant="compact" />
+                <div key={article.slug} className="group flex flex-1 gap-3 overflow-hidden rounded-sm">
+                  <div className="relative w-24 shrink-0 overflow-hidden rounded-sm">
+                    {article.featuredImage ? (
+                      <Image src={article.featuredImage} alt={article.title} fill className="object-cover" />
+                    ) : (
+                      <div className="h-full w-full bg-surface-secondary" />
+                    )}
+                  </div>
+                  <div className="flex flex-1 flex-col justify-center min-w-0 py-1">
+                    <Link href={`/berita/${article.slug}`} className="line-clamp-2 text-sm font-semibold leading-snug text-txt-primary hover:underline">
+                      {article.title}
+                    </Link>
+                    <p className="mt-1 text-xs text-txt-muted">{article.publishedAt ? new Date(article.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : ""}</p>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
