@@ -133,16 +133,22 @@ export default async function CategoryPage({ params }: { params: { slug: string 
           <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
         </div>
 
-        {/* Headline — 1 large slider + 2 side cards */}
+        {/* Headline — 50% slider + 25% + 25% side cards */}
         {articles.length >= 3 && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-            {/* Left: Main headline slider */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
+            {/* Left 50%: Main headline slider */}
             <div className="lg:col-span-2">
               <HeadlineSlider items={JSON.parse(JSON.stringify(articles.slice(0, 5)))} />
             </div>
-            {/* Right: 2 stacked article cards */}
+            {/* Middle 25%: stacked cards */}
             <div className="flex flex-col gap-4">
               {articles.slice(5, 7).map((article) => (
+                <ArticleCard key={article.slug} {...article} variant="compact" />
+              ))}
+            </div>
+            {/* Right 25%: stacked cards */}
+            <div className="flex flex-col gap-4">
+              {articles.slice(7, 9).map((article) => (
                 <ArticleCard key={article.slug} {...article} variant="compact" />
               ))}
             </div>
@@ -186,13 +192,13 @@ export default async function CategoryPage({ params }: { params: { slug: string 
           <div className="lg:col-span-2">
             {/* Articles grid (skip headline + side cards) */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              {articles.slice(7, 13).map((article) => (
+              {articles.slice(9, 15).map((article) => (
                 <ArticleCard key={article.slug} {...article} />
               ))}
             </div>
 
             {/* Inline ad between rows */}
-            {articles.length > 13 && (
+            {articles.length > 15 && (
               <div className="my-6">
                 <div className="rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ height: "120px" }}>
                   <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
@@ -202,9 +208,9 @@ export default async function CategoryPage({ params }: { params: { slug: string 
             )}
 
             {/* Remaining articles */}
-            {articles.length > 13 && (
+            {articles.length > 15 && (
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                {articles.slice(13).map((article) => (
+                {articles.slice(15).map((article) => (
                   <ArticleCard key={article.slug} {...article} />
                 ))}
               </div>
