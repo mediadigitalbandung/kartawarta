@@ -8,10 +8,7 @@ import { redirect } from "next/navigation";
 import {
   LayoutDashboard,
   FileText,
-  Image,
   Users,
-  BarChart3,
-  Settings,
   Megaphone,
   Flag,
   ChevronLeft,
@@ -23,12 +20,9 @@ import { cn } from "@/lib/utils";
 const menuItems = [
   { name: "Dashboard", href: "/panel/dashboard", icon: LayoutDashboard },
   { name: "Artikel", href: "/panel/artikel", icon: FileText },
-  { name: "Media", href: "/panel/media", icon: Image },
   { name: "Laporan", href: "/panel/laporan", icon: Flag },
   { name: "Iklan", href: "/panel/iklan", icon: Megaphone, adminOnly: true },
   { name: "Pengguna", href: "/panel/pengguna", icon: Users, adminOnly: true },
-  { name: "Statistik", href: "/panel/statistik", icon: BarChart3 },
-  { name: "Pengaturan", href: "/panel/pengaturan", icon: Settings },
 ];
 
 export default function PanelLayout({ children }: { children: React.ReactNode }) {

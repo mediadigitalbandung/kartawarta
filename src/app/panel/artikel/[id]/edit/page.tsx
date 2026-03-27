@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import {
   Save,
@@ -11,6 +11,7 @@ import {
   Trash2,
   AlertCircle,
   CheckCircle,
+  ArrowLeft,
 } from "lucide-react";
 
 const RichTextEditor = dynamic(
@@ -31,9 +32,43 @@ interface Source {
   url: string;
 }
 
-export default function NewArticlePage() {
+function LoadingSkeleton() {
+  return (
+    <div className="mx-auto max-w-5xl animate-pulse">
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <div className="h-7 w-48 rounded bg-surface-tertiary" />
+          <div className="mt-2 h-4 w-64 rounded bg-surface-secondary" />
+        </div>
+        <div className="flex gap-2">
+          <div className="h-10 w-32 rounded-[12px] bg-surface-tertiary" />
+          <div className="h-10 w-40 rounded-[12px] bg-surface-tertiary" />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="space-y-4 lg:col-span-2">
+          <div className="h-14 rounded-[12px] bg-surface-tertiary" />
+          <div className="h-[500px] rounded-[12px] bg-surface-tertiary" />
+          <div className="h-40 rounded-[12px] bg-surface-tertiary" />
+        </div>
+        <div className="space-y-4">
+          <div className="h-24 rounded-[12px] bg-surface-tertiary" />
+          <div className="h-24 rounded-[12px] bg-surface-tertiary" />
+          <div className="h-32 rounded-[12px] bg-surface-tertiary" />
+          <div className="h-24 rounded-[12px] bg-surface-tertiary" />
+          <div className="h-24 rounded-[12px] bg-surface-tertiary" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function EditArticlePage() {
   const router = useRouter();
-  const [categories, setCategories] = useState<Category[]>([]);
+  const params = useParams();
+  const articleId = params.id as string;
+
+  const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [excerpt, setExcerpt] = useState("");
@@ -48,6 +83,8 @@ export default function NewArticlePage() {
   const [error, setError] = useState("");
   const [showSeo, setShowSeo] = useState(false);
   const [showChecklist, setShowChecklist] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [currentStatus, setCurrentStatus] = useState("");
 
   const [checklist, setChecklist] = useState({
     notClickbait: false,
@@ -71,9 +108,49 @@ export default function NewArticlePage() {
     }
   }, []);
 
+  const fetchArticle = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/articles/${articleId}`);
+      if (!res.ok) {
+        setError("Gagal memuat artikel");
+        return;
+      }
+      const json = await res.json();
+      const article = json.data;
+
+      setTitle(article.title || "");
+      setContent(article.content || "");
+      setExcerpt(article.excerpt || "");
+      setCategoryId(article.categoryId || article.category?.id || "");
+      setTags(article.tags?.map((t: { name: string }) => t.name).join(", ") || "");
+      setFeaturedImage(article.featuredImage || "");
+      setSeoTitle(article.seoTitle || "");
+      setSeoDescription(article.seoDescription || "");
+      setVerificationLabel(article.verificationLabel || "UNVERIFIED");
+      setCurrentStatus(article.status || "DRAFT");
+
+      if (article.sources && article.sources.length > 0) {
+        setSources(
+          article.sources.map((s: { name?: string; title?: string; institution?: string; url?: string }) => ({
+            name: s.name || "",
+            title: s.title || "",
+            institution: s.institution || "",
+            url: s.url || "",
+          }))
+        );
+      }
+    } catch {
+      setError("Terjadi kesalahan saat memuat artikel.");
+    } finally {
+      setLoading(false);
+    }
+  }, [articleId]);
+
   useEffect(() => {
     fetchCategories();
-  }, [fetchCategories]);
+    fetchArticle();
+  }, [fetchCategories, fetchArticle]);
 
   const addSource = () => {
     setSources([...sources, { name: "", title: "", institution: "", url: "" }]);
@@ -110,8 +187,8 @@ export default function NewArticlePage() {
         .map((t) => t.trim())
         .filter(Boolean);
 
-      const res = await fetch("/api/articles", {
-        method: "POST",
+      const res = await fetch(`/api/articles/${articleId}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title,
@@ -144,15 +221,25 @@ export default function NewArticlePage() {
     }
   };
 
+  if (loading) {
+    return <LoadingSkeleton />;
+  }
+
   return (
     <div className="mx-auto max-w-5xl">
       <div className="mb-6 flex items-center justify-between">
         <div>
+          <button
+            onClick={() => router.push("/panel/artikel")}
+            className="mb-1 flex items-center gap-1 text-xs text-txt-secondary hover:text-txt-primary"
+          >
+            <ArrowLeft size={14} /> Kembali ke Daftar Artikel
+          </button>
           <h1 className="text-2xl font-bold text-txt-primary">
-            Tulis Artikel Baru
+            Edit Artikel
           </h1>
           <p className="text-sm text-txt-secondary">
-            Pastikan mengikuti standar jurnalistik
+            Status saat ini: <span className="font-medium text-gold">{currentStatus.replace(/_/g, " ")}</span>
           </p>
         </div>
         <div className="flex items-center gap-2">

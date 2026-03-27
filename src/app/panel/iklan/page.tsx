@@ -79,6 +79,7 @@ export default function IklanPage() {
   const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [editingAd, setEditingAd] = useState<Ad | null>(null);
 
   // Form state
   const [formName, setFormName] = useState("");
@@ -123,9 +124,23 @@ export default function IklanPage() {
     setFormTargetUrl("");
     setFormStartDate("");
     setFormEndDate("");
+    setEditingAd(null);
   }
 
-  async function handleAddAd(e: FormEvent) {
+  function openEditModal(ad: Ad) {
+    setEditingAd(ad);
+    setFormName(ad.name);
+    setFormType(ad.type);
+    setFormSlot(ad.slot);
+    setFormImageUrl(ad.imageUrl || "");
+    setFormHtmlCode(ad.htmlCode || "");
+    setFormTargetUrl(ad.targetUrl || "");
+    setFormStartDate(ad.startDate ? new Date(ad.startDate).toISOString().split("T")[0] : "");
+    setFormEndDate(ad.endDate ? new Date(ad.endDate).toISOString().split("T")[0] : "");
+    setShowModal(true);
+  }
+
+  async function handleSubmitAd(e: FormEvent) {
     e.preventDefault();
 
     if (!formName || !formStartDate || !formEndDate) {
@@ -135,33 +150,52 @@ export default function IklanPage() {
 
     try {
       setSubmitting(true);
-      const res = await fetch("/api/ads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formName,
-          type: formType,
-          slot: formSlot,
-          imageUrl: formImageUrl || null,
-          htmlCode: formHtmlCode || null,
-          targetUrl: formTargetUrl || null,
-          startDate: new Date(formStartDate).toISOString(),
-          endDate: new Date(formEndDate).toISOString(),
-        }),
-      });
 
-      if (!res.ok) {
-        const json = await res.json();
-        throw new Error(json.error || "Gagal menambah iklan");
+      const body = {
+        name: formName,
+        type: formType,
+        slot: formSlot,
+        imageUrl: formImageUrl || null,
+        htmlCode: formHtmlCode || null,
+        targetUrl: formTargetUrl || null,
+        startDate: new Date(formStartDate).toISOString(),
+        endDate: new Date(formEndDate).toISOString(),
+      };
+
+      if (editingAd) {
+        const res = await fetch(`/api/ads/${editingAd.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+        if (!res.ok) {
+          const json = await res.json();
+          throw new Error(json.error || "Gagal mengupdate iklan");
+        }
+
+        alert("Iklan berhasil diupdate.");
+      } else {
+        const res = await fetch("/api/ads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+        if (!res.ok) {
+          const json = await res.json();
+          throw new Error(json.error || "Gagal menambah iklan");
+        }
+
+        alert("Iklan berhasil ditambahkan.");
       }
 
-      alert("Iklan berhasil ditambahkan.");
       setShowModal(false);
       resetForm();
       fetchAds();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Gagal menambah iklan.");
-      console.error("Add ad error:", err);
+      alert(err instanceof Error ? err.message : "Gagal menyimpan iklan.");
+      console.error("Save ad error:", err);
     } finally {
       setSubmitting(false);
     }
@@ -300,7 +334,11 @@ export default function IklanPage() {
                         </td>
                         <td className="px-5 py-3 text-right">
                           <div className="flex items-center justify-end gap-1">
-                            <button className="btn-ghost rounded p-1" title="Edit">
+                            <button
+                              onClick={() => openEditModal(ad)}
+                              className="btn-ghost rounded p-1"
+                              title="Edit"
+                            >
                               <Edit size={16} />
                             </button>
                             <button
@@ -333,8 +371,10 @@ export default function IklanPage() {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="w-full max-w-md rounded-[12px] border border-border bg-surface p-6 shadow-lg">
-            <h2 className="mb-4 text-lg font-bold text-txt-primary">Tambah Iklan Baru</h2>
-            <form className="space-y-3" onSubmit={handleAddAd}>
+            <h2 className="mb-4 text-lg font-bold text-txt-primary">
+              {editingAd ? "Edit Iklan" : "Tambah Iklan Baru"}
+            </h2>
+            <form className="space-y-3" onSubmit={handleSubmitAd}>
               <input
                 type="text"
                 placeholder="Nama iklan"
@@ -420,7 +460,7 @@ export default function IklanPage() {
                   disabled={submitting}
                   className="btn-primary px-4 py-2 text-sm font-semibold disabled:opacity-50"
                 >
-                  {submitting ? "Menyimpan..." : "Tambah"}
+                  {submitting ? "Menyimpan..." : editingAd ? "Simpan" : "Tambah"}
                 </button>
               </div>
             </form>

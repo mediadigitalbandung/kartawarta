@@ -68,6 +68,7 @@ export default function PenggunaPage() {
   const [search, setSearch] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
 
   // Form state
   const [formName, setFormName] = useState("");
@@ -106,42 +107,87 @@ export default function PenggunaPage() {
     setFormPassword("");
     setFormRole("");
     setFormSpec("");
+    setEditingUser(null);
   }
 
-  async function handleAddUser(e: FormEvent) {
+  function openEditModal(user: User) {
+    setEditingUser(user);
+    setFormName(user.name);
+    setFormEmail(user.email);
+    setFormPassword("");
+    setFormRole(user.role);
+    setFormSpec(user.specialization || "");
+    setShowModal(true);
+  }
+
+  async function handleSubmitUser(e: FormEvent) {
     e.preventDefault();
 
-    if (!formName || !formEmail || !formPassword || !formRole) {
-      alert("Semua field wajib diisi (kecuali spesialisasi).");
+    if (!formName || !formEmail || !formRole) {
+      alert("Nama, email, dan role wajib diisi.");
+      return;
+    }
+
+    if (!editingUser && !formPassword) {
+      alert("Password wajib diisi untuk pengguna baru.");
       return;
     }
 
     try {
       setSubmitting(true);
-      const res = await fetch("/api/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+
+      if (editingUser) {
+        // Update existing user
+        const body: Record<string, string | undefined> = {
           name: formName,
           email: formEmail,
-          password: formPassword,
           role: formRole,
           specialization: formSpec || undefined,
-        }),
-      });
+        };
+        if (formPassword) {
+          body.password = formPassword;
+        }
 
-      if (!res.ok) {
-        const json = await res.json();
-        throw new Error(json.error || "Gagal menambah pengguna");
+        const res = await fetch(`/api/users/${editingUser.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+        if (!res.ok) {
+          const json = await res.json();
+          throw new Error(json.error || "Gagal mengupdate pengguna");
+        }
+
+        alert("Pengguna berhasil diupdate.");
+      } else {
+        // Create new user
+        const res = await fetch("/api/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: formName,
+            email: formEmail,
+            password: formPassword,
+            role: formRole,
+            specialization: formSpec || undefined,
+          }),
+        });
+
+        if (!res.ok) {
+          const json = await res.json();
+          throw new Error(json.error || "Gagal menambah pengguna");
+        }
+
+        alert("Pengguna berhasil ditambahkan.");
       }
 
-      alert("Pengguna berhasil ditambahkan.");
       setShowModal(false);
       resetForm();
       fetchUsers();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Gagal menambah pengguna.");
-      console.error("Add user error:", err);
+      alert(err instanceof Error ? err.message : "Gagal menyimpan pengguna.");
+      console.error("Save user error:", err);
     } finally {
       setSubmitting(false);
     }
@@ -266,7 +312,11 @@ export default function PenggunaPage() {
                       <td className="px-5 py-3 text-txt-secondary">{formatDate(user.createdAt)}</td>
                       <td className="px-5 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <button className="btn-ghost rounded p-1" title="Edit">
+                          <button
+                            onClick={() => openEditModal(user)}
+                            className="btn-ghost rounded p-1"
+                            title="Edit"
+                          >
                             <Edit size={16} />
                           </button>
                           <button
@@ -298,8 +348,10 @@ export default function PenggunaPage() {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="w-full max-w-md rounded-[12px] border border-border bg-surface p-6 shadow-lg">
-            <h2 className="mb-4 text-lg font-bold text-txt-primary">Tambah Pengguna Baru</h2>
-            <form className="space-y-3" onSubmit={handleAddUser}>
+            <h2 className="mb-4 text-lg font-bold text-txt-primary">
+              {editingUser ? "Edit Pengguna" : "Tambah Pengguna Baru"}
+            </h2>
+            <form className="space-y-3" onSubmit={handleSubmitUser}>
               <input
                 type="text"
                 placeholder="Nama lengkap"
@@ -318,10 +370,10 @@ export default function PenggunaPage() {
               />
               <input
                 type="password"
-                placeholder="Password (min. 8 karakter)"
+                placeholder={editingUser ? "Password baru (kosongkan jika tidak diubah)" : "Password (min. 8 karakter)"}
                 value={formPassword}
                 onChange={(e) => setFormPassword(e.target.value)}
-                required
+                required={!editingUser}
                 minLength={8}
                 className="input w-full"
               />
@@ -356,7 +408,7 @@ export default function PenggunaPage() {
                   disabled={submitting}
                   className="btn-primary px-4 py-2 text-sm font-semibold disabled:opacity-50"
                 >
-                  {submitting ? "Menyimpan..." : "Tambah"}
+                  {submitting ? "Menyimpan..." : editingUser ? "Simpan" : "Tambah"}
                 </button>
               </div>
             </form>
