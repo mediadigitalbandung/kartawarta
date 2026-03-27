@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import ArticleCard from "@/components/artikel/ArticleCard";
 import Sidebar from "@/components/layout/Sidebar";
+import BannerAd, { SidebarAd } from "@/components/ads/BannerAd";
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -71,13 +72,36 @@ export default async function CategoryPage({ params }: { params: { slug: string 
           </p>
         </div>
 
+        {/* Banner Ad — Leaderboard */}
+        <BannerAd size="slim" className="mb-6" />
+
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
+            {/* First 6 articles */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              {articles.map((article) => (
+              {articles.slice(0, 6).map((article) => (
                 <ArticleCard key={article.slug} {...article} />
               ))}
             </div>
+
+            {/* Inline ad between rows */}
+            {articles.length > 6 && (
+              <div className="my-6">
+                <div className="rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ height: "120px" }}>
+                  <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
+                  <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
+                </div>
+              </div>
+            )}
+
+            {/* Remaining articles */}
+            {articles.length > 6 && (
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                {articles.slice(6).map((article) => (
+                  <ArticleCard key={article.slug} {...article} />
+                ))}
+              </div>
+            )}
 
             {articles.length === 0 && (
               <div className="rounded-[12px] border-2 border-dashed border-border py-16 text-center">
@@ -88,6 +112,24 @@ export default async function CategoryPage({ params }: { params: { slug: string 
 
           <div className="lg:col-span-1">
             <Sidebar trending={sidebarTrending} />
+            {/* Sidebar Ad */}
+            <div className="mt-5">
+              <SidebarAd />
+            </div>
+          </div>
+        </div>
+
+        {/* Banner Ad — Bottom split 70/30 */}
+        <div className="mt-8">
+          <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
+            <div className="lg:col-span-7 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ height: "200px" }}>
+              <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
+              <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
+            </div>
+            <div className="lg:col-span-3 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ height: "200px" }}>
+              <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
+              <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
+            </div>
           </div>
         </div>
       </div>
