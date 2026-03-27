@@ -4,6 +4,8 @@ import Providers from "@/components/Providers";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
+export const viewport = { width: "device-width", initialScale: 1 };
+
 export const metadata: Metadata = {
   title: {
     default: "Jurnalis Hukum Bandung - Media Hukum Digital Terpercaya",

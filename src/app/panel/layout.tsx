@@ -34,6 +34,7 @@ const menuItems = [
 export default function PanelLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session, status } = useSession();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (status === "loading") {
     return (
@@ -48,7 +49,6 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   }
 
   const isAdmin = session.user.role === "SUPER_ADMIN" || session.user.role === "CHIEF_EDITOR";
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const sidebarContent = (
     <div className="flex h-full flex-col px-3 py-4">

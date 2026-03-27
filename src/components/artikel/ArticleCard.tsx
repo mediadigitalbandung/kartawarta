@@ -78,7 +78,7 @@ export default function ArticleCard({
             {category.name}
           </Link>
           <Link href={`/berita/${slug}`}>
-            <h2 className="mt-1 text-xl font-bold leading-tight text-txt-primary hover:underline sm:text-2xl">
+            <h2 className="mt-1 text-lg font-bold leading-tight text-txt-primary hover:underline sm:text-xl lg:text-2xl">
               {title}
             </h2>
           </Link>

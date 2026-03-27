@@ -216,7 +216,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats grid */}
-      <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
@@ -244,6 +244,7 @@ export default function DashboardPage() {
               Artikel Terbaru
             </h2>
           </div>
+          <div className="overflow-x-auto">
           <div className="divide-y divide-border">
             {recentArticles.length === 0 ? (
               <div className="px-5 py-8 text-center text-sm text-txt-secondary">
@@ -271,6 +272,7 @@ export default function DashboardPage() {
                 </div>
               ))
             )}
+          </div>
           </div>
         </div>
 

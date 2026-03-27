@@ -65,7 +65,7 @@ export default function Header() {
 
             {/* Right side: Search + actions */}
             <div className="flex items-center gap-2">
-            <form action="/search" className="relative w-32 sm:w-48 md:w-64 lg:w-80">
+            <form action="/search" className="relative w-28 sm:w-40 md:w-64 lg:w-80">
               <Search
                 size={16}
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30"
@@ -139,7 +139,7 @@ export default function Header() {
       {/* Row 2: Category navigation — prominent white bar */}
       <nav className="bg-surface border-b border-border">
         <div className="container-main">
-          <ul className="flex items-center justify-between">
+          <ul className="flex items-center gap-0 overflow-x-auto scrollbar-hide">
             {categoryNavMain.map((item, i) => (
               <li key={item.href} className="shrink-0">
                 <Link
