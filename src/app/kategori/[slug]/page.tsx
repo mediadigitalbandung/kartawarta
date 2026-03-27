@@ -217,6 +217,12 @@ export default async function CategoryPage({ params }: { params: { slug: string 
           </div>
         )}
 
+        {/* Banner Ad — below polling */}
+        <div className="mb-6 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ height: "270px" }}>
+          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
+          <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
+        </div>
+
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
             {/* Articles grid (skip headline + side cards) */}
