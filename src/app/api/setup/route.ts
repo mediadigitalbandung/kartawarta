@@ -117,9 +117,9 @@ export async function GET(request: NextRequest) {
     return successResponse({
       message: "Setup berhasil! Database telah di-seed.",
       users: {
-        admin: { email: admin.email, password: "Admin@JHB2026!" },
-        editor: { email: editor.email, password: "Editor@JHB2026!" },
-        journalist: { email: journalist.email, password: "Jurnalis@JHB2026!" },
+        admin: { email: admin.email },
+        editor: { email: editor.email },
+        journalist: { email: journalist.email },
       },
       categories: categories.length,
       note: "SEGERA GANTI PASSWORD setelah login pertama kali!",
