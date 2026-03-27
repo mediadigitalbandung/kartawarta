@@ -1,10 +1,123 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Vote } from "lucide-react";
 import ArticleCard from "@/components/artikel/ArticleCard";
 import Sidebar from "@/components/layout/Sidebar";
 import BannerAd, { SidebarAd } from "@/components/ads/BannerAd";
+
+const categoryPolling: Record<string, { question: string; options: { label: string; percentage: number }[]; totalVotes: number }> = {
+  "hukum-pidana": {
+    question: "Apakah hukuman mati masih relevan dalam sistem hukum pidana Indonesia?",
+    options: [
+      { label: "Sangat Relevan", percentage: 38 },
+      { label: "Relevan", percentage: 24 },
+      { label: "Netral", percentage: 16 },
+      { label: "Tidak Relevan", percentage: 15 },
+      { label: "Sangat Tidak Relevan", percentage: 7 },
+    ],
+    totalVotes: 3842,
+  },
+  "hukum-perdata": {
+    question: "Apakah proses mediasi wajib di pengadilan efektif menyelesaikan sengketa perdata?",
+    options: [
+      { label: "Sangat Efektif", percentage: 22 },
+      { label: "Efektif", percentage: 31 },
+      { label: "Cukup", percentage: 25 },
+      { label: "Tidak Efektif", percentage: 16 },
+      { label: "Sangat Tidak Efektif", percentage: 6 },
+    ],
+    totalVotes: 2156,
+  },
+  "hukum-tata-negara": {
+    question: "Perlukah perubahan (amandemen) kelima terhadap UUD 1945?",
+    options: [
+      { label: "Sangat Perlu", percentage: 35 },
+      { label: "Perlu", percentage: 28 },
+      { label: "Netral", percentage: 18 },
+      { label: "Tidak Perlu", percentage: 13 },
+      { label: "Sangat Tidak Perlu", percentage: 6 },
+    ],
+    totalVotes: 5230,
+  },
+  "ham": {
+    question: "Apakah Indonesia sudah cukup serius dalam menangani kasus pelanggaran HAM berat?",
+    options: [
+      { label: "Sangat Serius", percentage: 8 },
+      { label: "Cukup Serius", percentage: 18 },
+      { label: "Netral", percentage: 20 },
+      { label: "Kurang Serius", percentage: 32 },
+      { label: "Sangat Kurang", percentage: 22 },
+    ],
+    totalVotes: 4710,
+  },
+  "hukum-bisnis": {
+    question: "Apakah regulasi bisnis di Indonesia sudah mendukung pertumbuhan UMKM?",
+    options: [
+      { label: "Sangat Mendukung", percentage: 12 },
+      { label: "Mendukung", percentage: 25 },
+      { label: "Netral", percentage: 28 },
+      { label: "Kurang Mendukung", percentage: 25 },
+      { label: "Tidak Mendukung", percentage: 10 },
+    ],
+    totalVotes: 1890,
+  },
+  "hukum-lingkungan": {
+    question: "Apakah sanksi hukum terhadap perusahaan pencemar lingkungan sudah cukup berat?",
+    options: [
+      { label: "Sudah Berat", percentage: 8 },
+      { label: "Cukup", percentage: 15 },
+      { label: "Netral", percentage: 18 },
+      { label: "Kurang Berat", percentage: 35 },
+      { label: "Sangat Kurang", percentage: 24 },
+    ],
+    totalVotes: 3120,
+  },
+  "ketenagakerjaan": {
+    question: "Apakah UU Cipta Kerja sudah melindungi hak-hak pekerja secara memadai?",
+    options: [
+      { label: "Sangat Memadai", percentage: 10 },
+      { label: "Memadai", percentage: 18 },
+      { label: "Netral", percentage: 22 },
+      { label: "Kurang Memadai", percentage: 30 },
+      { label: "Tidak Memadai", percentage: 20 },
+    ],
+    totalVotes: 5680,
+  },
+  "opini": {
+    question: "Apakah media di Indonesia sudah cukup independen dalam memberitakan isu hukum?",
+    options: [
+      { label: "Sangat Independen", percentage: 10 },
+      { label: "Independen", percentage: 22 },
+      { label: "Netral", percentage: 25 },
+      { label: "Kurang Independen", percentage: 28 },
+      { label: "Tidak Independen", percentage: 15 },
+    ],
+    totalVotes: 2940,
+  },
+  "berita-bandung": {
+    question: "Bagaimana penilaian Anda terhadap penegakan hukum di Kota Bandung saat ini?",
+    options: [
+      { label: "Sangat Baik", percentage: 12 },
+      { label: "Baik", percentage: 28 },
+      { label: "Cukup", percentage: 30 },
+      { label: "Buruk", percentage: 20 },
+      { label: "Sangat Buruk", percentage: 10 },
+    ],
+    totalVotes: 4350,
+  },
+  "infografis": {
+    question: "Format konten hukum apa yang paling Anda sukai?",
+    options: [
+      { label: "Infografis Visual", percentage: 42 },
+      { label: "Artikel Panjang", percentage: 20 },
+      { label: "Video Pendek", percentage: 22 },
+      { label: "Podcast", percentage: 10 },
+      { label: "Thread/Ringkasan", percentage: 6 },
+    ],
+    totalVotes: 1580,
+  },
+};
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -135,6 +248,38 @@ export default async function CategoryPage({ params }: { params: { slug: string 
             </div>
           </div>
         </div>
+
+        {/* Polling */}
+        {categoryPolling[params.slug] && (
+          <div className="mt-8">
+            <div className="flex items-center mb-5">
+              <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
+                <Vote size={18} className="mr-2 text-goto-green" />
+                Polling {category.name}
+              </h2>
+            </div>
+            <div className="rounded-[12px] border border-border bg-surface-secondary p-6 max-w-xl">
+              <p className="text-sm font-semibold text-txt-primary mb-5">{categoryPolling[params.slug].question}</p>
+              <div className="space-y-3">
+                {categoryPolling[params.slug].options.map((opt) => (
+                  <div key={opt.label}>
+                    <div className="flex items-center justify-between text-sm mb-1">
+                      <span className="text-txt-primary text-xs">{opt.label}</span>
+                      <span className="font-bold text-txt-primary text-xs">{opt.percentage}%</span>
+                    </div>
+                    <div className="h-2 rounded-full bg-border">
+                      <div
+                        className="h-2 rounded-full bg-goto-green transition-all"
+                        style={{ width: `${opt.percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[11px] text-txt-muted mt-4">{categoryPolling[params.slug].totalVotes.toLocaleString("id-ID")} suara</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
