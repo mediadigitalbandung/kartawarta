@@ -275,7 +275,11 @@ export default async function CategoryPage({ params }: { params: { slug: string 
 
           <div className="lg:col-span-1">
             <Sidebar trending={sidebarTrending} />
-            {/* Sidebar Ad */}
+            {/* Sidebar Ad 1 */}
+            <div className="mt-5">
+              <SidebarAd />
+            </div>
+            {/* Sidebar Ad 2 */}
             <div className="mt-5">
               <SidebarAd />
             </div>
