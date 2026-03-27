@@ -102,7 +102,7 @@ export default function BreakingSlider({ items }: BreakingSliderProps) {
 
             {/* Content at bottom */}
             <div
-              className="absolute bottom-0 left-0 right-0 px-12 pb-9 pt-4"
+              className="absolute bottom-0 left-0 right-0 px-4 pb-8 pt-3 sm:px-8 sm:pb-9 lg:px-12"
               style={{
                 transform: isActive ? "translateY(0)" : "translateY(12px)",
                 opacity: isActive ? 1 : 0,
@@ -115,7 +115,7 @@ export default function BreakingSlider({ items }: BreakingSliderProps) {
                 {article.category.name}
               </span>
               <Link href={`/berita/${article.slug}`}>
-                <h3 className="mt-1 text-[15px] font-bold leading-snug text-white line-clamp-3">
+                <h3 className="mt-1 text-sm sm:text-[15px] font-bold leading-snug text-white line-clamp-3">
                   {article.title}
                 </h3>
               </Link>
@@ -150,14 +150,14 @@ export default function BreakingSlider({ items }: BreakingSliderProps) {
         <>
           <button
             onClick={prev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/50 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/50 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
             aria-label="Previous"
           >
             <ChevronLeft size={16} strokeWidth={1.5} />
           </button>
           <button
             onClick={next}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/50 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/50 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
             aria-label="Next"
           >
             <ChevronRight size={16} strokeWidth={1.5} />

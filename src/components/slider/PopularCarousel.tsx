@@ -81,7 +81,7 @@ export default function PopularCarousel({ items }: PopularCarouselProps) {
         {items.map((article, i) => (
           <article
             key={article.slug}
-            className="group w-[calc(25%-15px)] min-w-[220px] shrink-0"
+            className="group w-[calc(50%-10px)] sm:w-[calc(33%-13px)] lg:w-[calc(25%-15px)] min-w-[150px] shrink-0"
           >
             <div>
               {/* Image with rank overlay */}
@@ -132,7 +132,7 @@ export default function PopularCarousel({ items }: PopularCarouselProps) {
       {canScrollLeft && (
         <button
           onClick={() => scroll("left")}
-          className="absolute -left-4 top-[25%] -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-txt-secondary shadow-card transition-all duration-200 hover:border-txt-muted hover:text-txt-primary hover:shadow-card-hover hover:scale-110"
+          className="absolute -left-4 top-[25%] -translate-y-1/2 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-txt-secondary shadow-card transition-all duration-200 hover:border-txt-muted hover:text-txt-primary hover:shadow-card-hover hover:scale-110"
           aria-label="Scroll left"
         >
           <ChevronLeft size={18} strokeWidth={1.5} />
@@ -143,7 +143,7 @@ export default function PopularCarousel({ items }: PopularCarouselProps) {
       {canScrollRight && (
         <button
           onClick={() => scroll("right")}
-          className="absolute -right-4 top-[25%] -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-txt-secondary shadow-card transition-all duration-200 hover:border-txt-muted hover:text-txt-primary hover:shadow-card-hover hover:scale-110"
+          className="absolute -right-4 top-[25%] -translate-y-1/2 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface text-txt-secondary shadow-card transition-all duration-200 hover:border-txt-muted hover:text-txt-primary hover:shadow-card-hover hover:scale-110"
           aria-label="Scroll right"
         >
           <ChevronRight size={18} strokeWidth={1.5} />

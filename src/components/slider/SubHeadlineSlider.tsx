@@ -77,7 +77,7 @@ export default function SubHeadlineSlider({ items }: SubHeadlineSliderProps) {
           return (
             <div
               key={pageIdx}
-              className="absolute inset-0 grid grid-cols-2 gap-4"
+              className="absolute inset-0 grid grid-cols-2 gap-2 sm:gap-4"
               style={{
                 zIndex: isActive ? 2 : isLeaving ? 1 : 0,
                 opacity: isVisible ? 1 : 0,
@@ -134,14 +134,14 @@ export default function SubHeadlineSlider({ items }: SubHeadlineSliderProps) {
         <>
           <button
             onClick={prev}
-            className="absolute left-1 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/50 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
+            className="absolute left-1 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/50 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
             aria-label="Previous"
           >
             <ChevronLeft size={16} strokeWidth={1.5} />
           </button>
           <button
             onClick={next}
-            className="absolute right-1 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/50 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
+            className="absolute right-1 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/50 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
             aria-label="Next"
           >
             <ChevronRight size={16} strokeWidth={1.5} />

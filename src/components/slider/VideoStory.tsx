@@ -62,7 +62,7 @@ export default function VideoStory({ items }: VideoStoryProps) {
         {items.map((item) => (
           <article
             key={item.slug}
-            className="group w-[180px] sm:w-[200px] shrink-0"
+            className="group w-[140px] sm:w-[160px] md:w-[180px] lg:w-[200px] shrink-0"
           >
             <Link href={`/berita/${item.slug}`} className="block">
               {/* Vertical thumbnail — portrait ratio like video story */}
@@ -115,7 +115,7 @@ export default function VideoStory({ items }: VideoStoryProps) {
       {canScrollLeft && (
         <button
           onClick={() => scroll("left")}
-          className="absolute -left-4 top-[30%] -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-txt-secondary shadow-card transition-all duration-200 hover:border-txt-muted hover:text-txt-primary hover:shadow-card-hover hover:scale-110"
+          className="absolute left-1 sm:-left-4 top-[30%] -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-txt-secondary shadow-card transition-all duration-200 hover:border-txt-muted hover:text-txt-primary hover:shadow-card-hover hover:scale-110"
           aria-label="Scroll left"
         >
           <ChevronLeft size={18} strokeWidth={1.5} />
@@ -126,7 +126,7 @@ export default function VideoStory({ items }: VideoStoryProps) {
       {canScrollRight && (
         <button
           onClick={() => scroll("right")}
-          className="absolute -right-4 top-[30%] -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-txt-secondary shadow-card transition-all duration-200 hover:border-txt-muted hover:text-txt-primary hover:shadow-card-hover hover:scale-110"
+          className="absolute right-1 sm:-right-4 top-[30%] -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-txt-secondary shadow-card transition-all duration-200 hover:border-txt-muted hover:text-txt-primary hover:shadow-card-hover hover:scale-110"
           aria-label="Scroll right"
         >
           <ChevronRight size={18} strokeWidth={1.5} />

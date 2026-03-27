@@ -65,7 +65,7 @@ export default function Header() {
 
             {/* Right side: Search + actions */}
             <div className="flex items-center gap-2">
-            <form action="/search" className="relative w-64 sm:w-80">
+            <form action="/search" className="relative w-32 sm:w-48 md:w-64 lg:w-80">
               <Search
                 size={16}
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30"
@@ -83,7 +83,7 @@ export default function Header() {
                 <div className="relative">
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-goto-green text-xs font-bold text-white transition-opacity hover:opacity-90"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-goto-green text-xs font-bold text-white transition-opacity hover:opacity-90"
                   >
                     {session.user?.name?.charAt(0)?.toUpperCase() || "U"}
                   </button>
@@ -126,7 +126,7 @@ export default function Header() {
               {/* Mobile menu toggle */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="rounded-full p-2 text-white/70 transition-colors hover:text-white lg:hidden"
+                className="flex h-10 w-10 items-center justify-center rounded-full text-white/70 transition-colors hover:text-white lg:hidden"
                 aria-label="Menu"
               >
                 {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}

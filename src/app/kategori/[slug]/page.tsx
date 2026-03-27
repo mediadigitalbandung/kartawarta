@@ -138,13 +138,13 @@ export default async function CategoryPage({ params }: { params: { slug: string 
 
         {/* Headline — 50% slider + 25% + 25% side cards */}
         {articles.length >= 3 && (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             {/* Left 50%: Main headline slider */}
             <div className="lg:col-span-2">
               <HeadlineSlider items={JSON.parse(JSON.stringify(articles.slice(0, 5)))} />
             </div>
             {/* Middle 25%: 3 stacked cards — full height */}
-            <div className="flex flex-col">
+            <div className="hidden md:flex flex-col">
               {articles.slice(5, 8).map((article, i) => (
                 <div key={article.slug} className={`group flex flex-1 gap-3 ${i > 0 ? "border-t border-border" : ""}`}>
                   <div className="relative w-28 shrink-0">
@@ -164,7 +164,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
               ))}
             </div>
             {/* Right 25%: 3 stacked cards — full height */}
-            <div className="flex flex-col">
+            <div className="hidden md:flex flex-col">
               {articles.slice(8, 11).map((article, i) => (
                 <div key={article.slug} className={`group flex flex-1 gap-3 ${i > 0 ? "border-t border-border" : ""}`}>
                   <div className="relative w-28 shrink-0">
@@ -238,7 +238,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
           <VideoStory items={videoStoryData} />
         </div>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           <div className="lg:col-span-2">
             {/* Articles grid (skip headline + side cards) */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">

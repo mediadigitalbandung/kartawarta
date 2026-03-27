@@ -112,7 +112,7 @@ export default function HeadlineSlider({ items }: HeadlineSliderProps) {
 
               {/* Content — slides up on enter */}
               <div
-                className="absolute bottom-0 left-0 right-0 px-14 pt-5 pb-9 sm:px-16 sm:pt-8 sm:pb-12"
+                className="absolute bottom-0 left-0 right-0 px-4 pt-4 pb-8 sm:px-8 md:px-12 lg:px-16 sm:pb-10 lg:pb-12"
                 style={{
                   transform: isActive && transitioning ? "translateY(0)" : isActive ? "translateY(0)" : "translateY(20px)",
                   opacity: isActive ? 1 : 0,
@@ -126,7 +126,7 @@ export default function HeadlineSlider({ items }: HeadlineSliderProps) {
                 </span>
 
                 <Link href={`/berita/${article.slug}`}>
-                  <h2 className="mt-2 text-lg font-extrabold leading-[1.2] text-white sm:text-xl lg:text-2xl">
+                  <h2 className="mt-2 text-base font-extrabold leading-[1.2] text-white sm:text-lg md:text-xl lg:text-2xl">
                     {article.title}
                   </h2>
                 </Link>
@@ -172,14 +172,14 @@ export default function HeadlineSlider({ items }: HeadlineSliderProps) {
         <>
           <button
             onClick={prev}
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/50 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/50 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
             aria-label="Previous"
           >
             <ChevronLeft size={18} strokeWidth={1.5} />
           </button>
           <button
             onClick={next}
-            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/50 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/50 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
             aria-label="Next"
           >
             <ChevronRight size={18} strokeWidth={1.5} />
@@ -194,13 +194,15 @@ export default function HeadlineSlider({ items }: HeadlineSliderProps) {
             <button
               key={i}
               onClick={() => goToSlide(i)}
-              className={`rounded-full transition-all duration-300 ${
+              className="rounded-full transition-all duration-300 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              aria-label={`Slide ${i + 1}`}
+            >
+              <span className={`block rounded-full transition-all duration-300 ${
                 i === current
                   ? "h-2.5 w-2.5 bg-white shadow-[0_0_6px_rgba(255,255,255,0.4)]"
                   : "h-2 w-2 bg-white/30 hover:bg-white/60"
-              }`}
-              aria-label={`Slide ${i + 1}`}
-            />
+              }`} />
+            </button>
           ))}
         </div>
       )}

@@ -201,12 +201,12 @@ export default async function HomePage() {
                   {trendingArticles.slice(0, 8).map((article, i) => (
                     <div key={article.slug} className="group flex items-start gap-4 py-4 first:pt-0">
                       {/* Rank number */}
-                      <span className="shrink-0 w-8 pt-2 text-center text-3xl font-extrabold text-goto-green select-none">
+                      <span className="shrink-0 w-8 pt-2 text-center text-xl sm:text-2xl lg:text-3xl font-extrabold text-goto-green select-none">
                         {i + 1}
                       </span>
                       {/* Thumbnail */}
                       <Link href={`/berita/${article.slug}`} className="shrink-0">
-                        <div className="relative h-[100px] w-[150px] overflow-hidden rounded">
+                        <div className="relative h-[70px] w-[100px] sm:h-[80px] sm:w-[120px] lg:h-[100px] lg:w-[150px] overflow-hidden rounded">
                           {article.featuredImage ? (
                             <Image
                               src={article.featuredImage}
@@ -269,7 +269,7 @@ export default async function HomePage() {
               Lihat Semua
             </Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {jadwalSidangData.map((j) => (
               <div key={j.date} className="rounded-lg border border-border bg-surface-secondary p-4 hover:border-goto-green/40 transition-colors">
                 <div className="flex items-center gap-3 mb-3">
@@ -446,7 +446,7 @@ export default async function HomePage() {
                 </Link>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Left: Featured article — large card with image overlay */}
                 {featured && (
                   <div className="lg:col-span-1">
@@ -565,7 +565,7 @@ export default async function HomePage() {
               Kategori
             </h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
             {categories.map((cat) => {
               const Icon = categoryIconMap[cat.slug] || defaultIcon;
               return (

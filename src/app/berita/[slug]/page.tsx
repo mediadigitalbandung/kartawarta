@@ -121,7 +121,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               {article.category.name}
             </Link>
             <span>&gt;</span>
-            <span className="truncate max-w-[200px] text-txt-muted">{article.title}</span>
+            <span className="truncate max-w-[120px] sm:max-w-[200px] lg:max-w-[400px] text-txt-muted">{article.title}</span>
           </nav>
 
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
@@ -143,7 +143,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               </div>
 
               {/* Title */}
-              <h1 className="text-3xl font-extrabold leading-tight text-txt-primary tracking-tight sm:text-4xl">
+              <h1 className="text-2xl font-extrabold leading-tight text-txt-primary tracking-tight sm:text-3xl lg:text-4xl">
                 {article.title}
               </h1>
 
@@ -186,7 +186,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               </div>
 
               {/* Share bar */}
-              <div className="mt-8 flex items-center gap-3 rounded-[12px] bg-surface-secondary p-4">
+              <div className="mt-8 flex flex-wrap items-center gap-3 rounded-[12px] bg-surface-secondary p-3 sm:p-4">
                 <div className="flex items-center gap-2 text-txt-secondary">
                   <Share2 size={14} />
                   <span className="text-xs font-semibold uppercase tracking-wider">Bagikan</span>
@@ -288,7 +288,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
             </article>
 
             {/* Sidebar */}
-            <div className="lg:col-span-1">
+            <div className="hidden lg:block lg:col-span-1">
               <Sidebar trending={sidebarTrending} />
             </div>
           </div>
