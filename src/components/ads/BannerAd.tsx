@@ -1,9 +1,14 @@
 interface BannerAdProps {
-  size: "leaderboard" | "billboard" | "sidebar" | "inline";
+  size: "leaderboard" | "billboard" | "sidebar" | "inline" | "slim";
   className?: string;
 }
 
 const sizeConfig = {
+  slim: {
+    height: "135px",
+    label: "Ad",
+    containerClass: "py-2",
+  },
   leaderboard: {
     height: "270px",
     label: "Leaderboard Ad",

@@ -396,7 +396,7 @@ export default async function HomePage() {
       </section>
 
       {/* Banner Ad — above Video Story */}
-      <BannerAd size="leaderboard" className="bg-surface" />
+      <BannerAd size="slim" className="bg-surface" />
 
       {/* Video Story — horizontal scroll */}
       <section className="bg-surface-secondary py-8">
