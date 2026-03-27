@@ -20,7 +20,7 @@ export default function RedaksiPage() {
     <div className="bg-surface min-h-screen">
       <div className="container-main py-12">
         <div className="mx-auto max-w-3xl">
-          <h1 className="flex items-center gap-3 text-3xl font-bold text-txt-primary">
+          <h1 className="flex items-center gap-3 text-xl font-bold text-txt-primary sm:text-2xl lg:text-3xl">
             <span className="block h-8 w-[3px] rounded-full bg-goto-green" />
             Susunan Redaksi
           </h1>
@@ -30,7 +30,7 @@ export default function RedaksiPage() {
             seluruh proses produksi dan distribusi konten.
           </p>
 
-          <div className="mt-8 space-y-4">
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {redaksi.map((item, i) => (
               <div
                 key={i}
@@ -39,7 +39,7 @@ export default function RedaksiPage() {
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-goto-green text-lg font-bold text-white">
                   {item.name === "\u2014" ? (i + 1) : item.name.charAt(0)}
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-xs font-semibold uppercase tracking-wider text-goto-green">
                     {item.position}
                   </p>

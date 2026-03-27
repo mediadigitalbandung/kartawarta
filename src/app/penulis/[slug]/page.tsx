@@ -55,7 +55,7 @@ export default async function PenulisPage({ params }: { params: { slug: string }
               {author.name.charAt(0)}
             </div>
             <div className="flex-1 text-center sm:text-left">
-              <h1 className="text-2xl font-bold text-txt-primary">
+              <h1 className="text-xl font-bold text-txt-primary sm:text-2xl lg:text-3xl">
                 {author.name}
               </h1>
               <p className="mt-1 text-sm text-goto-green">{author.role.replace(/_/g, " ")}</p>
@@ -68,7 +68,7 @@ export default async function PenulisPage({ params }: { params: { slug: string }
                 {author.bio}
               </p>
 
-              <div className="mt-4 flex justify-center gap-6 sm:justify-start">
+              <div className="mt-4 flex flex-wrap justify-center gap-4 sm:gap-6 sm:justify-start">
                 <div className="flex items-center gap-1.5 text-sm text-txt-muted">
                   <FileText size={14} />
                   <span className="font-semibold text-txt-primary">
@@ -94,7 +94,7 @@ export default async function PenulisPage({ params }: { params: { slug: string }
 
         {/* Articles by author */}
         <div className="mt-8">
-          <h2 className="mb-4 flex items-center gap-3 text-lg font-bold text-txt-primary">
+          <h2 className="mb-4 flex items-center gap-3 text-base font-bold text-txt-primary sm:text-lg lg:text-xl">
             <span className="block h-6 w-[3px] rounded-full bg-goto-green" />
             Artikel oleh {author.name}
           </h2>

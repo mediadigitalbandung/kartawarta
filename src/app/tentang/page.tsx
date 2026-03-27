@@ -11,7 +11,7 @@ export default function TentangPage() {
     <div className="bg-surface min-h-screen">
       <div className="container-main py-12">
         <div className="mx-auto max-w-3xl">
-          <h1 className="flex items-center gap-3 text-3xl font-bold text-txt-primary">
+          <h1 className="flex items-center gap-3 text-xl font-bold text-txt-primary sm:text-2xl lg:text-3xl">
             <span className="block h-8 w-[3px] rounded-full bg-goto-green" />
             Tentang Kami
           </h1>
@@ -35,7 +35,7 @@ export default function TentangPage() {
           </div>
 
           {/* Values */}
-          <div className="mt-12 grid grid-cols-2 gap-6">
+          <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
             {[
               { icon: Shield, title: "Akurat & Terverifikasi", desc: "Setiap berita melalui proses fact-checking dan verifikasi sumber sebelum dipublikasikan." },
               { icon: Eye, title: "Transparan", desc: "Kami terbuka terhadap koreksi dan selalu mencantumkan sumber informasi dalam setiap artikel." },

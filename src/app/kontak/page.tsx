@@ -16,7 +16,7 @@ export default function KontakPage() {
     <div className="bg-surface min-h-screen">
       <div className="container-main py-12">
         <div className="mx-auto max-w-4xl">
-          <h1 className="flex items-center gap-3 text-3xl font-bold text-txt-primary">
+          <h1 className="flex items-center gap-3 text-xl font-bold text-txt-primary sm:text-2xl lg:text-3xl">
             <span className="block h-8 w-[3px] rounded-full bg-goto-green" />
             Hubungi Kami
           </h1>
@@ -71,7 +71,7 @@ export default function KontakPage() {
                 <form onSubmit={handleSubmit} className="rounded-[12px] border border-border bg-surface p-6">
                   <h2 className="mb-4 text-lg font-bold text-txt-primary">Kirim Pesan</h2>
                   <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <div>
                         <label className="mb-1 block text-sm font-medium text-txt-primary">Nama</label>
                         <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="input w-full" />
