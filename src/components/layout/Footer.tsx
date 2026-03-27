@@ -10,13 +10,6 @@ const footerLinks = {
     { name: "HAM", href: "/kategori/ham" },
     { name: "Opini", href: "/kategori/opini" },
   ],
-  tentang: [
-    { name: "Tentang Kami", href: "/tentang" },
-    { name: "Redaksi", href: "/redaksi" },
-    { name: "Kode Etik", href: "/kode-etik" },
-    { name: "Pedoman Media", href: "/pedoman-media" },
-    { name: "Koreksi & Klarifikasi", href: "/kode-etik" },
-  ],
   kontak: [
     { name: "Kontak Redaksi", href: "/kontak" },
     { name: "Kebijakan Privasi", href: "/privasi" },
@@ -29,7 +22,7 @@ export default function Footer() {
   return (
     <footer className="bg-surface-dark text-white">
       <div className="container-main py-10">
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
           {/* Brand */}
           <div className="col-span-2 sm:col-span-1">
             <div className="flex items-center gap-2">
@@ -50,25 +43,6 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2">
               {footerLinks.kategori.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-white/60 transition-colors duration-200 hover:text-goto-green"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Tentang */}
-          <div>
-            <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/40">
-              Tentang
-            </h4>
-            <ul className="space-y-2">
-              {footerLinks.tentang.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
