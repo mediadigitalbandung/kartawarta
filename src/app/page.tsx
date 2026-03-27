@@ -88,7 +88,7 @@ export default async function HomePage() {
       where: { status: "PUBLISHED" },
       include: { author: true, category: true },
       orderBy: { publishedAt: "desc" },
-      take: 80,
+      take: 50,
     }),
     prisma.category.findMany({
       include: { _count: { select: { articles: true } } },
@@ -111,7 +111,7 @@ export default async function HomePage() {
   const subHeadlines = articles.slice(5, 11);     // 6 items = 3 pages x 2 cards for sub-headline slider
   const breakingArticles = articles.slice(11, 16); // For breaking news slider
   const terkiniArticles = articles.slice(16, 24); // Berita Terkini: 2x4 grid = 8
-  const restArticles = articles.slice(22);
+  const restArticles = articles.slice(24);
 
   const tickerItems = tickerArticles.map((a) => ({
     title: a.title,
