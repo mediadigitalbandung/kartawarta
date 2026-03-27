@@ -93,8 +93,9 @@ export default function NewArticlePage() {
     setError("");
 
     if (!title.trim()) return setError("Judul wajib diisi");
-    if (!content.trim() || content.length < 50) return setError("Konten minimal 50 karakter");
-    if (!categoryId) return setError("Kategori wajib dipilih");
+    if (!content.trim()) return setError("Konten tidak boleh kosong");
+    if (content.length < 50) return setError("Konten minimal 50 karakter");
+    if (!categoryId) return setError("Kategori harus dipilih");
 
     if (status !== "DRAFT" && !allChecked) {
       setShowChecklist(true);
@@ -136,6 +137,7 @@ export default function NewArticlePage() {
         return;
       }
 
+      alert("Artikel berhasil disimpan");
       router.push("/panel/artikel");
       router.refresh();
     } catch {
@@ -369,11 +371,12 @@ export default function NewArticlePage() {
               value={verificationLabel}
               onChange={(e) => setVerificationLabel(e.target.value)}
               className="input w-full"
+              aria-label="Label verifikasi artikel"
             >
-              <option value="UNVERIFIED">Belum Diverifikasi</option>
-              <option value="VERIFIED">Terverifikasi</option>
-              <option value="OPINION">Opini</option>
-              <option value="CORRECTION">Koreksi</option>
+              <option value="UNVERIFIED">Belum Diverifikasi — Belum dicek kebenarannya</option>
+              <option value="VERIFIED">Terverifikasi — Fakta sudah dikonfirmasi</option>
+              <option value="OPINION">Opini — Artikel berisi pendapat penulis</option>
+              <option value="CORRECTION">Koreksi — Perbaikan atas artikel sebelumnya</option>
             </select>
           </div>
 

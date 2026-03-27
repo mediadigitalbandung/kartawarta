@@ -29,12 +29,19 @@ interface Ad {
 }
 
 const slotLabels: Record<string, string> = {
-  HEADER: "Header (728x90)",
-  SIDEBAR: "Sidebar (300x250)",
-  IN_ARTICLE: "In-Article",
+  HEADER: "Header Banner",
+  SIDEBAR: "Sidebar",
+  IN_ARTICLE: "Dalam Artikel",
   FOOTER: "Footer",
-  POPUP: "Popup",
+  BETWEEN_SECTIONS: "Antar Seksi",
+  POPUP: "Pop-up",
   FLOATING_BOTTOM: "Floating Bottom",
+};
+
+const typeLabels: Record<string, string> = {
+  IMAGE: "Gambar",
+  GIF: "GIF Animasi",
+  HTML: "Kode HTML",
 };
 
 function formatDate(dateStr: string): string {
@@ -174,7 +181,7 @@ export default function IklanPage() {
           throw new Error(json.error || "Gagal mengupdate iklan");
         }
 
-        alert("Iklan berhasil diupdate.");
+        alert("Iklan berhasil diperbarui");
       } else {
         const res = await fetch("/api/ads", {
           method: "POST",
@@ -187,7 +194,7 @@ export default function IklanPage() {
           throw new Error(json.error || "Gagal menambah iklan");
         }
 
-        alert("Iklan berhasil ditambahkan.");
+        alert("Iklan berhasil ditambahkan");
       }
 
       setShowModal(false);
@@ -202,7 +209,7 @@ export default function IklanPage() {
   }
 
   async function handleDelete(id: string, name: string) {
-    if (!confirm(`Yakin ingin menghapus iklan "${name}"?`)) {
+    if (!confirm("Apakah Anda yakin ingin menghapus iklan ini? Tindakan ini tidak dapat dibatalkan.")) {
       return;
     }
 
@@ -215,7 +222,7 @@ export default function IklanPage() {
         throw new Error(json.error || "Gagal menghapus iklan");
       }
 
-      alert("Iklan berhasil dihapus.");
+      alert("Iklan berhasil dihapus");
       fetchAds();
     } catch (err) {
       alert(err instanceof Error ? err.message : "Gagal menghapus iklan.");
@@ -247,7 +254,14 @@ export default function IklanPage() {
 
       {error && (
         <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4 text-center text-sm text-red-700">
-          {error}
+          <p>{error}</p>
+          <button
+            onClick={fetchAds}
+            className="mt-2 rounded-[12px] bg-red-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-red-700"
+            aria-label="Coba muat ulang daftar iklan"
+          >
+            Coba Lagi
+          </button>
         </div>
       )}
 
@@ -259,7 +273,7 @@ export default function IklanPage() {
           <div className="mb-6 grid grid-cols-3 gap-4">
             <div className="rounded-[12px] border border-border bg-surface p-4 shadow-card">
               <div className="flex items-center gap-2 text-sm text-txt-secondary">
-                <Eye size={16} className="text-blue-500" /> Total Impressions
+                <Eye size={16} className="text-blue-500" /> Total Tayangan
               </div>
               <p className="mt-1 text-2xl font-bold text-txt-primary">
                 {totalImpressions.toLocaleString("id-ID")}
@@ -267,7 +281,7 @@ export default function IklanPage() {
             </div>
             <div className="rounded-[12px] border border-border bg-surface p-4 shadow-card">
               <div className="flex items-center gap-2 text-sm text-txt-secondary">
-                <MousePointer size={16} className="text-goto-green" /> Total Clicks
+                <MousePointer size={16} className="text-goto-green" /> Total Klik
               </div>
               <p className="mt-1 text-2xl font-bold text-txt-primary">
                 {totalClicks.toLocaleString("id-ID")}
@@ -275,7 +289,7 @@ export default function IklanPage() {
             </div>
             <div className="rounded-[12px] border border-border bg-surface p-4 shadow-card">
               <div className="flex items-center gap-2 text-sm text-txt-secondary">
-                <BarChart3 size={16} className="text-purple-500" /> Avg. CTR
+                <BarChart3 size={16} className="text-purple-500" /> Rata-rata CTR
               </div>
               <p className="mt-1 text-2xl font-bold text-txt-primary">{avgCtr}%</p>
             </div>
@@ -290,8 +304,8 @@ export default function IklanPage() {
                     <th className="px-5 py-3 text-left font-medium text-txt-secondary">Nama Iklan</th>
                     <th className="px-5 py-3 text-left font-medium text-txt-secondary">Posisi</th>
                     <th className="px-5 py-3 text-left font-medium text-txt-secondary">Periode</th>
-                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">Impressions</th>
-                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">Clicks</th>
+                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">Tayangan</th>
+                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">Klik</th>
                     <th className="px-5 py-3 text-left font-medium text-txt-secondary">CTR</th>
                     <th className="px-5 py-3 text-left font-medium text-txt-secondary">Status</th>
                     <th className="px-5 py-3 text-right font-medium text-txt-secondary">Aksi</th>
@@ -306,7 +320,7 @@ export default function IklanPage() {
                       <tr key={ad.id} className="hover:bg-surface-secondary">
                         <td className="px-5 py-3">
                           <p className="font-medium text-txt-primary">{ad.name}</p>
-                          <p className="text-xs text-txt-muted">{ad.type}</p>
+                          <p className="text-xs text-txt-muted">{typeLabels[ad.type] || ad.type}</p>
                         </td>
                         <td className="px-5 py-3">
                           <span className="rounded bg-surface-tertiary px-2 py-0.5 text-xs font-medium text-txt-secondary">
@@ -387,10 +401,11 @@ export default function IklanPage() {
                 value={formType}
                 onChange={(e) => setFormType(e.target.value)}
                 className="input w-full"
+                aria-label="Tipe iklan"
               >
-                <option value="IMAGE">IMAGE</option>
-                <option value="GIF">GIF</option>
-                <option value="HTML">HTML</option>
+                <option value="IMAGE">Gambar</option>
+                <option value="GIF">GIF Animasi</option>
+                <option value="HTML">Kode HTML</option>
               </select>
               <select
                 value={formSlot}

@@ -17,6 +17,15 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const roleLabelsMap: Record<string, string> = {
+  SUPER_ADMIN: "Super Admin",
+  CHIEF_EDITOR: "Editor Kepala",
+  EDITOR: "Editor",
+  SENIOR_JOURNALIST: "Jurnalis Senior",
+  JOURNALIST: "Jurnalis",
+  CONTRIBUTOR: "Kontributor",
+};
+
 const menuItems = [
   { name: "Dashboard", href: "/panel/dashboard", icon: LayoutDashboard },
   { name: "Artikel", href: "/panel/artikel", icon: FileText },
@@ -90,7 +99,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
               {session.user.name}
             </p>
             <p className="text-xs text-white/50">
-              {session.user.role.replace(/_/g, " ")}
+              {roleLabelsMap[session.user.role] || session.user.role.replace(/_/g, " ")}
             </p>
           </div>
         </div>
@@ -106,6 +115,10 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           <div
             className="fixed inset-0 z-40 bg-black/50 lg:hidden"
             onClick={() => setSidebarOpen(false)}
+            aria-label="Tutup menu"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setSidebarOpen(false); }}
           />
         )}
 
@@ -121,6 +134,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           <button
             onClick={() => setSidebarOpen(false)}
             className="absolute right-3 top-4 rounded-lg p-1 text-white/60 hover:text-white lg:hidden"
+            aria-label="Tutup sidebar"
           >
             <X size={20} />
           </button>
@@ -134,6 +148,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             <button
               onClick={() => setSidebarOpen(true)}
               className="rounded-lg p-1.5 text-txt-primary hover:bg-surface-secondary"
+              aria-label="Buka menu navigasi"
             >
               <Menu size={22} />
             </button>

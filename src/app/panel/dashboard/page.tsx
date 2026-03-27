@@ -1,7 +1,8 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import {
   FileText,
   Eye,
@@ -9,6 +10,8 @@ import {
   CheckCircle,
   AlertTriangle,
   TrendingUp,
+  Users,
+  Megaphone,
 } from "lucide-react";
 
 interface Article {
@@ -40,9 +43,9 @@ const statusColors: Record<string, string> = {
 };
 
 const statusLabels: Record<string, string> = {
-  PUBLISHED: "Dipublikasikan",
-  IN_REVIEW: "Dalam Review",
-  DRAFT: "Draft",
+  PUBLISHED: "Dipublikasi",
+  IN_REVIEW: "Menunggu Review",
+  DRAFT: "Draf",
   REJECTED: "Ditolak",
   APPROVED: "Disetujui",
   ARCHIVED: "Diarsipkan",
@@ -105,8 +108,7 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<StatsItem[]>([]);
   const [recentArticles, setRecentArticles] = useState<Article[]>([]);
 
-  useEffect(() => {
-    async function fetchData() {
+  const fetchData = useCallback(async () => {
       try {
         setLoading(true);
         setError(null);
@@ -146,11 +148,11 @@ export default function DashboardPage() {
 
         setStats([
           { label: "Total Artikel", value: formatNumber(totalArticles), icon: FileText, color: "text-blue-500 bg-blue-50" },
-          { label: "Total Views", value: formatNumber(totalViews), icon: Eye, color: "text-goto-green bg-goto-light" },
+          { label: "Total Tayangan", value: formatNumber(totalViews), icon: Eye, color: "text-goto-green bg-goto-light" },
           { label: "Menunggu Review", value: pendingReview.toString(), icon: Clock, color: "text-yellow-500 bg-yellow-50" },
-          { label: "Dipublikasikan", value: formatNumber(published), icon: CheckCircle, color: "text-goto-green bg-goto-light" },
+          { label: "Dipublikasi", value: formatNumber(published), icon: CheckCircle, color: "text-goto-green bg-goto-light" },
           { label: "Laporan Masuk", value: reportsPending.toString(), icon: AlertTriangle, color: "text-red-500 bg-red-50" },
-          { label: "Views Hari Ini", value: formatNumber(todayViews), icon: TrendingUp, color: "text-purple-500 bg-purple-50" },
+          { label: "Tayangan Hari Ini", value: formatNumber(todayViews), icon: TrendingUp, color: "text-purple-500 bg-purple-50" },
         ]);
 
         // Recent articles (last 5 by createdAt)
@@ -164,10 +166,11 @@ export default function DashboardPage() {
       } finally {
         setLoading(false);
       }
-    }
-
-    fetchData();
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   if (loading) {
     return (
@@ -197,7 +200,14 @@ export default function DashboardPage() {
           </p>
         </div>
         <div className="rounded-[12px] border border-red-200 bg-red-50 p-6 text-center text-red-700">
-          {error}
+          <p>{error}</p>
+          <button
+            onClick={fetchData}
+            className="mt-3 rounded-[12px] bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+            aria-label="Coba muat ulang data"
+          >
+            Coba Lagi
+          </button>
         </div>
       </div>
     );
@@ -284,42 +294,62 @@ export default function DashboardPage() {
             </h2>
           </div>
           <div className="grid grid-cols-2 gap-3 p-5">
-            <a
+            <Link
               href="/panel/artikel/baru"
               className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
+              aria-label="Tulis artikel baru"
             >
               <FileText size={24} className="text-goto-green" />
               <span className="text-sm font-medium text-txt-secondary">
                 Tulis Artikel Baru
               </span>
-            </a>
-            <a
-              href="/panel/artikel"
-              className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
-            >
-              <Clock size={24} className="text-yellow-500" />
-              <span className="text-sm font-medium text-txt-secondary">
-                Review Artikel
-              </span>
-            </a>
-            <a
-              href="/panel/statistik"
-              className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
-            >
-              <TrendingUp size={24} className="text-goto-green" />
-              <span className="text-sm font-medium text-txt-secondary">
-                Lihat Statistik
-              </span>
-            </a>
-            <a
+            </Link>
+            {["SUPER_ADMIN", "CHIEF_EDITOR", "EDITOR"].includes(session?.user?.role || "") && (
+              <Link
+                href="/panel/artikel"
+                className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
+                aria-label="Review artikel"
+              >
+                <Clock size={24} className="text-yellow-500" />
+                <span className="text-sm font-medium text-txt-secondary">
+                  Review Artikel
+                </span>
+              </Link>
+            )}
+            <Link
               href="/panel/laporan"
               className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
+              aria-label="Cek laporan masuk"
             >
               <AlertTriangle size={24} className="text-red-500" />
               <span className="text-sm font-medium text-txt-secondary">
                 Cek Laporan
               </span>
-            </a>
+            </Link>
+            {["SUPER_ADMIN", "CHIEF_EDITOR"].includes(session?.user?.role || "") && (
+              <>
+                <Link
+                  href="/panel/pengguna"
+                  className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
+                  aria-label="Kelola pengguna"
+                >
+                  <Users size={24} className="text-purple-500" />
+                  <span className="text-sm font-medium text-txt-secondary">
+                    Kelola Pengguna
+                  </span>
+                </Link>
+                <Link
+                  href="/panel/iklan"
+                  className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
+                  aria-label="Kelola iklan"
+                >
+                  <Megaphone size={24} className="text-blue-500" />
+                  <span className="text-sm font-medium text-txt-secondary">
+                    Kelola Iklan
+                  </span>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -19,16 +19,18 @@ interface Report {
 }
 
 const reasonLabels: Record<string, { label: string; color: string }> = {
-  HOAX: { label: "Hoax", color: "bg-red-50 text-red-600" },
+  HOAX: { label: "Berita Palsu/Hoax", color: "bg-red-50 text-red-600" },
+  MISLEADING: { label: "Menyesatkan", color: "bg-yellow-50 text-yellow-600" },
   INACCURATE: { label: "Tidak Akurat", color: "bg-yellow-50 text-yellow-600" },
   SARA: { label: "SARA", color: "bg-orange-50 text-orange-600" },
+  PLAGIARISM: { label: "Plagiarisme", color: "bg-blue-50 text-blue-600" },
   DEFAMATION: { label: "Pencemaran Nama Baik", color: "bg-purple-50 text-purple-600" },
   OTHER: { label: "Lainnya", color: "bg-surface-tertiary text-txt-secondary" },
 };
 
 const statusConfig: Record<string, { label: string; icon: React.ElementType; color: string }> = {
   PENDING: { label: "Menunggu", icon: Clock, color: "text-yellow-600" },
-  REVIEWED: { label: "Sedang Ditinjau", icon: Eye, color: "text-goto-green" },
+  REVIEWED: { label: "Ditinjau", icon: Eye, color: "text-goto-green" },
   RESOLVED: { label: "Selesai", icon: CheckCircle, color: "text-goto-green" },
   DISMISSED: { label: "Ditolak", icon: XCircle, color: "text-txt-muted" },
 };
@@ -97,6 +99,11 @@ export default function LaporanPage() {
   }, [fetchReports]);
 
   async function handleUpdateStatus(id: string, newStatus: string) {
+    const statusLabel = statusConfig[newStatus]?.label || newStatus;
+    if (!confirm(`Apakah Anda yakin ingin mengubah status laporan menjadi "${statusLabel}"?`)) {
+      return;
+    }
+
     try {
       setUpdating(id);
       const res = await fetch(`/api/reports/${id}`, {
@@ -110,7 +117,7 @@ export default function LaporanPage() {
         throw new Error(json.error || "Gagal mengubah status laporan");
       }
 
-      alert(`Laporan berhasil diubah ke status: ${statusConfig[newStatus]?.label || newStatus}`);
+      alert(`Status laporan berhasil diubah menjadi: ${statusConfig[newStatus]?.label || newStatus}`);
       fetchReports();
     } catch (err) {
       alert(err instanceof Error ? err.message : "Gagal mengubah status laporan.");
@@ -135,7 +142,14 @@ export default function LaporanPage() {
 
       {error && (
         <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4 text-center text-sm text-red-700">
-          {error}
+          <p>{error}</p>
+          <button
+            onClick={fetchReports}
+            className="mt-2 rounded-[12px] bg-red-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-red-700"
+            aria-label="Coba muat ulang daftar laporan"
+          >
+            Coba Lagi
+          </button>
         </div>
       )}
 
@@ -206,6 +220,7 @@ export default function LaporanPage() {
                             onClick={() => handleUpdateStatus(report.id, "REVIEWED")}
                             disabled={updating === report.id}
                             className="rounded-[12px] bg-goto-light px-3 py-1.5 text-xs font-medium text-goto-green hover:bg-goto-green/20 disabled:opacity-50"
+                            aria-label="Tinjau laporan"
                           >
                             {updating === report.id ? "..." : "Tinjau"}
                           </button>
@@ -213,6 +228,7 @@ export default function LaporanPage() {
                             onClick={() => handleUpdateStatus(report.id, "DISMISSED")}
                             disabled={updating === report.id}
                             className="rounded-[12px] bg-surface-tertiary px-3 py-1.5 text-xs font-medium text-txt-secondary hover:bg-border disabled:opacity-50"
+                            aria-label="Tolak laporan"
                           >
                             {updating === report.id ? "..." : "Tolak"}
                           </button>

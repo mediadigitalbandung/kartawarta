@@ -112,6 +112,10 @@ export default function EditArticlePage() {
     try {
       setLoading(true);
       const res = await fetch(`/api/articles/${articleId}`);
+      if (res.status === 404) {
+        setError("Artikel tidak ditemukan");
+        return;
+      }
       if (!res.ok) {
         setError("Gagal memuat artikel");
         return;
@@ -170,8 +174,9 @@ export default function EditArticlePage() {
     setError("");
 
     if (!title.trim()) return setError("Judul wajib diisi");
-    if (!content.trim() || content.length < 50) return setError("Konten minimal 50 karakter");
-    if (!categoryId) return setError("Kategori wajib dipilih");
+    if (!content.trim()) return setError("Konten tidak boleh kosong");
+    if (content.length < 50) return setError("Konten minimal 50 karakter");
+    if (!categoryId) return setError("Kategori harus dipilih");
 
     if (status !== "DRAFT" && !allChecked) {
       setShowChecklist(true);
@@ -213,6 +218,7 @@ export default function EditArticlePage() {
         return;
       }
 
+      alert("Artikel berhasil diperbarui");
       router.push("/panel/artikel");
       router.refresh();
     } catch {
@@ -239,7 +245,9 @@ export default function EditArticlePage() {
             Edit Artikel
           </h1>
           <p className="text-sm text-txt-secondary">
-            Status saat ini: <span className="font-medium text-gold">{currentStatus.replace(/_/g, " ")}</span>
+            Status saat ini: <span className="font-medium text-gold">{
+              { DRAFT: "Draf", IN_REVIEW: "Menunggu Review", APPROVED: "Disetujui", PUBLISHED: "Dipublikasi", REJECTED: "Ditolak", ARCHIVED: "Diarsipkan" }[currentStatus] || currentStatus.replace(/_/g, " ")
+            }</span>
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -456,11 +464,12 @@ export default function EditArticlePage() {
               value={verificationLabel}
               onChange={(e) => setVerificationLabel(e.target.value)}
               className="input w-full"
+              aria-label="Label verifikasi artikel"
             >
-              <option value="UNVERIFIED">Belum Diverifikasi</option>
-              <option value="VERIFIED">Terverifikasi</option>
-              <option value="OPINION">Opini</option>
-              <option value="CORRECTION">Koreksi</option>
+              <option value="UNVERIFIED">Belum Diverifikasi — Belum dicek kebenarannya</option>
+              <option value="VERIFIED">Terverifikasi — Fakta sudah dikonfirmasi</option>
+              <option value="OPINION">Opini — Artikel berisi pendapat penulis</option>
+              <option value="CORRECTION">Koreksi — Perbaikan atas artikel sebelumnya</option>
             </select>
           </div>
 

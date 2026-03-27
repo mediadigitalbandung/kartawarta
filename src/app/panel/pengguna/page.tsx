@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, FormEvent } from "react";
+import { useSession } from "next-auth/react";
 import {
   Plus,
   Search,
@@ -10,6 +11,7 @@ import {
   UserCheck,
   UserX,
   Mail,
+  ShieldAlert,
 } from "lucide-react";
 
 interface User {
@@ -61,6 +63,7 @@ function LoadingSkeleton() {
 }
 
 export default function PenggunaPage() {
+  const { data: session } = useSession();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -159,7 +162,7 @@ export default function PenggunaPage() {
           throw new Error(json.error || "Gagal mengupdate pengguna");
         }
 
-        alert("Pengguna berhasil diupdate.");
+        alert("Pengguna berhasil diperbarui");
       } else {
         // Create new user
         const res = await fetch("/api/users", {
@@ -179,7 +182,7 @@ export default function PenggunaPage() {
           throw new Error(json.error || "Gagal menambah pengguna");
         }
 
-        alert("Pengguna berhasil ditambahkan.");
+        alert("Pengguna berhasil ditambahkan");
       }
 
       setShowModal(false);
@@ -194,7 +197,7 @@ export default function PenggunaPage() {
   }
 
   async function handleDelete(id: string, name: string) {
-    if (!confirm(`Yakin ingin menghapus pengguna "${name}"? Tindakan ini tidak bisa dibatalkan.`)) {
+    if (!confirm("Apakah Anda yakin ingin menghapus pengguna ini?")) {
       return;
     }
 
@@ -207,7 +210,7 @@ export default function PenggunaPage() {
         throw new Error(json.error || "Gagal menghapus pengguna");
       }
 
-      alert("Pengguna berhasil dihapus.");
+      alert("Pengguna berhasil dihapus");
       fetchUsers();
     } catch (err) {
       alert(err instanceof Error ? err.message : "Gagal menghapus pengguna.");
@@ -222,6 +225,18 @@ export default function PenggunaPage() {
       u.name.toLowerCase().includes(search.toLowerCase()) ||
       u.email.toLowerCase().includes(search.toLowerCase())
   );
+
+  if (session && session.user.role !== "SUPER_ADMIN") {
+    return (
+      <div className="flex min-h-[40vh] flex-col items-center justify-center text-center">
+        <ShieldAlert size={48} className="mb-4 text-red-400" />
+        <h1 className="text-xl font-bold text-txt-primary">Akses Ditolak</h1>
+        <p className="mt-2 text-sm text-txt-secondary">
+          Halaman ini hanya dapat diakses oleh Super Admin.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -252,7 +267,14 @@ export default function PenggunaPage() {
 
       {error && (
         <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4 text-center text-sm text-red-700">
-          {error}
+          <p>{error}</p>
+          <button
+            onClick={fetchUsers}
+            className="mt-2 rounded-[12px] bg-red-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-red-700"
+            aria-label="Coba muat ulang daftar pengguna"
+          >
+            Coba Lagi
+          </button>
         </div>
       )}
 
@@ -368,15 +390,21 @@ export default function PenggunaPage() {
                 required
                 className="input w-full"
               />
-              <input
-                type="password"
-                placeholder={editingUser ? "Password baru (kosongkan jika tidak diubah)" : "Password (min. 8 karakter)"}
-                value={formPassword}
-                onChange={(e) => setFormPassword(e.target.value)}
-                required={!editingUser}
-                minLength={8}
-                className="input w-full"
-              />
+              <div>
+                <input
+                  type="password"
+                  placeholder={editingUser ? "Password baru" : "Password (min. 8 karakter)"}
+                  value={formPassword}
+                  onChange={(e) => setFormPassword(e.target.value)}
+                  required={!editingUser}
+                  minLength={8}
+                  className="input w-full"
+                  aria-label="Password"
+                />
+                {editingUser && (
+                  <p className="mt-1 text-xs text-txt-muted">Kosongkan jika tidak ingin mengubah password</p>
+                )}
+              </div>
               <select
                 value={formRole}
                 onChange={(e) => setFormRole(e.target.value)}

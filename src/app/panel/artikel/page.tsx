@@ -30,9 +30,9 @@ interface Article {
 }
 
 const statusConfig: Record<string, { label: string; icon: React.ElementType; color: string }> = {
-  PUBLISHED: { label: "Dipublikasikan", icon: CheckCircle, color: "bg-goto-light text-goto-green" },
-  IN_REVIEW: { label: "Dalam Review", icon: Clock, color: "bg-yellow-50 text-yellow-600" },
-  DRAFT: { label: "Draft", icon: FileText, color: "bg-surface-tertiary text-txt-secondary" },
+  PUBLISHED: { label: "Dipublikasi", icon: CheckCircle, color: "bg-goto-light text-goto-green" },
+  IN_REVIEW: { label: "Menunggu Review", icon: Clock, color: "bg-yellow-50 text-yellow-600" },
+  DRAFT: { label: "Draf", icon: FileText, color: "bg-surface-tertiary text-txt-secondary" },
   APPROVED: { label: "Disetujui", icon: CheckCircle, color: "bg-blue-50 text-blue-600" },
   REJECTED: { label: "Ditolak", icon: XCircle, color: "bg-red-50 text-red-600" },
   ARCHIVED: { label: "Diarsipkan", icon: FileText, color: "bg-surface-tertiary text-txt-muted" },
@@ -100,7 +100,7 @@ export default function ArtikelPage() {
   }, [fetchArticles]);
 
   async function handleDelete(id: string, title: string) {
-    if (!confirm(`Yakin ingin menghapus artikel "${title}"? Tindakan ini tidak bisa dibatalkan.`)) {
+    if (!confirm(`Apakah Anda yakin ingin menghapus artikel ini? Tindakan ini tidak dapat dibatalkan.`)) {
       return;
     }
 
@@ -113,7 +113,7 @@ export default function ArtikelPage() {
         throw new Error(json.error || "Gagal menghapus artikel");
       }
 
-      alert("Artikel berhasil dihapus.");
+      alert("Artikel berhasil dihapus");
       fetchArticles();
     } catch (err) {
       alert(err instanceof Error ? err.message : "Gagal menghapus artikel.");
@@ -177,7 +177,14 @@ export default function ArtikelPage() {
 
       {error && (
         <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4 text-center text-sm text-red-700">
-          {error}
+          <p>{error}</p>
+          <button
+            onClick={fetchArticles}
+            className="mt-2 rounded-[12px] bg-red-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-red-700"
+            aria-label="Coba muat ulang daftar artikel"
+          >
+            Coba Lagi
+          </button>
         </div>
       )}
 
@@ -235,6 +242,7 @@ export default function ArtikelPage() {
                               onClick={() => router.push(`/berita/${article.slug}`)}
                               className="btn-ghost rounded p-1"
                               title="Lihat"
+                              aria-label="Lihat artikel"
                             >
                               <Eye size={16} />
                             </button>
@@ -242,6 +250,7 @@ export default function ArtikelPage() {
                               onClick={() => router.push(`/panel/artikel/${article.id}/edit`)}
                               className="btn-ghost rounded p-1"
                               title="Edit"
+                              aria-label="Edit artikel"
                             >
                               <Edit size={16} />
                             </button>
@@ -250,6 +259,7 @@ export default function ArtikelPage() {
                               disabled={deleting === article.id}
                               className="btn-ghost rounded p-1 hover:text-red-500 disabled:opacity-50"
                               title="Hapus"
+                              aria-label="Hapus artikel"
                             >
                               <Trash2 size={16} />
                             </button>
