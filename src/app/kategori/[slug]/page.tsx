@@ -133,24 +133,66 @@ export default async function CategoryPage({ params }: { params: { slug: string 
           <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
         </div>
 
-        {/* Headline Slider — top 5 articles */}
+        {/* Headline — 1 large slider + 2 side cards */}
         {articles.length >= 3 && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+            {/* Left: Main headline slider */}
+            <div className="lg:col-span-2">
+              <HeadlineSlider items={JSON.parse(JSON.stringify(articles.slice(0, 5)))} />
+            </div>
+            {/* Right: 2 stacked article cards */}
+            <div className="flex flex-col gap-4">
+              {articles.slice(5, 7).map((article) => (
+                <ArticleCard key={article.slug} {...article} variant="compact" />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Polling — right below headline */}
+        {categoryPolling[params.slug] && (
           <div className="mb-8">
-            <HeadlineSlider items={JSON.parse(JSON.stringify(articles.slice(0, 5)))} />
+            <div className="flex items-center mb-4">
+              <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
+                <Vote size={18} className="mr-2 text-goto-green" />
+                Polling {category.name}
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {categoryPolling[params.slug].map((poll, idx) => (
+                <div key={idx} className="rounded-[12px] border border-border bg-surface-secondary p-5">
+                  <p className="text-sm font-semibold text-txt-primary mb-4">{poll.question}</p>
+                  <div className="space-y-2.5">
+                    {poll.options.map((opt) => (
+                      <div key={opt.label}>
+                        <div className="flex items-center justify-between text-sm mb-1">
+                          <span className="text-txt-primary text-xs">{opt.label}</span>
+                          <span className="font-bold text-txt-primary text-xs">{opt.percentage}%</span>
+                        </div>
+                        <div className="h-1.5 rounded-full bg-border">
+                          <div className="h-1.5 rounded-full bg-goto-green" style={{ width: `${opt.percentage}%` }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-txt-muted mt-3">{poll.totalVotes.toLocaleString("id-ID")} suara</p>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            {/* Articles grid (skip first 5 used in headline) */}
+            {/* Articles grid (skip headline + side cards) */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              {articles.slice(5, 11).map((article) => (
+              {articles.slice(7, 13).map((article) => (
                 <ArticleCard key={article.slug} {...article} />
               ))}
             </div>
 
             {/* Inline ad between rows */}
-            {articles.length > 11 && (
+            {articles.length > 13 && (
               <div className="my-6">
                 <div className="rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ height: "120px" }}>
                   <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
@@ -160,9 +202,9 @@ export default async function CategoryPage({ params }: { params: { slug: string 
             )}
 
             {/* Remaining articles */}
-            {articles.length > 11 && (
+            {articles.length > 13 && (
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                {articles.slice(11).map((article) => (
+                {articles.slice(13).map((article) => (
                   <ArticleCard key={article.slug} {...article} />
                 ))}
               </div>
@@ -198,41 +240,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
           </div>
         </div>
 
-        {/* Polling — 3 polls per category */}
-        {categoryPolling[params.slug] && (
-          <div className="mt-8">
-            <div className="flex items-center mb-5">
-              <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
-                <Vote size={18} className="mr-2 text-goto-green" />
-                Polling {category.name}
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {categoryPolling[params.slug].map((poll, idx) => (
-                <div key={idx} className="rounded-[12px] border border-border bg-surface-secondary p-5">
-                  <p className="text-sm font-semibold text-txt-primary mb-4">{poll.question}</p>
-                  <div className="space-y-2.5">
-                    {poll.options.map((opt) => (
-                      <div key={opt.label}>
-                        <div className="flex items-center justify-between text-sm mb-1">
-                          <span className="text-txt-primary text-xs">{opt.label}</span>
-                          <span className="font-bold text-txt-primary text-xs">{opt.percentage}%</span>
-                        </div>
-                        <div className="h-1.5 rounded-full bg-border">
-                          <div
-                            className="h-1.5 rounded-full bg-goto-green transition-all"
-                            style={{ width: `${opt.percentage}%` }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-[11px] text-txt-muted mt-3">{poll.totalVotes.toLocaleString("id-ID")} suara</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* (Polling moved above article grid) */}
       </div>
     </div>
   );
