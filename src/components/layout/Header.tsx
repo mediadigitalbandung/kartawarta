@@ -54,14 +54,14 @@ export default function Header() {
           <div className="flex items-center justify-between py-3">
             {/* Logo */}
             <Link href="/" className="group flex shrink-0 items-center gap-2.5">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-goto-green text-xs font-bold text-white">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-goto-green text-sm font-bold text-white">
                 JH
               </span>
               <span className="hidden items-baseline gap-1.5 sm:flex">
-                <span className="text-base font-bold text-white sm:text-lg">
+                <span className="text-lg font-bold text-white sm:text-2xl">
                   Jurnalis Hukum
                 </span>
-                <span className="text-xs text-white/50 sm:text-sm">Bandung</span>
+                <span className="text-sm text-white/50 sm:text-base">Bandung</span>
               </span>
             </Link>
 
@@ -148,7 +148,7 @@ export default function Header() {
               <li key={item.href} className="shrink-0">
                 <Link
                   href={item.href}
-                  className={`relative inline-block px-4 py-3 text-sm font-semibold transition-all duration-200 ${
+                  className={`relative inline-block px-4 py-3 text-base font-semibold transition-all duration-200 ${
                     isActive
                       ? "text-goto-green after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[3px] after:rounded-full after:bg-goto-green"
                       : "text-txt-primary hover:text-goto-green"
@@ -163,7 +163,7 @@ export default function Header() {
             <li className="relative shrink-0">
               <button
                 onClick={() => setMoreOpen(!moreOpen)}
-                className="inline-flex items-center gap-1 px-4 py-3 text-sm font-semibold text-txt-secondary hover:text-goto-green transition-colors"
+                className="inline-flex items-center gap-1 px-4 py-3 text-base font-semibold text-txt-secondary hover:text-goto-green transition-colors"
               >
                 Lainnya
                 <ChevronRight size={14} className={`transition-transform duration-200 ${moreOpen ? "rotate-90" : ""}`} />
