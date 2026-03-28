@@ -289,7 +289,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats grid */}
-      <div className={`mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3 ${isAdmin ? "md:grid-cols-4 lg:grid-cols-6" : "md:grid-cols-4"}`}>
+      <div className={`mb-8 grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4 sm:grid-cols-3 ${isAdmin ? "md:grid-cols-4 lg:grid-cols-6" : "md:grid-cols-4"}`}>
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (

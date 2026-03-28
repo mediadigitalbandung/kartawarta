@@ -164,10 +164,10 @@ export default function RiwayatReviewPage() {
               <thead className="border-b border-border bg-surface-secondary">
                 <tr>
                   <th className="px-5 py-3 text-left font-medium text-txt-secondary">Judul Artikel</th>
-                  <th className="px-5 py-3 text-left font-medium text-txt-secondary">Penulis</th>
+                  <th className="hidden md:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Penulis</th>
                   <th className="px-5 py-3 text-left font-medium text-txt-secondary">Status Akhir</th>
-                  <th className="px-5 py-3 text-left font-medium text-txt-secondary">Catatan Review</th>
-                  <th className="px-5 py-3 text-left font-medium text-txt-secondary">Tanggal Review</th>
+                  <th className="hidden md:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Catatan Review</th>
+                  <th className="hidden md:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Tanggal Review</th>
                   <th className="px-5 py-3 text-right font-medium text-txt-secondary">Aksi</th>
                 </tr>
               </thead>
@@ -180,7 +180,7 @@ export default function RiwayatReviewPage() {
                       <td className="max-w-[250px] px-5 py-3">
                         <p className="truncate font-medium text-txt-primary">{article.title}</p>
                       </td>
-                      <td className="px-5 py-3 text-txt-secondary">
+                      <td className="hidden md:table-cell px-5 py-3 text-txt-secondary">
                         {article.author?.name || "\u2014"}
                       </td>
                       <td className="px-5 py-3">
@@ -201,12 +201,12 @@ export default function RiwayatReviewPage() {
                           {isApproved ? "Disetujui" : isRejected ? "Ditolak" : article.status}
                         </span>
                       </td>
-                      <td className="max-w-[200px] px-5 py-3">
+                      <td className="hidden md:table-cell max-w-[200px] px-5 py-3">
                         <p className="truncate text-txt-secondary text-xs">
                           {article.reviewNote || "\u2014"}
                         </p>
                       </td>
-                      <td className="px-5 py-3 text-txt-secondary">
+                      <td className="hidden md:table-cell px-5 py-3 text-txt-secondary">
                         {article.reviewedAt ? formatDate(article.reviewedAt) : "\u2014"}
                       </td>
                       <td className="px-5 py-3 text-right">

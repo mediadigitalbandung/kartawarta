@@ -136,7 +136,7 @@ export default function StatistikEditorPage() {
           </p>
         </div>
         <div className="animate-pulse">
-          <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div className="mb-6 grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
@@ -181,7 +181,7 @@ export default function StatistikEditorPage() {
       )}
 
       {/* Stats Cards */}
-      <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
         <div className="rounded-[12px] border border-border bg-surface p-4 shadow-card">
           <div className="inline-flex rounded-[12px] bg-blue-50 p-2 text-blue-500">
             <Clock size={18} />

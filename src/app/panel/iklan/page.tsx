@@ -52,7 +52,7 @@ function formatDate(dateStr: string): string {
 function LoadingSkeleton() {
   return (
     <div className="animate-pulse">
-      <div className="mb-6 grid grid-cols-3 gap-4">
+      <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="rounded-[12px] border border-border bg-surface p-4 shadow-card">
             <div className="h-4 w-24 rounded bg-surface-tertiary" />
@@ -280,7 +280,7 @@ export default function IklanPage() {
       ) : (
         <>
           {/* Stats */}
-          <div className="mb-6 grid grid-cols-3 gap-4">
+          <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             <div className="rounded-[12px] border border-border bg-surface p-4 shadow-card">
               <div className="flex items-center gap-2 text-sm text-txt-secondary">
                 <Eye size={16} className="text-blue-500" /> Total Tayangan

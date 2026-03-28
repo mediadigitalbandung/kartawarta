@@ -43,7 +43,7 @@ function formatDate(dateStr: string): string {
 function LoadingSkeleton() {
   return (
     <div className="animate-pulse">
-      <div className="mb-6 grid grid-cols-4 gap-4">
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="rounded-[12px] border border-border bg-surface p-4 shadow-card">
             <div className="h-4 w-24 rounded bg-surface-tertiary" />
@@ -158,7 +158,7 @@ export default function LaporanPage() {
       ) : (
         <>
           {/* Stats */}
-          <div className="mb-6 grid grid-cols-4 gap-4">
+          <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
             {Object.entries(statusConfig).map(([key, config]) => {
               const Icon = config.icon;
               const count = reports.filter((r) => r.status === key).length;

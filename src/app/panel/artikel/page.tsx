@@ -245,7 +245,7 @@ export default function ArtikelPage() {
             <button
               key={status}
               onClick={() => setFilterStatus(status)}
-              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+              className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
                 filterStatus === status
                   ? "bg-goto-green text-white"
                   : "bg-surface-tertiary text-txt-secondary hover:bg-border"

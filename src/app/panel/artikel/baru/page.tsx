@@ -243,7 +243,7 @@ export default function NewArticlePage() {
             </div>
             <div className="space-y-3">
               {sources.map((source, i) => (
-                <div key={i} className="grid grid-cols-2 gap-2 rounded-[12px] border border-border p-3">
+                <div key={i} className="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-[12px] border border-border p-3">
                   <input
                     type="text"
                     placeholder="Nama narasumber *"
