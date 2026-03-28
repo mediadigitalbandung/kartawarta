@@ -137,7 +137,7 @@ export default async function HomePage() {
       <NewsTicker items={tickerItems} />
 
       {/* Banner Ad — Leaderboard (above headline) */}
-      <BannerAd size="leaderboard" className="bg-surface" />
+      <BannerAd size="slim" className="bg-surface" />
 
       {/* Headline News Slider + Breaking News */}
       <section className="bg-surface py-6">
@@ -203,7 +203,7 @@ export default async function HomePage() {
                 <ScrollableContainer maxItems={5} label="Lihat Lebih Banyak Trending" className="flex-1">
                 <div className="space-y-0 divide-y divide-border">
                   {trendingArticles.slice(0, 8).map((article, i) => (
-                    <div key={article.slug} className="group flex items-start gap-4 py-4 first:pt-0">
+                    <div key={article.slug} className="group flex items-start gap-3 sm:gap-4 py-3 sm:py-4 first:pt-0">
                       {/* Rank number */}
                       <span className="shrink-0 w-8 pt-2 text-center text-xl sm:text-2xl lg:text-3xl font-extrabold text-goto-green select-none">
                         {i + 1}
@@ -250,11 +250,11 @@ export default async function HomePage() {
       <div className="bg-surface-secondary py-4">
         <div className="container-main">
           <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
-            <div className="lg:col-span-7 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ height: "150px" }}>
+            <div className="lg:col-span-7 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ height: "100px" }}>
               <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
               <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
             </div>
-            <div className="lg:col-span-3 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ height: "150px" }}>
+            <div className="lg:col-span-3 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ height: "100px" }}>
               <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
               <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
             </div>
@@ -314,11 +314,11 @@ export default async function HomePage() {
           <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-surface-dark mb-5">
             {/* Placeholder — ganti dengan iframe YouTube/embed nanti */}
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-600 shadow-lg shadow-red-600/30 cursor-pointer hover:bg-red-500 transition-colors">
-                <Play size={28} className="text-white ml-1" />
+              <div className="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-red-600 shadow-lg shadow-red-600/30 cursor-pointer hover:bg-red-500 transition-colors">
+                <Play size={24} className="text-white ml-0.5" />
               </div>
-              <p className="mt-4 text-white font-bold text-lg">Sidang Praperadilan Kasus Korupsi Bandung Barat</p>
-              <p className="mt-1 text-white/50 text-sm">PN Bandung &middot; Majelis Hakim: Dr. H. Ahmad S., S.H., M.H.</p>
+              <p className="mt-4 text-white font-bold text-sm sm:text-lg text-center px-4">Sidang Praperadilan Kasus Korupsi Bandung Barat</p>
+              <p className="mt-1 text-white/50 text-xs sm:text-sm text-center px-4">PN Bandung &middot; Majelis Hakim: Dr. H. Ahmad S., S.H., M.H.</p>
               <div className="mt-3 flex items-center gap-2">
                 <span className="flex items-center gap-1.5 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white">
                   <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
