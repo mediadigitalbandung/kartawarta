@@ -142,6 +142,16 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
     fetchNotifications();
   }, [fetchNotifications]);
 
+  // Lock body scroll when mobile sidebar is open
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [sidebarOpen]);
+
   // Close notification dropdown on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -177,7 +187,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   });
 
   const sidebarContent = (
-    <div className="flex h-full flex-col px-3 py-4">
+    <div className="flex h-full flex-col px-3 py-4 overflow-y-auto overscroll-contain">
       <a
         href="/"
         className="mb-4 flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/60 hover:text-white hover:bg-white/5"
@@ -254,7 +264,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         {/* Sidebar — desktop: always visible, mobile: slide-in */}
         <aside
           className={cn(
-            "fixed left-0 top-0 z-50 h-screen w-60 bg-surface-dark pt-16 transition-transform duration-200",
+            "fixed left-0 top-0 z-50 h-[100dvh] w-60 bg-surface-dark pt-16 transition-transform duration-200 overflow-hidden",
             "lg:translate-x-0 lg:z-40",
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           )}
@@ -271,7 +281,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 lg:ml-60">
+        <main className="flex-1 lg:ml-60 min-w-0 overflow-x-hidden">
           {/* Top bar */}
           <div className="sticky top-0 z-30 flex items-center justify-between bg-surface border-b border-border h-14 px-4">
             <div className="flex items-center">
