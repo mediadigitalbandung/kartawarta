@@ -18,7 +18,10 @@ import {
   MessageSquare,
   User,
   Calendar,
+  Loader2,
+  Sparkles,
 } from "lucide-react";
+import ImageUploader from "@/components/editor/ImageUploader";
 
 const RichTextEditor = dynamic(
   () => import("@/components/editor/RichTextEditor"),
@@ -113,6 +116,42 @@ export default function EditArticlePage() {
   });
 
   const allChecked = Object.values(checklist).every(Boolean);
+
+  const [aiLoading, setAiLoading] = useState<Record<string, boolean>>({});
+
+  const generateAI = async (feature: string, setter: (val: string) => void) => {
+    if (!title.trim() || !content.trim()) return;
+    setAiLoading((prev) => ({ ...prev, [feature]: true }));
+    try {
+      const res = await fetch("/api/ai/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ feature, title, content }),
+      });
+      const data = await res.json();
+      if (data.success && data.data?.result) {
+        setter(data.data.result);
+      } else {
+        setError(data.error || "Gagal generate AI");
+      }
+    } catch {
+      setError("Gagal menghubungi AI service");
+    } finally {
+      setAiLoading((prev) => ({ ...prev, [feature]: false }));
+    }
+  };
+
+  const AiButton = ({ feature, setter }: { feature: string; setter: (val: string) => void }) => (
+    <button
+      type="button"
+      onClick={() => generateAI(feature, setter)}
+      disabled={!title.trim() || !content.trim() || aiLoading[feature]}
+      className="flex items-center gap-1 text-xs text-goto-green hover:underline disabled:opacity-40 disabled:no-underline"
+    >
+      {aiLoading[feature] ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+      Generate AI
+    </button>
+  );
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -564,7 +603,10 @@ export default function EditArticlePage() {
             {showSeo && (
               <div className="space-y-3 border-t border-border px-6 py-4">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-txt-primary">SEO Title ({seoTitle.length}/70)</label>
+                  <div className="mb-1 flex items-center justify-between">
+                    <label className="text-sm font-medium text-txt-primary">SEO Title ({seoTitle.length}/70)</label>
+                    <AiButton feature="seo_title" setter={setSeoTitle} />
+                  </div>
                   <input
                     type="text"
                     value={seoTitle}
@@ -575,7 +617,10 @@ export default function EditArticlePage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-txt-primary">Meta Description ({seoDescription.length}/160)</label>
+                  <div className="mb-1 flex items-center justify-between">
+                    <label className="text-sm font-medium text-txt-primary">Meta Description ({seoDescription.length}/160)</label>
+                    <AiButton feature="meta_description" setter={setSeoDescription} />
+                  </div>
                   <textarea
                     value={seoDescription}
                     onChange={(e) => setSeoDescription(e.target.value)}
@@ -613,7 +658,10 @@ export default function EditArticlePage() {
 
           {/* Tags */}
           <div className="rounded-[12px] border border-border bg-surface p-6">
-            <label className="mb-2 block text-sm font-medium text-txt-primary">Tags</label>
+            <div className="mb-2 flex items-center justify-between">
+              <label className="text-sm font-medium text-txt-primary">Tags</label>
+              <AiButton feature="tags" setter={setTags} />
+            </div>
             <input
               type="text"
               value={tags}
@@ -626,7 +674,10 @@ export default function EditArticlePage() {
 
           {/* Excerpt */}
           <div className="rounded-[12px] border border-border bg-surface p-6">
-            <label className="mb-2 block text-sm font-medium text-txt-primary">Ringkasan</label>
+            <div className="mb-2 flex items-center justify-between">
+              <label className="text-sm font-medium text-txt-primary">Ringkasan</label>
+              <AiButton feature="summary" setter={setExcerpt} />
+            </div>
             <textarea
               value={excerpt}
               onChange={(e) => setExcerpt(e.target.value)}
@@ -642,13 +693,28 @@ export default function EditArticlePage() {
             <label className="mb-2 block text-sm font-medium text-txt-primary">
               Gambar Utama
             </label>
-            <input
-              type="url"
-              value={featuredImage}
-              onChange={(e) => setFeaturedImage(e.target.value)}
-              placeholder="URL gambar utama"
-              className="input w-full"
+            <ImageUploader
+              onUpload={(url: string) => setFeaturedImage(url)}
+              currentImage={featuredImage}
             />
+            <div className="mt-2">
+              <input
+                type="url"
+                value={featuredImage}
+                onChange={(e) => setFeaturedImage(e.target.value)}
+                placeholder="Atau paste URL gambar"
+                className="input w-full text-xs"
+              />
+            </div>
+            {featuredImage && !featuredImage.startsWith("data:") && (
+              <img
+                src={featuredImage}
+                alt="Preview"
+                className="mt-2 w-full rounded-[8px] object-cover"
+                style={{ maxHeight: 200 }}
+                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+              />
+            )}
           </div>
 
           {/* Verification Label */}

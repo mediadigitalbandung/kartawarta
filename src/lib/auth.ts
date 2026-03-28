@@ -130,7 +130,9 @@ export const authOptions: NextAuthOptions = {
       session.user.sessionId = token.sessionId;
       if (token.name) session.user.name = token.name as string;
       // Pass login attempt warning to client
-      (session as Record<string, unknown>).loginAttempt = !!(token as Record<string, unknown>).loginAttempt;
+      const sess = session as unknown as { loginAttempt?: boolean };
+      const tok = token as unknown as { loginAttempt?: boolean };
+      sess.loginAttempt = !!tok.loginAttempt;
       return session;
     },
   },

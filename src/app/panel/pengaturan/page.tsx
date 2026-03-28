@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import { Settings, Save, CheckCircle } from "lucide-react";
+import { Settings, Save, CheckCircle, Bot, Eye, EyeOff } from "lucide-react";
 
 interface SiteSettings {
   siteName: string;
@@ -42,7 +42,13 @@ export default function PengaturanPage() {
 
   const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
   const [toast, setToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("Pengaturan berhasil disimpan");
   const [loaded, setLoaded] = useState(false);
+
+  // AI settings state
+  const [aiApiKey, setAiApiKey] = useState("");
+  const [aiKeyVisible, setAiKeyVisible] = useState(false);
+  const [aiSaving, setAiSaving] = useState(false);
 
   // Redirect non-super-admin
   if (sessionStatus !== "loading" && session && userRole !== "SUPER_ADMIN") {
@@ -59,12 +65,47 @@ export default function PengaturanPage() {
       // Ignore parse errors
     }
     setLoaded(true);
+
+    // Load AI API key from server
+    fetch("/api/settings")
+      .then((res) => res.ok ? res.json() : null)
+      .then((json) => {
+        if (json?.data?.deepseek_api_key) {
+          setAiApiKey(json.data.deepseek_api_key);
+        }
+      })
+      .catch(() => {});
   }, []);
+
+  const showToast = (message: string) => {
+    setToastMessage(message);
+    setToast(true);
+    setTimeout(() => setToast(false), 3000);
+  };
 
   const handleSave = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-    setToast(true);
-    setTimeout(() => setToast(false), 3000);
+    showToast("Pengaturan berhasil disimpan");
+  };
+
+  const handleSaveAiKey = async () => {
+    setAiSaving(true);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: "deepseek_api_key", value: aiApiKey }),
+      });
+      if (res.ok) {
+        showToast("API Key berhasil disimpan");
+      } else {
+        showToast("Gagal menyimpan API Key");
+      }
+    } catch {
+      showToast("Gagal menyimpan API Key");
+    } finally {
+      setAiSaving(false);
+    }
   };
 
   const updateField = <K extends keyof SiteSettings>(
@@ -89,7 +130,7 @@ export default function PengaturanPage() {
         <div className="fixed right-4 top-20 z-50 flex items-center gap-2 rounded-[12px] border border-goto-green/20 bg-goto-50 px-5 py-3 shadow-lg">
           <CheckCircle size={18} className="text-goto-green" />
           <span className="text-sm font-medium text-goto-green">
-            Pengaturan berhasil disimpan
+            {toastMessage}
           </span>
         </div>
       )}
@@ -291,6 +332,60 @@ export default function PengaturanPage() {
                       : "translate-x-0.5"
                   } mt-0.5`}
                 />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Konfigurasi AI */}
+        <div className="rounded-[12px] border border-border bg-surface p-5 shadow-card">
+          <div className="mb-4 flex items-center gap-2">
+            <Bot size={20} className="text-goto-green" />
+            <h2 className="text-lg font-semibold text-txt-primary">
+              Konfigurasi AI
+            </h2>
+          </div>
+          <div className="space-y-4">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-txt-primary">
+                DeepSeek API Key
+              </label>
+              <div className="relative">
+                <input
+                  type={aiKeyVisible ? "text" : "password"}
+                  value={aiApiKey}
+                  onChange={(e) => setAiApiKey(e.target.value)}
+                  className="input pr-10"
+                  placeholder="sk-..."
+                />
+                <button
+                  type="button"
+                  onClick={() => setAiKeyVisible(!aiKeyVisible)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-txt-muted hover:text-txt-primary"
+                >
+                  {aiKeyVisible ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              <p className="mt-1 text-xs text-txt-muted">
+                Dapatkan API key dari{" "}
+                <a
+                  href="https://platform.deepseek.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gold hover:underline"
+                >
+                  platform.deepseek.com
+                </a>
+              </p>
+            </div>
+            <div className="flex justify-end">
+              <button
+                onClick={handleSaveAiKey}
+                disabled={aiSaving}
+                className="btn-primary"
+              >
+                <Save size={16} />
+                {aiSaving ? "Menyimpan..." : "Simpan API Key"}
               </button>
             </div>
           </div>

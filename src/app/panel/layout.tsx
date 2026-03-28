@@ -20,6 +20,7 @@ import {
   Bell,
   Settings,
   BarChart3,
+  Sparkles,
   LogOut,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
@@ -55,6 +56,7 @@ const menuItems: MenuItem[] = [
   { name: "Iklan", href: "/panel/iklan", icon: Megaphone, adminOnly: true },
   { name: "Pengguna", href: "/panel/pengguna", icon: Users, adminOnly: true },
   { name: "Statistik", href: "/panel/statistik-editor", icon: BarChart3, editorOnly: true },
+  { name: "Log AI", href: "/panel/ai-log", icon: Sparkles, adminOnly: true },
   { name: "Pengaturan", href: "/panel/pengaturan", icon: Settings, adminOnly: true },
   { name: "Profil", href: "/panel/profil", icon: UserCircle },
 ];
@@ -346,7 +348,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           </div>
 
           {/* Warning: login attempt from another device */}
-          {(session as Record<string, unknown>)?.loginAttempt && (
+          {!!((session as unknown as Record<string, boolean>)?.loginAttempt) && (
             <div className="mx-4 mt-4 sm:mx-6 rounded-[12px] bg-yellow-50 border border-yellow-200 px-4 py-3 flex items-start gap-3">
               <span className="text-yellow-600 mt-0.5">⚠️</span>
               <div>
