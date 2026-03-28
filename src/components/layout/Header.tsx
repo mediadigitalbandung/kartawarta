@@ -149,8 +149,8 @@ export default function Header() {
               </button>
             </div>
           </div>
-          {/* Mobile search bar — hides on scroll */}
-          <div className={`overflow-hidden transition-all duration-300 md:hidden ${scrolled ? "max-h-0 pb-0" : "max-h-14 pb-3"}`}>
+          {/* Mobile search bar — smooth hide on scroll */}
+          <div className={`overflow-hidden md:hidden transition-all duration-500 ease-in-out ${scrolled ? "max-h-0 pb-0 opacity-0 -translate-y-2" : "max-h-14 pb-3 opacity-100 translate-y-0"}`}>
             <form action="/search" className="relative">
               <Search
                 size={16}
