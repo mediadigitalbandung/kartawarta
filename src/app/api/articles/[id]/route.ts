@@ -22,6 +22,7 @@ const updateArticleSchema = z.object({
   status: z.enum(["DRAFT", "IN_REVIEW", "APPROVED", "PUBLISHED", "REJECTED", "ARCHIVED"]).optional(),
   verificationLabel: z.enum(["VERIFIED", "UNVERIFIED", "CORRECTION", "OPINION"]).optional(),
   scheduledAt: z.string().datetime().optional().nullable(),
+  reviewNote: z.string().max(1000).optional().nullable(),
 });
 
 // GET /api/articles/:id
@@ -85,8 +86,8 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { tags: tagNames, sources: sourcesData, ...rawData } = body;
-    const data = updateArticleSchema.parse(rawData);
+    const { tags: tagNames, sources: sourcesData, reviewNote: bodyReviewNote, ...rawData } = body;
+    const data = updateArticleSchema.parse({ ...rawData, reviewNote: bodyReviewNote });
 
     // Handle status changes
     if (data.status) {
@@ -120,16 +121,28 @@ export async function PUT(
       ? calculateReadTime(data.content)
       : undefined;
 
+    // Build review fields when approving/rejecting
+    const reviewFields: Record<string, unknown> = {};
+    if (data.status && ["APPROVED", "REJECTED"].includes(data.status)) {
+      reviewFields.reviewNote = data.reviewNote || null;
+      reviewFields.reviewedBy = session.user.id;
+      reviewFields.reviewedAt = new Date();
+    }
+
+    // Remove reviewNote from data to avoid conflict
+    const { reviewNote: _rn, ...updateData } = data;
+
     const updated = await prisma.article.update({
       where: { id: params.id },
       data: {
-        ...data,
+        ...updateData,
+        ...reviewFields,
         readTime,
         publishedAt:
-          data.status === "PUBLISHED" && !article.publishedAt
+          updateData.status === "PUBLISHED" && !article.publishedAt
             ? new Date()
             : undefined,
-        scheduledAt: data.scheduledAt ? new Date(data.scheduledAt) : undefined,
+        scheduledAt: updateData.scheduledAt ? new Date(updateData.scheduledAt) : undefined,
         // Handle tags: disconnect all, then reconnect
         ...(tagNames && Array.isArray(tagNames) && {
           tags: {

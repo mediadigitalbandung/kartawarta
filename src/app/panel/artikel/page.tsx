@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import {
   Plus,
@@ -28,6 +29,9 @@ interface Article {
   author?: { id: string; name: string; avatar?: string };
   category?: { id: string; name: string; slug: string };
 }
+
+const CREATOR_ROLES = ["JOURNALIST", "SENIOR_JOURNALIST", "CONTRIBUTOR"];
+const EDITOR_ROLES = ["EDITOR", "CHIEF_EDITOR", "SUPER_ADMIN"];
 
 const statusConfig: Record<string, { label: string; icon: React.ElementType; color: string }> = {
   PUBLISHED: { label: "Dipublikasi", icon: CheckCircle, color: "bg-goto-light text-goto-green" },
@@ -65,21 +69,40 @@ function LoadingSkeleton() {
 
 export default function ArtikelPage() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const userRole = session?.user?.role || "";
+  const userId = session?.user?.id || "";
+  const isEditor = EDITOR_ROLES.includes(userRole);
+  const isCreator = CREATOR_ROLES.includes(userRole);
+
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const [filterStatus, setFilterStatus] = useState("ALL");
+  // Editors default to IN_REVIEW, creators default to ALL
+  const [filterStatus, setFilterStatus] = useState(isEditor ? "IN_REVIEW" : "ALL");
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Update default filter when session loads
+  useEffect(() => {
+    if (isEditor) {
+      setFilterStatus("IN_REVIEW");
+    }
+  }, [isEditor]);
+
   const fetchArticles = useCallback(async () => {
+    if (!session?.user) return;
     try {
       setLoading(true);
       setError(null);
 
-      // Fetch all statuses for the admin panel
-      const statusParam = "ALL";
-      const res = await fetch(`/api/articles?limit=50&status=${statusParam}`);
+      // Creators only see their own articles
+      let url = `/api/articles?limit=50&status=ALL`;
+      if (isCreator) {
+        url += `&authorId=${userId}`;
+      }
+
+      const res = await fetch(url);
 
       if (!res.ok) {
         throw new Error("Gagal memuat artikel");
@@ -93,7 +116,7 @@ export default function ArtikelPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [session?.user, isCreator, userId]);
 
   useEffect(() => {
     fetchArticles();
@@ -134,7 +157,9 @@ export default function ArtikelPage() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-txt-primary">Artikel</h1>
-          <p className="text-sm text-txt-secondary">Kelola semua artikel Anda</p>
+          <p className="text-sm text-txt-secondary">
+            {isCreator ? "Kelola artikel Anda" : "Kelola semua artikel"}
+          </p>
         </div>
         <Link
           href="/panel/artikel/baru"
@@ -157,7 +182,7 @@ export default function ArtikelPage() {
             className="input w-full pl-9"
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Filter size={14} className="text-txt-muted" />
           {["ALL", "DRAFT", "IN_REVIEW", "APPROVED", "PUBLISHED", "REJECTED"].map((status) => (
             <button
@@ -200,7 +225,9 @@ export default function ArtikelPage() {
                   <tr>
                     <th className="px-5 py-3 text-left font-medium text-txt-secondary">Judul</th>
                     <th className="px-5 py-3 text-left font-medium text-txt-secondary">Kategori</th>
-                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">Penulis</th>
+                    {isEditor && (
+                      <th className="px-5 py-3 text-left font-medium text-txt-secondary">Penulis</th>
+                    )}
                     <th className="px-5 py-3 text-left font-medium text-txt-secondary">Status</th>
                     <th className="px-5 py-3 text-left font-medium text-txt-secondary">Views</th>
                     <th className="px-5 py-3 text-left font-medium text-txt-secondary">Tanggal</th>
@@ -221,9 +248,11 @@ export default function ArtikelPage() {
                         <td className="px-5 py-3 text-txt-secondary">
                           {article.category?.name || "\u2014"}
                         </td>
-                        <td className="px-5 py-3 text-txt-secondary">
-                          {article.author?.name || "\u2014"}
-                        </td>
+                        {isEditor && (
+                          <td className="px-5 py-3 text-txt-secondary">
+                            {article.author?.name || "\u2014"}
+                          </td>
+                        )}
                         <td className="px-5 py-3">
                           <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${config.color}`}>
                             <StatusIcon size={12} />

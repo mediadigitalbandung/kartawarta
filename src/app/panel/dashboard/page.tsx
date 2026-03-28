@@ -12,6 +12,8 @@ import {
   TrendingUp,
   Users,
   Megaphone,
+  XCircle,
+  Send,
 } from "lucide-react";
 
 interface Article {
@@ -32,6 +34,9 @@ interface StatsItem {
   icon: React.ElementType;
   color: string;
 }
+
+const CREATOR_ROLES = ["JOURNALIST", "SENIOR_JOURNALIST", "CONTRIBUTOR"];
+const EDITOR_ROLES = ["EDITOR", "CHIEF_EDITOR"];
 
 const statusColors: Record<string, string> = {
   PUBLISHED: "bg-goto-light text-goto-green",
@@ -54,8 +59,8 @@ const statusLabels: Record<string, string> = {
 function LoadingSkeleton() {
   return (
     <div className="animate-pulse">
-      <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-        {Array.from({ length: 6 }).map((_, i) => (
+      <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
             className="rounded-[12px] border border-border bg-surface p-4 shadow-card"
@@ -103,70 +108,128 @@ function formatDate(dateStr: string): string {
 
 export default function DashboardPage() {
   const { data: session } = useSession();
+  const userRole = session?.user?.role || "";
+  const userId = session?.user?.id || "";
+  const isCreator = CREATOR_ROLES.includes(userRole);
+  const isEditorRole = EDITOR_ROLES.includes(userRole);
+  const isAdmin = userRole === "SUPER_ADMIN";
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<StatsItem[]>([]);
   const [recentArticles, setRecentArticles] = useState<Article[]>([]);
 
   const fetchData = useCallback(async () => {
+      if (!session?.user) return;
       try {
         setLoading(true);
         setError(null);
 
-        const [articlesRes, reportsRes] = await Promise.all([
-          fetch("/api/articles?limit=100&status=ALL"),
-          fetch("/api/reports"),
-        ]);
+        // Creators fetch only their articles; editors/admins fetch all
+        const articlesUrl = isCreator
+          ? `/api/articles?limit=100&status=ALL&authorId=${userId}`
+          : `/api/articles?limit=100&status=ALL`;
+
+        const fetches: Promise<Response>[] = [fetch(articlesUrl)];
+        // Only admins/editors see reports
+        if (!isCreator) {
+          fetches.push(fetch("/api/reports"));
+        }
+
+        const results = await Promise.all(fetches);
 
         let allArticles: Article[] = [];
         let reportsPending = 0;
 
-        if (articlesRes.ok) {
-          const articlesJson = await articlesRes.json();
+        if (results[0].ok) {
+          const articlesJson = await results[0].json();
           allArticles = articlesJson.data?.articles || [];
         }
 
-        if (reportsRes.ok) {
-          const reportsJson = await reportsRes.json();
+        if (!isCreator && results[1]?.ok) {
+          const reportsJson = await results[1].json();
           const reports = reportsJson.data || [];
           reportsPending = reports.filter(
             (r: { status: string }) => r.status === "PENDING"
           ).length;
         }
 
-        // Calculate stats
-        const totalArticles = allArticles.length;
-        const totalViews = allArticles.reduce((sum, a) => sum + (a.viewCount || 0), 0);
-        const pendingReview = allArticles.filter((a) => a.status === "IN_REVIEW").length;
-        const published = allArticles.filter((a) => a.status === "PUBLISHED").length;
+        // Build stats based on role
+        if (isCreator) {
+          // Creator stats: my articles, my drafts, pending review, published
+          const myTotal = allArticles.length;
+          const myDrafts = allArticles.filter((a) => a.status === "DRAFT").length;
+          const myPendingReview = allArticles.filter((a) => a.status === "IN_REVIEW").length;
+          const myPublished = allArticles.filter((a) => a.status === "PUBLISHED").length;
 
-        // Today's views approximation: sum views of articles published today
-        const today = new Date().toDateString();
-        const todayViews = allArticles
-          .filter((a) => a.publishedAt && new Date(a.publishedAt).toDateString() === today)
-          .reduce((sum, a) => sum + (a.viewCount || 0), 0);
+          setStats([
+            { label: "Artikel Saya", value: formatNumber(myTotal), icon: FileText, color: "text-blue-500 bg-blue-50" },
+            { label: "Draf Saya", value: myDrafts.toString(), icon: FileText, color: "text-surface-tertiary bg-surface-secondary" },
+            { label: "Menunggu Review", value: myPendingReview.toString(), icon: Clock, color: "text-yellow-500 bg-yellow-50" },
+            { label: "Dipublikasi", value: formatNumber(myPublished), icon: CheckCircle, color: "text-goto-green bg-goto-light" },
+          ]);
 
-        setStats([
-          { label: "Total Artikel", value: formatNumber(totalArticles), icon: FileText, color: "text-blue-500 bg-blue-50" },
-          { label: "Total Tayangan", value: formatNumber(totalViews), icon: Eye, color: "text-goto-green bg-goto-light" },
-          { label: "Menunggu Review", value: pendingReview.toString(), icon: Clock, color: "text-yellow-500 bg-yellow-50" },
-          { label: "Dipublikasi", value: formatNumber(published), icon: CheckCircle, color: "text-goto-green bg-goto-light" },
-          { label: "Laporan Masuk", value: reportsPending.toString(), icon: AlertTriangle, color: "text-red-500 bg-red-50" },
-          { label: "Tayangan Hari Ini", value: formatNumber(todayViews), icon: TrendingUp, color: "text-purple-500 bg-purple-50" },
-        ]);
+          // Recent: my articles sorted by createdAt
+          const sorted = [...allArticles].sort(
+            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+          setRecentArticles(sorted.slice(0, 5));
+        } else if (isEditorRole) {
+          // Editor stats: review queue, approved today, rejected, total
+          const reviewQueue = allArticles.filter((a) => a.status === "IN_REVIEW").length;
+          const today = new Date().toDateString();
+          const approvedToday = allArticles.filter(
+            (a) => a.status === "APPROVED" || (a.status === "PUBLISHED" && a.publishedAt && new Date(a.publishedAt).toDateString() === today)
+          ).length;
+          const rejected = allArticles.filter((a) => a.status === "REJECTED").length;
+          const totalArticles = allArticles.length;
 
-        // Recent articles (last 5 by createdAt)
-        const sorted = [...allArticles].sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        setRecentArticles(sorted.slice(0, 5));
+          setStats([
+            { label: "Antrean Review", value: reviewQueue.toString(), icon: Clock, color: "text-yellow-500 bg-yellow-50" },
+            { label: "Disetujui Hari Ini", value: approvedToday.toString(), icon: CheckCircle, color: "text-goto-green bg-goto-light" },
+            { label: "Ditolak", value: rejected.toString(), icon: XCircle, color: "text-red-500 bg-red-50" },
+            { label: "Total Artikel", value: formatNumber(totalArticles), icon: FileText, color: "text-blue-500 bg-blue-50" },
+          ]);
+
+          // Recent: IN_REVIEW first, then by createdAt
+          const sorted = [...allArticles].sort((a, b) => {
+            if (a.status === "IN_REVIEW" && b.status !== "IN_REVIEW") return -1;
+            if (a.status !== "IN_REVIEW" && b.status === "IN_REVIEW") return 1;
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          });
+          setRecentArticles(sorted.slice(0, 5));
+        } else {
+          // Admin (SUPER_ADMIN): full stats
+          const totalArticles = allArticles.length;
+          const totalViews = allArticles.reduce((sum, a) => sum + (a.viewCount || 0), 0);
+          const pendingReview = allArticles.filter((a) => a.status === "IN_REVIEW").length;
+          const published = allArticles.filter((a) => a.status === "PUBLISHED").length;
+          const today = new Date().toDateString();
+          const todayViews = allArticles
+            .filter((a) => a.publishedAt && new Date(a.publishedAt).toDateString() === today)
+            .reduce((sum, a) => sum + (a.viewCount || 0), 0);
+
+          setStats([
+            { label: "Total Artikel", value: formatNumber(totalArticles), icon: FileText, color: "text-blue-500 bg-blue-50" },
+            { label: "Total Tayangan", value: formatNumber(totalViews), icon: Eye, color: "text-goto-green bg-goto-light" },
+            { label: "Menunggu Review", value: pendingReview.toString(), icon: Clock, color: "text-yellow-500 bg-yellow-50" },
+            { label: "Dipublikasi", value: formatNumber(published), icon: CheckCircle, color: "text-goto-green bg-goto-light" },
+            { label: "Laporan Masuk", value: reportsPending.toString(), icon: AlertTriangle, color: "text-red-500 bg-red-50" },
+            { label: "Tayangan Hari Ini", value: formatNumber(todayViews), icon: TrendingUp, color: "text-purple-500 bg-purple-50" },
+          ]);
+
+          const sorted = [...allArticles].sort(
+            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+          setRecentArticles(sorted.slice(0, 5));
+        }
       } catch (err) {
         setError("Gagal memuat data dashboard. Silakan coba lagi.");
         console.error("Dashboard fetch error:", err);
       } finally {
         setLoading(false);
       }
-  }, []);
+  }, [session?.user, isCreator, isEditorRole, userId]);
 
   useEffect(() => {
     fetchData();
@@ -226,7 +289,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats grid */}
-      <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+      <div className={`mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3 ${isAdmin ? "md:grid-cols-4 lg:grid-cols-6" : "md:grid-cols-4"}`}>
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
@@ -251,23 +314,30 @@ export default function DashboardPage() {
         <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
           <div className="border-b border-border bg-surface-secondary px-5 py-4">
             <h2 className="font-semibold text-txt-primary">
-              Artikel Terbaru
+              {isCreator ? "Artikel Saya Terbaru" : isEditorRole ? "Antrean Review" : "Artikel Terbaru"}
             </h2>
           </div>
           <div className="overflow-x-auto">
           <div className="divide-y divide-border">
             {recentArticles.length === 0 ? (
               <div className="px-5 py-8 text-center text-sm text-txt-secondary">
-                Belum ada artikel.
+                {isCreator ? "Anda belum memiliki artikel." : "Belum ada artikel."}
               </div>
             ) : (
               recentArticles.map((article) => (
-                <div key={article.id} className="flex items-center justify-between px-5 py-3 hover:bg-surface-secondary">
+                <Link
+                  key={article.id}
+                  href={`/panel/artikel/${article.id}/edit`}
+                  className="flex items-center justify-between px-5 py-3 hover:bg-surface-secondary"
+                >
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-txt-primary">
                       {article.title}
                     </p>
-                    <p className="text-xs text-txt-secondary">{formatDate(article.createdAt)}</p>
+                    <p className="text-xs text-txt-secondary">
+                      {isEditorRole && article.author?.name ? `${article.author.name} — ` : ""}
+                      {formatDate(article.createdAt)}
+                    </p>
                   </div>
                   <div className="ml-4 flex items-center gap-3">
                     {article.viewCount > 0 && (
@@ -279,7 +349,7 @@ export default function DashboardPage() {
                       {statusLabels[article.status] || article.status}
                     </span>
                   </div>
-                </div>
+                </Link>
               ))
             )}
           </div>
@@ -304,7 +374,7 @@ export default function DashboardPage() {
                 Tulis Artikel Baru
               </span>
             </Link>
-            {["SUPER_ADMIN", "CHIEF_EDITOR", "EDITOR"].includes(session?.user?.role || "") && (
+            {(isEditorRole || isAdmin) && (
               <Link
                 href="/panel/artikel"
                 className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
@@ -316,17 +386,31 @@ export default function DashboardPage() {
                 </span>
               </Link>
             )}
-            <Link
-              href="/panel/laporan"
-              className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
-              aria-label="Cek laporan masuk"
-            >
-              <AlertTriangle size={24} className="text-red-500" />
-              <span className="text-sm font-medium text-txt-secondary">
-                Cek Laporan
-              </span>
-            </Link>
-            {["SUPER_ADMIN", "CHIEF_EDITOR"].includes(session?.user?.role || "") && (
+            {isCreator && (
+              <Link
+                href="/panel/artikel"
+                className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
+                aria-label="Lihat artikel saya"
+              >
+                <Send size={24} className="text-blue-500" />
+                <span className="text-sm font-medium text-txt-secondary">
+                  Artikel Saya
+                </span>
+              </Link>
+            )}
+            {!isCreator && (
+              <Link
+                href="/panel/laporan"
+                className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
+                aria-label="Cek laporan masuk"
+              >
+                <AlertTriangle size={24} className="text-red-500" />
+                <span className="text-sm font-medium text-txt-secondary">
+                  Cek Laporan
+                </span>
+              </Link>
+            )}
+            {(isAdmin || userRole === "CHIEF_EDITOR") && (
               <>
                 <Link
                   href="/panel/pengguna"

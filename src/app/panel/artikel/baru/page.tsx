@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import {
   Save,
@@ -11,6 +12,7 @@ import {
   Trash2,
   AlertCircle,
   CheckCircle,
+  Upload,
 } from "lucide-react";
 
 const RichTextEditor = dynamic(
@@ -31,8 +33,14 @@ interface Source {
   url: string;
 }
 
+const CAN_SUBMIT_REVIEW = ["SUPER_ADMIN", "CHIEF_EDITOR", "EDITOR", "SENIOR_JOURNALIST", "JOURNALIST"];
+const CAN_PUBLISH_DIRECTLY = ["SUPER_ADMIN", "CHIEF_EDITOR", "SENIOR_JOURNALIST"];
+
 export default function NewArticlePage() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const userRole = session?.user?.role || "";
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -76,7 +84,6 @@ export default function NewArticlePage() {
   }, [fetchCategories]);
 
   const addSource = () => {
-    // Don't add if last source has empty name
     if (sources.length > 0 && !sources[sources.length - 1].name.trim()) {
       return;
     }
@@ -162,22 +169,37 @@ export default function NewArticlePage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {/* All roles: Save Draft */}
           <button
             onClick={() => handleSubmit("DRAFT")}
             disabled={saving}
             className="btn-secondary flex items-center gap-1.5 px-4 py-2 text-sm font-medium disabled:opacity-50"
           >
             <Save size={16} />
-            Simpan Draft
+            Simpan Draf
           </button>
-          <button
-            onClick={() => handleSubmit("IN_REVIEW")}
-            disabled={saving}
-            className="btn-primary flex items-center gap-1.5 px-4 py-2 text-sm font-semibold disabled:opacity-50"
-          >
-            <Send size={16} />
-            Kirim untuk Review
-          </button>
+          {/* All except CONTRIBUTOR: Submit for review */}
+          {CAN_SUBMIT_REVIEW.includes(userRole) && (
+            <button
+              onClick={() => handleSubmit("IN_REVIEW")}
+              disabled={saving}
+              className="btn-primary flex items-center gap-1.5 px-4 py-2 text-sm font-semibold disabled:opacity-50"
+            >
+              <Send size={16} />
+              Kirim untuk Review
+            </button>
+          )}
+          {/* Senior editors/admins: Publish directly */}
+          {CAN_PUBLISH_DIRECTLY.includes(userRole) && (
+            <button
+              onClick={() => handleSubmit("PUBLISHED")}
+              disabled={saving}
+              className="flex items-center gap-1.5 rounded-[12px] bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+            >
+              <Upload size={16} />
+              Publikasi Langsung
+            </button>
+          )}
         </div>
       </div>
 

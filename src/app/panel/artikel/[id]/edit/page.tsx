@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import {
   Save,
@@ -12,6 +13,11 @@ import {
   AlertCircle,
   CheckCircle,
   ArrowLeft,
+  XCircle,
+  Upload,
+  MessageSquare,
+  User,
+  Calendar,
 } from "lucide-react";
 
 const RichTextEditor = dynamic(
@@ -31,6 +37,10 @@ interface Source {
   institution: string;
   url: string;
 }
+
+const EDITOR_ROLES = ["EDITOR", "CHIEF_EDITOR", "SUPER_ADMIN"];
+const CAN_PUBLISH_DIRECTLY = ["SUPER_ADMIN", "CHIEF_EDITOR", "SENIOR_JOURNALIST"];
+const CAN_SUBMIT_REVIEW = ["SUPER_ADMIN", "CHIEF_EDITOR", "EDITOR", "SENIOR_JOURNALIST", "JOURNALIST"];
 
 function LoadingSkeleton() {
   return (
@@ -67,6 +77,9 @@ export default function EditArticlePage() {
   const router = useRouter();
   const params = useParams();
   const articleId = params.id as string;
+  const { data: session } = useSession();
+  const userRole = session?.user?.role || "";
+  const isEditor = EDITOR_ROLES.includes(userRole);
 
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("");
@@ -85,6 +98,11 @@ export default function EditArticlePage() {
   const [showChecklist, setShowChecklist] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [currentStatus, setCurrentStatus] = useState("");
+  const [reviewNote, setReviewNote] = useState("");
+  const [existingReviewNote, setExistingReviewNote] = useState("");
+  const [existingReviewedBy, setExistingReviewedBy] = useState("");
+  const [existingReviewedAt, setExistingReviewedAt] = useState("");
+  const [rejectNote, setRejectNote] = useState("");
 
   const [checklist, setChecklist] = useState({
     notClickbait: false,
@@ -133,6 +151,9 @@ export default function EditArticlePage() {
       setSeoDescription(article.seoDescription || "");
       setVerificationLabel(article.verificationLabel || "UNVERIFIED");
       setCurrentStatus(article.status || "DRAFT");
+      setExistingReviewNote(article.reviewNote || "");
+      setExistingReviewedBy(article.reviewedBy || "");
+      setExistingReviewedAt(article.reviewedAt || "");
 
       if (article.sources && article.sources.length > 0) {
         setSources(
@@ -157,7 +178,6 @@ export default function EditArticlePage() {
   }, [fetchCategories, fetchArticle]);
 
   const addSource = () => {
-    // Don't add if last source has empty name
     if (sources.length > 0 && !sources[sources.length - 1].name.trim()) {
       return;
     }
@@ -174,7 +194,7 @@ export default function EditArticlePage() {
     setSources(updated);
   };
 
-  const handleSubmit = async (status: "DRAFT" | "IN_REVIEW" | "PUBLISHED") => {
+  const handleSubmit = async (status: "DRAFT" | "IN_REVIEW" | "PUBLISHED" | "APPROVED" | "REJECTED") => {
     setError("");
 
     if (!title.trim()) return setError("Judul wajib diisi");
@@ -182,7 +202,11 @@ export default function EditArticlePage() {
     if (content.length < 50) return setError("Konten minimal 50 karakter");
     if (!categoryId) return setError("Kategori harus dipilih");
 
-    if (status !== "DRAFT" && !allChecked) {
+    if (status === "REJECTED" && !rejectNote.trim()) {
+      return setError("Alasan penolakan wajib diisi");
+    }
+
+    if (!["DRAFT", "APPROVED", "REJECTED"].includes(status) && !allChecked) {
       setShowChecklist(true);
       return setError("Semua checklist jurnalistik harus dipenuhi sebelum submit");
     }
@@ -196,22 +220,31 @@ export default function EditArticlePage() {
         .map((t) => t.trim())
         .filter(Boolean);
 
+      const body: Record<string, unknown> = {
+        title,
+        content,
+        excerpt: excerpt || undefined,
+        categoryId,
+        tags: tagList,
+        featuredImage: featuredImage || undefined,
+        seoTitle: seoTitle || undefined,
+        seoDescription: seoDescription || undefined,
+        status,
+        verificationLabel,
+        sources: validSources.length > 0 ? validSources : undefined,
+      };
+
+      // Add review note for approve/reject
+      if (status === "APPROVED") {
+        body.reviewNote = reviewNote || null;
+      } else if (status === "REJECTED") {
+        body.reviewNote = rejectNote;
+      }
+
       const res = await fetch(`/api/articles/${articleId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          content,
-          excerpt: excerpt || undefined,
-          categoryId,
-          tags: tagList,
-          featuredImage: featuredImage || undefined,
-          seoTitle: seoTitle || undefined,
-          seoDescription: seoDescription || undefined,
-          status,
-          verificationLabel,
-          sources: validSources.length > 0 ? validSources : undefined,
-        }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
@@ -222,7 +255,14 @@ export default function EditArticlePage() {
         return;
       }
 
-      alert("Artikel berhasil diperbarui");
+      const statusMessages: Record<string, string> = {
+        APPROVED: "Artikel berhasil disetujui",
+        REJECTED: "Artikel telah ditolak",
+        PUBLISHED: "Artikel berhasil dipublikasi",
+        DRAFT: "Artikel disimpan sebagai draf",
+        IN_REVIEW: "Artikel dikirim untuk review",
+      };
+      alert(statusMessages[status] || "Artikel berhasil diperbarui");
       router.push("/panel/artikel");
       router.refresh();
     } catch {
@@ -270,22 +310,37 @@ export default function EditArticlePage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {/* Save Draft - always available */}
           <button
             onClick={() => handleSubmit("DRAFT")}
             disabled={saving}
             className="btn-secondary flex items-center gap-1.5 px-4 py-2 text-sm font-medium disabled:opacity-50"
           >
             <Save size={16} />
-            Simpan Draft
+            Simpan Draf
           </button>
-          <button
-            onClick={() => handleSubmit("IN_REVIEW")}
-            disabled={saving}
-            className="btn-primary flex items-center gap-1.5 px-4 py-2 text-sm font-semibold disabled:opacity-50"
-          >
-            <Send size={16} />
-            Kirim untuk Review
-          </button>
+          {/* Submit for review - not for editors reviewing, not for contributors */}
+          {CAN_SUBMIT_REVIEW.includes(userRole) && !isEditor && (
+            <button
+              onClick={() => handleSubmit("IN_REVIEW")}
+              disabled={saving}
+              className="btn-primary flex items-center gap-1.5 px-4 py-2 text-sm font-semibold disabled:opacity-50"
+            >
+              <Send size={16} />
+              Kirim untuk Review
+            </button>
+          )}
+          {/* Publish directly for senior editors */}
+          {CAN_PUBLISH_DIRECTLY.includes(userRole) && (
+            <button
+              onClick={() => handleSubmit("PUBLISHED")}
+              disabled={saving}
+              className="flex items-center gap-1.5 rounded-[12px] bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+            >
+              <Upload size={16} />
+              Publikasi Langsung
+            </button>
+          )}
         </div>
       </div>
 
@@ -293,6 +348,128 @@ export default function EditArticlePage() {
         <div className="mb-4 flex items-center gap-2 rounded-[12px] bg-red-50 px-4 py-3 text-sm text-red-700">
           <AlertCircle size={16} />
           {error}
+        </div>
+      )}
+
+      {/* Review note from previous rejection - shown to article creator */}
+      {currentStatus === "REJECTED" && existingReviewNote && (
+        <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4">
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-red-700">
+            <XCircle size={16} />
+            Artikel Ditolak
+          </h3>
+          <p className="mt-2 text-sm text-red-600">{existingReviewNote}</p>
+          <div className="mt-2 flex items-center gap-4 text-xs text-red-400">
+            {existingReviewedBy && (
+              <span className="flex items-center gap-1">
+                <User size={12} />
+                Reviewer: {existingReviewedBy}
+              </span>
+            )}
+            {existingReviewedAt && (
+              <span className="flex items-center gap-1">
+                <Calendar size={12} />
+                {new Date(existingReviewedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Review info for approved articles */}
+      {currentStatus === "APPROVED" && existingReviewedAt && (
+        <div className="mb-4 rounded-[12px] border border-blue-200 bg-blue-50 p-4">
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-blue-700">
+            <CheckCircle size={16} />
+            Artikel Disetujui
+          </h3>
+          {existingReviewNote && (
+            <p className="mt-2 text-sm text-blue-600">{existingReviewNote}</p>
+          )}
+          <div className="mt-2 flex items-center gap-4 text-xs text-blue-400">
+            {existingReviewedBy && (
+              <span className="flex items-center gap-1">
+                <User size={12} />
+                Reviewer: {existingReviewedBy}
+              </span>
+            )}
+            {existingReviewedAt && (
+              <span className="flex items-center gap-1">
+                <Calendar size={12} />
+                {new Date(existingReviewedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Editor Review Panel - shown when article is IN_REVIEW and user is editor */}
+      {isEditor && currentStatus === "IN_REVIEW" && (
+        <div className="mb-6 rounded-[12px] border-2 border-yellow-300 bg-yellow-50 p-5">
+          <h3 className="flex items-center gap-2 text-base font-bold text-yellow-800">
+            <MessageSquare size={18} />
+            Panel Review Editor
+          </h3>
+          <p className="mt-1 text-sm text-yellow-600">
+            Artikel ini menunggu review. Silakan periksa dan pilih aksi di bawah.
+          </p>
+
+          {/* Optional review note for approval */}
+          <div className="mt-4">
+            <label className="mb-1 block text-sm font-medium text-yellow-800">
+              Catatan Review (opsional untuk persetujuan)
+            </label>
+            <textarea
+              value={reviewNote}
+              onChange={(e) => setReviewNote(e.target.value)}
+              rows={2}
+              placeholder="Catatan untuk penulis..."
+              className="input w-full text-sm"
+            />
+          </div>
+
+          {/* Rejection reason */}
+          <div className="mt-3">
+            <label className="mb-1 block text-sm font-medium text-red-700">
+              Alasan Penolakan (wajib jika menolak)
+            </label>
+            <textarea
+              value={rejectNote}
+              onChange={(e) => setRejectNote(e.target.value)}
+              rows={2}
+              placeholder="Jelaskan alasan penolakan..."
+              className="input w-full text-sm border-red-200"
+            />
+          </div>
+
+          <div className="mt-4 flex items-center gap-3">
+            <button
+              onClick={() => handleSubmit("APPROVED")}
+              disabled={saving}
+              className="flex items-center gap-1.5 rounded-[12px] bg-goto-green px-5 py-2.5 text-sm font-semibold text-white hover:bg-goto-dark disabled:opacity-50"
+            >
+              <CheckCircle size={16} />
+              Setujui
+            </button>
+            <button
+              onClick={() => handleSubmit("REJECTED")}
+              disabled={saving}
+              className="flex items-center gap-1.5 rounded-[12px] bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+            >
+              <XCircle size={16} />
+              Tolak
+            </button>
+            {CAN_PUBLISH_DIRECTLY.includes(userRole) && (
+              <button
+                onClick={() => handleSubmit("PUBLISHED")}
+                disabled={saving}
+                className="flex items-center gap-1.5 rounded-[12px] bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+              >
+                <Upload size={16} />
+                Publikasi Langsung
+              </button>
+            )}
+          </div>
         </div>
       )}
 

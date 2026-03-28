@@ -9,7 +9,7 @@ import {
   ApiError,
 } from "@/lib/api-utils";
 import { slugify, calculateReadTime } from "@/lib/utils";
-import { canWriteArticles, canPublishDirectly } from "@/lib/auth";
+import { canWriteArticles, canPublishDirectly, canApproveArticles } from "@/lib/auth";
 
 const createArticleSchema = z.object({
   title: z.string().min(5, "Judul minimal 5 karakter").max(255),
@@ -51,7 +51,8 @@ export async function GET(request: NextRequest) {
     if (status === "ALL") {
       // Fetch all statuses — requires auth (admin panel)
       const session = await requireAuth();
-      if (authorId && authorId !== session.user.id) {
+      // Non-editor roles can only see their own articles
+      if (!canApproveArticles(session.user.role)) {
         where.authorId = session.user.id;
       }
       // No status filter — return all
@@ -60,7 +61,8 @@ export async function GET(request: NextRequest) {
     } else {
       // Non-public statuses require auth
       const session = await requireAuth();
-      if (authorId && authorId !== session.user.id) {
+      // Non-editor roles can only see their own articles
+      if (!canApproveArticles(session.user.role)) {
         where.authorId = session.user.id;
       }
       where.status = status;
