@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
@@ -43,8 +43,15 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { data: session } = useSession();
   const pathname = usePathname();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 80);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <>
@@ -142,8 +149,8 @@ export default function Header() {
               </button>
             </div>
           </div>
-          {/* Mobile search bar — full width below logo row */}
-          <div className="pb-3 md:hidden">
+          {/* Mobile search bar — hides on scroll */}
+          <div className={`overflow-hidden transition-all duration-300 md:hidden ${scrolled ? "max-h-0 pb-0" : "max-h-14 pb-3"}`}>
             <form action="/search" className="relative">
               <Search
                 size={16}
