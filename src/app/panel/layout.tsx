@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
 import {
   LayoutDashboard,
   FileText,
@@ -68,6 +67,7 @@ interface NotificationItem {
 
 export default function PanelLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session, status } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
@@ -162,7 +162,10 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   }
 
   if (!session) {
-    redirect("/login");
+    if (typeof window !== "undefined") {
+      router.push("/login");
+    }
+    return null;
   }
 
   const totalNotifCount = notifications.reduce((sum, n) => sum + n.count, 0);
@@ -175,13 +178,13 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
   const sidebarContent = (
     <div className="flex h-full flex-col px-3 py-4">
-      <Link
+      <a
         href="/"
         className="mb-4 flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/60 hover:text-white hover:bg-white/5"
       >
         <ChevronLeft size={16} />
         Kembali ke Situs
-      </Link>
+      </a>
 
       <nav className="flex-1 space-y-1">
         {filteredMenu.map((item) => {
