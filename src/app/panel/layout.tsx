@@ -19,6 +19,8 @@ import {
   UserCircle,
   ClipboardCheck,
   Bell,
+  Settings,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -51,6 +53,8 @@ const menuItems: MenuItem[] = [
   { name: "Aktivitas", href: "/panel/aktivitas", icon: History, adminOnly: true },
   { name: "Iklan", href: "/panel/iklan", icon: Megaphone, adminOnly: true },
   { name: "Pengguna", href: "/panel/pengguna", icon: Users, adminOnly: true },
+  { name: "Statistik", href: "/panel/statistik-editor", icon: BarChart3, editorOnly: true },
+  { name: "Pengaturan", href: "/panel/pengaturan", icon: Settings, adminOnly: true },
   { name: "Profil", href: "/panel/profil", icon: UserCircle },
 ];
 
