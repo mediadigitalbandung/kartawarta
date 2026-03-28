@@ -1,0 +1,255 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
+import { ChevronLeft, ChevronRight, Filter } from "lucide-react";
+
+/* ── Types ─────────────────────────────────────────────────────────── */
+
+interface AuditLog {
+  id: string;
+  action: string;
+  entity: string;
+  entityId: string;
+  detail: string | null;
+  createdAt: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  };
+}
+
+interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+/* ── Helpers ───────────────────────────────────────────────────────── */
+
+function formatDateTime(dateStr: string): string {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+const actionLabels: Record<string, { label: string; color: string }> = {
+  CREATE: { label: "Buat", color: "bg-goto-green/10 text-goto-green" },
+  UPDATE: { label: "Ubah", color: "bg-blue-50 text-blue-600" },
+  DELETE: { label: "Hapus", color: "bg-red-50 text-red-600" },
+  LOGIN: { label: "Masuk", color: "bg-surface-tertiary text-txt-secondary" },
+  LOGOUT: { label: "Keluar", color: "bg-surface-tertiary text-txt-secondary" },
+  PUBLISH: { label: "Terbit", color: "bg-goto-green/10 text-goto-green" },
+  APPROVE: { label: "Setujui", color: "bg-goto-green/10 text-goto-green" },
+  REJECT: { label: "Tolak", color: "bg-red-50 text-red-600" },
+};
+
+const entityLabels: Record<string, string> = {
+  article: "Artikel",
+  category: "Kategori",
+  tag: "Tag",
+  user: "Pengguna",
+  ad: "Iklan",
+  report: "Laporan",
+};
+
+const filterActions = ["", "CREATE", "UPDATE", "DELETE", "LOGIN", "PUBLISH", "APPROVE", "REJECT"];
+
+/* ── Loading skeleton ──────────────────────────────────────────────── */
+
+function LoadingSkeleton() {
+  return (
+    <div className="animate-pulse overflow-hidden rounded-[12px] border border-border bg-surface shadow-card">
+      <div className="border-b border-border bg-surface-secondary px-5 py-3">
+        <div className="h-4 w-full rounded bg-surface-tertiary" />
+      </div>
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-4 border-b border-border px-5 py-3">
+          <div className="h-4 w-32 rounded bg-surface-tertiary" />
+          <div className="h-4 w-24 rounded bg-surface-tertiary" />
+          <div className="h-4 w-16 rounded bg-surface-tertiary" />
+          <div className="flex-1">
+            <div className="h-4 w-2/3 rounded bg-surface-tertiary" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ── Main Page ─────────────────────────────────────────────────────── */
+
+export default function AktivitasPage() {
+  const { data: session } = useSession();
+  const [logs, setLogs] = useState<AuditLog[]>([]);
+  const [pagination, setPagination] = useState<Pagination | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [actionFilter, setActionFilter] = useState("");
+
+  const isSuperAdmin = session?.user?.role === "SUPER_ADMIN";
+
+  const fetchLogs = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams({ page: String(page), limit: "20" });
+      if (actionFilter) params.set("action", actionFilter);
+      const res = await fetch(`/api/audit-logs?${params.toString()}`);
+      const json = await res.json();
+      if (json.success) {
+        setLogs(json.data.logs);
+        setPagination(json.data.pagination);
+      } else {
+        setError(json.error || "Gagal memuat log aktivitas");
+      }
+    } catch {
+      setError("Gagal terhubung ke server");
+    } finally {
+      setLoading(false);
+    }
+  }, [page, actionFilter]);
+
+  useEffect(() => {
+    if (isSuperAdmin) fetchLogs();
+  }, [fetchLogs, isSuperAdmin]);
+
+  /* ── Guard ── */
+  if (!isSuperAdmin) {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <p className="text-txt-secondary">Hanya Super Admin yang dapat mengakses halaman ini.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-txt-primary">Log Aktivitas</h1>
+          <p className="mt-1 text-sm text-txt-secondary">
+            Riwayat semua aktivitas di panel admin
+            {pagination && <span className="ml-1">({pagination.total} total)</span>}
+          </p>
+        </div>
+      </div>
+
+      {/* Filter */}
+      <div className="flex items-center gap-3">
+        <Filter size={16} className="text-txt-secondary" />
+        <select
+          value={actionFilter}
+          onChange={(e) => {
+            setActionFilter(e.target.value);
+            setPage(1);
+          }}
+          className="rounded-lg border border-border bg-surface-secondary px-3 py-2 text-sm text-txt-primary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
+        >
+          <option value="">Semua Aksi</option>
+          {filterActions.filter(Boolean).map((a) => (
+            <option key={a} value={a}>
+              {actionLabels[a]?.label || a}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Table */}
+      {loading ? (
+        <LoadingSkeleton />
+      ) : error ? (
+        <div className="rounded-[12px] border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+          {error}
+        </div>
+      ) : logs.length === 0 ? (
+        <div className="rounded-[12px] border border-border bg-surface p-8 text-center text-txt-secondary">
+          Tidak ada log aktivitas ditemukan.
+        </div>
+      ) : (
+        <div className="overflow-hidden rounded-[12px] border border-border bg-surface shadow-card">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-surface-secondary text-left">
+                  <th className="px-4 py-3 font-medium text-txt-secondary">Waktu</th>
+                  <th className="px-4 py-3 font-medium text-txt-secondary">Pengguna</th>
+                  <th className="px-4 py-3 font-medium text-txt-secondary">Aksi</th>
+                  <th className="px-4 py-3 font-medium text-txt-secondary">Entitas</th>
+                  <th className="hidden px-4 py-3 font-medium text-txt-secondary md:table-cell">Detail</th>
+                </tr>
+              </thead>
+              <tbody>
+                {logs.map((log) => {
+                  const actionInfo = actionLabels[log.action] || {
+                    label: log.action,
+                    color: "bg-surface-tertiary text-txt-secondary",
+                  };
+                  return (
+                    <tr key={log.id} className="border-b border-border last:border-0 hover:bg-surface-secondary/50 transition-colors">
+                      <td className="whitespace-nowrap px-4 py-3 text-txt-secondary">
+                        {formatDateTime(log.createdAt)}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-txt-primary">{log.user.name}</div>
+                        <div className="text-xs text-txt-secondary">{log.user.email}</div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${actionInfo.color}`}>
+                          {actionInfo.label}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-txt-primary">
+                        {entityLabels[log.entity] || log.entity}
+                      </td>
+                      <td className="hidden max-w-xs truncate px-4 py-3 text-txt-secondary md:table-cell">
+                        {log.detail || "-"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {pagination && pagination.totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-txt-secondary">
+            Halaman {pagination.page} dari {pagination.totalPages}
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-sm font-medium text-txt-secondary hover:bg-surface-secondary transition-colors disabled:opacity-50"
+            >
+              <ChevronLeft size={16} />
+              Sebelumnya
+            </button>
+            <button
+              onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
+              disabled={page >= pagination.totalPages}
+              className="flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-sm font-medium text-txt-secondary hover:bg-surface-secondary transition-colors disabled:opacity-50"
+            >
+              Selanjutnya
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

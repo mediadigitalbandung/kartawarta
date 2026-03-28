@@ -19,8 +19,10 @@ export async function GET() {
 
 const createCategorySchema = z.object({
   name: z.string().min(2).max(50),
+  slug: z.string().min(2).max(60).optional(),
   description: z.string().max(200).optional(),
   icon: z.string().optional(),
+  order: z.number().int().min(0).optional(),
 });
 
 // POST /api/categories
@@ -33,9 +35,10 @@ export async function POST(request: NextRequest) {
     const category = await prisma.category.create({
       data: {
         name: data.name,
-        slug: slugify(data.name),
+        slug: data.slug || slugify(data.name),
         description: data.description,
         icon: data.icon,
+        order: data.order ?? 0,
       },
     });
 
