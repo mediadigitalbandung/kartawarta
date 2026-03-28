@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "@/components/Providers";
 import { Suspense } from "react";
-import Header from "@/components/layout/Header";
 import TopLoader from "@/components/layout/TopLoader";
-import TrendingTags from "@/components/layout/TrendingTags";
+import PublicNav from "@/components/layout/PublicNav";
 import Footer from "@/components/layout/Footer";
 
 export const viewport = { width: "device-width", initialScale: 1 };
@@ -48,8 +47,7 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <TopLoader />
           </Suspense>
-          <Header />
-          <TrendingTags />
+          <PublicNav />
           <main className="flex-1">{children}</main>
           <Footer />
         </Providers>
