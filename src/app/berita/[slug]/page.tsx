@@ -15,6 +15,7 @@ import {
 import CopyProtection from "@/components/artikel/CopyProtection";
 import Sidebar from "@/components/layout/Sidebar";
 import ArticleCard from "@/components/artikel/ArticleCard";
+import BannerAd from "@/components/ads/BannerAd";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 // Note: DOMPurify removed — content sanitized at input via API validation
@@ -112,6 +113,9 @@ export default async function ArticlePage({ params }: { params: { slug: string }
       />
 
       <div className="bg-surface min-h-screen overflow-x-hidden">
+        {/* Ad — Top leaderboard */}
+        <BannerAd size="slim" className="bg-surface-secondary" />
+
         <div className="container-main py-8 overflow-hidden">
           {/* Breadcrumb */}
           <nav className="mb-6 flex items-center gap-2 text-sm text-txt-secondary">
@@ -170,6 +174,12 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               {/* Divider */}
               <div className="mt-6 h-px bg-border" />
 
+              {/* Ad — below meta */}
+              <div className="mt-6 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "6 / 1" }}>
+                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
+                <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
+              </div>
+
               {/* Featured Image */}
               {article.featuredImage && (
                 <div className="relative mt-6 aspect-[16/9] overflow-hidden rounded-[12px]">
@@ -183,6 +193,12 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                   className="article-content text-base sm:text-[17px] leading-[1.8] break-words text-justify"
                   dangerouslySetInnerHTML={{ __html: sanitizedContent }}
                 />
+              </div>
+
+              {/* Ad — after content */}
+              <div className="mt-8 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "4 / 1" }}>
+                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
+                <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
               </div>
 
               {/* Share bar */}
@@ -242,6 +258,12 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                 ))}
               </div>
 
+              {/* Ad — after tags */}
+              <div className="mt-6 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "6 / 1" }}>
+                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
+                <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
+              </div>
+
               {/* Report button */}
               <div className="mt-8 border-t border-border pt-5">
                 <button className="btn-ghost text-xs text-txt-secondary hover:text-red-600">
@@ -272,6 +294,12 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                 </div>
               </div>
 
+              {/* Ad — before related */}
+              <div className="mt-8 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "3 / 1" }}>
+                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
+                <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
+              </div>
+
               {/* Related articles */}
               {relatedArticles.length > 0 && (
                 <section className="mt-10">
@@ -290,9 +318,22 @@ export default async function ArticlePage({ params }: { params: { slug: string }
             {/* Sidebar */}
             <div className="hidden lg:block lg:col-span-1">
               <Sidebar trending={sidebarTrending} />
+              {/* Sidebar Ad 1 */}
+              <div className="mt-5 rounded-lg bg-gradient-to-b from-surface-tertiary to-surface-secondary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "4 / 3" }}>
+                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
+                <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
+              </div>
+              {/* Sidebar Ad 2 */}
+              <div className="mt-5 rounded-lg bg-gradient-to-b from-surface-tertiary to-surface-secondary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "4 / 3" }}>
+                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
+                <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Ad — Bottom full width */}
+        <BannerAd size="leaderboard" className="bg-surface-secondary" />
       </div>
     </>
   );
