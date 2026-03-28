@@ -65,13 +65,13 @@ export default function Header() {
               </span>
             </Link>
 
+            {/* Right side: Date + Search + actions */}
+            <div className="flex items-center gap-3">
             {/* Live date */}
             <span className="hidden text-xs text-white/40 md:block">
               {new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
             </span>
-
-            {/* Right side: Search + actions */}
-            <div className="flex items-center gap-2">
+            <div className="hidden h-5 w-px bg-white/20 md:block" />
             <form action="/search" className="relative w-28 sm:w-40 md:w-64 lg:w-80">
               <Search
                 size={16}
