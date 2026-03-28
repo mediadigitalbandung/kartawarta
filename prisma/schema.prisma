@@ -226,3 +226,26 @@ model AuditLog {
   @@index([entity, entityId])
   @@map("audit_logs")
 }
+
+model AIUsageLog {
+  id           String   @id @default(cuid())
+  userId       String
+  userName     String
+  feature      String
+  inputTokens  Int      @default(0)
+  outputTokens Int      @default(0)
+  totalTokens  Int      @default(0)
+  articleTitle  String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@map("ai_usage_logs")
+}
+
+model SystemSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String @db.Text
+
+  @@map("system_settings")
+}
