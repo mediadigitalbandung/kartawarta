@@ -286,12 +286,12 @@ export default function PenggunaPage() {
             <table className="w-full text-sm">
               <thead className="border-b border-border bg-surface-secondary">
                 <tr>
-                  <th className="px-5 py-3 text-left font-medium text-txt-secondary">Pengguna</th>
-                  <th className="px-5 py-3 text-left font-medium text-txt-secondary">Role</th>
-                  <th className="px-5 py-3 text-left font-medium text-txt-secondary">Artikel</th>
-                  <th className="px-5 py-3 text-left font-medium text-txt-secondary">Status</th>
-                  <th className="px-5 py-3 text-left font-medium text-txt-secondary">Terdaftar</th>
-                  <th className="px-5 py-3 text-right font-medium text-txt-secondary">Aksi</th>
+                  <th className="px-3 sm:px-5 py-3 text-left font-medium text-txt-secondary">Pengguna</th>
+                  <th className="px-3 sm:px-5 py-3 text-left font-medium text-txt-secondary">Role</th>
+                  <th className="hidden sm:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Artikel</th>
+                  <th className="hidden md:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Status</th>
+                  <th className="hidden lg:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Terdaftar</th>
+                  <th className="px-3 sm:px-5 py-3 text-right font-medium text-txt-secondary">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -299,28 +299,28 @@ export default function PenggunaPage() {
                   const role = roleLabels[user.role] || { label: user.role, color: "bg-surface-tertiary text-txt-secondary" };
                   return (
                     <tr key={user.id} className="hover:bg-surface-secondary">
-                      <td className="px-5 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-goto-green text-sm font-bold text-white">
+                      <td className="px-3 sm:px-5 py-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-goto-green text-xs sm:text-sm font-bold text-white">
                             {user.name.charAt(0)}
                           </div>
-                          <div>
-                            <p className="font-medium text-txt-primary">{user.name}</p>
-                            <p className="flex items-center gap-1 text-xs text-txt-secondary">
+                          <div className="min-w-0">
+                            <p className="font-medium text-txt-primary text-xs sm:text-sm truncate">{user.name}</p>
+                            <p className="flex items-center gap-1 text-[10px] sm:text-xs text-txt-secondary truncate">
                               <Mail size={10} /> {user.email}
                             </p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-5 py-3">
-                        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${role.color}`}>
+                      <td className="px-3 sm:px-5 py-3">
+                        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-medium ${role.color}`}>
                           <Shield size={10} /> {role.label}
                         </span>
                       </td>
-                      <td className="px-5 py-3 text-txt-secondary">
+                      <td className="hidden sm:table-cell px-5 py-3 text-txt-secondary">
                         {user._count?.articles ?? 0}
                       </td>
-                      <td className="px-5 py-3">
+                      <td className="hidden md:table-cell px-5 py-3">
                         {user.isActive ? (
                           <span className="flex items-center gap-1 text-xs text-goto-green">
                             <UserCheck size={12} /> Aktif
@@ -331,8 +331,8 @@ export default function PenggunaPage() {
                           </span>
                         )}
                       </td>
-                      <td className="px-5 py-3 text-txt-secondary">{formatDate(user.createdAt)}</td>
-                      <td className="px-5 py-3 text-right">
+                      <td className="hidden lg:table-cell px-5 py-3 text-txt-secondary">{formatDate(user.createdAt)}</td>
+                      <td className="px-3 sm:px-5 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => openEditModal(user)}

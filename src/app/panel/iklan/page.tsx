@@ -311,14 +311,14 @@ export default function IklanPage() {
               <table className="w-full text-sm">
                 <thead className="border-b border-border bg-surface-secondary">
                   <tr>
-                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">Nama Iklan</th>
-                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">Posisi</th>
-                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">Periode</th>
-                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">Tayangan</th>
-                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">Klik</th>
-                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">CTR</th>
-                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">Status</th>
-                    <th className="px-5 py-3 text-right font-medium text-txt-secondary">Aksi</th>
+                    <th className="px-3 sm:px-5 py-3 text-left font-medium text-txt-secondary">Nama Iklan</th>
+                    <th className="px-3 sm:px-5 py-3 text-left font-medium text-txt-secondary">Posisi</th>
+                    <th className="hidden md:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Periode</th>
+                    <th className="hidden sm:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Tayangan</th>
+                    <th className="hidden sm:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Klik</th>
+                    <th className="hidden lg:table-cell px-5 py-3 text-left font-medium text-txt-secondary">CTR</th>
+                    <th className="px-3 sm:px-5 py-3 text-left font-medium text-txt-secondary">Status</th>
+                    <th className="px-3 sm:px-5 py-3 text-right font-medium text-txt-secondary">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -328,29 +328,29 @@ export default function IklanPage() {
                       : "0.00%";
                     return (
                       <tr key={ad.id} className="hover:bg-surface-secondary">
-                        <td className="px-5 py-3">
-                          <p className="font-medium text-txt-primary">{ad.name}</p>
-                          <p className="text-xs text-txt-muted">{typeLabels[ad.type] || ad.type}</p>
+                        <td className="px-3 sm:px-5 py-3">
+                          <p className="font-medium text-txt-primary text-xs sm:text-sm">{ad.name}</p>
+                          <p className="text-[10px] sm:text-xs text-txt-muted">{typeLabels[ad.type] || ad.type}</p>
                         </td>
-                        <td className="px-5 py-3">
-                          <span className="rounded bg-surface-tertiary px-2 py-0.5 text-xs font-medium text-txt-secondary">
+                        <td className="px-3 sm:px-5 py-3">
+                          <span className="rounded bg-surface-tertiary px-2 py-0.5 text-[10px] sm:text-xs font-medium text-txt-secondary">
                             {slotLabels[ad.slot] || ad.slot}
                           </span>
                         </td>
-                        <td className="px-5 py-3 text-txt-secondary">
+                        <td className="hidden md:table-cell px-5 py-3 text-txt-secondary">
                           <div className="flex items-center gap-1 text-xs">
                             <Calendar size={10} />
                             {formatDate(ad.startDate)} — {formatDate(ad.endDate)}
                           </div>
                         </td>
-                        <td className="px-5 py-3 text-txt-secondary">
+                        <td className="hidden sm:table-cell px-5 py-3 text-txt-secondary">
                           {ad.impressions.toLocaleString("id-ID")}
                         </td>
-                        <td className="px-5 py-3 text-txt-secondary">
+                        <td className="hidden sm:table-cell px-5 py-3 text-txt-secondary">
                           {ad.clicks.toLocaleString("id-ID")}
                         </td>
-                        <td className="px-5 py-3 font-bold text-txt-primary">{ctr}</td>
-                        <td className="px-5 py-3">
+                        <td className="hidden lg:table-cell px-5 py-3 font-bold text-txt-primary">{ctr}</td>
+                        <td className="px-3 sm:px-5 py-3">
                           <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${ad.isActive ? "bg-goto-light text-goto-green" : "bg-red-50 text-red-600"}`}>
                             <Power size={10} />
                             {ad.isActive ? "Aktif" : "Nonaktif"}

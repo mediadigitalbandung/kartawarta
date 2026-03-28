@@ -280,16 +280,16 @@ export default function ArtikelPage() {
               <table className="w-full text-sm">
                 <thead className="border-b border-border bg-surface-secondary">
                   <tr>
-                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">Judul</th>
-                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">Kategori</th>
+                    <th className="px-3 sm:px-5 py-3 text-left font-medium text-txt-secondary">Judul</th>
+                    <th className="hidden md:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Kategori</th>
                     {isEditor && (
-                      <th className="px-5 py-3 text-left font-medium text-txt-secondary">Penulis</th>
+                      <th className="hidden lg:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Penulis</th>
                     )}
-                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">Status</th>
-                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">Progres</th>
-                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">Views</th>
-                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">Tanggal</th>
-                    <th className="px-5 py-3 text-right font-medium text-txt-secondary">Aksi</th>
+                    <th className="px-3 sm:px-5 py-3 text-left font-medium text-txt-secondary">Status</th>
+                    <th className="hidden lg:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Progres</th>
+                    <th className="hidden sm:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Views</th>
+                    <th className="hidden md:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Tanggal</th>
+                    <th className="px-3 sm:px-5 py-3 text-right font-medium text-txt-secondary">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -298,32 +298,32 @@ export default function ArtikelPage() {
                     const StatusIcon = config.icon;
                     return (
                       <tr key={article.id} className="hover:bg-surface-secondary">
-                        <td className="max-w-[300px] px-5 py-3">
-                          <p className="truncate font-medium text-txt-primary">
+                        <td className="max-w-[200px] sm:max-w-[300px] px-3 sm:px-5 py-3">
+                          <p className="truncate font-medium text-txt-primary text-xs sm:text-sm">
                             {article.title}
                           </p>
                         </td>
-                        <td className="px-5 py-3 text-txt-secondary">
+                        <td className="hidden md:table-cell px-5 py-3 text-txt-secondary">
                           {article.category?.name || "\u2014"}
                         </td>
                         {isEditor && (
-                          <td className="px-5 py-3 text-txt-secondary">
+                          <td className="hidden lg:table-cell px-5 py-3 text-txt-secondary">
                             {article.author?.name || "\u2014"}
                           </td>
                         )}
-                        <td className="px-5 py-3">
-                          <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${config.color}`}>
+                        <td className="px-3 sm:px-5 py-3">
+                          <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-medium ${config.color}`}>
                             <StatusIcon size={12} />
                             {config.label}
                           </span>
                         </td>
-                        <td className="px-5 py-3">
+                        <td className="hidden lg:table-cell px-5 py-3">
                           <StatusTimeline status={article.status} />
                         </td>
-                        <td className="px-5 py-3 text-txt-secondary">
+                        <td className="hidden sm:table-cell px-5 py-3 text-txt-secondary">
                           {article.viewCount > 0 ? article.viewCount.toLocaleString("id-ID") : "\u2014"}
                         </td>
-                        <td className="px-5 py-3 text-txt-secondary">
+                        <td className="hidden md:table-cell px-5 py-3 text-txt-secondary">
                           {formatDate(article.publishedAt || article.createdAt)}
                         </td>
                         <td className="px-5 py-3 text-right">
