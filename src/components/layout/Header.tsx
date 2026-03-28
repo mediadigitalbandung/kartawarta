@@ -51,9 +51,10 @@ export default function Header() {
       {/* Row 1: Top bar — sticky dark header */}
       <header className="sticky top-0 z-50 bg-surface-dark">
         <div className="container-main">
+          {/* Row 1: Logo + date + actions */}
           <div className="flex items-center justify-between py-3">
             {/* Logo */}
-            <Link href="/" className="group flex shrink-0 items-center gap-2.5">
+            <Link href="/" className="group flex shrink-0 items-center gap-2">
               <span className="flex h-8 w-8 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-goto-green text-xs sm:text-base font-bold text-white">
                 JH
               </span>
@@ -65,14 +66,15 @@ export default function Header() {
               </span>
             </Link>
 
-            {/* Right side: Date + Search + actions */}
+            {/* Right: Date + Search (desktop) + actions */}
             <div className="flex items-center gap-3">
             {/* Live date */}
             <span className="hidden text-xs text-white/40 md:block">
               {new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
             </span>
             <div className="hidden h-5 w-px bg-white/20 md:block" />
-            <form action="/search" className="relative w-28 sm:w-40 md:w-64 lg:w-80">
+            {/* Search — hidden on mobile, shown inline on md+ */}
+            <form action="/search" className="relative hidden md:block md:w-64 lg:w-80">
               <Search
                 size={16}
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-txt-muted"
@@ -139,6 +141,21 @@ export default function Header() {
                 {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
             </div>
+          </div>
+          {/* Mobile search bar — full width below logo row */}
+          <div className="pb-3 md:hidden">
+            <form action="/search" className="relative">
+              <Search
+                size={16}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-txt-muted"
+              />
+              <input
+                type="text"
+                name="q"
+                placeholder="Cari di sini..."
+                className="w-full rounded-full border border-white/20 bg-white/10 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/50 transition-all focus:border-goto-green focus:bg-white/15 focus:outline-none"
+              />
+            </form>
           </div>
         </div>
       </header>
