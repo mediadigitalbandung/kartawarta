@@ -240,6 +240,15 @@ export default async function CategoryPage({ params }: { params: { slug: string 
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           <div className="lg:col-span-2">
+            {/* Section header */}
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
+                Berita Terkini {category.name}
+              </h2>
+              <Link href={`/kategori/${params.slug}`} className="text-sm font-medium text-goto-green hover:underline">
+                Lihat Semua &rarr;
+              </Link>
+            </div>
             {/* Articles grid (skip headline + side cards) */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               {articles.slice(11, 17).map((article) => (
