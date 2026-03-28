@@ -362,6 +362,7 @@ export default function IklanPage() {
                               onClick={() => openEditModal(ad)}
                               className="btn-ghost rounded p-1"
                               title="Edit"
+                              aria-label="Edit iklan"
                             >
                               <Edit size={16} />
                             </button>
@@ -370,6 +371,7 @@ export default function IklanPage() {
                               disabled={deleting === ad.id}
                               className="btn-ghost rounded p-1 hover:text-red-500 disabled:opacity-50"
                               title="Hapus"
+                              aria-label="Hapus iklan"
                             >
                               <Trash2 size={16} />
                             </button>

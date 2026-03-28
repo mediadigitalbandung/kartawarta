@@ -73,7 +73,7 @@ function Modal({
       <div className="w-[calc(100%-2rem)] max-w-md mx-auto rounded-[12px] border border-border bg-surface p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-txt-primary">{title}</h3>
-          <button onClick={onClose} className="rounded-lg p-1 text-txt-secondary hover:text-txt-primary">
+          <button onClick={onClose} className="rounded-lg p-1 text-txt-secondary hover:text-txt-primary" aria-label="Tutup">
             <X size={20} />
           </button>
         </div>
@@ -404,6 +404,7 @@ export default function KategoriPage() {
                               onClick={() => openCatModal(cat)}
                               className="rounded-lg p-1.5 text-txt-secondary hover:bg-surface-secondary hover:text-goto-green transition-colors"
                               title="Edit"
+                              aria-label="Edit kategori"
                             >
                               <Edit size={16} />
                             </button>
@@ -412,6 +413,7 @@ export default function KategoriPage() {
                               disabled={catDeleting === cat.id}
                               className="rounded-lg p-1.5 text-txt-secondary hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50"
                               title="Hapus"
+                              aria-label="Hapus kategori"
                             >
                               <Trash2 size={16} />
                             </button>
@@ -544,6 +546,7 @@ export default function KategoriPage() {
                               onClick={() => openTagModal(tag)}
                               className="rounded-lg p-1.5 text-txt-secondary hover:bg-surface-secondary hover:text-goto-green transition-colors"
                               title="Edit"
+                              aria-label="Edit tag"
                             >
                               <Edit size={16} />
                             </button>
@@ -552,6 +555,7 @@ export default function KategoriPage() {
                               disabled={tagDeleting === tag.id}
                               className="rounded-lg p-1.5 text-txt-secondary hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50"
                               title="Hapus"
+                              aria-label="Hapus tag"
                             >
                               <Trash2 size={16} />
                             </button>

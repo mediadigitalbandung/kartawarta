@@ -338,6 +338,7 @@ export default function PenggunaPage() {
                             onClick={() => openEditModal(user)}
                             className="btn-ghost rounded p-1"
                             title="Edit"
+                            aria-label="Edit pengguna"
                           >
                             <Edit size={16} />
                           </button>
@@ -346,6 +347,7 @@ export default function PenggunaPage() {
                             disabled={deleting === user.id}
                             className="btn-ghost rounded p-1 hover:text-red-500 disabled:opacity-50"
                             title="Hapus"
+                            aria-label="Hapus pengguna"
                           >
                             <Trash2 size={16} />
                           </button>
