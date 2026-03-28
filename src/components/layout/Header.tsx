@@ -271,7 +271,7 @@ export default function Header() {
           </div>
 
           {/* Mobile nav items */}
-          <div className="overflow-y-auto" style={{ maxHeight: "calc(100vh - 130px)" }}>
+          <div className="overflow-y-auto overscroll-contain" style={{ maxHeight: "calc(100vh - 130px)" }}>
             <div className="px-3 py-2">
               <span className="px-3 text-[11px] font-semibold uppercase tracking-wider text-txt-muted">
                 Kategori
