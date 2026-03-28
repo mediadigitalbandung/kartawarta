@@ -314,15 +314,15 @@ export async function PUT(
 
     // --- ADMIN (SUPER_ADMIN / CHIEF_EDITOR) ---
     if (isAdmin) {
-      // Admin "Batalkan Persetujuan" for own editor assignment: APPROVED -> IN_REVIEW
-      if (data.status === "IN_REVIEW" && article.status === "APPROVED" && isAssignedEditor) {
+      // Admin "Kembalikan ke Editor": APPROVED -> IN_REVIEW
+      if (data.status === "IN_REVIEW" && article.status === "APPROVED") {
         const updated = await prisma.article.update({
           where: { id: params.id },
           data: {
             status: "IN_REVIEW",
             verificationLabel: "UNVERIFIED",
-            reviewNote: null,
-            reviewedAt: null,
+            reviewNote: data.reviewNote || "Dikembalikan oleh admin untuk review ulang",
+            reviewedAt: new Date(),
           },
           include: {
             author: { select: { id: true, name: true } },
