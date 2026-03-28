@@ -235,9 +235,9 @@ export default function Header() {
           mobileMenuOpen ? "visible" : "invisible"
         }`}
       >
-        {/* Backdrop — fully opaque */}
+        {/* Backdrop — dark overlay */}
         <div
-          className={`absolute inset-0 bg-black/60 transition-opacity duration-300 ${
+          className={`absolute inset-0 bg-black/80 transition-opacity duration-300 ${
             mobileMenuOpen ? "opacity-100" : "opacity-0"
           }`}
           onClick={() => setMobileMenuOpen(false)}
