@@ -276,12 +276,11 @@ export async function PUT(
       // Editor can edit content (title, content, excerpt, category, tags)
       if (!data.status || !["APPROVED", "REJECTED"].includes(data.status)) {
         // Content edit by editor — save changes without status change
-        const { tags: tagNames, ...articleData } = data;
         const updateData: Record<string, unknown> = {};
-        if (articleData.title) updateData.title = articleData.title;
-        if (articleData.content) updateData.content = articleData.content;
-        if (articleData.excerpt !== undefined) updateData.excerpt = articleData.excerpt;
-        if (articleData.categoryId) updateData.categoryId = articleData.categoryId;
+        if (data.title) updateData.title = data.title;
+        if (data.content) updateData.content = data.content;
+        if (data.excerpt !== undefined) updateData.excerpt = data.excerpt;
+        if (data.categoryId) updateData.categoryId = data.categoryId;
         if (tagNames && Array.isArray(tagNames)) {
           updateData.tags = {
             set: [],
