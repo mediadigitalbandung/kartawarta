@@ -221,13 +221,13 @@ export default function Header() {
 
       {/* Mobile slide-in panel */}
       <div
-        className={`fixed inset-0 top-0 z-40 lg:hidden transition-all duration-300 ${
+        className={`fixed inset-0 z-[60] lg:hidden transition-all duration-300 ${
           mobileMenuOpen ? "visible" : "invisible"
         }`}
       >
-        {/* Backdrop */}
+        {/* Backdrop — fully opaque */}
         <div
-          className={`absolute inset-0 bg-surface-dark/50 transition-opacity duration-300 ${
+          className={`absolute inset-0 bg-black/60 transition-opacity duration-300 ${
             mobileMenuOpen ? "opacity-100" : "opacity-0"
           }`}
           onClick={() => setMobileMenuOpen(false)}
@@ -235,7 +235,7 @@ export default function Header() {
 
         {/* Panel */}
         <div
-          className={`absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-surface transition-transform duration-300 ease-out shadow-lg ${
+          className={`absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-surface transition-transform duration-300 ease-out shadow-2xl ${
             mobileMenuOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >
