@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -11,9 +11,14 @@ import {
   Users,
   Megaphone,
   Flag,
+  FolderOpen,
+  History,
   ChevronLeft,
   Menu,
   X,
+  UserCircle,
+  ClipboardCheck,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,18 +31,121 @@ const roleLabelsMap: Record<string, string> = {
   CONTRIBUTOR: "Kontributor",
 };
 
-const menuItems = [
+const EDITOR_ROLES = ["EDITOR", "CHIEF_EDITOR", "SUPER_ADMIN"];
+const CREATOR_ROLES = ["JOURNALIST", "SENIOR_JOURNALIST", "CONTRIBUTOR"];
+
+interface MenuItem {
+  name: string;
+  href: string;
+  icon: React.ElementType;
+  adminOnly?: boolean;
+  editorOnly?: boolean;
+}
+
+const menuItems: MenuItem[] = [
   { name: "Dashboard", href: "/panel/dashboard", icon: LayoutDashboard },
   { name: "Artikel", href: "/panel/artikel", icon: FileText },
+  { name: "Kategori", href: "/panel/kategori", icon: FolderOpen, adminOnly: true },
+  { name: "Riwayat Review", href: "/panel/riwayat-review", icon: ClipboardCheck, editorOnly: true },
   { name: "Laporan", href: "/panel/laporan", icon: Flag },
+  { name: "Aktivitas", href: "/panel/aktivitas", icon: History, adminOnly: true },
   { name: "Iklan", href: "/panel/iklan", icon: Megaphone, adminOnly: true },
   { name: "Pengguna", href: "/panel/pengguna", icon: Users, adminOnly: true },
+  { name: "Profil", href: "/panel/profil", icon: UserCircle },
 ];
+
+interface NotificationItem {
+  label: string;
+  count: number;
+  href: string;
+}
 
 export default function PanelLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session, status } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  const userRole = session?.user?.role || "";
+  const isAdmin = userRole === "SUPER_ADMIN" || userRole === "CHIEF_EDITOR";
+  const isEditor = EDITOR_ROLES.includes(userRole);
+  const isCreator = CREATOR_ROLES.includes(userRole);
+
+  const fetchNotifications = useCallback(async () => {
+    if (!session?.user) return;
+    try {
+      const items: NotificationItem[] = [];
+
+      if (isCreator) {
+        // Count rejected articles for this creator
+        const res = await fetch(`/api/articles?status=REJECTED&authorId=${session.user.id}&limit=100`);
+        if (res.ok) {
+          const json = await res.json();
+          const count = json.data?.pagination?.total || 0;
+          if (count > 0) {
+            items.push({
+              label: `${count} artikel ditolak`,
+              count,
+              href: "/panel/artikel",
+            });
+          }
+        }
+      }
+
+      if (isEditor) {
+        // Count articles pending review
+        const res = await fetch("/api/articles?status=IN_REVIEW&limit=1");
+        if (res.ok) {
+          const json = await res.json();
+          const count = json.data?.pagination?.total || 0;
+          if (count > 0) {
+            items.push({
+              label: `${count} artikel menunggu review`,
+              count,
+              href: "/panel/artikel",
+            });
+          }
+        }
+      }
+
+      if (isAdmin) {
+        // Count pending reports
+        const res = await fetch("/api/reports?status=PENDING&limit=1");
+        if (res.ok) {
+          const json = await res.json();
+          const count = json.data?.pagination?.total || json.data?.reports?.length || 0;
+          if (count > 0) {
+            items.push({
+              label: `${count} laporan menunggu`,
+              count,
+              href: "/panel/laporan",
+            });
+          }
+        }
+      }
+
+      setNotifications(items);
+    } catch {
+      // Silently fail — notifications are non-critical
+    }
+  }, [session?.user, isCreator, isEditor, isAdmin]);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
+
+  // Close notification dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setNotifOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   if (status === "loading") {
     return (
@@ -51,7 +159,13 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
     redirect("/login");
   }
 
-  const isAdmin = session.user.role === "SUPER_ADMIN" || session.user.role === "CHIEF_EDITOR";
+  const totalNotifCount = notifications.reduce((sum, n) => sum + n.count, 0);
+
+  const filteredMenu = menuItems.filter((item) => {
+    if (item.adminOnly && !isAdmin) return false;
+    if (item.editorOnly && !isEditor) return false;
+    return true;
+  });
 
   const sidebarContent = (
     <div className="flex h-full flex-col px-3 py-4">
@@ -64,28 +178,26 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
       </Link>
 
       <nav className="flex-1 space-y-1">
-        {menuItems
-          .filter((item) => !item.adminOnly || isAdmin)
-          .map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setSidebarOpen(false)}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                  isActive
-                    ? "bg-goto-green/10 text-goto-green"
-                    : "text-white/60 hover:text-white hover:bg-white/5"
-                )}
-              >
-                <Icon size={18} />
-                {item.name}
-              </Link>
-            );
-          })}
+        {filteredMenu.map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname.startsWith(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setSidebarOpen(false)}
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                isActive
+                  ? "bg-goto-green/10 text-goto-green"
+                  : "text-white/60 hover:text-white hover:bg-white/5"
+              )}
+            >
+              <Icon size={18} />
+              {item.name}
+            </Link>
+          );
+        })}
       </nav>
 
       {/* User info */}
@@ -143,17 +255,66 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
         {/* Main content */}
         <main className="flex-1 lg:ml-60">
-          {/* Top bar — mobile only */}
-          <div className="sticky top-0 z-30 flex items-center bg-surface border-b border-border h-14 px-4 lg:hidden">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="rounded-lg p-1.5 text-txt-primary hover:bg-surface-secondary"
-              aria-label="Buka menu navigasi"
-            >
-              <Menu size={22} />
-            </button>
-            <span className="ml-3 text-sm font-semibold text-txt-primary">Panel Admin</span>
+          {/* Top bar */}
+          <div className="sticky top-0 z-30 flex items-center justify-between bg-surface border-b border-border h-14 px-4">
+            <div className="flex items-center">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="rounded-lg p-1.5 text-txt-primary hover:bg-surface-secondary lg:hidden"
+                aria-label="Buka menu navigasi"
+              >
+                <Menu size={22} />
+              </button>
+              <span className="ml-3 text-sm font-semibold text-txt-primary lg:ml-0">Panel Admin</span>
+            </div>
+
+            {/* Notification bell */}
+            <div className="relative" ref={notifRef}>
+              <button
+                onClick={() => setNotifOpen(!notifOpen)}
+                className="relative rounded-lg p-2 text-txt-secondary hover:bg-surface-secondary hover:text-txt-primary transition-colors"
+                aria-label="Notifikasi"
+              >
+                <Bell size={20} />
+                {totalNotifCount > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                    {totalNotifCount > 99 ? "99+" : totalNotifCount}
+                  </span>
+                )}
+              </button>
+
+              {/* Notification dropdown */}
+              {notifOpen && (
+                <div className="absolute right-0 top-full mt-2 w-72 overflow-hidden rounded-[12px] border border-border bg-surface shadow-lg">
+                  <div className="border-b border-border px-4 py-3">
+                    <h3 className="text-sm font-semibold text-txt-primary">Notifikasi</h3>
+                  </div>
+                  {notifications.length === 0 ? (
+                    <div className="px-4 py-6 text-center text-sm text-txt-muted">
+                      Tidak ada notifikasi baru
+                    </div>
+                  ) : (
+                    <div className="max-h-64 overflow-y-auto">
+                      {notifications.map((notif, i) => (
+                        <Link
+                          key={i}
+                          href={notif.href}
+                          onClick={() => setNotifOpen(false)}
+                          className="flex items-center gap-3 px-4 py-3 hover:bg-surface-secondary transition-colors"
+                        >
+                          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-red-500/10">
+                            <span className="text-xs font-bold text-red-400">{notif.count}</span>
+                          </div>
+                          <p className="text-sm text-txt-primary">{notif.label}</p>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
+
           <div className="p-4 sm:p-6">{children}</div>
         </main>
       </div>

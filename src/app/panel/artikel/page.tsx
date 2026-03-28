@@ -42,6 +42,63 @@ const statusConfig: Record<string, { label: string; icon: React.ElementType; col
   ARCHIVED: { label: "Diarsipkan", icon: FileText, color: "bg-surface-tertiary text-txt-muted" },
 };
 
+// Progress steps for the timeline indicator
+const progressSteps = ["DRAFT", "IN_REVIEW", "APPROVED", "PUBLISHED"];
+const stepLabels: Record<string, string> = {
+  DRAFT: "Draf",
+  IN_REVIEW: "Review",
+  APPROVED: "Disetujui",
+  PUBLISHED: "Publikasi",
+};
+
+function StatusTimeline({ status }: { status: string }) {
+  const isRejected = status === "REJECTED";
+  const isArchived = status === "ARCHIVED";
+  const currentIndex = progressSteps.indexOf(status);
+
+  return (
+    <div className="flex items-center gap-0.5">
+      {progressSteps.map((step, i) => {
+        const isCompleted = !isRejected && !isArchived && currentIndex >= i;
+        const isCurrent = step === status;
+        return (
+          <div key={step} className="flex items-center">
+            <div
+              className={`flex items-center justify-center rounded-full text-[9px] font-bold transition-colors ${
+                isRejected
+                  ? "h-4 w-4 border border-red-500/40 bg-red-500/10 text-red-400"
+                  : isCompleted
+                    ? "h-4 w-4 bg-goto-green text-white"
+                    : "h-4 w-4 border border-border bg-surface-tertiary text-txt-muted"
+              }`}
+              title={stepLabels[step]}
+            >
+              {isCompleted ? "\u2713" : i + 1}
+            </div>
+            {i < progressSteps.length - 1 && (
+              <div
+                className={`h-[2px] w-3 ${
+                  isRejected
+                    ? "bg-red-500/20"
+                    : !isArchived && currentIndex > i
+                      ? "bg-goto-green"
+                      : "bg-border"
+                }`}
+              />
+            )}
+          </div>
+        );
+      })}
+      {isRejected && (
+        <span className="ml-1 text-[9px] font-medium text-red-400">Ditolak</span>
+      )}
+      {isArchived && (
+        <span className="ml-1 text-[9px] font-medium text-txt-muted">Arsip</span>
+      )}
+    </div>
+  );
+}
+
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr);
   return d.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
@@ -229,6 +286,7 @@ export default function ArtikelPage() {
                       <th className="px-5 py-3 text-left font-medium text-txt-secondary">Penulis</th>
                     )}
                     <th className="px-5 py-3 text-left font-medium text-txt-secondary">Status</th>
+                    <th className="px-5 py-3 text-left font-medium text-txt-secondary">Progres</th>
                     <th className="px-5 py-3 text-left font-medium text-txt-secondary">Views</th>
                     <th className="px-5 py-3 text-left font-medium text-txt-secondary">Tanggal</th>
                     <th className="px-5 py-3 text-right font-medium text-txt-secondary">Aksi</th>
@@ -258,6 +316,9 @@ export default function ArtikelPage() {
                             <StatusIcon size={12} />
                             {config.label}
                           </span>
+                        </td>
+                        <td className="px-5 py-3">
+                          <StatusTimeline status={article.status} />
                         </td>
                         <td className="px-5 py-3 text-txt-secondary">
                           {article.viewCount > 0 ? article.viewCount.toLocaleString("id-ID") : "\u2014"}

@@ -44,6 +44,7 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get("category");
     const status = searchParams.get("status") || "PUBLISHED";
     const authorId = searchParams.get("authorId");
+    const reviewedBy = searchParams.get("reviewedBy");
     const sort = searchParams.get("sort") || "publishedAt";
 
     const where: Record<string, unknown> = {};
@@ -73,6 +74,9 @@ export async function GET(request: NextRequest) {
     }
     if (authorId) {
       where.authorId = authorId;
+    }
+    if (reviewedBy) {
+      where.reviewedBy = reviewedBy;
     }
 
     const orderBy: Record<string, string> =
