@@ -7,6 +7,7 @@ import ArticleCard from "@/components/artikel/ArticleCard";
 import PaginatedArticles from "@/components/artikel/PaginatedArticles";
 import Sidebar from "@/components/layout/Sidebar";
 import HeadlineSlider from "@/components/slider/HeadlineSlider";
+import SubHeadlineSlider from "@/components/slider/SubHeadlineSlider";
 import VideoStory from "@/components/slider/VideoStory";
 import BannerAd, { SidebarAd } from "@/components/ads/BannerAd";
 import { videoStoryData } from "@/lib/video-data";
@@ -137,53 +138,17 @@ export default async function CategoryPage({ params }: { params: { slug: string 
           <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
         </div>
 
-        {/* Headline — 50% slider + 25% + 25% side cards */}
+        {/* Headline slider */}
         {articles.length >= 3 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            {/* Left 50%: Main headline slider */}
-            <div className="lg:col-span-2">
-              <HeadlineSlider items={JSON.parse(JSON.stringify(articles.slice(0, 5)))} />
-            </div>
-            {/* Middle 25%: 3 stacked cards — full height */}
-            <div className="hidden md:flex flex-col">
-              {articles.slice(5, 8).map((article, i) => (
-                <div key={article.slug} className={`group flex flex-1 gap-3 ${i > 0 ? "border-t border-border" : ""}`}>
-                  <div className="relative w-28 shrink-0">
-                    {article.featuredImage ? (
-                      <Image src={article.featuredImage} alt={article.title} fill className="object-cover" />
-                    ) : (
-                      <div className="h-full w-full bg-surface-secondary" />
-                    )}
-                  </div>
-                  <div className="flex flex-1 flex-col justify-center min-w-0 py-2">
-                    <Link href={`/berita/${article.slug}`} className="line-clamp-2 text-[13px] font-semibold leading-snug text-txt-primary hover:underline">
-                      {article.title}
-                    </Link>
-                    <p className="mt-1 text-[11px] text-txt-muted">{article.publishedAt ? new Date(article.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : ""}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            {/* Right 25%: 3 stacked cards — full height */}
-            <div className="hidden md:flex flex-col">
-              {articles.slice(8, 11).map((article, i) => (
-                <div key={article.slug} className={`group flex flex-1 gap-3 ${i > 0 ? "border-t border-border" : ""}`}>
-                  <div className="relative w-28 shrink-0">
-                    {article.featuredImage ? (
-                      <Image src={article.featuredImage} alt={article.title} fill className="object-cover" />
-                    ) : (
-                      <div className="h-full w-full bg-surface-secondary" />
-                    )}
-                  </div>
-                  <div className="flex flex-1 flex-col justify-center min-w-0 py-2">
-                    <Link href={`/berita/${article.slug}`} className="line-clamp-2 text-[13px] font-semibold leading-snug text-txt-primary hover:underline">
-                      {article.title}
-                    </Link>
-                    <p className="mt-1 text-[11px] text-txt-muted">{article.publishedAt ? new Date(article.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : ""}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="mb-6">
+            <HeadlineSlider items={JSON.parse(JSON.stringify(articles.slice(0, 5)))} />
+          </div>
+        )}
+
+        {/* Sub-headline slider — crossfade like headline */}
+        {articles.length >= 7 && (
+          <div className="mb-6">
+            <SubHeadlineSlider items={JSON.parse(JSON.stringify(articles.slice(5, 11)))} />
           </div>
         )}
 
