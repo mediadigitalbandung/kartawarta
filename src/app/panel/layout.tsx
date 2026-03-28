@@ -54,9 +54,9 @@ const menuItems: MenuItem[] = [
   { name: "Laporan", href: "/panel/laporan", icon: Flag },
   { name: "Aktivitas", href: "/panel/aktivitas", icon: History, adminOnly: true },
   { name: "Iklan", href: "/panel/iklan", icon: Megaphone, adminOnly: true },
+  { name: "Log AI", href: "/panel/ai-log", icon: Sparkles, adminOnly: true },
   { name: "Pengguna", href: "/panel/pengguna", icon: Users, adminOnly: true },
   { name: "Statistik", href: "/panel/statistik-editor", icon: BarChart3, editorOnly: true },
-  { name: "Log AI", href: "/panel/ai-log", icon: Sparkles, adminOnly: true },
   { name: "Pengaturan", href: "/panel/pengaturan", icon: Settings, adminOnly: true },
   { name: "Profil", href: "/panel/profil", icon: UserCircle },
 ];
