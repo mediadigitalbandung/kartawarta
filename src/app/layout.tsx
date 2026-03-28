@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "@/components/Providers";
+import { Suspense } from "react";
 import Header from "@/components/layout/Header";
+import TopLoader from "@/components/layout/TopLoader";
 import TrendingTags from "@/components/layout/TrendingTags";
 import Footer from "@/components/layout/Footer";
 
@@ -43,6 +45,9 @@ export default function RootLayout({
     <html lang="id">
       <body className="flex min-h-screen flex-col font-sans bg-surface text-txt-primary">
         <Providers>
+          <Suspense fallback={null}>
+            <TopLoader />
+          </Suspense>
           <Header />
           <TrendingTags />
           <main className="flex-1">{children}</main>
