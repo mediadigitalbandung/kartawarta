@@ -213,7 +213,7 @@ export default function ArtikelPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-txt-primary">Artikel</h1>
+          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">Artikel</h1>
           <p className="text-sm text-txt-secondary">
             {isCreator ? "Kelola artikel Anda" : "Kelola semua artikel"}
           </p>

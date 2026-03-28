@@ -137,7 +137,7 @@ export default function AktivitasPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-txt-primary">Log Aktivitas</h1>
+          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">Log Aktivitas</h1>
           <p className="mt-1 text-sm text-txt-secondary">
             Riwayat semua aktivitas di panel admin
             {pagination && <span className="ml-1">({pagination.total} total)</span>}
@@ -197,7 +197,7 @@ export default function AktivitasPage() {
                   };
                   return (
                     <tr key={log.id} className="border-b border-border last:border-0 hover:bg-surface-secondary/50 transition-colors">
-                      <td className="whitespace-nowrap px-4 py-3 text-txt-secondary">
+                      <td className="px-4 py-3 text-txt-secondary">
                         {formatDateTime(log.createdAt)}
                       </td>
                       <td className="px-4 py-3">

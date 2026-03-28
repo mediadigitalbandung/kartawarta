@@ -161,7 +161,7 @@ export default function NewArticlePage() {
     <div className="mx-auto max-w-5xl">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-txt-primary">
+          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">
             Tulis Artikel Baru
           </h1>
           <p className="text-sm text-txt-secondary">

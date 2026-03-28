@@ -132,7 +132,7 @@ export default function LaporanPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-txt-primary">
+        <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">
           Laporan Berita
         </h1>
         <p className="text-sm text-txt-secondary">
@@ -167,7 +167,7 @@ export default function LaporanPage() {
                   <div className={`flex items-center gap-2 text-sm ${config.color}`}>
                     <Icon size={16} /> {config.label}
                   </div>
-                  <p className="mt-1 text-2xl font-bold text-txt-primary">{count}</p>
+                  <p className="mt-1 text-lg sm:text-2xl font-bold text-txt-primary">{count}</p>
                 </div>
               );
             })}

@@ -89,7 +89,7 @@ export default function RiwayatReviewPage() {
       <div className="mb-6">
         <div className="flex items-center gap-2">
           <ClipboardCheck size={24} className="text-goto-green" />
-          <h1 className="text-2xl font-bold text-txt-primary">Riwayat Review</h1>
+          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">Riwayat Review</h1>
         </div>
         <p className="text-sm text-txt-secondary mt-1">
           Artikel yang telah Anda review

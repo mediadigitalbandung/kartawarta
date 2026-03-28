@@ -98,7 +98,7 @@ export default function PengaturanPage() {
       <div className="mb-6">
         <div className="flex items-center gap-2">
           <Settings size={24} className="text-goto-green" />
-          <h1 className="text-2xl font-bold text-txt-primary">
+          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">
             Pengaturan Sistem
           </h1>
         </div>

@@ -242,7 +242,7 @@ export default function PenggunaPage() {
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-txt-primary">Kelola Pengguna</h1>
+          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">Kelola Pengguna</h1>
           <p className="text-sm text-txt-secondary">{users.length} pengguna terdaftar</p>
         </div>
         <button

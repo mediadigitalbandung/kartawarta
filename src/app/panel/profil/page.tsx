@@ -98,7 +98,7 @@ export default function ProfilPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-txt-primary">Profil Saya</h1>
+        <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">Profil Saya</h1>
         <p className="text-sm text-txt-secondary">Kelola informasi profil Anda</p>
       </div>
 

@@ -127,7 +127,7 @@ export default function StatistikEditorPage() {
         <div className="mb-6">
           <div className="flex items-center gap-2">
             <BarChart3 size={24} className="text-goto-green" />
-            <h1 className="text-2xl font-bold text-txt-primary">
+            <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">
               Statistik Editor
             </h1>
           </div>
@@ -159,7 +159,7 @@ export default function StatistikEditorPage() {
       <div className="mb-6">
         <div className="flex items-center gap-2">
           <BarChart3 size={24} className="text-goto-green" />
-          <h1 className="text-2xl font-bold text-txt-primary">
+          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">
             Statistik Editor
           </h1>
         </div>

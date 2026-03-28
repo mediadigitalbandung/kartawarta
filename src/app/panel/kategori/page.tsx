@@ -316,7 +316,7 @@ export default function KategoriPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-txt-primary">Kelola Kategori &amp; Tag</h1>
+          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">Kelola Kategori &amp; Tag</h1>
           <p className="mt-1 text-sm text-txt-secondary">Atur kategori dan tag untuk artikel</p>
         </div>
       </div>

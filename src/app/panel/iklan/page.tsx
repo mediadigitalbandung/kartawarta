@@ -250,7 +250,7 @@ export default function IklanPage() {
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-txt-primary">Kelola Iklan</h1>
+          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">Kelola Iklan</h1>
           <p className="text-sm text-txt-secondary">Atur banner iklan di berbagai posisi</p>
         </div>
         <button
@@ -285,7 +285,7 @@ export default function IklanPage() {
               <div className="flex items-center gap-2 text-sm text-txt-secondary">
                 <Eye size={16} className="text-blue-500" /> Total Tayangan
               </div>
-              <p className="mt-1 text-2xl font-bold text-txt-primary">
+              <p className="mt-1 text-lg sm:text-2xl font-bold text-txt-primary">
                 {totalImpressions.toLocaleString("id-ID")}
               </p>
             </div>
@@ -293,7 +293,7 @@ export default function IklanPage() {
               <div className="flex items-center gap-2 text-sm text-txt-secondary">
                 <MousePointer size={16} className="text-goto-green" /> Total Klik
               </div>
-              <p className="mt-1 text-2xl font-bold text-txt-primary">
+              <p className="mt-1 text-lg sm:text-2xl font-bold text-txt-primary">
                 {totalClicks.toLocaleString("id-ID")}
               </p>
             </div>
@@ -301,7 +301,7 @@ export default function IklanPage() {
               <div className="flex items-center gap-2 text-sm text-txt-secondary">
                 <BarChart3 size={16} className="text-purple-500" /> Rata-rata CTR
               </div>
-              <p className="mt-1 text-2xl font-bold text-txt-primary">{avgCtr}%</p>
+              <p className="mt-1 text-lg sm:text-2xl font-bold text-txt-primary">{avgCtr}%</p>
             </div>
           </div>
 

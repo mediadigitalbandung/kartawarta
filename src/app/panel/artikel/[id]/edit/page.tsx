@@ -48,7 +48,7 @@ function LoadingSkeleton() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <div className="h-7 w-48 rounded bg-surface-tertiary" />
-          <div className="mt-2 h-4 w-64 rounded bg-surface-secondary" />
+          <div className="mt-2 h-4 w-48 sm:w-64 rounded bg-surface-secondary" />
         </div>
         <div className="flex gap-2">
           <div className="h-10 w-32 rounded-[12px] bg-surface-tertiary" />
@@ -300,7 +300,7 @@ export default function EditArticlePage() {
           >
             <ArrowLeft size={14} /> Kembali ke Daftar Artikel
           </button>
-          <h1 className="text-2xl font-bold text-txt-primary">
+          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">
             Edit Artikel
           </h1>
           <p className="text-sm text-txt-secondary">
