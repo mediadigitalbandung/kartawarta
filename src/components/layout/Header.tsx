@@ -32,12 +32,7 @@ const categoryNavMore = [
   { name: "Koreksi & Klarifikasi", href: "/kode-etik" },
 ];
 
-const mobileExtraLinks = [
-  { name: "Hukum Administrasi", href: "/kategori/hukum-administrasi" },
-  { name: "Hukum Bisnis", href: "/kategori/hukum-bisnis" },
-  { name: "Hukum Lingkungan", href: "/kategori/hukum-lingkungan" },
-  { name: "Koreksi & Klarifikasi", href: "/kode-etik" },
-];
+// All mobile categories combined from main + more (no duplicates needed)
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -279,25 +274,6 @@ export default function Header() {
             </div>
             <ul className="space-y-0.5 px-3 pb-3">
               {[...categoryNavMain, ...categoryNavMore].map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="flex items-center justify-between rounded px-3 py-2.5 text-sm font-medium text-txt-primary transition-colors hover:bg-surface-secondary hover:text-goto-green"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {item.name}
-                    <ChevronRight size={16} className="text-txt-muted" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <div className="border-t border-border px-3 py-2">
-              <span className="px-3 text-[11px] font-semibold uppercase tracking-wider text-txt-muted">
-                Lainnya
-              </span>
-            </div>
-            <ul className="space-y-0.5 px-3 pb-3">
-              {mobileExtraLinks.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
