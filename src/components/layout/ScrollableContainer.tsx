@@ -22,7 +22,8 @@ export default function ScrollableContainer({
   const [isMobile, setIsMobile] = useState(false);
   const [needsScroll, setNeedsScroll] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
-  const collapsedHeight = maxItems * 120; // ~120px per item estimate
+  // Mobile cards are taller (~300px each), desktop cards are side-by-side (~200px)
+  const collapsedHeight = isMobile ? maxItems * 320 : maxItems * 120;
 
   useEffect(() => {
     const checkMobile = () => {

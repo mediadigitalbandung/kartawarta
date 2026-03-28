@@ -173,7 +173,7 @@ export default async function HomePage() {
                   Lihat Semua
                 </Link>
               </div>
-              <ScrollableContainer maxItems={5} label="Lihat Lebih Banyak Berita">
+              <ScrollableContainer maxItems={3} label="Lihat Lebih Banyak Berita">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   {terkiniArticles.map((a) => (
                     <ArticleCard key={a.slug} {...a} variant="standard" />
@@ -194,7 +194,7 @@ export default async function HomePage() {
                     Lihat Semua
                   </Link>
                 </div>
-                <ScrollableContainer maxItems={5} label="Lihat Lebih Banyak Trending" className="flex-1">
+                <ScrollableContainer maxItems={3} label="Lihat Lebih Banyak Trending" className="flex-1">
                 <div className="space-y-0 divide-y divide-border">
                   {trendingArticles.slice(0, 8).map((article, i) => (
                     <div key={article.slug} className="group flex items-start gap-3 sm:gap-4 py-3 sm:py-4 first:pt-0">
