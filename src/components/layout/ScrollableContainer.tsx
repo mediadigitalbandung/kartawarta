@@ -32,7 +32,7 @@ export default function ScrollableContainer({
 
   return (
     <div
-      className={`overflow-y-auto overscroll-contain scrollbar-hide ${className}`}
+      className={`overflow-y-auto scrollbar-hide ${className}`}
       style={{ maxHeight: `${maxHeight}px` }}
     >
       {children}
