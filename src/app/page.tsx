@@ -10,6 +10,7 @@ import PopularCarousel from "@/components/slider/PopularCarousel";
 import SubHeadlineSlider from "@/components/slider/SubHeadlineSlider";
 import VideoStory from "@/components/slider/VideoStory";
 import BannerAd, { SidebarAd } from "@/components/ads/BannerAd";
+import ScrollableContainer from "@/components/layout/ScrollableContainer";
 import { videoStoryData } from "@/lib/video-data";
 import { Scale, BookOpen, Gavel, Shield, Users, Landmark, LucideIcon, Globe, Monitor, Building2, FileText, AlertTriangle, Radio,Calendar, Play, Vote, TrendingUp } from "lucide-react";
 import { prisma } from "@/lib/prisma";
@@ -178,11 +179,13 @@ export default async function HomePage() {
                   Lihat Semua
                 </Link>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                {terkiniArticles.map((a) => (
-                  <ArticleCard key={a.slug} {...a} variant="standard" />
-                ))}
-              </div>
+              <ScrollableContainer maxItems={5} label="Lihat Lebih Banyak Berita">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  {terkiniArticles.map((a) => (
+                    <ArticleCard key={a.slug} {...a} variant="standard" />
+                  ))}
+                </div>
+              </ScrollableContainer>
             </div>
 
             {/* Right: Berita Terpopuler — vertical list */}
@@ -197,7 +200,8 @@ export default async function HomePage() {
                     Lihat Semua
                   </Link>
                 </div>
-                <div className="space-y-0 divide-y divide-border flex-1">
+                <ScrollableContainer maxItems={5} label="Lihat Lebih Banyak Trending" className="flex-1">
+                <div className="space-y-0 divide-y divide-border">
                   {trendingArticles.slice(0, 8).map((article, i) => (
                     <div key={article.slug} className="group flex items-start gap-4 py-4 first:pt-0">
                       {/* Rank number */}
@@ -235,6 +239,7 @@ export default async function HomePage() {
                     </div>
                   ))}
                 </div>
+                </ScrollableContainer>
               </div>
             )}
           </div>
