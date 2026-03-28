@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 
@@ -15,6 +15,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const sessionExpired = searchParams.get("reason") === "session_expired";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,6 +59,12 @@ export default function LoginPage() {
             Jurnalis Hukum Bandung
           </p>
         </div>
+
+        {sessionExpired && (
+          <div className="mb-4 rounded-[12px] bg-yellow-50 px-4 py-3 text-sm text-yellow-700">
+            Sesi Anda telah berakhir karena akun ini login di perangkat lain. Silakan login kembali.
+          </div>
+        )}
 
         {error && (
           <div className="mb-6 rounded-[12px] bg-red-50 px-4 py-3 text-sm text-red-600">

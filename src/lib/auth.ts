@@ -12,12 +12,14 @@ declare module "next-auth" {
       name: string;
       role: Role;
       avatar?: string | null;
+      sessionId?: string;
     };
   }
   interface User {
     id: string;
     role: Role;
     avatar?: string | null;
+    sessionId?: string;
   }
 }
 
@@ -26,6 +28,7 @@ declare module "next-auth/jwt" {
     id: string;
     role: Role;
     avatar?: string | null;
+    sessionId?: string;
   }
 }
 
@@ -59,12 +62,20 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Email atau password salah");
         }
 
+        // Generate unique session ID and save to DB
+        const sessionId = crypto.randomUUID();
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { activeSessionId: sessionId, lastLoginAt: new Date() },
+        });
+
         return {
           id: user.id,
           email: user.email,
           name: user.name,
           role: user.role,
           avatar: user.avatar,
+          sessionId,
         };
       },
     }),
@@ -75,19 +86,27 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.role = user.role;
         token.avatar = user.avatar;
+        token.sessionId = user.sessionId;
       }
-      // Refresh role from DB on every request to ensure accuracy
-      if (token.id && (trigger === "update" || !user)) {
+      // Validate session is still active (not kicked by login on another device)
+      if (token.id && token.sessionId) {
         try {
           const dbUser = await prisma.user.findUnique({
             where: { id: token.id as string },
-            select: { role: true, name: true, avatar: true, isActive: true },
+            select: { role: true, name: true, avatar: true, isActive: true, activeSessionId: true },
           });
-          if (dbUser && dbUser.isActive) {
-            token.role = dbUser.role;
-            token.name = dbUser.name;
-            token.avatar = dbUser.avatar;
+          if (!dbUser || !dbUser.isActive) {
+            // User deactivated
+            return { ...token, invalid: true };
           }
+          if (dbUser.activeSessionId && dbUser.activeSessionId !== token.sessionId) {
+            // Another device logged in — invalidate this session
+            return { ...token, invalid: true };
+          }
+          // Refresh role from DB
+          token.role = dbUser.role;
+          token.name = dbUser.name;
+          token.avatar = dbUser.avatar;
         } catch {
           // Silently fail — use cached token
         }
@@ -95,9 +114,14 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
+      // If session was invalidated by another login, force sign out
+      if ((token as Record<string, unknown>).invalid) {
+        return { ...session, user: { ...session.user, invalid: true } } as typeof session;
+      }
       session.user.id = token.id;
       session.user.role = token.role;
       session.user.avatar = token.avatar;
+      session.user.sessionId = token.sessionId;
       if (token.name) session.user.name = token.name as string;
       return session;
     },

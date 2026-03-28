@@ -171,9 +171,9 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  if (!session) {
+  if (!session || (session.user as Record<string, unknown>)?.invalid) {
     if (typeof window !== "undefined") {
-      router.push("/login");
+      signOut({ callbackUrl: "/login?reason=session_expired" });
     }
     return null;
   }
