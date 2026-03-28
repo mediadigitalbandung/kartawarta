@@ -180,7 +180,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               {/* Article content */}
               <div className="mt-8 max-w-full overflow-hidden">
                 <div
-                  className="article-content text-base sm:text-[17px] leading-[1.8] break-words"
+                  className="article-content text-base sm:text-[17px] leading-[1.8] break-words text-justify"
                   dangerouslySetInnerHTML={{ __html: sanitizedContent }}
                 />
               </div>
