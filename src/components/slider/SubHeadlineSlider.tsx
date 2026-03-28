@@ -68,7 +68,7 @@ export default function SubHeadlineSlider({ items }: SubHeadlineSliderProps) {
   return (
     <div className="relative group">
       {/* Stacked pages — crossfade like headline slider */}
-      <div className="relative" style={{ aspectRatio: "32/9" }}>
+      <div className="relative aspect-[16/9] sm:aspect-[32/9]">
         {pages.map((pageItems, pageIdx) => {
           const isActive = pageIdx === currentPage;
           const isLeaving = pageIdx === previousPage;
@@ -77,7 +77,7 @@ export default function SubHeadlineSlider({ items }: SubHeadlineSliderProps) {
           return (
             <div
               key={pageIdx}
-              className="absolute inset-0 grid grid-cols-2 gap-2 sm:gap-4"
+              className="absolute inset-0 grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4"
               style={{
                 zIndex: isActive ? 2 : isLeaving ? 1 : 0,
                 opacity: isVisible ? 1 : 0,

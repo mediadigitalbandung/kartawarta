@@ -146,14 +146,14 @@ export default function Header() {
       {/* Row 2: Category navigation — prominent white bar */}
       <nav className="bg-surface border-b border-border relative">
         <div className="container-main">
-          <ul className="flex items-center justify-between">
+          <ul className="flex items-center gap-1 overflow-x-auto scrollbar-hide lg:justify-between lg:gap-0">
             {categoryNavMain.map((item) => {
               const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
               return (
               <li key={item.href} className="shrink-0">
                 <Link
                   href={item.href}
-                  className={`relative inline-block px-4 py-3 text-base font-semibold transition-all duration-200 ${
+                  className={`relative inline-block px-3 py-2.5 text-sm sm:text-base font-semibold transition-all duration-200 whitespace-nowrap ${
                     isActive
                       ? "text-goto-green after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[3px] after:rounded-full after:bg-goto-green"
                       : "text-txt-primary hover:text-goto-green"
@@ -168,7 +168,7 @@ export default function Header() {
             <li className="relative shrink-0">
               <button
                 onClick={() => setMoreOpen(!moreOpen)}
-                className="inline-flex items-center gap-1 px-4 py-3 text-base font-semibold text-txt-secondary hover:text-goto-green transition-colors"
+                className="inline-flex items-center gap-1 px-3 py-2.5 text-sm sm:text-base font-semibold text-txt-secondary hover:text-goto-green transition-colors whitespace-nowrap"
               >
                 Lainnya
                 <ChevronRight size={14} className={`transition-transform duration-200 ${moreOpen ? "rotate-90" : ""}`} />

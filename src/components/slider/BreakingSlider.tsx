@@ -150,14 +150,14 @@ export default function BreakingSlider({ items }: BreakingSliderProps) {
         <>
           <button
             onClick={prev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/50 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
+            className="absolute left-1 top-1/2 -translate-y-1/2 z-20 flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white/60 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
             aria-label="Previous"
           >
             <ChevronLeft size={16} strokeWidth={1.5} />
           </button>
           <button
             onClick={next}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/50 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
+            className="absolute right-1 top-1/2 -translate-y-1/2 z-20 flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white/60 backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-black/40 hover:text-white hover:scale-110"
             aria-label="Next"
           >
             <ChevronRight size={16} strokeWidth={1.5} />
