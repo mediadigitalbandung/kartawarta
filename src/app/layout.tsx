@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "@/components/Providers";
 import Header from "@/components/layout/Header";
+import TrendingTags from "@/components/layout/TrendingTags";
 import Footer from "@/components/layout/Footer";
 
 export const viewport = { width: "device-width", initialScale: 1 };
@@ -43,6 +44,7 @@ export default function RootLayout({
       <body className="flex min-h-screen flex-col font-sans bg-surface text-txt-primary">
         <Providers>
           <Header />
+          <TrendingTags />
           <main className="flex-1">{children}</main>
           <Footer />
         </Providers>
