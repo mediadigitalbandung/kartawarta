@@ -265,9 +265,9 @@ export default async function CategoryPage({ params }: { params: { slug: string 
 
           <div className="lg:col-span-1 flex flex-col">
             <Sidebar trending={sidebarTrending} />
-            {/* Sidebar Ad */}
-            <div className="mt-5">
-              <div className="rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative w-full" style={{ height: "250px" }}>
+            {/* Sidebar Ad — flex-1 stretches to fill remaining height */}
+            <div className="mt-5 flex-1">
+              <div className="rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative w-full h-full min-h-[150px]">
                 <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
                 <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
               </div>
