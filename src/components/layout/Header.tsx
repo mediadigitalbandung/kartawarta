@@ -139,9 +139,9 @@ export default function Header() {
       </header>
 
       {/* Row 2: Category navigation — prominent white bar */}
-      <nav className="bg-surface border-b border-border">
+      <nav className="bg-surface border-b border-border relative">
         <div className="container-main">
-          <ul className="flex items-center gap-0 overflow-x-auto scrollbar-hide">
+          <ul className="flex items-center justify-between">
             {categoryNavMain.map((item) => {
               const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
               return (
@@ -171,7 +171,7 @@ export default function Header() {
               {moreOpen && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setMoreOpen(false)} />
-                  <div className="absolute left-0 top-full z-20 mt-0 w-52 rounded-lg border border-border bg-surface py-1 shadow-lg">
+                  <div className="absolute right-0 top-full z-20 mt-0 w-52 rounded-lg border border-border bg-surface py-1 shadow-lg">
                     {categoryNavMore.map((item) => (
                       <Link
                         key={item.href}
