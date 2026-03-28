@@ -54,14 +54,14 @@ export default function Header() {
           <div className="flex items-center justify-between py-3">
             {/* Logo */}
             <Link href="/" className="group flex shrink-0 items-center gap-2.5">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-goto-green text-sm font-bold text-white">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-goto-green text-base font-bold text-white">
                 JH
               </span>
-              <span className="hidden items-baseline gap-1.5 sm:flex">
-                <span className="text-lg font-bold text-white sm:text-2xl">
+              <span className="hidden items-baseline gap-2 sm:flex">
+                <span className="text-2xl font-bold text-white sm:text-3xl">
                   Jurnalis Hukum
                 </span>
-                <span className="text-sm text-white/50 sm:text-base">Bandung</span>
+                <span className="text-base text-white/50 sm:text-xl">Bandung</span>
               </span>
             </Link>
 
