@@ -118,7 +118,7 @@ export default function ProfilPage() {
         {/* Profile Card */}
         <div className="rounded-[12px] border border-border bg-surface p-6 shadow-card">
           <div className="flex flex-col items-center text-center">
-            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-goto-green text-3xl font-bold text-white">
+            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-goto-green text-xl sm:text-3xl font-bold text-white">
               {profile?.name?.charAt(0) || <UserCircle size={40} />}
             </div>
             <h2 className="text-lg font-semibold text-txt-primary">{profile?.name}</h2>

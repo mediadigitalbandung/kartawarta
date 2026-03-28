@@ -186,7 +186,7 @@ export default function StatistikEditorPage() {
           <div className="inline-flex rounded-[12px] bg-blue-50 p-2 text-blue-500">
             <Clock size={18} />
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-txt-primary">
+          <p className="mt-2 text-xl sm:text-3xl font-extrabold text-txt-primary">
             {totalReview}
           </p>
           <p className="text-xs text-txt-secondary">Total Review</p>
@@ -195,7 +195,7 @@ export default function StatistikEditorPage() {
           <div className="inline-flex rounded-[12px] bg-goto-light p-2 text-goto-green">
             <CheckCircle size={18} />
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-goto-green">
+          <p className="mt-2 text-xl sm:text-3xl font-extrabold text-goto-green">
             {approved}
           </p>
           <p className="text-xs text-txt-secondary">Disetujui</p>
@@ -204,7 +204,7 @@ export default function StatistikEditorPage() {
           <div className="inline-flex rounded-[12px] bg-red-50 p-2 text-red-500">
             <XCircle size={18} />
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-red-500">
+          <p className="mt-2 text-xl sm:text-3xl font-extrabold text-red-500">
             {rejected}
           </p>
           <p className="text-xs text-txt-secondary">Ditolak</p>
@@ -213,7 +213,7 @@ export default function StatistikEditorPage() {
           <div className="inline-flex rounded-[12px] bg-purple-50 p-2 text-purple-500">
             <TrendingUp size={18} />
           </div>
-          <p className="mt-2 text-3xl font-extrabold text-txt-primary">
+          <p className="mt-2 text-xl sm:text-3xl font-extrabold text-txt-primary">
             {avgPerDay}
           </p>
           <p className="text-xs text-txt-secondary">Rata-rata Review/Hari</p>

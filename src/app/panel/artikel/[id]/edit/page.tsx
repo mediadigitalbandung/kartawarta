@@ -292,7 +292,7 @@ export default function EditArticlePage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <button
             onClick={() => router.push("/panel/artikel")}
@@ -309,7 +309,7 @@ export default function EditArticlePage() {
             }</span>
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {/* Save Draft - always available */}
           <button
             onClick={() => handleSubmit("DRAFT")}

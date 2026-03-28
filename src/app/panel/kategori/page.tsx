@@ -367,7 +367,7 @@ export default function KategoriPage() {
               {catError}
             </div>
           ) : categories.length === 0 ? (
-            <div className="rounded-[12px] border border-border bg-surface p-8 text-center text-txt-secondary">
+            <div className="rounded-[12px] border border-border bg-surface p-4 sm:p-8 text-center text-txt-secondary">
               Belum ada kategori. Klik &quot;Tambah Kategori&quot; untuk memulai.
             </div>
           ) : (
@@ -515,7 +515,7 @@ export default function KategoriPage() {
           {tagLoading ? (
             <LoadingSkeleton />
           ) : tags.length === 0 ? (
-            <div className="rounded-[12px] border border-border bg-surface p-8 text-center text-txt-secondary">
+            <div className="rounded-[12px] border border-border bg-surface p-4 sm:p-8 text-center text-txt-secondary">
               Belum ada tag. Klik &quot;Tambah Tag&quot; untuk memulai.
             </div>
           ) : (

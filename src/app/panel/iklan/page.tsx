@@ -248,7 +248,7 @@ export default function IklanPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-txt-primary">Kelola Iklan</h1>
           <p className="text-sm text-txt-secondary">Atur banner iklan di berbagai posisi</p>

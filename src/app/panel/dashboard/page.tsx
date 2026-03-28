@@ -300,7 +300,7 @@ export default function DashboardPage() {
               <div className={`inline-flex rounded-[12px] p-2 ${stat.color}`}>
                 <Icon size={18} />
               </div>
-              <p className="mt-2 text-3xl font-extrabold text-txt-primary">
+              <p className="mt-2 text-xl sm:text-3xl font-extrabold text-txt-primary">
                 {stat.value}
               </p>
               <p className="text-xs text-txt-secondary">{stat.label}</p>

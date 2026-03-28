@@ -173,7 +173,7 @@ export default function AktivitasPage() {
           {error}
         </div>
       ) : logs.length === 0 ? (
-        <div className="rounded-[12px] border border-border bg-surface p-8 text-center text-txt-secondary">
+        <div className="rounded-[12px] border border-border bg-surface p-4 sm:p-8 text-center text-txt-secondary">
           Tidak ada log aktivitas ditemukan.
         </div>
       ) : (
@@ -226,11 +226,11 @@ export default function AktivitasPage() {
 
       {/* Pagination */}
       {pagination && pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-sm text-txt-secondary">
             Halaman {pagination.page} dari {pagination.totalPages}
           </p>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1}

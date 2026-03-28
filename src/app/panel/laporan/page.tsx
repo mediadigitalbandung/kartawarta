@@ -176,7 +176,7 @@ export default function LaporanPage() {
           {/* Reports list */}
           <div className="space-y-3">
             {reports.length === 0 ? (
-              <div className="rounded-[12px] border border-border bg-surface p-8 text-center text-txt-secondary shadow-card">
+              <div className="rounded-[12px] border border-border bg-surface p-4 sm:p-8 text-center text-txt-secondary shadow-card">
                 Belum ada laporan.
               </div>
             ) : (
