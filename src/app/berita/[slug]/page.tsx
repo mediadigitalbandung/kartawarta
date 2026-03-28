@@ -111,8 +111,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         articleTitle={article.title}
       />
 
-      <div className="bg-surface min-h-screen">
-        <div className="container-main py-8">
+      <div className="bg-surface min-h-screen overflow-x-hidden">
+        <div className="container-main py-8 overflow-hidden">
           {/* Breadcrumb */}
           <nav className="mb-6 flex items-center gap-2 text-sm text-txt-secondary">
             <Link href="/" className="transition-colors hover:text-goto-green">Beranda</Link>
@@ -178,9 +178,9 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               )}
 
               {/* Article content */}
-              <div className="mt-8 max-w-3xl">
+              <div className="mt-8 max-w-full overflow-hidden">
                 <div
-                  className="article-content text-[17px] leading-[1.8]"
+                  className="article-content text-base sm:text-[17px] leading-[1.8] break-words"
                   dangerouslySetInnerHTML={{ __html: sanitizedContent }}
                 />
               </div>
