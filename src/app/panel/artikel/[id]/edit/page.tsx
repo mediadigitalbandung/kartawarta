@@ -157,6 +157,10 @@ export default function EditArticlePage() {
   }, [fetchCategories, fetchArticle]);
 
   const addSource = () => {
+    // Don't add if last source has empty name
+    if (sources.length > 0 && !sources[sources.length - 1].name.trim()) {
+      return;
+    }
     setSources([...sources, { name: "", title: "", institution: "", url: "" }]);
   };
 
@@ -229,6 +233,21 @@ export default function EditArticlePage() {
 
   if (loading) {
     return <LoadingSkeleton />;
+  }
+
+  if (error && !title) {
+    return (
+      <div className="flex min-h-[40vh] flex-col items-center justify-center text-center">
+        <AlertCircle size={48} className="mb-4 text-red-400" />
+        <h1 className="text-xl font-bold text-txt-primary">{error}</h1>
+        <button
+          onClick={() => router.push("/panel/artikel")}
+          className="btn-primary mt-4 flex items-center gap-2 px-4 py-2 text-sm font-semibold"
+        >
+          <ArrowLeft size={16} /> Kembali ke Daftar Artikel
+        </button>
+      </div>
+    );
   }
 
   return (

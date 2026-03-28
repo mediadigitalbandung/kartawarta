@@ -85,7 +85,8 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const data = updateArticleSchema.parse(body);
+    const { tags: tagNames, sources: sourcesData, ...rawData } = body;
+    const data = updateArticleSchema.parse(rawData);
 
     // Handle status changes
     if (data.status) {
@@ -129,6 +130,16 @@ export async function PUT(
             ? new Date()
             : undefined,
         scheduledAt: data.scheduledAt ? new Date(data.scheduledAt) : undefined,
+        // Handle tags: disconnect all, then reconnect
+        ...(tagNames && Array.isArray(tagNames) && {
+          tags: {
+            set: [], // disconnect all existing
+            connectOrCreate: tagNames.map((name: string) => ({
+              where: { name },
+              create: { name, slug: name.toLowerCase().replace(/\s+/g, '-') },
+            })),
+          },
+        }),
       },
       include: {
         author: { select: { id: true, name: true } },
@@ -137,6 +148,19 @@ export async function PUT(
         sources: true,
       },
     });
+
+    // Handle sources: delete existing, create new
+    if (sourcesData && Array.isArray(sourcesData)) {
+      await prisma.source.deleteMany({ where: { articleId: params.id } });
+      if (sourcesData.length > 0) {
+        await prisma.source.createMany({
+          data: sourcesData.map((s: any) => ({
+            ...s,
+            articleId: params.id,
+          })),
+        });
+      }
+    }
 
     await logAudit(
       session.user.id,

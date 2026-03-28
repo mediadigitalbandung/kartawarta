@@ -76,6 +76,10 @@ export default function NewArticlePage() {
   }, [fetchCategories]);
 
   const addSource = () => {
+    // Don't add if last source has empty name
+    if (sources.length > 0 && !sources[sources.length - 1].name.trim()) {
+      return;
+    }
     setSources([...sources, { name: "", title: "", institution: "", url: "" }]);
   };
 

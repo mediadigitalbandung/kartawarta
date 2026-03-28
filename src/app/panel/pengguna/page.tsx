@@ -226,13 +226,13 @@ export default function PenggunaPage() {
       u.email.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (session && session.user.role !== "SUPER_ADMIN") {
+  if (session && session.user.role !== "SUPER_ADMIN" && session.user.role !== "CHIEF_EDITOR") {
     return (
       <div className="flex min-h-[40vh] flex-col items-center justify-center text-center">
         <ShieldAlert size={48} className="mb-4 text-red-400" />
         <h1 className="text-xl font-bold text-txt-primary">Akses Ditolak</h1>
         <p className="mt-2 text-sm text-txt-secondary">
-          Halaman ini hanya dapat diakses oleh Super Admin.
+          Halaman ini hanya dapat diakses oleh Super Admin atau Editor Kepala.
         </p>
       </div>
     );

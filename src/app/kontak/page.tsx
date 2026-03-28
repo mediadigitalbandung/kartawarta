@@ -6,10 +6,35 @@ import { Mail, MapPin, Phone, Send } from "lucide-react";
 export default function KontakPage() {
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    setError("");
+    setSending(true);
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        setError(data.error || "Gagal mengirim pesan");
+        setSending(false);
+        return;
+      }
+
+      setSent(true);
+    } catch {
+      setError("Terjadi kesalahan. Silakan coba lagi.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -97,8 +122,11 @@ export default function KontakPage() {
                       <label className="mb-1 block text-sm font-medium text-txt-primary">Pesan</label>
                       <textarea required rows={5} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} className="input w-full" />
                     </div>
-                    <button type="submit" className="btn-primary flex items-center gap-2">
-                      <Send size={16} /> Kirim Pesan
+                    {error && (
+                      <p className="text-sm text-red-600">{error}</p>
+                    )}
+                    <button type="submit" disabled={sending} className="btn-primary flex items-center gap-2 disabled:opacity-50">
+                      <Send size={16} /> {sending ? "Mengirim..." : "Kirim Pesan"}
                     </button>
                   </div>
                 </form>
