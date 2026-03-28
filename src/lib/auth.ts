@@ -70,11 +70,27 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
         token.avatar = user.avatar;
+      }
+      // Refresh role from DB on every request to ensure accuracy
+      if (token.id && (trigger === "update" || !user)) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: { role: true, name: true, avatar: true, isActive: true },
+          });
+          if (dbUser && dbUser.isActive) {
+            token.role = dbUser.role;
+            token.name = dbUser.name;
+            token.avatar = dbUser.avatar;
+          }
+        } catch {
+          // Silently fail — use cached token
+        }
       }
       return token;
     },
@@ -82,6 +98,7 @@ export const authOptions: NextAuthOptions = {
       session.user.id = token.id;
       session.user.role = token.role;
       session.user.avatar = token.avatar;
+      if (token.name) session.user.name = token.name as string;
       return session;
     },
   },

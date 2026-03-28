@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
@@ -14,10 +14,17 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const { data: session } = useSession();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    // Sign out existing session first to prevent session mixing
+    if (session) {
+      await signOut({ redirect: false });
+    }
 
     const result = await signIn("credentials", {
       email,
@@ -30,8 +37,8 @@ export default function LoginPage() {
     if (result?.error) {
       setError(result.error);
     } else {
-      router.push("/panel/dashboard");
-      router.refresh();
+      // Hard redirect to clear all cached state
+      window.location.href = "/panel/dashboard";
     }
   };
 
