@@ -669,7 +669,7 @@ export default function EditArticlePage() {
           )}
           <div className="rounded-[12px] border border-border bg-surface p-5">
             <label className="mb-2 block text-xs font-medium text-txt-muted uppercase tracking-wider">Konten</label>
-            <div className="prose prose-sm max-w-none text-txt-primary" dangerouslySetInnerHTML={{ __html: content }} />
+            <div className="prose prose-sm max-w-none text-txt-primary text-justify" dangerouslySetInnerHTML={{ __html: content }} />
           </div>
         </div>
       </div>
@@ -896,7 +896,7 @@ export default function EditArticlePage() {
           )}
           <div className="rounded-[12px] border border-border bg-surface p-5">
             <label className="mb-2 block text-xs font-medium text-txt-muted uppercase tracking-wider">Konten</label>
-            <div className="prose prose-sm max-w-none text-txt-primary" dangerouslySetInnerHTML={{ __html: content }} />
+            <div className="prose prose-sm max-w-none text-txt-primary text-justify" dangerouslySetInnerHTML={{ __html: content }} />
           </div>
           {sources.filter(s => s.name.trim()).length > 0 && (
             <div className="rounded-[12px] border border-border bg-surface p-5">
@@ -1215,7 +1215,7 @@ export default function EditArticlePage() {
           )}
           <div className="rounded-[12px] border border-border bg-surface p-5">
             <label className="mb-2 block text-xs font-medium text-txt-muted uppercase tracking-wider">Konten</label>
-            <div className="prose prose-sm max-w-none text-txt-primary" dangerouslySetInnerHTML={{ __html: content }} />
+            <div className="prose prose-sm max-w-none text-txt-primary text-justify" dangerouslySetInnerHTML={{ __html: content }} />
           </div>
         </div>
       )}
