@@ -424,8 +424,8 @@ export default async function HomePage() {
       {/* Category Sections — Kumparan-style layout */}
       {categoryEntries.map(([categoryName, { categorySlug, articles: catArticles }], idx) => {
         const featured = catArticles[0];
-        const trending = catArticles.slice(1, 3);
-        const terbaru = catArticles.slice(3, 6);
+        const trending = catArticles.slice(1, 4);
+        const terbaru = catArticles.slice(4, 7);
 
         return (
           <section
@@ -446,12 +446,12 @@ export default async function HomePage() {
                 </Link>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Left: Featured article — large card with image overlay */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left: Featured article — compact landscape */}
                 {featured && (
                   <div className="lg:col-span-1">
                     <Link href={`/berita/${featured.slug}`} className="group block">
-                      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-surface-dark">
+                      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-surface-dark">
                         {featured.featuredImage ? (
                           <Image
                             src={featured.featuredImage}
@@ -462,12 +462,12 @@ export default async function HomePage() {
                         ) : (
                           <div className="h-full w-full bg-surface-tertiary" />
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                        <div className="absolute bottom-0 left-0 right-0 p-5">
-                          <h3 className="text-lg font-bold leading-tight text-white line-clamp-3">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                        <div className="absolute bottom-0 left-0 right-0 p-4">
+                          <h3 className="text-base font-bold leading-snug text-white line-clamp-2">
                             {featured.title}
                           </h3>
-                          <div className="mt-2 flex items-center gap-2 text-xs text-white/50">
+                          <div className="mt-1.5 flex items-center gap-2 text-[11px] text-white/50">
                             <span className="text-goto-green font-semibold">{featured.author.name}</span>
                             <span>{featured.publishedAt ? new Date(featured.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : ""}</span>
                           </div>
@@ -477,36 +477,32 @@ export default async function HomePage() {
                   </div>
                 )}
 
-                {/* Center: Trending */}
+                {/* Center: Trending — scrollable list */}
                 {trending.length > 0 && (
                   <div className="lg:col-span-1">
-                    <h3 className="border-l-[3px] border-goto-green pl-3 text-sm font-bold text-txt-primary mb-4">
+                    <h3 className="border-l-[3px] border-goto-green pl-3 text-sm font-bold text-txt-primary mb-3">
                       Trending di {categoryName}
                     </h3>
-                    <div className="space-y-4">
+                    <div className="space-y-0 divide-y divide-border max-h-[280px] overflow-y-auto scrollbar-hide">
                       {trending.map((a) => (
-                        <div key={a.slug} className="group">
-                          <span className="text-[11px] text-txt-muted">
-                            {a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : ""}
-                          </span>
-                          <div className="flex gap-3 mt-1">
-                            <div className="flex-1 min-w-0">
-                              <Link href={`/berita/${a.slug}`}>
-                                <h4 className="text-sm font-bold text-txt-primary leading-snug line-clamp-3 group-hover:text-goto-green transition-colors">
-                                  {a.title}
-                                </h4>
-                              </Link>
-                              <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-txt-muted">
-                                <span className="text-goto-green font-semibold">{a.author.name}</span>
+                        <div key={a.slug} className="group flex gap-3 py-2.5 first:pt-0">
+                          {a.featuredImage && (
+                            <Link href={`/berita/${a.slug}`} className="shrink-0">
+                              <div className="relative h-[56px] w-[80px] overflow-hidden rounded">
+                                <Image src={a.featuredImage} alt={a.title} fill className="object-cover" />
                               </div>
+                            </Link>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <Link href={`/berita/${a.slug}`}>
+                              <h4 className="text-[13px] font-bold text-txt-primary leading-snug line-clamp-2 group-hover:text-goto-green transition-colors">
+                                {a.title}
+                              </h4>
+                            </Link>
+                            <div className="mt-1 flex items-center gap-1.5 text-[10px] text-txt-muted">
+                              <span className="text-goto-green font-semibold">{a.author.name}</span>
+                              <span>{a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : ""}</span>
                             </div>
-                            {a.featuredImage && (
-                              <Link href={`/berita/${a.slug}`} className="shrink-0">
-                                <div className="relative h-[72px] w-[100px] overflow-hidden rounded">
-                                  <Image src={a.featuredImage} alt={a.title} fill className="object-cover" />
-                                </div>
-                              </Link>
-                            )}
                           </div>
                         </div>
                       ))}
@@ -517,32 +513,30 @@ export default async function HomePage() {
                 {/* Right: Terbaru */}
                 {terbaru.length > 0 && (
                   <div className="lg:col-span-1">
-                    <h3 className="border-l-[3px] border-goto-green pl-3 text-sm font-bold text-txt-primary mb-4">
+                    <h3 className="border-l-[3px] border-goto-green pl-3 text-sm font-bold text-txt-primary mb-3">
                       Terbaru di {categoryName}
                     </h3>
-                    <div className="space-y-4">
+                    <div className="space-y-0 divide-y divide-border max-h-[280px] overflow-y-auto scrollbar-hide">
                       {terbaru.map((a) => (
-                        <div key={a.slug} className="group flex gap-3">
-                          <div className="flex-1 min-w-0">
-                            <Link href={`/berita/${a.slug}`}>
-                              <h4 className="text-sm font-bold text-txt-primary leading-snug line-clamp-2 group-hover:text-goto-green transition-colors">
-                                {a.title}
-                              </h4>
-                            </Link>
-                            <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-txt-muted">
-                              <span className="text-goto-green font-semibold">{a.author.name}</span>
-                              <span>
-                                {a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : ""}
-                              </span>
-                            </div>
-                          </div>
+                        <div key={a.slug} className="group flex gap-3 py-2.5 first:pt-0">
                           {a.featuredImage && (
                             <Link href={`/berita/${a.slug}`} className="shrink-0">
-                              <div className="relative h-[64px] w-[90px] overflow-hidden rounded">
+                              <div className="relative h-[56px] w-[80px] overflow-hidden rounded">
                                 <Image src={a.featuredImage} alt={a.title} fill className="object-cover" />
                               </div>
                             </Link>
                           )}
+                          <div className="flex-1 min-w-0">
+                            <Link href={`/berita/${a.slug}`}>
+                              <h4 className="text-[13px] font-bold text-txt-primary leading-snug line-clamp-2 group-hover:text-goto-green transition-colors">
+                                {a.title}
+                              </h4>
+                            </Link>
+                            <div className="mt-1 flex items-center gap-1.5 text-[10px] text-txt-muted">
+                              <span className="text-goto-green font-semibold">{a.author.name}</span>
+                              <span>{a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : ""}</span>
+                            </div>
+                          </div>
                         </div>
                       ))}
                     </div>
