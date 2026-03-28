@@ -14,12 +14,16 @@ import {
   CheckCircle,
   ArrowLeft,
   XCircle,
-  Upload,
   MessageSquare,
   User,
   Calendar,
   Loader2,
   Sparkles,
+  Lock,
+  Undo2,
+  Upload,
+  ArrowRight,
+  Eye,
 } from "lucide-react";
 import ImageUploader from "@/components/editor/ImageUploader";
 
@@ -42,7 +46,7 @@ interface Source {
 }
 
 const EDITOR_ROLES = ["EDITOR", "CHIEF_EDITOR", "SUPER_ADMIN"];
-const CAN_PUBLISH_DIRECTLY = ["SUPER_ADMIN", "CHIEF_EDITOR", "SENIOR_JOURNALIST"];
+const ADMIN_ROLES = ["SUPER_ADMIN", "CHIEF_EDITOR"];
 const CAN_SUBMIT_REVIEW = ["SUPER_ADMIN", "CHIEF_EDITOR", "EDITOR", "SENIOR_JOURNALIST", "JOURNALIST"];
 
 function LoadingSkeleton() {
@@ -82,7 +86,9 @@ export default function EditArticlePage() {
   const articleId = params.id as string;
   const { data: session } = useSession();
   const userRole = session?.user?.role || "";
+  const userId = session?.user?.id || "";
   const isEditor = EDITOR_ROLES.includes(userRole);
+  const isAdmin = ADMIN_ROLES.includes(userRole);
 
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("");
@@ -93,7 +99,6 @@ export default function EditArticlePage() {
   const [featuredImage, setFeaturedImage] = useState("");
   const [seoTitle, setSeoTitle] = useState("");
   const [seoDescription, setSeoDescription] = useState("");
-  const [verificationLabel, setVerificationLabel] = useState("UNVERIFIED");
   const [sources, setSources] = useState<Source[]>([{ name: "", title: "", institution: "", url: "" }]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -101,11 +106,21 @@ export default function EditArticlePage() {
   const [showChecklist, setShowChecklist] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [currentStatus, setCurrentStatus] = useState("");
-  const [reviewNote, setReviewNote] = useState("");
   const [existingReviewNote, setExistingReviewNote] = useState("");
   const [existingReviewedBy, setExistingReviewedBy] = useState("");
+  const [existingReviewerName, setExistingReviewerName] = useState("");
   const [existingReviewedAt, setExistingReviewedAt] = useState("");
+  const [articleAuthorId, setArticleAuthorId] = useState("");
+  const [articleAuthorName, setArticleAuthorName] = useState("");
+  const [articleCreatedAt, setArticleCreatedAt] = useState("");
+
+  // Editor review state
+  const [reviewChoice, setReviewChoice] = useState<"approve" | "reject" | null>(null);
+  const [approveNote, setApproveNote] = useState("");
   const [rejectNote, setRejectNote] = useState("");
+
+  // Admin return-to-editor note
+  const [returnNote, setReturnNote] = useState("");
 
   const [checklist, setChecklist] = useState({
     notClickbait: false,
@@ -188,11 +203,14 @@ export default function EditArticlePage() {
       setFeaturedImage(article.featuredImage || "");
       setSeoTitle(article.seoTitle || "");
       setSeoDescription(article.seoDescription || "");
-      setVerificationLabel(article.verificationLabel || "UNVERIFIED");
       setCurrentStatus(article.status || "DRAFT");
       setExistingReviewNote(article.reviewNote || "");
       setExistingReviewedBy(article.reviewedBy || "");
+      setExistingReviewerName(article.reviewerName || "");
       setExistingReviewedAt(article.reviewedAt || "");
+      setArticleAuthorId(article.authorId || article.author?.id || "");
+      setArticleAuthorName(article.author?.name || "");
+      setArticleCreatedAt(article.createdAt || "");
 
       if (article.sources && article.sources.length > 0) {
         setSources(
@@ -233,7 +251,26 @@ export default function EditArticlePage() {
     setSources(updated);
   };
 
-  const handleSubmit = async (status: "DRAFT" | "IN_REVIEW" | "PUBLISHED" | "APPROVED" | "REJECTED") => {
+  // Determine user's role in relation to this article
+  const isOwner = articleAuthorId === userId;
+  const isAssignedEditor = isEditor && existingReviewedBy === userId;
+
+  // Determine what view to show
+  const getViewMode = (): "journalist" | "editor" | "admin" | "unauthorized" => {
+    if (isAdmin) return "admin";
+    if (isEditor && !isOwner) return "editor";
+    if (isOwner) return "journalist";
+    if (isEditor) return "editor"; // editor viewing any article
+    return "unauthorized";
+  };
+
+  const viewMode = getViewMode();
+
+  // Check if jurnalis can edit content
+  const canJurnalisEdit = isOwner && ["DRAFT", "REJECTED"].includes(currentStatus);
+
+  // --- JURNALIS HANDLERS ---
+  const handleJurnalisSubmit = async (status: "DRAFT" | "IN_REVIEW") => {
     setError("");
 
     if (!title.trim()) return setError("Judul wajib diisi");
@@ -241,71 +278,208 @@ export default function EditArticlePage() {
     if (content.length < 50) return setError("Konten minimal 50 karakter");
     if (!categoryId) return setError("Kategori harus dipilih");
 
-    if (status === "REJECTED" && !rejectNote.trim()) {
-      return setError("Alasan penolakan wajib diisi");
-    }
-
-    if (!["DRAFT", "APPROVED", "REJECTED"].includes(status) && !allChecked) {
+    if (status === "IN_REVIEW" && !allChecked) {
       setShowChecklist(true);
       return setError("Semua checklist jurnalistik harus dipenuhi sebelum submit");
     }
 
-    setSaving(true);
+    if (status === "IN_REVIEW") {
+      if (!confirm("Artikel akan dikirim untuk review oleh editor. Lanjutkan?")) return;
+    }
 
+    setSaving(true);
     try {
       const validSources = sources.filter((s) => s.name.trim());
-      const tagList = tags
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean);
-
-      const body: Record<string, unknown> = {
-        title,
-        content,
-        excerpt: excerpt || undefined,
-        categoryId,
-        tags: tagList,
-        featuredImage: featuredImage || undefined,
-        seoTitle: seoTitle || undefined,
-        seoDescription: seoDescription || undefined,
-        status,
-        verificationLabel,
-        sources: validSources.length > 0 ? validSources : undefined,
-      };
-
-      // Add review note for approve/reject
-      if (status === "APPROVED") {
-        body.reviewNote = reviewNote || null;
-      } else if (status === "REJECTED") {
-        body.reviewNote = rejectNote;
-      }
+      const tagList = tags.split(",").map((t) => t.trim()).filter(Boolean);
 
       const res = await fetch(`/api/articles/${articleId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          title,
+          content,
+          excerpt: excerpt || undefined,
+          categoryId,
+          tags: tagList,
+          featuredImage: featuredImage || undefined,
+          seoTitle: seoTitle || undefined,
+          seoDescription: seoDescription || undefined,
+          status,
+          sources: validSources.length > 0 ? validSources : undefined,
+        }),
       });
 
       const data = await res.json();
-
       if (!data.success) {
         setError(data.error || "Gagal menyimpan artikel");
         setSaving(false);
         return;
       }
 
-      const statusMessages: Record<string, string> = {
-        APPROVED: "Artikel berhasil disetujui",
-        REJECTED: "Artikel telah ditolak",
-        PUBLISHED: "Artikel berhasil dipublikasi",
-        DRAFT: "Artikel disimpan sebagai draf",
-        IN_REVIEW: "Artikel dikirim untuk review",
-      };
-      alert(statusMessages[status] || "Artikel berhasil diperbarui");
+      alert(status === "IN_REVIEW" ? "Artikel dikirim untuk review" : "Artikel disimpan sebagai draf");
       router.push("/panel/artikel");
       router.refresh();
     } catch {
       setError("Terjadi kesalahan. Silakan coba lagi.");
+      setSaving(false);
+    }
+  };
+
+  const handleCancelReview = async () => {
+    if (!confirm("Batalkan review dan kembalikan artikel ke draf?")) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/articles/${articleId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "DRAFT" }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        setError(data.error || "Gagal membatalkan review");
+        setSaving(false);
+        return;
+      }
+      alert("Review dibatalkan. Artikel kembali ke draf.");
+      router.push("/panel/artikel");
+      router.refresh();
+    } catch {
+      setError("Terjadi kesalahan.");
+      setSaving(false);
+    }
+  };
+
+  // --- EDITOR HANDLERS ---
+  const handleEditorApprove = async () => {
+    if (!confirm("Setujui artikel ini? Artikel akan diteruskan ke admin untuk publikasi.")) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/articles/${articleId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status: "APPROVED",
+          reviewNote: approveNote || null,
+        }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        setError(data.error || "Gagal menyetujui artikel");
+        setSaving(false);
+        return;
+      }
+      alert("Artikel berhasil disetujui");
+      router.push("/panel/artikel");
+      router.refresh();
+    } catch {
+      setError("Terjadi kesalahan.");
+      setSaving(false);
+    }
+  };
+
+  const handleEditorReject = async () => {
+    if (!rejectNote.trim()) {
+      setError("Alasan penolakan wajib diisi");
+      return;
+    }
+    if (!confirm("Tolak artikel ini? Artikel akan dikembalikan ke penulis.")) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/articles/${articleId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status: "REJECTED",
+          reviewNote: rejectNote,
+        }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        setError(data.error || "Gagal menolak artikel");
+        setSaving(false);
+        return;
+      }
+      alert("Artikel ditolak dan dikembalikan ke penulis");
+      router.push("/panel/artikel");
+      router.refresh();
+    } catch {
+      setError("Terjadi kesalahan.");
+      setSaving(false);
+    }
+  };
+
+  const handleEditorCancelApproval = async () => {
+    if (!confirm("Batalkan persetujuan? Artikel akan kembali ke status review.")) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/articles/${articleId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "IN_REVIEW" }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        setError(data.error || "Gagal membatalkan persetujuan");
+        setSaving(false);
+        return;
+      }
+      alert("Persetujuan dibatalkan. Artikel kembali ke review.");
+      router.push("/panel/artikel");
+      router.refresh();
+    } catch {
+      setError("Terjadi kesalahan.");
+      setSaving(false);
+    }
+  };
+
+  // --- ADMIN HANDLERS ---
+  const handleAdminPublish = async () => {
+    if (!confirm("Publikasi artikel ini? Artikel akan tampil di halaman publik.")) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/articles/${articleId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "PUBLISHED" }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        setError(data.error || "Gagal mempublikasi artikel");
+        setSaving(false);
+        return;
+      }
+      alert("Artikel berhasil dipublikasikan!");
+      router.push("/panel/artikel");
+      router.refresh();
+    } catch {
+      setError("Terjadi kesalahan.");
+      setSaving(false);
+    }
+  };
+
+  const handleAdminReturnToEditor = async () => {
+    if (!confirm("Kembalikan artikel ke editor untuk review ulang?")) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/articles/${articleId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status: "IN_REVIEW",
+          reviewNote: returnNote || null,
+        }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        setError(data.error || "Gagal mengembalikan artikel");
+        setSaving(false);
+        return;
+      }
+      alert("Artikel dikembalikan ke editor");
+      router.push("/panel/artikel");
+      router.refresh();
+    } catch {
+      setError("Terjadi kesalahan.");
       setSaving(false);
     }
   };
@@ -329,6 +503,423 @@ export default function EditArticlePage() {
     );
   }
 
+  const statusLabel: Record<string, string> = {
+    DRAFT: "Draf",
+    IN_REVIEW: "Menunggu Review",
+    APPROVED: "Disetujui",
+    PUBLISHED: "Dipublikasi",
+    REJECTED: "Ditolak",
+    ARCHIVED: "Diarsipkan",
+  };
+
+  // ============================================================
+  // RENDER: ADMIN VIEW
+  // ============================================================
+  if (viewMode === "admin") {
+    return (
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-6">
+          <button
+            onClick={() => router.push("/panel/artikel")}
+            className="mb-1 flex items-center gap-1 text-xs text-txt-secondary hover:text-txt-primary"
+          >
+            <ArrowLeft size={14} /> Kembali ke Daftar Artikel
+          </button>
+          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">
+            Review Artikel (Admin)
+          </h1>
+          <p className="text-sm text-txt-secondary">
+            Status: <span className="font-medium text-gold">{statusLabel[currentStatus] || currentStatus}</span>
+          </p>
+        </div>
+
+        {error && (
+          <div className="mb-4 flex items-center gap-2 rounded-[12px] bg-red-50 px-4 py-3 text-sm text-red-700">
+            <AlertCircle size={16} />
+            {error}
+          </div>
+        )}
+
+        {/* Activity Info */}
+        <div className="mb-6 rounded-[12px] border border-border bg-surface p-5 space-y-3">
+          <h3 className="text-sm font-bold text-txt-primary uppercase tracking-wider flex items-center gap-2">
+            <Eye size={16} />
+            Informasi Artikel
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            <div>
+              <span className="text-txt-muted">Penulis:</span>{" "}
+              <span className="text-txt-primary font-medium">{articleAuthorName || "—"}</span>
+            </div>
+            <div>
+              <span className="text-txt-muted">Dibuat:</span>{" "}
+              <span className="text-txt-primary">
+                {articleCreatedAt ? new Date(articleCreatedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"}
+              </span>
+            </div>
+            <div>
+              <span className="text-txt-muted">Editor reviewer:</span>{" "}
+              <span className="text-txt-primary font-medium">{existingReviewerName || "—"}</span>
+            </div>
+            <div>
+              <span className="text-txt-muted">Waktu review:</span>{" "}
+              <span className="text-txt-primary">
+                {existingReviewedAt ? new Date(existingReviewedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"}
+              </span>
+            </div>
+            {existingReviewNote && (
+              <div className="sm:col-span-2">
+                <span className="text-txt-muted">Catatan review:</span>{" "}
+                <span className="text-txt-primary">{existingReviewNote}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Admin Actions */}
+        {currentStatus === "APPROVED" && (
+          <div className="mb-6 rounded-[12px] border-2 border-goto-green/30 bg-goto-50 p-5">
+            <h3 className="flex items-center gap-2 text-base font-bold text-goto-dark">
+              <CheckCircle size={18} />
+              Artikel Disetujui — Siap Dipublikasi
+            </h3>
+            <p className="mt-1 text-sm text-goto-green">
+              Artikel ini telah disetujui oleh editor. Anda dapat mempublikasi atau mengembalikan ke editor.
+            </p>
+
+            <div className="mt-4 space-y-3">
+              <div>
+                <label className="mb-1 block text-sm font-medium text-txt-secondary">
+                  Catatan untuk editor (opsional, jika mengembalikan)
+                </label>
+                <textarea
+                  value={returnNote}
+                  onChange={(e) => setReturnNote(e.target.value)}
+                  rows={2}
+                  placeholder="Catatan jika ingin mengembalikan ke editor..."
+                  className="input w-full text-sm"
+                />
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleAdminPublish}
+                  disabled={saving}
+                  className="flex items-center gap-1.5 rounded-[12px] bg-goto-green px-5 py-2.5 text-sm font-semibold text-white hover:bg-goto-dark disabled:opacity-50"
+                >
+                  <Upload size={16} />
+                  Publikasi
+                </button>
+                <button
+                  onClick={handleAdminReturnToEditor}
+                  disabled={saving}
+                  className="flex items-center gap-1.5 rounded-[12px] border border-yellow-300 bg-yellow-50 px-5 py-2.5 text-sm font-semibold text-yellow-700 hover:bg-yellow-100 disabled:opacity-50"
+                >
+                  <Undo2 size={16} />
+                  Kembalikan ke Editor
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentStatus === "PUBLISHED" && (
+          <div className="mb-6 rounded-[12px] border border-goto-green/30 bg-goto-50 p-5">
+            <h3 className="flex items-center gap-2 text-base font-bold text-goto-dark">
+              <CheckCircle size={18} />
+              Artikel Sudah Dipublikasikan
+            </h3>
+          </div>
+        )}
+
+        {currentStatus === "IN_REVIEW" && (
+          <div className="mb-6 rounded-[12px] border border-yellow-300 bg-yellow-50 p-5">
+            <h3 className="flex items-center gap-2 text-base font-bold text-yellow-800">
+              <MessageSquare size={18} />
+              Artikel Sedang Direview oleh Editor
+            </h3>
+            <p className="mt-1 text-sm text-yellow-600">
+              Editor: {existingReviewerName || "Belum ditugaskan"}
+            </p>
+          </div>
+        )}
+
+        {/* Read-only article content */}
+        <div className="space-y-4">
+          <div className="rounded-[12px] border border-border bg-surface p-5">
+            <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Judul</label>
+            <p className="text-lg font-bold text-txt-primary">{title}</p>
+          </div>
+          <div className="rounded-[12px] border border-border bg-surface p-5">
+            <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Kategori</label>
+            <p className="text-sm text-txt-primary">{categories.find(c => c.id === categoryId)?.name || categoryId}</p>
+          </div>
+          {excerpt && (
+            <div className="rounded-[12px] border border-border bg-surface p-5">
+              <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Ringkasan</label>
+              <p className="text-sm text-txt-primary">{excerpt}</p>
+            </div>
+          )}
+          {featuredImage && (
+            <div className="rounded-[12px] border border-border bg-surface p-5">
+              <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Gambar Utama</label>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={featuredImage} alt="Featured" className="mt-2 max-h-64 rounded-[8px] object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+            </div>
+          )}
+          <div className="rounded-[12px] border border-border bg-surface p-5">
+            <label className="mb-2 block text-xs font-medium text-txt-muted uppercase tracking-wider">Konten</label>
+            <div className="prose prose-sm max-w-none text-txt-primary" dangerouslySetInnerHTML={{ __html: content }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ============================================================
+  // RENDER: EDITOR VIEW
+  // ============================================================
+  if (viewMode === "editor") {
+    // Not assigned to this editor
+    if (currentStatus === "IN_REVIEW" && !isAssignedEditor && !isAdmin) {
+      return (
+        <div className="mx-auto max-w-5xl">
+          <button
+            onClick={() => router.push("/panel/artikel")}
+            className="mb-4 flex items-center gap-1 text-xs text-txt-secondary hover:text-txt-primary"
+          >
+            <ArrowLeft size={14} /> Kembali
+          </button>
+          <div className="flex min-h-[30vh] flex-col items-center justify-center text-center">
+            <Lock size={48} className="mb-4 text-yellow-400" />
+            <h1 className="text-xl font-bold text-txt-primary">Artikel ini tidak ditugaskan kepada Anda</h1>
+            <p className="mt-2 text-sm text-txt-secondary">
+              Artikel ini sedang direview oleh editor lain ({existingReviewerName || "tidak diketahui"}).
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-6">
+          <button
+            onClick={() => router.push("/panel/artikel")}
+            className="mb-1 flex items-center gap-1 text-xs text-txt-secondary hover:text-txt-primary"
+          >
+            <ArrowLeft size={14} /> Kembali ke Daftar Artikel
+          </button>
+          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">
+            Review Artikel
+          </h1>
+          <p className="text-sm text-txt-secondary">
+            Status: <span className="font-medium text-gold">{statusLabel[currentStatus] || currentStatus}</span>
+            {" | "}Penulis: <span className="font-medium">{articleAuthorName}</span>
+          </p>
+        </div>
+
+        {error && (
+          <div className="mb-4 flex items-center gap-2 rounded-[12px] bg-red-50 px-4 py-3 text-sm text-red-700">
+            <AlertCircle size={16} />
+            {error}
+          </div>
+        )}
+
+        {/* Editor Review Panel - IN_REVIEW */}
+        {currentStatus === "IN_REVIEW" && isAssignedEditor && (
+          <div className="mb-6 rounded-[12px] border-2 border-yellow-300 bg-yellow-50 p-5">
+            <h3 className="flex items-center gap-2 text-base font-bold text-yellow-800">
+              <MessageSquare size={18} />
+              Panel Review Editor
+            </h3>
+            <p className="mt-1 text-sm text-yellow-600">
+              Periksa artikel di bawah, kemudian pilih salah satu aksi.
+            </p>
+
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Approve Card */}
+              <div
+                onClick={() => { setReviewChoice("approve"); setRejectNote(""); }}
+                className={`cursor-pointer rounded-[12px] border-2 p-4 transition-all ${
+                  reviewChoice === "approve"
+                    ? "border-goto-green bg-goto-green/5"
+                    : "border-border bg-white hover:border-goto-green/50"
+                } ${reviewChoice === "reject" ? "opacity-40 pointer-events-none" : ""}`}
+              >
+                <div className="flex items-center gap-2 text-goto-green font-bold">
+                  <CheckCircle size={20} />
+                  Setujui
+                </div>
+                <p className="mt-1 text-xs text-txt-secondary">Artikel memenuhi standar. Teruskan ke admin untuk publikasi.</p>
+                {reviewChoice === "approve" && (
+                  <div className="mt-3">
+                    <label className="mb-1 block text-xs font-medium text-txt-secondary">
+                      Catatan (opsional)
+                    </label>
+                    <textarea
+                      value={approveNote}
+                      onChange={(e) => setApproveNote(e.target.value)}
+                      rows={2}
+                      placeholder="Catatan untuk penulis..."
+                      className="input w-full text-sm"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Reject Card */}
+              <div
+                onClick={() => { setReviewChoice("reject"); setApproveNote(""); }}
+                className={`cursor-pointer rounded-[12px] border-2 p-4 transition-all ${
+                  reviewChoice === "reject"
+                    ? "border-red-500 bg-red-500/5"
+                    : "border-border bg-white hover:border-red-300"
+                } ${reviewChoice === "approve" ? "opacity-40 pointer-events-none" : ""}`}
+              >
+                <div className="flex items-center gap-2 text-red-600 font-bold">
+                  <XCircle size={20} />
+                  Tolak
+                </div>
+                <p className="mt-1 text-xs text-txt-secondary">Artikel perlu diperbaiki. Kembalikan ke penulis dengan catatan.</p>
+                {reviewChoice === "reject" && (
+                  <div className="mt-3">
+                    <label className="mb-1 block text-xs font-medium text-red-700">
+                      Alasan penolakan (wajib)
+                    </label>
+                    <textarea
+                      value={rejectNote}
+                      onChange={(e) => setRejectNote(e.target.value)}
+                      rows={2}
+                      placeholder="Jelaskan alasan penolakan..."
+                      className="input w-full text-sm border-red-200"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Reset choice */}
+            {reviewChoice && (
+              <button
+                onClick={() => { setReviewChoice(null); setApproveNote(""); setRejectNote(""); }}
+                className="mt-3 text-xs text-txt-muted hover:text-txt-secondary underline"
+              >
+                Reset pilihan
+              </button>
+            )}
+
+            {/* Submit button */}
+            {reviewChoice && (
+              <div className="mt-4">
+                <button
+                  onClick={reviewChoice === "approve" ? handleEditorApprove : handleEditorReject}
+                  disabled={saving || (reviewChoice === "reject" && !rejectNote.trim())}
+                  className={`flex items-center gap-1.5 rounded-[12px] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50 ${
+                    reviewChoice === "approve"
+                      ? "bg-goto-green hover:bg-goto-dark"
+                      : "bg-red-600 hover:bg-red-700"
+                  }`}
+                >
+                  {reviewChoice === "approve" ? (
+                    <>
+                      <CheckCircle size={16} />
+                      Konfirmasi Setujui
+                    </>
+                  ) : (
+                    <>
+                      <XCircle size={16} />
+                      Konfirmasi Tolak
+                    </>
+                  )}
+                  <ArrowRight size={14} />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Editor Cancel Approval - APPROVED */}
+        {currentStatus === "APPROVED" && isAssignedEditor && (
+          <div className="mb-6 rounded-[12px] border border-blue-200 bg-blue-50 p-5">
+            <h3 className="flex items-center gap-2 text-base font-bold text-blue-700">
+              <CheckCircle size={18} />
+              Artikel Telah Disetujui
+            </h3>
+            <p className="mt-1 text-sm text-blue-600">
+              Menunggu publikasi oleh admin.
+            </p>
+            <button
+              onClick={handleEditorCancelApproval}
+              disabled={saving}
+              className="mt-3 flex items-center gap-1.5 rounded-[12px] border border-yellow-300 bg-yellow-50 px-4 py-2 text-sm font-semibold text-yellow-700 hover:bg-yellow-100 disabled:opacity-50"
+            >
+              <Undo2 size={16} />
+              Batalkan Persetujuan
+            </button>
+          </div>
+        )}
+
+        {currentStatus === "PUBLISHED" && (
+          <div className="mb-6 rounded-[12px] border border-goto-green/30 bg-goto-50 p-5">
+            <h3 className="flex items-center gap-2 text-base font-bold text-goto-dark">
+              <CheckCircle size={18} />
+              Artikel Telah Dipublikasikan
+            </h3>
+          </div>
+        )}
+
+        {/* Read-only article content */}
+        <div className="space-y-4">
+          <div className="rounded-[12px] border border-border bg-surface p-5">
+            <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Judul</label>
+            <p className="text-lg font-bold text-txt-primary">{title}</p>
+          </div>
+          <div className="rounded-[12px] border border-border bg-surface p-5">
+            <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Kategori</label>
+            <p className="text-sm text-txt-primary">{categories.find(c => c.id === categoryId)?.name || categoryId}</p>
+          </div>
+          {excerpt && (
+            <div className="rounded-[12px] border border-border bg-surface p-5">
+              <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Ringkasan</label>
+              <p className="text-sm text-txt-primary">{excerpt}</p>
+            </div>
+          )}
+          {featuredImage && (
+            <div className="rounded-[12px] border border-border bg-surface p-5">
+              <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Gambar Utama</label>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={featuredImage} alt="Featured" className="mt-2 max-h-64 rounded-[8px] object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+            </div>
+          )}
+          <div className="rounded-[12px] border border-border bg-surface p-5">
+            <label className="mb-2 block text-xs font-medium text-txt-muted uppercase tracking-wider">Konten</label>
+            <div className="prose prose-sm max-w-none text-txt-primary" dangerouslySetInnerHTML={{ __html: content }} />
+          </div>
+          {sources.filter(s => s.name.trim()).length > 0 && (
+            <div className="rounded-[12px] border border-border bg-surface p-5">
+              <label className="mb-2 block text-xs font-medium text-txt-muted uppercase tracking-wider">Sumber</label>
+              <div className="space-y-2">
+                {sources.filter(s => s.name.trim()).map((s, i) => (
+                  <div key={i} className="text-sm text-txt-primary">
+                    <span className="font-medium">{s.name}</span>
+                    {s.title && <span className="text-txt-secondary"> — {s.title}</span>}
+                    {s.institution && <span className="text-txt-secondary"> ({s.institution})</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ============================================================
+  // RENDER: JOURNALIST VIEW (article owner)
+  // ============================================================
   return (
     <div className="mx-auto max-w-5xl">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -343,44 +934,32 @@ export default function EditArticlePage() {
             Edit Artikel
           </h1>
           <p className="text-sm text-txt-secondary">
-            Status saat ini: <span className="font-medium text-gold">{
-              { DRAFT: "Draf", IN_REVIEW: "Menunggu Review", APPROVED: "Disetujui", PUBLISHED: "Dipublikasi", REJECTED: "Ditolak", ARCHIVED: "Diarsipkan" }[currentStatus] || currentStatus.replace(/_/g, " ")
-            }</span>
+            Status saat ini: <span className="font-medium text-gold">{statusLabel[currentStatus] || currentStatus}</span>
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Save Draft - always available */}
-          <button
-            onClick={() => handleSubmit("DRAFT")}
-            disabled={saving}
-            className="btn-secondary flex items-center gap-1.5 px-4 py-2 text-sm font-medium disabled:opacity-50"
-          >
-            <Save size={16} />
-            Simpan Draf
-          </button>
-          {/* Submit for review - not for editors reviewing, not for contributors */}
-          {CAN_SUBMIT_REVIEW.includes(userRole) && !isEditor && (
+        {/* Action buttons only for editable states */}
+        {canJurnalisEdit && (
+          <div className="flex flex-wrap items-center gap-2">
             <button
-              onClick={() => handleSubmit("IN_REVIEW")}
+              onClick={() => handleJurnalisSubmit("DRAFT")}
               disabled={saving}
-              className="btn-primary flex items-center gap-1.5 px-4 py-2 text-sm font-semibold disabled:opacity-50"
+              className="btn-secondary flex items-center gap-1.5 px-4 py-2 text-sm font-medium disabled:opacity-50"
             >
-              <Send size={16} />
-              Kirim untuk Review
+              <Save size={16} />
+              Simpan Draf
             </button>
-          )}
-          {/* Publish directly for senior editors */}
-          {CAN_PUBLISH_DIRECTLY.includes(userRole) && (
-            <button
-              onClick={() => handleSubmit("PUBLISHED")}
-              disabled={saving}
-              className="flex items-center gap-1.5 rounded-[12px] bg-goto-green px-4 py-2 text-sm font-semibold text-white hover:bg-goto-green/90 disabled:opacity-50"
-            >
-              <Upload size={16} />
-              Publikasi Langsung
-            </button>
-          )}
-        </div>
+            {CAN_SUBMIT_REVIEW.includes(userRole) && (
+              <button
+                onClick={() => handleJurnalisSubmit("IN_REVIEW")}
+                disabled={saving}
+                className="btn-primary flex items-center gap-1.5 px-4 py-2 text-sm font-semibold disabled:opacity-50"
+              >
+                <Send size={16} />
+                Kirim untuk Review
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {error && (
@@ -390,19 +969,19 @@ export default function EditArticlePage() {
         </div>
       )}
 
-      {/* Review note from previous rejection - shown to article creator */}
+      {/* REJECTED: Show editor's rejection note */}
       {currentStatus === "REJECTED" && existingReviewNote && (
-        <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4">
+        <div className="mb-4 rounded-[12px] border-2 border-red-300 bg-red-50 p-4">
           <h3 className="flex items-center gap-2 text-sm font-semibold text-red-700">
             <XCircle size={16} />
-            Artikel Ditolak
+            Artikel Ditolak oleh Editor
           </h3>
-          <p className="mt-2 text-sm text-red-600">{existingReviewNote}</p>
+          <p className="mt-2 text-sm text-red-600 font-medium">{existingReviewNote}</p>
           <div className="mt-2 flex items-center gap-4 text-xs text-red-400">
-            {existingReviewedBy && (
+            {existingReviewerName && (
               <span className="flex items-center gap-1">
                 <User size={12} />
-                Reviewer: {existingReviewedBy}
+                Editor: {existingReviewerName}
               </span>
             )}
             {existingReviewedAt && (
@@ -412,373 +991,234 @@ export default function EditArticlePage() {
               </span>
             )}
           </div>
+          <p className="mt-3 text-xs text-red-500">
+            Silakan perbaiki artikel sesuai catatan editor, kemudian kirim kembali untuk review.
+          </p>
         </div>
       )}
 
-      {/* Review info for approved articles */}
-      {currentStatus === "APPROVED" && existingReviewedAt && (
+      {/* IN_REVIEW: Article locked, show who is reviewing */}
+      {currentStatus === "IN_REVIEW" && isOwner && (
+        <div className="mb-4 rounded-[12px] border-2 border-yellow-300 bg-yellow-50 p-4">
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-yellow-800">
+            <Lock size={16} />
+            Artikel Sedang Direview
+          </h3>
+          <p className="mt-1 text-sm text-yellow-600">
+            Artikel sedang direview oleh <span className="font-semibold">{existingReviewerName || "editor"}</span>.
+            Anda tidak dapat mengedit artikel selama proses review.
+          </p>
+          <button
+            onClick={handleCancelReview}
+            disabled={saving}
+            className="mt-3 flex items-center gap-1.5 rounded-[12px] border border-yellow-400 bg-white px-4 py-2 text-sm font-semibold text-yellow-700 hover:bg-yellow-100 disabled:opacity-50"
+          >
+            <Undo2 size={16} />
+            Batalkan Review
+          </button>
+        </div>
+      )}
+
+      {/* APPROVED: Article locked */}
+      {currentStatus === "APPROVED" && isOwner && (
         <div className="mb-4 rounded-[12px] border border-blue-200 bg-blue-50 p-4">
           <h3 className="flex items-center gap-2 text-sm font-semibold text-blue-700">
             <CheckCircle size={16} />
-            Artikel Disetujui
+            Artikel Telah Disetujui
           </h3>
-          {existingReviewNote && (
-            <p className="mt-2 text-sm text-blue-600">{existingReviewNote}</p>
-          )}
-          <div className="mt-2 flex items-center gap-4 text-xs text-blue-400">
-            {existingReviewedBy && (
-              <span className="flex items-center gap-1">
-                <User size={12} />
-                Reviewer: {existingReviewedBy}
-              </span>
-            )}
-            {existingReviewedAt && (
-              <span className="flex items-center gap-1">
-                <Calendar size={12} />
-                {new Date(existingReviewedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-              </span>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Editor Review Panel - shown when article is IN_REVIEW and user is editor */}
-      {isEditor && currentStatus === "IN_REVIEW" && (
-        <div className="mb-6 rounded-[12px] border-2 border-yellow-300 bg-yellow-50 p-5">
-          <h3 className="flex items-center gap-2 text-base font-bold text-yellow-800">
-            <MessageSquare size={18} />
-            Panel Review Editor
-          </h3>
-          <p className="mt-1 text-sm text-yellow-600">
-            Artikel ini menunggu review. Silakan periksa dan pilih aksi di bawah.
+          <p className="mt-1 text-sm text-blue-600">
+            Artikel telah disetujui oleh editor. Menunggu publikasi oleh admin.
           </p>
-
-          {/* Optional review note for approval */}
-          <div className="mt-4">
-            <label className="mb-1 block text-sm font-medium text-yellow-800">
-              Catatan Review (opsional untuk persetujuan)
-            </label>
-            <textarea
-              value={reviewNote}
-              onChange={(e) => setReviewNote(e.target.value)}
-              rows={2}
-              placeholder="Catatan untuk penulis..."
-              className="input w-full text-sm"
-            />
-          </div>
-
-          {/* Rejection reason */}
-          <div className="mt-3">
-            <label className="mb-1 block text-sm font-medium text-red-700">
-              Alasan Penolakan (wajib jika menolak)
-            </label>
-            <textarea
-              value={rejectNote}
-              onChange={(e) => setRejectNote(e.target.value)}
-              rows={2}
-              placeholder="Jelaskan alasan penolakan..."
-              className="input w-full text-sm border-red-200"
-            />
-          </div>
-
-          <div className="mt-4 flex items-center gap-3">
-            <button
-              onClick={() => handleSubmit("APPROVED")}
-              disabled={saving}
-              className="flex items-center gap-1.5 rounded-[12px] bg-goto-green px-5 py-2.5 text-sm font-semibold text-white hover:bg-goto-dark disabled:opacity-50"
-            >
-              <CheckCircle size={16} />
-              Setujui
-            </button>
-            <button
-              onClick={() => handleSubmit("REJECTED")}
-              disabled={saving}
-              className="flex items-center gap-1.5 rounded-[12px] bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
-            >
-              <XCircle size={16} />
-              Tolak
-            </button>
-            {CAN_PUBLISH_DIRECTLY.includes(userRole) && (
-              <button
-                onClick={() => handleSubmit("PUBLISHED")}
-                disabled={saving}
-                className="flex items-center gap-1.5 rounded-[12px] bg-goto-green px-5 py-2.5 text-sm font-semibold text-white hover:bg-goto-green/90 disabled:opacity-50"
-              >
-                <Upload size={16} />
-                Publikasi Langsung
-              </button>
-            )}
-          </div>
+          {existingReviewNote && (
+            <p className="mt-2 text-sm text-blue-500">Catatan editor: {existingReviewNote}</p>
+          )}
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Main editor */}
-        <div className="space-y-4 lg:col-span-2">
-          {/* Title */}
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Judul Artikel"
-            className="input w-full px-4 py-3 text-xl font-bold"
-          />
-
-          {/* Editor */}
-          <div className="rounded-[12px] border border-border overflow-hidden">
-            <RichTextEditor content={content} onChange={setContent} />
-          </div>
-
-          {/* Sources */}
-          <div className="rounded-[12px] border border-border bg-surface p-6">
-            <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-sm font-medium text-txt-primary uppercase tracking-wider">
-                Sumber & Narasumber
-              </h3>
-              <button
-                type="button"
-                onClick={addSource}
-                className="flex items-center gap-1 text-xs text-goto-green hover:underline"
-              >
-                <Plus size={14} /> Tambah Sumber
-              </button>
-            </div>
-            <div className="space-y-3">
-              {sources.map((source, i) => (
-                <div key={i} className="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-[12px] border border-border p-3">
-                  <input
-                    type="text"
-                    placeholder="Nama narasumber *"
-                    value={source.name}
-                    onChange={(e) => updateSource(i, "name", e.target.value)}
-                    className="input text-sm"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Jabatan"
-                    value={source.title}
-                    onChange={(e) => updateSource(i, "title", e.target.value)}
-                    className="input text-sm"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Institusi"
-                    value={source.institution}
-                    onChange={(e) => updateSource(i, "institution", e.target.value)}
-                    className="input text-sm"
-                  />
-                  <div className="flex gap-2">
-                    <input
-                      type="url"
-                      placeholder="URL referensi"
-                      value={source.url}
-                      onChange={(e) => updateSource(i, "url", e.target.value)}
-                      className="input flex-1 text-sm"
-                    />
-                    {sources.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeSource(i)}
-                        className="rounded p-1.5 text-red-400 hover:bg-red-50"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* SEO Settings */}
-          <div className="rounded-[12px] border border-border bg-surface">
-            <button
-              type="button"
-              onClick={() => setShowSeo(!showSeo)}
-              className="flex w-full items-center justify-between px-6 py-3 text-sm font-medium text-txt-primary uppercase tracking-wider"
-            >
-              Pengaturan SEO
-              <ChevronDown size={16} className={showSeo ? "rotate-180" : ""} />
-            </button>
-            {showSeo && (
-              <div className="space-y-3 border-t border-border px-6 py-4">
-                <div>
-                  <div className="mb-1 flex items-center justify-between">
-                    <label className="text-sm font-medium text-txt-primary">SEO Title ({seoTitle.length}/70)</label>
-                    <AiButton feature="seo_title" setter={setSeoTitle} />
-                  </div>
-                  <input
-                    type="text"
-                    value={seoTitle}
-                    onChange={(e) => setSeoTitle(e.target.value)}
-                    maxLength={70}
-                    placeholder={title || "Judul untuk mesin pencari"}
-                    className="input w-full text-sm"
-                  />
-                </div>
-                <div>
-                  <div className="mb-1 flex items-center justify-between">
-                    <label className="text-sm font-medium text-txt-primary">Meta Description ({seoDescription.length}/160)</label>
-                    <AiButton feature="meta_description" setter={setSeoDescription} />
-                  </div>
-                  <textarea
-                    value={seoDescription}
-                    onChange={(e) => setSeoDescription(e.target.value)}
-                    maxLength={160}
-                    rows={2}
-                    placeholder="Deskripsi singkat untuk hasil pencarian"
-                    className="input w-full text-sm"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
+      {/* PUBLISHED: Article locked */}
+      {currentStatus === "PUBLISHED" && isOwner && (
+        <div className="mb-4 rounded-[12px] border border-goto-green/30 bg-goto-50 p-4">
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-goto-dark">
+            <CheckCircle size={16} />
+            Artikel Telah Dipublikasikan
+          </h3>
         </div>
+      )}
 
-        {/* Sidebar */}
-        <div className="space-y-4">
-          {/* Category */}
-          <div className="rounded-[12px] border border-border bg-surface p-6">
-            <label className="mb-2 block text-sm font-medium text-txt-primary">
-              Kategori *
-            </label>
-            <select
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-              className="input w-full"
-            >
-              <option value="">Pilih Kategori</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Tags */}
-          <div className="rounded-[12px] border border-border bg-surface p-6">
-            <div className="mb-2 flex items-center justify-between">
-              <label className="text-sm font-medium text-txt-primary">Tags</label>
-              <AiButton feature="tags" setter={setTags} />
-            </div>
+      {/* Article content — editable only when DRAFT or REJECTED */}
+      {canJurnalisEdit ? (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Main editor */}
+          <div className="space-y-4 lg:col-span-2">
             <input
               type="text"
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              placeholder="Tag1, Tag2, Tag3"
-              className="input w-full"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Judul Artikel"
+              className="input w-full px-4 py-3 text-xl font-bold"
             />
-            <p className="mt-1 text-xs text-txt-muted">Pisahkan dengan koma</p>
-          </div>
-
-          {/* Excerpt */}
-          <div className="rounded-[12px] border border-border bg-surface p-6">
-            <div className="mb-2 flex items-center justify-between">
-              <label className="text-sm font-medium text-txt-primary">Ringkasan</label>
-              <AiButton feature="summary" setter={setExcerpt} />
+            <div className="rounded-[12px] border border-border overflow-hidden">
+              <RichTextEditor content={content} onChange={setContent} />
             </div>
-            <textarea
-              value={excerpt}
-              onChange={(e) => setExcerpt(e.target.value)}
-              rows={3}
-              placeholder="Ringkasan singkat artikel"
-              maxLength={500}
-              className="input w-full"
-            />
-          </div>
-
-          {/* Featured Image */}
-          <div className="rounded-[12px] border border-border bg-surface p-6">
-            <label className="mb-2 block text-sm font-medium text-txt-primary">
-              Gambar Utama
-            </label>
-            <ImageUploader
-              onUpload={(url: string) => setFeaturedImage(url)}
-              currentImage={featuredImage}
-            />
-            <div className="mt-2">
-              <input
-                type="url"
-                value={featuredImage}
-                onChange={(e) => setFeaturedImage(e.target.value)}
-                placeholder="Atau paste URL gambar"
-                className="input w-full text-xs"
-              />
-            </div>
-            {featuredImage && !featuredImage.startsWith("data:") && (
-              <img
-                src={featuredImage}
-                alt="Preview"
-                className="mt-2 w-full rounded-[8px] object-cover"
-                style={{ maxHeight: 200 }}
-                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-              />
-            )}
-          </div>
-
-          {/* Verification Label */}
-          <div className="rounded-[12px] border border-border bg-surface p-6">
-            <label className="mb-2 block text-sm font-medium text-txt-primary">
-              Label Verifikasi
-            </label>
-            <select
-              value={verificationLabel}
-              onChange={(e) => setVerificationLabel(e.target.value)}
-              className="input w-full"
-              aria-label="Label verifikasi artikel"
-            >
-              <option value="UNVERIFIED">Belum Diverifikasi — Belum dicek kebenarannya</option>
-              <option value="VERIFIED">Terverifikasi — Fakta sudah dikonfirmasi</option>
-              <option value="OPINION">Opini — Artikel berisi pendapat penulis</option>
-              <option value="CORRECTION">Koreksi — Perbaikan atas artikel sebelumnya</option>
-            </select>
-          </div>
-
-          {/* Journalism Checklist */}
-          <div className="rounded-[12px] border border-goto-green/20 bg-goto-50 p-4">
-            <button
-              type="button"
-              onClick={() => setShowChecklist(!showChecklist)}
-              className="flex w-full items-center justify-between text-sm font-bold text-goto-dark"
-            >
-              <span className="flex items-center gap-1.5">
-                <CheckCircle size={16} />
-                Checklist Jurnalistik
-              </span>
-              <ChevronDown size={14} className={showChecklist ? "rotate-180" : ""} />
-            </button>
-            {showChecklist && (
-              <div className="mt-3 space-y-2">
-                {[
-                  { key: "notClickbait" as const, label: "Judul tidak clickbait / sensasional berlebihan" },
-                  { key: "hasSource" as const, label: "Minimal 1 sumber terverifikasi" },
-                  { key: "balanced" as const, label: "Cover both sides (perspektif berimbang)" },
-                  { key: "noSara" as const, label: "Tidak mengandung unsur SARA" },
-                  { key: "properLanguage" as const, label: "Bahasa sesuai PUEBI" },
-                ].map((item) => (
-                  <label key={item.key} className="flex items-start gap-2 text-xs text-goto-green">
-                    <input
-                      type="checkbox"
-                      checked={checklist[item.key]}
-                      onChange={(e) =>
-                        setChecklist({ ...checklist, [item.key]: e.target.checked })
-                      }
-                      className="mt-0.5 rounded"
-                    />
-                    {item.label}
-                  </label>
-                ))}
-                {allChecked && (
-                  <p className="mt-2 flex items-center gap-1 text-xs font-medium text-goto-green">
-                    <CheckCircle size={12} /> Semua checklist terpenuhi
-                  </p>
-                )}
+            {/* Sources */}
+            <div className="rounded-[12px] border border-border bg-surface p-6">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="text-sm font-medium text-txt-primary uppercase tracking-wider">
+                  Sumber & Narasumber
+                </h3>
+                <button type="button" onClick={addSource} className="flex items-center gap-1 text-xs text-goto-green hover:underline">
+                  <Plus size={14} /> Tambah Sumber
+                </button>
               </div>
-            )}
+              <div className="space-y-3">
+                {sources.map((source, i) => (
+                  <div key={i} className="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-[12px] border border-border p-3">
+                    <input type="text" placeholder="Nama narasumber *" value={source.name} onChange={(e) => updateSource(i, "name", e.target.value)} className="input text-sm" />
+                    <input type="text" placeholder="Jabatan" value={source.title} onChange={(e) => updateSource(i, "title", e.target.value)} className="input text-sm" />
+                    <input type="text" placeholder="Institusi" value={source.institution} onChange={(e) => updateSource(i, "institution", e.target.value)} className="input text-sm" />
+                    <div className="flex gap-2">
+                      <input type="url" placeholder="URL referensi" value={source.url} onChange={(e) => updateSource(i, "url", e.target.value)} className="input flex-1 text-sm" />
+                      {sources.length > 1 && (
+                        <button type="button" onClick={() => removeSource(i)} className="rounded p-1.5 text-red-400 hover:bg-red-50">
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* SEO Settings */}
+            <div className="rounded-[12px] border border-border bg-surface">
+              <button type="button" onClick={() => setShowSeo(!showSeo)} className="flex w-full items-center justify-between px-6 py-3 text-sm font-medium text-txt-primary uppercase tracking-wider">
+                Pengaturan SEO
+                <ChevronDown size={16} className={showSeo ? "rotate-180" : ""} />
+              </button>
+              {showSeo && (
+                <div className="space-y-3 border-t border-border px-6 py-4">
+                  <div>
+                    <div className="mb-1 flex items-center justify-between">
+                      <label className="text-sm font-medium text-txt-primary">SEO Title ({seoTitle.length}/70)</label>
+                      <AiButton feature="seo_title" setter={setSeoTitle} />
+                    </div>
+                    <input type="text" value={seoTitle} onChange={(e) => setSeoTitle(e.target.value)} maxLength={70} placeholder={title || "Judul untuk mesin pencari"} className="input w-full text-sm" />
+                  </div>
+                  <div>
+                    <div className="mb-1 flex items-center justify-between">
+                      <label className="text-sm font-medium text-txt-primary">Meta Description ({seoDescription.length}/160)</label>
+                      <AiButton feature="meta_description" setter={setSeoDescription} />
+                    </div>
+                    <textarea value={seoDescription} onChange={(e) => setSeoDescription(e.target.value)} maxLength={160} rows={2} placeholder="Deskripsi singkat untuk hasil pencarian" className="input w-full text-sm" />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-4">
+            <div className="rounded-[12px] border border-border bg-surface p-6">
+              <label className="mb-2 block text-sm font-medium text-txt-primary">Kategori *</label>
+              <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="input w-full">
+                <option value="">Pilih Kategori</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="rounded-[12px] border border-border bg-surface p-6">
+              <div className="mb-2 flex items-center justify-between">
+                <label className="text-sm font-medium text-txt-primary">Tags</label>
+                <AiButton feature="tags" setter={setTags} />
+              </div>
+              <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="Tag1, Tag2, Tag3" className="input w-full" />
+              <p className="mt-1 text-xs text-txt-muted">Pisahkan dengan koma</p>
+            </div>
+            <div className="rounded-[12px] border border-border bg-surface p-6">
+              <div className="mb-2 flex items-center justify-between">
+                <label className="text-sm font-medium text-txt-primary">Ringkasan</label>
+                <AiButton feature="summary" setter={setExcerpt} />
+              </div>
+              <textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={3} placeholder="Ringkasan singkat artikel" maxLength={500} className="input w-full" />
+            </div>
+            <div className="rounded-[12px] border border-border bg-surface p-6">
+              <label className="mb-2 block text-sm font-medium text-txt-primary">Gambar Utama</label>
+              <ImageUploader onUpload={(url: string) => setFeaturedImage(url)} currentImage={featuredImage} />
+              <div className="mt-2">
+                <input type="url" value={featuredImage} onChange={(e) => setFeaturedImage(e.target.value)} placeholder="Atau paste URL gambar" className="input w-full text-xs" />
+              </div>
+              {featuredImage && !featuredImage.startsWith("data:") && (
+                <img src={featuredImage} alt="Preview" className="mt-2 w-full rounded-[8px] object-cover" style={{ maxHeight: 200 }} onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+              )}
+            </div>
+            {/* Journalism Checklist */}
+            <div className="rounded-[12px] border border-goto-green/20 bg-goto-50 p-4">
+              <button type="button" onClick={() => setShowChecklist(!showChecklist)} className="flex w-full items-center justify-between text-sm font-bold text-goto-dark">
+                <span className="flex items-center gap-1.5">
+                  <CheckCircle size={16} />
+                  Checklist Jurnalistik
+                </span>
+                <ChevronDown size={14} className={showChecklist ? "rotate-180" : ""} />
+              </button>
+              {showChecklist && (
+                <div className="mt-3 space-y-2">
+                  {[
+                    { key: "notClickbait" as const, label: "Judul tidak clickbait / sensasional berlebihan" },
+                    { key: "hasSource" as const, label: "Minimal 1 sumber terverifikasi" },
+                    { key: "balanced" as const, label: "Cover both sides (perspektif berimbang)" },
+                    { key: "noSara" as const, label: "Tidak mengandung unsur SARA" },
+                    { key: "properLanguage" as const, label: "Bahasa sesuai PUEBI" },
+                  ].map((item) => (
+                    <label key={item.key} className="flex items-start gap-2 text-xs text-goto-green">
+                      <input
+                        type="checkbox"
+                        checked={checklist[item.key]}
+                        onChange={(e) => setChecklist({ ...checklist, [item.key]: e.target.checked })}
+                        className="mt-0.5 rounded"
+                      />
+                      {item.label}
+                    </label>
+                  ))}
+                  {allChecked && (
+                    <p className="mt-2 flex items-center gap-1 text-xs font-medium text-goto-green">
+                      <CheckCircle size={12} /> Semua checklist terpenuhi
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        /* Read-only view for locked articles */
+        <div className="space-y-4">
+          <div className="rounded-[12px] border border-border bg-surface p-5">
+            <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Judul</label>
+            <p className="text-lg font-bold text-txt-primary">{title}</p>
+          </div>
+          <div className="rounded-[12px] border border-border bg-surface p-5">
+            <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Kategori</label>
+            <p className="text-sm text-txt-primary">{categories.find(c => c.id === categoryId)?.name || categoryId}</p>
+          </div>
+          {excerpt && (
+            <div className="rounded-[12px] border border-border bg-surface p-5">
+              <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Ringkasan</label>
+              <p className="text-sm text-txt-primary">{excerpt}</p>
+            </div>
+          )}
+          {featuredImage && (
+            <div className="rounded-[12px] border border-border bg-surface p-5">
+              <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Gambar Utama</label>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={featuredImage} alt="Featured" className="mt-2 max-h-64 rounded-[8px] object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+            </div>
+          )}
+          <div className="rounded-[12px] border border-border bg-surface p-5">
+            <label className="mb-2 block text-xs font-medium text-txt-muted uppercase tracking-wider">Konten</label>
+            <div className="prose prose-sm max-w-none text-txt-primary" dangerouslySetInnerHTML={{ __html: content }} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

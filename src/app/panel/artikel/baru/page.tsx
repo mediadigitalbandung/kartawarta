@@ -12,9 +12,8 @@ import {
   Trash2,
   AlertCircle,
   CheckCircle,
-  Upload,
-  Sparkles,
   Loader2,
+  Sparkles,
 } from "lucide-react";
 import ImageUploader from "@/components/editor/ImageUploader";
 
@@ -37,7 +36,6 @@ interface Source {
 }
 
 const CAN_SUBMIT_REVIEW = ["SUPER_ADMIN", "CHIEF_EDITOR", "EDITOR", "SENIOR_JOURNALIST", "JOURNALIST"];
-const CAN_PUBLISH_DIRECTLY = ["SUPER_ADMIN", "CHIEF_EDITOR", "SENIOR_JOURNALIST"];
 
 export default function NewArticlePage() {
   const router = useRouter();
@@ -53,7 +51,6 @@ export default function NewArticlePage() {
   const [featuredImage, setFeaturedImage] = useState("");
   const [seoTitle, setSeoTitle] = useState("");
   const [seoDescription, setSeoDescription] = useState("");
-  const [verificationLabel, setVerificationLabel] = useState("UNVERIFIED");
   const [sources, setSources] = useState<Source[]>([{ name: "", title: "", institution: "", url: "" }]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -139,7 +136,7 @@ export default function NewArticlePage() {
     setSources(updated);
   };
 
-  const handleSubmit = async (status: "DRAFT" | "IN_REVIEW" | "PUBLISHED") => {
+  const handleSubmit = async (status: "DRAFT" | "IN_REVIEW") => {
     setError("");
 
     if (!title.trim()) return setError("Judul wajib diisi");
@@ -147,9 +144,16 @@ export default function NewArticlePage() {
     if (content.length < 50) return setError("Konten minimal 50 karakter");
     if (!categoryId) return setError("Kategori harus dipilih");
 
-    if (status !== "DRAFT" && !allChecked) {
+    if (status === "IN_REVIEW" && !allChecked) {
       setShowChecklist(true);
       return setError("Semua checklist jurnalistik harus dipenuhi sebelum submit");
+    }
+
+    // Confirmation dialog for review submission
+    if (status === "IN_REVIEW") {
+      if (!confirm("Artikel akan dikirim untuk review oleh editor. Lanjutkan?")) {
+        return;
+      }
     }
 
     setSaving(true);
@@ -174,7 +178,6 @@ export default function NewArticlePage() {
           seoTitle: seoTitle || undefined,
           seoDescription: seoDescription || undefined,
           status,
-          verificationLabel,
           sources: validSources.length > 0 ? validSources : undefined,
         }),
       });
@@ -187,7 +190,7 @@ export default function NewArticlePage() {
         return;
       }
 
-      alert("Artikel berhasil disimpan");
+      alert(status === "IN_REVIEW" ? "Artikel berhasil dikirim untuk review" : "Artikel berhasil disimpan sebagai draf");
       router.push("/panel/artikel");
       router.refresh();
     } catch {
@@ -208,7 +211,7 @@ export default function NewArticlePage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {/* All roles: Save Draft */}
+          {/* Save Draft */}
           <button
             onClick={() => handleSubmit("DRAFT")}
             disabled={saving}
@@ -217,7 +220,7 @@ export default function NewArticlePage() {
             <Save size={16} />
             Simpan Draf
           </button>
-          {/* All except CONTRIBUTOR: Submit for review */}
+          {/* Submit for review */}
           {CAN_SUBMIT_REVIEW.includes(userRole) && (
             <button
               onClick={() => handleSubmit("IN_REVIEW")}
@@ -226,17 +229,6 @@ export default function NewArticlePage() {
             >
               <Send size={16} />
               Kirim untuk Review
-            </button>
-          )}
-          {/* Senior editors/admins: Publish directly */}
-          {CAN_PUBLISH_DIRECTLY.includes(userRole) && (
-            <button
-              onClick={() => handleSubmit("PUBLISHED")}
-              disabled={saving}
-              className="flex items-center gap-1.5 rounded-[12px] bg-goto-green px-4 py-2 text-sm font-semibold text-white hover:bg-goto-green/90 disabled:opacity-50"
-            >
-              <Upload size={16} />
-              Publikasi Langsung
             </button>
           )}
         </div>
@@ -453,24 +445,6 @@ export default function NewArticlePage() {
                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
               />
             )}
-          </div>
-
-          {/* Verification Label */}
-          <div className="rounded-[12px] border border-border bg-surface p-6">
-            <label className="mb-2 block text-sm font-medium text-txt-primary">
-              Label Verifikasi
-            </label>
-            <select
-              value={verificationLabel}
-              onChange={(e) => setVerificationLabel(e.target.value)}
-              className="input w-full"
-              aria-label="Label verifikasi artikel"
-            >
-              <option value="UNVERIFIED">Belum Diverifikasi — Belum dicek kebenarannya</option>
-              <option value="VERIFIED">Terverifikasi — Fakta sudah dikonfirmasi</option>
-              <option value="OPINION">Opini — Artikel berisi pendapat penulis</option>
-              <option value="CORRECTION">Koreksi — Perbaikan atas artikel sebelumnya</option>
-            </select>
           </div>
 
           {/* Journalism Checklist */}

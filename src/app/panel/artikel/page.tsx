@@ -15,6 +15,7 @@ import {
   Clock,
   FileText,
   XCircle,
+  UserCheck,
 } from "lucide-react";
 
 interface Article {
@@ -26,6 +27,8 @@ interface Article {
   verificationLabel: string;
   createdAt: string;
   publishedAt: string | null;
+  reviewedBy?: string | null;
+  reviewerName?: string | null;
   author?: { id: string; name: string; avatar?: string };
   category?: { id: string; name: string; slug: string };
 }
@@ -60,7 +63,6 @@ function StatusTimeline({ status }: { status: string }) {
     <div className="flex items-center gap-0.5">
       {progressSteps.map((step, i) => {
         const isCompleted = !isRejected && !isArchived && currentIndex >= i;
-        const isCurrent = step === status;
         return (
           <div key={step} className="flex items-center">
             <div
@@ -287,6 +289,7 @@ export default function ArtikelPage() {
                     )}
                     <th className="px-3 sm:px-5 py-3 text-left font-medium text-txt-secondary">Status</th>
                     <th className="hidden lg:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Progres</th>
+                    <th className="hidden xl:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Editor</th>
                     <th className="hidden sm:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Views</th>
                     <th className="hidden md:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Tanggal</th>
                     <th className="px-3 sm:px-5 py-3 text-right font-medium text-txt-secondary">Aksi</th>
@@ -319,6 +322,16 @@ export default function ArtikelPage() {
                         </td>
                         <td className="hidden lg:table-cell px-5 py-3">
                           <StatusTimeline status={article.status} />
+                        </td>
+                        <td className="hidden xl:table-cell px-5 py-3 text-txt-secondary">
+                          {article.reviewerName ? (
+                            <span className="inline-flex items-center gap-1 text-xs">
+                              <UserCheck size={12} className="text-goto-green" />
+                              {article.reviewerName}
+                            </span>
+                          ) : (
+                            "\u2014"
+                          )}
                         </td>
                         <td className="hidden sm:table-cell px-5 py-3 text-txt-secondary">
                           {article.viewCount > 0 ? article.viewCount.toLocaleString("id-ID") : "\u2014"}

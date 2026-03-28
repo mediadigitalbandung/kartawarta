@@ -9,7 +9,7 @@ import {
   ApiError,
 } from "@/lib/api-utils";
 import { slugify, calculateReadTime } from "@/lib/utils";
-import { canWriteArticles, canPublishDirectly, canApproveArticles } from "@/lib/auth";
+import { canWriteArticles, canApproveArticles } from "@/lib/auth";
 
 const createArticleSchema = z.object({
   title: z.string().min(5, "Judul minimal 5 karakter").max(255),
@@ -20,8 +20,7 @@ const createArticleSchema = z.object({
   tags: z.array(z.string()).optional(),
   seoTitle: z.string().max(70).optional(),
   seoDescription: z.string().max(160).optional(),
-  status: z.enum(["DRAFT", "IN_REVIEW", "PUBLISHED"]).optional(),
-  verificationLabel: z.enum(["VERIFIED", "UNVERIFIED", "CORRECTION", "OPINION"]).optional(),
+  status: z.enum(["DRAFT", "IN_REVIEW"]).optional(),
   sources: z
     .array(
       z.object({
@@ -101,8 +100,24 @@ export async function GET(request: NextRequest) {
       prisma.article.count({ where }),
     ]);
 
+    // Resolve reviewer names for articles with reviewedBy
+    const reviewerIds = Array.from(new Set(articles.map(a => a.reviewedBy).filter(Boolean))) as string[];
+    let reviewerMap: Record<string, string> = {};
+    if (reviewerIds.length > 0) {
+      const reviewers = await prisma.user.findMany({
+        where: { id: { in: reviewerIds } },
+        select: { id: true, name: true },
+      });
+      reviewerMap = Object.fromEntries(reviewers.map(r => [r.id, r.name]));
+    }
+
+    const articlesWithReviewer = articles.map(a => ({
+      ...a,
+      reviewerName: a.reviewedBy ? reviewerMap[a.reviewedBy] || null : null,
+    }));
+
     return successResponse({
-      articles,
+      articles: articlesWithReviewer,
       pagination: {
         page,
         limit,
@@ -134,11 +149,8 @@ export async function POST(request: NextRequest) {
       slug = `${slug}-${Date.now().toString(36)}`;
     }
 
-    // Determine status
-    let finalStatus = data.status || "DRAFT";
-    if (finalStatus === "PUBLISHED" && !canPublishDirectly(session.user.role)) {
-      finalStatus = "IN_REVIEW";
-    }
+    // Jurnalis/Senior Journalist can only create DRAFT or IN_REVIEW
+    const finalStatus = data.status || "DRAFT";
 
     // Calculate read time
     const readTime = calculateReadTime(data.content);
@@ -157,6 +169,22 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // If submitting for review, randomly assign an editor
+    let assignedReviewerId: string | null = null;
+    if (finalStatus === "IN_REVIEW") {
+      const editors = await prisma.user.findMany({
+        where: {
+          role: { in: ["EDITOR", "CHIEF_EDITOR"] },
+          isActive: true,
+        },
+        select: { id: true },
+      });
+      if (editors.length > 0) {
+        const randomIndex = Math.floor(Math.random() * editors.length);
+        assignedReviewerId = editors[randomIndex].id;
+      }
+    }
+
     const article = await prisma.article.create({
       data: {
         title: data.title,
@@ -164,19 +192,20 @@ export async function POST(request: NextRequest) {
         content: data.content,
         excerpt: data.excerpt || data.content.replace(/<[^>]*>/g, "").slice(0, 200),
         featuredImage: data.featuredImage,
-        status: finalStatus as "DRAFT" | "IN_REVIEW" | "PUBLISHED",
-        verificationLabel: data.verificationLabel || "UNVERIFIED",
+        status: finalStatus as "DRAFT" | "IN_REVIEW",
+        verificationLabel: "UNVERIFIED",
         readTime,
         authorId: session.user.id,
         categoryId: data.categoryId,
         seoTitle: data.seoTitle || data.title,
         seoDescription: data.seoDescription || data.content.replace(/<[^>]*>/g, "").slice(0, 160),
-        publishedAt: finalStatus === "PUBLISHED" ? new Date() : null,
+        publishedAt: null,
         scheduledAt: data.scheduledAt ? new Date(data.scheduledAt) : null,
         tags: { connect: tagConnections },
         sources: data.sources
           ? { create: data.sources }
           : undefined,
+        reviewedBy: assignedReviewerId,
       },
       include: {
         author: { select: { id: true, name: true } },
@@ -191,7 +220,7 @@ export async function POST(request: NextRequest) {
       "CREATE",
       "article",
       article.id,
-      `Membuat artikel: ${article.title}`
+      `Membuat artikel: ${article.title} [status: ${finalStatus}]${assignedReviewerId ? ` [editor: ${assignedReviewerId}]` : ""}`
     );
 
     return successResponse(article, 201);
