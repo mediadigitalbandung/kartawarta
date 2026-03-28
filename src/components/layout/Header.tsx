@@ -48,7 +48,17 @@ export default function Header() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 80);
+    let lastY = 0;
+    const onScroll = () => {
+      const y = window.scrollY;
+      // Only toggle if scrolled past threshold with hysteresis to prevent flickering
+      if (y > 150 && y > lastY) {
+        setScrolled(true);
+      } else if (y < 100) {
+        setScrolled(false);
+      }
+      lastY = y;
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
