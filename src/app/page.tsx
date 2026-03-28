@@ -176,13 +176,13 @@ export default async function HomePage() {
                   Lihat Semua
                 </Link>
               </div>
-              <ScrollableContainer maxHeight={1200}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  {terkiniArticles.map((a) => (
-                    <ArticleCard key={a.slug} {...a} variant="standard" />
-                  ))}
-                </div>
-              </ScrollableContainer>
+              <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+                {terkiniArticles.map((a) => (
+                  <div key={a.slug} className="shrink-0 w-[260px] sm:w-[280px]">
+                    <ArticleCard {...a} variant="standard" />
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Right: Berita Terpopuler — vertical list */}
