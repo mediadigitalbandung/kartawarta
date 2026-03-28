@@ -23,8 +23,9 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
 
-    // Sign out existing session first to prevent session mixing
+    // Clear existing session before new login
     if (session) {
+      await fetch("/api/auth/logout", { method: "POST" });
       await signOut({ redirect: false });
     }
 
@@ -62,7 +63,7 @@ export default function LoginPage() {
 
         {sessionExpired && (
           <div className="mb-4 rounded-[12px] bg-yellow-50 px-4 py-3 text-sm text-yellow-700">
-            Sesi Anda telah berakhir karena akun ini login di perangkat lain. Silakan login kembali.
+            Sesi Anda telah berakhir. Silakan login kembali.
           </div>
         )}
 

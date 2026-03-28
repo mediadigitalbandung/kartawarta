@@ -62,6 +62,12 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Email atau password salah");
         }
 
+        // Check if user already has an active session
+        if (user.activeSessionId) {
+          // Block login — account is online on another device
+          throw new Error("Akun Anda sedang online di perangkat lain. Silakan logout terlebih dahulu dari perangkat tersebut.");
+        }
+
         // Generate unique session ID and save to DB
         const sessionId = crypto.randomUUID();
         await prisma.user.update({
@@ -88,7 +94,7 @@ export const authOptions: NextAuthOptions = {
         token.avatar = user.avatar;
         token.sessionId = user.sessionId;
       }
-      // Validate session is still active (not kicked by login on another device)
+      // Refresh role from DB and check session validity
       if (token.id && token.sessionId) {
         try {
           const dbUser = await prisma.user.findUnique({
@@ -96,25 +102,25 @@ export const authOptions: NextAuthOptions = {
             select: { role: true, name: true, avatar: true, isActive: true, activeSessionId: true },
           });
           if (!dbUser || !dbUser.isActive) {
-            // User deactivated
             return { ...token, invalid: true };
           }
+          // Check if another device tried to login (session mismatch)
           if (dbUser.activeSessionId && dbUser.activeSessionId !== token.sessionId) {
-            // Another device logged in — invalidate this session
-            return { ...token, invalid: true };
+            // Mark that there was a login attempt from another device
+            token.loginAttempt = true;
+          } else {
+            token.loginAttempt = false;
           }
-          // Refresh role from DB
           token.role = dbUser.role;
           token.name = dbUser.name;
           token.avatar = dbUser.avatar;
         } catch {
-          // Silently fail — use cached token
+          // Silently fail
         }
       }
       return token;
     },
     async session({ session, token }) {
-      // If session was invalidated by another login, force sign out
       if ((token as Record<string, unknown>).invalid) {
         return { ...session, user: { ...session.user, invalid: true } } as typeof session;
       }
@@ -123,6 +129,8 @@ export const authOptions: NextAuthOptions = {
       session.user.avatar = token.avatar;
       session.user.sessionId = token.sessionId;
       if (token.name) session.user.name = token.name as string;
+      // Pass login attempt warning to client
+      (session as Record<string, unknown>).loginAttempt = !!(token as Record<string, unknown>).loginAttempt;
       return session;
     },
   },

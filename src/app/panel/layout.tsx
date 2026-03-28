@@ -235,7 +235,10 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           </div>
         </div>
         <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
+          onClick={async () => {
+            await fetch("/api/auth/logout", { method: "POST" });
+            signOut({ callbackUrl: "/login" });
+          }}
           className="mt-2 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-white"
           aria-label="Keluar"
         >
@@ -341,6 +344,17 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
               )}
             </div>
           </div>
+
+          {/* Warning: login attempt from another device */}
+          {(session as Record<string, unknown>)?.loginAttempt && (
+            <div className="mx-4 mt-4 sm:mx-6 rounded-[12px] bg-yellow-50 border border-yellow-200 px-4 py-3 flex items-start gap-3">
+              <span className="text-yellow-600 mt-0.5">⚠️</span>
+              <div>
+                <p className="text-sm font-semibold text-yellow-800">Percobaan login dari perangkat lain</p>
+                <p className="text-xs text-yellow-600 mt-0.5">Seseorang mencoba masuk ke akun Anda dari perangkat lain. Jika bukan Anda, segera ubah password.</p>
+              </div>
+            </div>
+          )}
 
           <div className="p-4 sm:p-6">{children}</div>
         </main>
