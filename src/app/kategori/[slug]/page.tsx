@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight, Vote } from "lucide-react";
 import ArticleCard from "@/components/artikel/ArticleCard";
+import PaginatedArticles from "@/components/artikel/PaginatedArticles";
 import Sidebar from "@/components/layout/Sidebar";
 import HeadlineSlider from "@/components/slider/HeadlineSlider";
 import VideoStory from "@/components/slider/VideoStory";
@@ -241,20 +242,13 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           <div className="lg:col-span-2">
             {/* Section header */}
-            <div className="flex items-center justify-between mb-5">
+            <div className="mb-5">
               <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
                 Berita Terkini {category.name}
               </h2>
-              <Link href={`/kategori/${params.slug}`} className="text-sm font-medium text-goto-green hover:underline">
-                Lihat Semua &rarr;
-              </Link>
             </div>
-            {/* Articles grid — max 6 articles */}
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              {articles.slice(11, 17).map((article) => (
-                <ArticleCard key={article.slug} {...article} />
-              ))}
-            </div>
+            {/* Articles grid — paginated, 6 per page */}
+            <PaginatedArticles articles={JSON.parse(JSON.stringify(articles.slice(11)))} perPage={6} />
 
             {articles.length === 0 && (
               <div className="rounded-[12px] border-2 border-dashed border-border py-16 text-center">
