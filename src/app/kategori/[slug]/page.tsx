@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ChevronRight, Vote } from "lucide-react";
 import ArticleCard from "@/components/artikel/ArticleCard";
 import PaginatedArticles from "@/components/artikel/PaginatedArticles";
+import SearchableArticleList from "@/components/artikel/SearchableArticleList";
 import Sidebar from "@/components/layout/Sidebar";
 import HeadlineSlider from "@/components/slider/HeadlineSlider";
 import SubHeadlineSlider from "@/components/slider/SubHeadlineSlider";
@@ -240,7 +241,18 @@ export default async function CategoryPage({ params }: { params: { slug: string 
           <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
         </div>
 
-        {/* (Polling moved above article grid) */}
+        {/* Semua Berita — searchable list view */}
+        <section className="mt-8">
+          <div className="mb-5">
+            <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
+              Semua Berita {category.name}
+            </h2>
+          </div>
+          <SearchableArticleList
+            articles={JSON.parse(JSON.stringify(articles))}
+            categoryName={category.name.toLowerCase()}
+          />
+        </section>
       </div>
     </div>
   );
