@@ -5,28 +5,23 @@ interface BannerAdProps {
 
 const sizeConfig = {
   slim: {
-    height: "135px",
-    label: "Ad",
+    ratio: "8 / 1",       // wide & short
     containerClass: "py-2",
   },
   leaderboard: {
-    height: "270px",
-    label: "Leaderboard Ad",
+    ratio: "4 / 1",       // standard banner
     containerClass: "py-3",
   },
   billboard: {
-    height: "280px",
-    label: "Billboard Ad",
+    ratio: "3 / 1",       // wider billboard
     containerClass: "py-4",
   },
   sidebar: {
-    height: "280px",
-    label: "Sidebar Ad",
+    ratio: "4 / 3",       // vertical sidebar
     containerClass: "py-3",
   },
   inline: {
-    height: "150px",
-    label: "Inline Ad",
+    ratio: "6 / 1",       // thin inline
     containerClass: "py-4",
   },
 };
@@ -39,7 +34,7 @@ export default function BannerAd({ size, className = "" }: BannerAdProps) {
       <div className="container-main">
         <div
           className="relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center"
-          style={{ height: config.height }}
+          style={{ aspectRatio: config.ratio }}
         >
           <div className="absolute inset-0 opacity-[0.03]" style={{
             backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)",
@@ -57,7 +52,10 @@ export default function BannerAd({ size, className = "" }: BannerAdProps) {
 
 export function SidebarAd() {
   return (
-    <div className="rounded-lg bg-gradient-to-b from-surface-tertiary to-surface-secondary flex items-center justify-center overflow-hidden relative h-full min-h-[150px]">
+    <div
+      className="rounded-lg bg-gradient-to-b from-surface-tertiary to-surface-secondary flex items-center justify-center overflow-hidden relative w-full"
+      style={{ aspectRatio: "4 / 3" }}
+    >
       <div className="absolute inset-0 opacity-[0.03]" style={{
         backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)",
       }} />

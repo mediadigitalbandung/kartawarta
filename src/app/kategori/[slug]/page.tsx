@@ -134,7 +134,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         </div>
 
         {/* Banner Ad — Leaderboard */}
-        <div className="mb-6 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ height: "270px" }}>
+        <div className="mb-6 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "4 / 1" }}>
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
           <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
         </div>
@@ -187,7 +187,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         )}
 
         {/* Banner Ad — below polling */}
-        <div className="mb-6 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ height: "135px" }}>
+        <div className="mb-6 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "8 / 1" }}>
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
           <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
         </div>
@@ -227,7 +227,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
             <Sidebar trending={sidebarTrending} />
             {/* Sidebar Ad — flex-1 stretches to fill remaining height */}
             <div className="mt-5 flex-1">
-              <div className="rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative w-full h-full min-h-[150px]">
+              <div className="rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative w-full" style={{ aspectRatio: "4 / 3" }}>
                 <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
                 <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
               </div>
@@ -236,7 +236,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         </div>
 
         {/* Banner Ad — Bottom full width */}
-        <div className="mt-8 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ height: "150px" }}>
+        <div className="mt-8 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "6 / 1" }}>
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
           <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
         </div>
@@ -255,7 +255,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         </section>
 
         {/* Banner Ad — paling bawah */}
-        <div className="mt-8 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ height: "150px" }}>
+        <div className="mt-8 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "6 / 1" }}>
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
           <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
         </div>
