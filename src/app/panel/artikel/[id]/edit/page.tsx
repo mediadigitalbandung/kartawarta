@@ -871,48 +871,97 @@ export default function EditArticlePage() {
           </div>
         )}
 
-        {/* Read-only article content */}
-        <div className="space-y-4">
-          <div className="rounded-[12px] border border-border bg-surface p-5">
-            <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Judul</label>
-            <p className="text-lg font-bold text-txt-primary">{title}</p>
-          </div>
-          <div className="rounded-[12px] border border-border bg-surface p-5">
-            <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Kategori</label>
-            <p className="text-sm text-txt-primary">{categories.find(c => c.id === categoryId)?.name || categoryId}</p>
-          </div>
-          {excerpt && (
+        {/* Editable article content — editor can edit like journalist */}
+        {currentStatus === "IN_REVIEW" && isAssignedEditor ? (
+          <div className="space-y-4">
             <div className="rounded-[12px] border border-border bg-surface p-5">
-              <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Ringkasan</label>
-              <p className="text-sm text-txt-primary">{excerpt}</p>
+              <label className="mb-2 block text-sm font-medium text-txt-primary">Judul</label>
+              <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="input w-full text-lg font-bold" />
             </div>
-          )}
-          {featuredImage && (
             <div className="rounded-[12px] border border-border bg-surface p-5">
-              <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Gambar Utama</label>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={featuredImage} alt="Featured" className="mt-2 max-h-64 rounded-[8px] object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-            </div>
-          )}
-          <div className="rounded-[12px] border border-border bg-surface p-5">
-            <label className="mb-2 block text-xs font-medium text-txt-muted uppercase tracking-wider">Konten</label>
-            <div className="prose prose-sm max-w-none text-txt-primary text-justify" dangerouslySetInnerHTML={{ __html: content }} />
-          </div>
-          {sources.filter(s => s.name.trim()).length > 0 && (
-            <div className="rounded-[12px] border border-border bg-surface p-5">
-              <label className="mb-2 block text-xs font-medium text-txt-muted uppercase tracking-wider">Sumber</label>
-              <div className="space-y-2">
-                {sources.filter(s => s.name.trim()).map((s, i) => (
-                  <div key={i} className="text-sm text-txt-primary">
-                    <span className="font-medium">{s.name}</span>
-                    {s.title && <span className="text-txt-secondary"> — {s.title}</span>}
-                    {s.institution && <span className="text-txt-secondary"> ({s.institution})</span>}
-                  </div>
+              <label className="mb-2 block text-sm font-medium text-txt-primary">Kategori</label>
+              <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="input w-full">
+                <option value="">Pilih kategori</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
-              </div>
+              </select>
             </div>
-          )}
-        </div>
+            <div className="rounded-[12px] border border-border bg-surface p-5">
+              <label className="mb-2 block text-sm font-medium text-txt-primary">Ringkasan</label>
+              <textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={3} className="input w-full" placeholder="Ringkasan singkat artikel" />
+            </div>
+            <div className="rounded-[12px] border border-border bg-surface p-5">
+              <label className="mb-2 block text-sm font-medium text-txt-primary">Konten</label>
+              <RichTextEditor content={content} onChange={setContent} />
+            </div>
+            <div className="rounded-[12px] border border-border bg-surface p-5">
+              <label className="mb-2 block text-sm font-medium text-txt-primary">Tags</label>
+              <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} className="input w-full" placeholder="Tag1, Tag2, Tag3" />
+            </div>
+            {featuredImage && (
+              <div className="rounded-[12px] border border-border bg-surface p-5">
+                <label className="mb-2 block text-xs font-medium text-txt-muted uppercase tracking-wider">Gambar Utama</label>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={featuredImage} alt="Featured" className="mt-2 max-h-64 rounded-[8px] object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+              </div>
+            )}
+            <button
+              onClick={async () => {
+                setSaving(true);
+                setError("");
+                try {
+                  const res = await fetch(`/api/articles/${articleId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ title, content, excerpt, categoryId, tags: tags.split(",").map(t => t.trim()).filter(Boolean) }),
+                  });
+                  if (res.ok) {
+                    alert("Artikel berhasil disimpan");
+                  } else {
+                    const json = await res.json();
+                    setError(json.error || "Gagal menyimpan");
+                  }
+                } catch { setError("Terjadi kesalahan"); }
+                setSaving(false);
+              }}
+              disabled={saving}
+              className="btn-primary flex items-center gap-1.5 disabled:opacity-50"
+            >
+              <Save size={16} />
+              Simpan Perubahan
+            </button>
+          </div>
+        ) : (
+          /* Read-only for non-assigned or non-IN_REVIEW status */
+          <div className="space-y-4">
+            <div className="rounded-[12px] border border-border bg-surface p-5">
+              <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Judul</label>
+              <p className="text-lg font-bold text-txt-primary">{title}</p>
+            </div>
+            <div className="rounded-[12px] border border-border bg-surface p-5">
+              <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Kategori</label>
+              <p className="text-sm text-txt-primary">{categories.find(c => c.id === categoryId)?.name || categoryId}</p>
+            </div>
+            {excerpt && (
+              <div className="rounded-[12px] border border-border bg-surface p-5">
+                <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Ringkasan</label>
+                <p className="text-sm text-txt-primary">{excerpt}</p>
+              </div>
+            )}
+            {featuredImage && (
+              <div className="rounded-[12px] border border-border bg-surface p-5">
+                <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Gambar Utama</label>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={featuredImage} alt="Featured" className="mt-2 max-h-64 rounded-[8px] object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+              </div>
+            )}
+            <div className="rounded-[12px] border border-border bg-surface p-5">
+              <label className="mb-2 block text-xs font-medium text-txt-muted uppercase tracking-wider">Konten</label>
+              <div className="prose prose-sm max-w-none text-txt-primary text-justify" dangerouslySetInnerHTML={{ __html: content }} />
+            </div>
+          </div>
+        )}
       </div>
     );
   }

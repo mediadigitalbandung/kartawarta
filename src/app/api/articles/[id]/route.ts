@@ -264,7 +264,7 @@ export async function PUT(
         return successResponse(updated);
       }
 
-      // Editor can only review articles IN_REVIEW assigned to them
+      // Editor can only work on articles IN_REVIEW assigned to them
       if (article.status !== "IN_REVIEW") {
         throw new ApiError("Artikel tidak dalam status review", 403);
       }
@@ -273,9 +273,33 @@ export async function PUT(
         throw new ApiError("Artikel ini tidak ditugaskan kepada Anda", 403);
       }
 
-      // Editor can APPROVE or REJECT (not PUBLISHED)
+      // Editor can edit content (title, content, excerpt, category, tags)
       if (!data.status || !["APPROVED", "REJECTED"].includes(data.status)) {
-        throw new ApiError("Editor hanya dapat menyetujui atau menolak artikel", 403);
+        // Content edit by editor — save changes without status change
+        const { tags: tagNames, ...articleData } = data;
+        const updateData: Record<string, unknown> = {};
+        if (articleData.title) updateData.title = articleData.title;
+        if (articleData.content) updateData.content = articleData.content;
+        if (articleData.excerpt !== undefined) updateData.excerpt = articleData.excerpt;
+        if (articleData.categoryId) updateData.categoryId = articleData.categoryId;
+        if (tagNames && Array.isArray(tagNames)) {
+          updateData.tags = {
+            set: [],
+            connectOrCreate: tagNames.map((name: string) => ({
+              where: { name },
+              create: { name, slug: name.toLowerCase().replace(/\s+/g, "-") },
+            })),
+          };
+        }
+
+        const updated = await prisma.article.update({
+          where: { id: params.id },
+          data: updateData,
+          include: { author: { select: { id: true, name: true } }, category: { select: { id: true, name: true, slug: true } }, tags: true, sources: true },
+        });
+
+        await logAudit(session.user.id, "UPDATE", "article", article.id, `Editor mengedit konten artikel: ${article.title}`);
+        return successResponse(updated);
       }
 
       if (data.status === "REJECTED" && !data.reviewNote?.trim()) {
