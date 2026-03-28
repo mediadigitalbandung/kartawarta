@@ -282,14 +282,10 @@ export default async function CategoryPage({ params }: { params: { slug: string 
             )}
           </div>
 
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 flex flex-col">
             <Sidebar trending={sidebarTrending} />
-            {/* Sidebar Ad 1 */}
-            <div className="mt-5">
-              <SidebarAd />
-            </div>
-            {/* Sidebar Ad 2 */}
-            <div className="mt-5">
+            {/* Sidebar Ad — stretches to align bottom with article grid */}
+            <div className="mt-5 flex-1 flex items-end">
               <SidebarAd />
             </div>
           </div>
