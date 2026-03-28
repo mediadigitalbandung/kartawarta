@@ -237,14 +237,19 @@ export default function KategoriPage() {
       const slug = tagForm.slug.trim() || slugify(tagForm.name);
       if (editingTag) {
         // Tags API doesn't have PUT by id, so delete + recreate
-        await fetch(`/api/tags?id=${editingTag.id}`, { method: "DELETE" });
-        const res = await fetch("/api/tags", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: tagForm.name.trim(), slug }),
-        });
-        const json = await res.json();
-        if (!json.success) throw new Error(json.error);
+        const delRes = await fetch(`/api/tags?id=${editingTag.id}`, { method: "DELETE" });
+        if (!delRes.ok) throw new Error("Gagal menghapus tag lama");
+        try {
+          const res = await fetch("/api/tags", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: tagForm.name.trim(), slug }),
+          });
+          const json = await res.json();
+          if (!json.success) throw new Error(json.error);
+        } catch {
+          throw new Error("Gagal memperbarui tag. Tag mungkin terhapus, silakan buat ulang.");
+        }
         showFeedback("success", "Tag berhasil diperbarui");
       } else {
         const res = await fetch("/api/tags", {

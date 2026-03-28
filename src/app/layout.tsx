@@ -4,7 +4,7 @@ import Providers from "@/components/Providers";
 import { Suspense } from "react";
 import TopLoader from "@/components/layout/TopLoader";
 import PublicNav from "@/components/layout/PublicNav";
-import Footer from "@/components/layout/Footer";
+import PublicFooter from "@/components/layout/PublicFooter";
 
 export const viewport = { width: "device-width", initialScale: 1 };
 
@@ -49,7 +49,7 @@ export default function RootLayout({
           </Suspense>
           <PublicNav />
           <main className="flex-1">{children}</main>
-          <Footer />
+          <PublicFooter />
         </Providers>
       </body>
     </html>

@@ -61,8 +61,8 @@ function ToolbarButton({
       className={cn(
         "rounded p-1.5 transition-colors",
         active
-          ? "bg-primary-100 text-primary-600 dark:bg-primary-900 dark:text-primary-400"
-          : "text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800",
+          ? "bg-goto-light text-goto-green"
+          : "text-txt-secondary hover:bg-surface-secondary",
         disabled && "cursor-not-allowed opacity-30"
       )}
     >
@@ -124,9 +124,9 @@ export default function RichTextEditor({
   if (!editor) return null;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+    <div className="overflow-hidden rounded-xl border border-border bg-surface">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-0.5 border-b border-gray-200 px-2 py-1.5 dark:border-gray-800">
+      <div className="flex flex-wrap items-center gap-0.5 border-b border-border px-2 py-1.5">
         {/* Text formatting */}
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -157,7 +157,7 @@ export default function RichTextEditor({
           <Strikethrough size={16} />
         </ToolbarButton>
 
-        <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-gray-700" />
+        <div className="mx-1 h-6 w-px bg-border" />
 
         {/* Headings */}
         <ToolbarButton
@@ -182,7 +182,7 @@ export default function RichTextEditor({
           <Heading3 size={16} />
         </ToolbarButton>
 
-        <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-gray-700" />
+        <div className="mx-1 h-6 w-px bg-border" />
 
         {/* Lists */}
         <ToolbarButton
@@ -220,7 +220,7 @@ export default function RichTextEditor({
           <Minus size={16} />
         </ToolbarButton>
 
-        <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-gray-700" />
+        <div className="mx-1 h-6 w-px bg-border" />
 
         {/* Alignment */}
         <ToolbarButton
@@ -245,7 +245,7 @@ export default function RichTextEditor({
           <AlignRight size={16} />
         </ToolbarButton>
 
-        <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-gray-700" />
+        <div className="mx-1 h-6 w-px bg-border" />
 
         {/* Media */}
         <ToolbarButton onClick={addImage} title="Sisipkan Gambar">
@@ -258,7 +258,7 @@ export default function RichTextEditor({
           <YoutubeIcon size={16} />
         </ToolbarButton>
 
-        <div className="mx-1 h-6 w-px bg-gray-200 dark:bg-gray-700" />
+        <div className="mx-1 h-6 w-px bg-border" />
 
         {/* Undo/Redo */}
         <ToolbarButton
@@ -281,7 +281,7 @@ export default function RichTextEditor({
       <EditorContent editor={editor} />
 
       {/* Word count */}
-      <div className="border-t border-gray-200 px-4 py-2 text-xs text-gray-400 dark:border-gray-800">
+      <div className="border-t border-border px-4 py-2 text-xs text-txt-muted">
         {editor.storage.characterCount?.words?.() ?? 0} kata &middot;{" "}
         {editor.storage.characterCount?.characters?.() ?? 0} karakter &middot;{" "}
         ~{Math.max(1, Math.ceil((editor.storage.characterCount?.words?.() ?? 0) / 200))} menit baca

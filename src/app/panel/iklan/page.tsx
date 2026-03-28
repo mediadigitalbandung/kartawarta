@@ -155,6 +155,16 @@ export default function IklanPage() {
       return;
     }
 
+    if (!formType) {
+      alert("Tipe iklan wajib dipilih.");
+      return;
+    }
+
+    if (!formSlot) {
+      alert("Posisi slot iklan wajib dipilih.");
+      return;
+    }
+
     try {
       setSubmitting(true);
 

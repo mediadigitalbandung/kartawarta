@@ -194,7 +194,7 @@ export default function NewArticlePage() {
             <button
               onClick={() => handleSubmit("PUBLISHED")}
               disabled={saving}
-              className="flex items-center gap-1.5 rounded-[12px] bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-[12px] bg-goto-green px-4 py-2 text-sm font-semibold text-white hover:bg-goto-green/90 disabled:opacity-50"
             >
               <Upload size={16} />
               Publikasi Langsung
