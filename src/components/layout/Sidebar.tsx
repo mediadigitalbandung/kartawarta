@@ -42,7 +42,12 @@ export default function Sidebar({ trending = [], recent = [], popular = [] }: Si
       {/* Trending */}
       {trending.length > 0 && (
         <div>
-          <SectionTitle>Trending</SectionTitle>
+          <div className="flex items-center justify-between">
+            <SectionTitle>Trending</SectionTitle>
+            <Link href="/search?q=trending" className="text-xs font-medium text-goto-green hover:underline">
+              Lihat Lainnya &rarr;
+            </Link>
+          </div>
           <ul className="mt-4">
             {trending.map((article, i) => (
               <li
