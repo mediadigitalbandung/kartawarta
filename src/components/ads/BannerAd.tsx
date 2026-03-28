@@ -5,7 +5,7 @@ interface BannerAdProps {
 
 const sizeConfig = {
   slim: {
-    ratio: "4 / 1",       // same as leaderboard
+    ratio: "3 / 1",       // compact but visible
     containerClass: "py-2",
   },
   leaderboard: {
