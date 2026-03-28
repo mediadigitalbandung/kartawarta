@@ -6,9 +6,9 @@ import TrendingTags from "./TrendingTags";
 
 export default function PublicNav() {
   const pathname = usePathname();
-  const isPanel = pathname.startsWith("/panel");
+  const hideNav = pathname.startsWith("/panel") || pathname === "/login";
 
-  if (isPanel) return null;
+  if (hideNav) return null;
 
   return (
     <>
