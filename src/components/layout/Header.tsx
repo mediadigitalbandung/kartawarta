@@ -47,6 +47,16 @@ export default function Header() {
   const { data: session } = useSession();
   const pathname = usePathname();
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileMenuOpen]);
+
   useEffect(() => {
     let lastY = 0;
     const onScroll = () => {
