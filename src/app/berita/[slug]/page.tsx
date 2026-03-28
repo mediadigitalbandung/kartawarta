@@ -303,12 +303,17 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               {/* Related articles */}
               {relatedArticles.length > 0 && (
                 <section className="mt-10">
-                  <div className="section-header">
-                    <h2 className="section-title">Artikel Terkait</h2>
+                  <div className="flex items-center justify-between mb-5">
+                    <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">Artikel Terkait</h2>
+                    <Link href={`/kategori/${article.category.slug}`} className="text-sm font-medium text-goto-green hover:underline">
+                      Lihat Lainnya &rarr;
+                    </Link>
                   </div>
-                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
                     {relatedArticles.map((related) => (
-                      <ArticleCard key={related.slug} {...related} />
+                      <div key={related.slug} className="shrink-0 w-[260px] sm:w-[280px]">
+                        <ArticleCard {...related} variant="standard" />
+                      </div>
                     ))}
                   </div>
                 </section>
