@@ -873,64 +873,96 @@ export default function EditArticlePage() {
 
         {/* Editable article content — editor can edit like journalist */}
         {currentStatus === "IN_REVIEW" && isAssignedEditor ? (
-          <div className="space-y-4">
-            <div className="rounded-[12px] border border-border bg-surface p-5">
-              <label className="mb-2 block text-sm font-medium text-txt-primary">Judul</label>
-              <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="input w-full text-lg font-bold" />
-            </div>
-            <div className="rounded-[12px] border border-border bg-surface p-5">
-              <label className="mb-2 block text-sm font-medium text-txt-primary">Kategori</label>
-              <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="input w-full">
-                <option value="">Pilih kategori</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
-            </div>
-            <div className="rounded-[12px] border border-border bg-surface p-5">
-              <label className="mb-2 block text-sm font-medium text-txt-primary">Ringkasan</label>
-              <textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={3} className="input w-full" placeholder="Ringkasan singkat artikel" />
-            </div>
-            <div className="rounded-[12px] border border-border bg-surface p-5">
-              <label className="mb-2 block text-sm font-medium text-txt-primary">Konten</label>
-              <RichTextEditor content={content} onChange={setContent} />
-            </div>
-            <div className="rounded-[12px] border border-border bg-surface p-5">
-              <label className="mb-2 block text-sm font-medium text-txt-primary">Tags</label>
-              <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} className="input w-full" placeholder="Tag1, Tag2, Tag3" />
-            </div>
-            {featuredImage && (
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {/* Main content — 2/3 */}
+            <div className="lg:col-span-2 space-y-4">
               <div className="rounded-[12px] border border-border bg-surface p-5">
-                <label className="mb-2 block text-xs font-medium text-txt-muted uppercase tracking-wider">Gambar Utama</label>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={featuredImage} alt="Featured" className="mt-2 max-h-64 rounded-[8px] object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                <label className="mb-2 block text-sm font-medium text-txt-primary">Judul</label>
+                <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="input w-full text-lg font-bold" />
               </div>
-            )}
-            <button
-              onClick={async () => {
-                setSaving(true);
-                setError("");
-                try {
-                  const res = await fetch(`/api/articles/${articleId}`, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ title, content, excerpt, categoryId, tags: tags.split(",").map(t => t.trim()).filter(Boolean) }),
-                  });
-                  if (res.ok) {
-                    alert("Artikel berhasil disimpan");
-                  } else {
-                    const json = await res.json();
-                    setError(json.error || "Gagal menyimpan");
-                  }
-                } catch { setError("Terjadi kesalahan"); }
-                setSaving(false);
-              }}
-              disabled={saving}
-              className="btn-primary flex items-center gap-1.5 disabled:opacity-50"
-            >
-              <Save size={16} />
-              Simpan Perubahan
-            </button>
+              <div className="rounded-[12px] border border-border bg-surface p-5">
+                <label className="mb-2 block text-sm font-medium text-txt-primary">Konten</label>
+                <RichTextEditor content={content} onChange={setContent} />
+              </div>
+            </div>
+            {/* Sidebar — 1/3 */}
+            <div className="space-y-4">
+              <div className="rounded-[12px] border border-border bg-surface p-5">
+                <label className="mb-2 block text-sm font-medium text-txt-primary">Kategori</label>
+                <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="input w-full">
+                  <option value="">Pilih kategori</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="rounded-[12px] border border-border bg-surface p-5">
+                <div className="mb-2 flex items-center justify-between">
+                  <label className="text-sm font-medium text-txt-primary">Tags</label>
+                  <AiButton feature="tags" setter={setTags} />
+                </div>
+                <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} className="input w-full" placeholder="Tag1, Tag2, Tag3" />
+                <p className="mt-1 text-xs text-txt-muted">Pisahkan dengan koma</p>
+              </div>
+              <div className="rounded-[12px] border border-border bg-surface p-5">
+                <div className="mb-2 flex items-center justify-between">
+                  <label className="text-sm font-medium text-txt-primary">Ringkasan</label>
+                  <AiButton feature="summary" setter={setExcerpt} />
+                </div>
+                <textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={3} className="input w-full" placeholder="Ringkasan singkat artikel" maxLength={500} />
+              </div>
+              <div className="rounded-[12px] border border-border bg-surface p-5">
+                <label className="mb-2 block text-sm font-medium text-txt-primary">Gambar Utama</label>
+                <ImageUploader onUpload={(url: string) => setFeaturedImage(url)} currentImage={featuredImage} />
+                <div className="mt-2">
+                  <input type="url" value={featuredImage} onChange={(e) => setFeaturedImage(e.target.value)} placeholder="Atau paste URL gambar" className="input w-full text-xs" />
+                </div>
+                {featuredImage && !featuredImage.startsWith("data:") && (
+                  <img src={featuredImage} alt="Preview" className="mt-2 w-full rounded-[8px] object-cover" style={{ maxHeight: 200 }} onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                )}
+              </div>
+              <div className="rounded-[12px] border border-border bg-surface p-5">
+                <div className="mb-2 flex items-center justify-between">
+                  <label className="text-sm font-medium text-txt-primary">SEO Title</label>
+                  <AiButton feature="seo_title" setter={setSeoTitle} />
+                </div>
+                <input type="text" value={seoTitle} onChange={(e) => setSeoTitle(e.target.value)} className="input w-full" placeholder="SEO Title (maks 60 karakter)" maxLength={60} />
+                <p className="mt-1 text-xs text-txt-muted">{seoTitle.length}/60</p>
+              </div>
+              <div className="rounded-[12px] border border-border bg-surface p-5">
+                <div className="mb-2 flex items-center justify-between">
+                  <label className="text-sm font-medium text-txt-primary">Meta Description</label>
+                  <AiButton feature="meta_description" setter={setSeoDescription} />
+                </div>
+                <textarea value={seoDescription} onChange={(e) => setSeoDescription(e.target.value)} rows={2} className="input w-full" placeholder="Meta description (maks 155 karakter)" maxLength={155} />
+                <p className="mt-1 text-xs text-txt-muted">{seoDescription.length}/155</p>
+              </div>
+              <button
+                onClick={async () => {
+                  setSaving(true);
+                  setError("");
+                  try {
+                    const res = await fetch(`/api/articles/${articleId}`, {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ title, content, excerpt, categoryId, featuredImage, seoTitle, seoDescription, tags: tags.split(",").map(t => t.trim()).filter(Boolean) }),
+                    });
+                    if (res.ok) {
+                      alert("Artikel berhasil disimpan");
+                    } else {
+                      const json = await res.json();
+                      setError(json.error || "Gagal menyimpan");
+                    }
+                  } catch { setError("Terjadi kesalahan"); }
+                  setSaving(false);
+                }}
+                disabled={saving}
+                className="btn-primary w-full flex items-center justify-center gap-1.5 disabled:opacity-50"
+              >
+                <Save size={16} />
+                Simpan Perubahan
+              </button>
+            </div>
           </div>
         ) : (
           /* Read-only for non-assigned or non-IN_REVIEW status */
