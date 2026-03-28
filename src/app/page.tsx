@@ -271,9 +271,9 @@ export default async function HomePage() {
               Lihat Semua
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
             {jadwalSidangData.map((j) => (
-              <div key={j.date} className="rounded-lg border border-border bg-surface-secondary p-4 hover:border-goto-green/40 transition-colors">
+              <div key={j.date} className="shrink-0 w-[240px] sm:w-[260px] rounded-lg border border-border bg-surface-secondary p-4 hover:border-goto-green/40 transition-colors">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="flex h-12 w-12 flex-col items-center justify-center rounded-lg bg-goto-green text-white">
                     <span className="text-lg font-extrabold leading-none">{j.date.split(" ")[0]}</span>
