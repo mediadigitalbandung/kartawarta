@@ -138,7 +138,7 @@ function SearchContent() {
       {searched && results.length > 0 && (
         <div className="mt-5 flex flex-col sm:flex-row items-start sm:items-center gap-3">
           {/* Sort by */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <SlidersHorizontal size={14} className="text-txt-muted shrink-0" />
             <span className="text-xs text-txt-muted shrink-0">Urutan:</span>
             {sortOptions.map((opt) => (
@@ -158,7 +158,7 @@ function SearchContent() {
           </div>
 
           {/* Time range */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Calendar size={14} className="text-txt-muted shrink-0" />
             <span className="text-xs text-txt-muted shrink-0">Periode:</span>
             {timeOptions.map((opt) => (

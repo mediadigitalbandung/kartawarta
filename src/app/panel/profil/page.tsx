@@ -114,7 +114,7 @@ export default function ProfilPage() {
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {/* Profile Card */}
         <div className="rounded-[12px] border border-border bg-surface p-6 shadow-card">
           <div className="flex flex-col items-center text-center">

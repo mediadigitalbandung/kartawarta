@@ -231,7 +231,7 @@ export default function PengaturanPage() {
                     parseInt(e.target.value) || 12
                   )
                 }
-                className="input w-32"
+                className="input w-full sm:w-32"
               />
             </div>
             <div className="flex items-center justify-between rounded-[12px] border border-border bg-surface-secondary px-4 py-3">
