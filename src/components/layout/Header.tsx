@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
   Menu,
@@ -43,6 +44,7 @@ export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const { data: session } = useSession();
+  const pathname = usePathname();
 
   return (
     <>
@@ -140,12 +142,14 @@ export default function Header() {
       <nav className="bg-surface border-b border-border">
         <div className="container-main">
           <ul className="flex items-center gap-0 overflow-x-auto scrollbar-hide">
-            {categoryNavMain.map((item, i) => (
+            {categoryNavMain.map((item) => {
+              const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+              return (
               <li key={item.href} className="shrink-0">
                 <Link
                   href={item.href}
                   className={`relative inline-block px-4 py-3 text-sm font-semibold transition-all duration-200 ${
-                    i === 0
+                    isActive
                       ? "text-goto-green after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[3px] after:rounded-full after:bg-goto-green"
                       : "text-txt-primary hover:text-goto-green"
                   }`}
@@ -153,7 +157,8 @@ export default function Header() {
                   {item.name}
                 </Link>
               </li>
-            ))}
+              );
+            })}
             {/* Lainnya dropdown */}
             <li className="relative shrink-0">
               <button
