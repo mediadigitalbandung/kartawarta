@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, SlidersHorizontal, Clock, Eye } from "lucide-react";
+import { Search, SlidersHorizontal, Clock, Eye, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Article {
   title: string;
@@ -27,6 +27,8 @@ type SortBy = "terbaru" | "terlama" | "terpopuler";
 export default function SearchableArticleList({ articles, categoryName }: SearchableArticleListProps) {
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortBy>("terbaru");
+  const [page, setPage] = useState(0);
+  const perPage = 10;
 
   const filtered = useMemo(() => {
     let result = articles;
@@ -49,8 +51,12 @@ export default function SearchableArticleList({ articles, categoryName }: Search
       return new Date(b.publishedAt || 0).getTime() - new Date(a.publishedAt || 0).getTime();
     });
 
+    setPage(0);
     return result;
   }, [articles, query, sortBy]);
+
+  const totalPages = Math.ceil(filtered.length / perPage);
+  const paginated = filtered.slice(page * perPage, (page + 1) * perPage);
 
   const formatDate = (d: Date | string | null) =>
     d ? new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : "";
@@ -95,7 +101,7 @@ export default function SearchableArticleList({ articles, categoryName }: Search
 
       {/* Article list — 1 article per row */}
       <div className="space-y-0 divide-y divide-border">
-        {filtered.map((article) => (
+        {paginated.map((article) => (
           <article key={article.slug} className="group flex gap-4 py-4 first:pt-0">
             {/* Thumbnail */}
             {article.featuredImage && (
@@ -146,6 +152,31 @@ export default function SearchableArticleList({ articles, categoryName }: Search
           </article>
         ))}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex items-center justify-center gap-3">
+          <button
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            disabled={page === 0}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-goto-green hover:text-goto-green disabled:opacity-30 disabled:hover:border-border disabled:hover:text-txt-primary"
+          >
+            <ChevronLeft size={16} />
+            Sebelumnya
+          </button>
+          <span className="text-sm text-txt-muted">
+            {page + 1} / {totalPages}
+          </span>
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+            disabled={page === totalPages - 1}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-goto-green hover:text-goto-green disabled:opacity-30 disabled:hover:border-border disabled:hover:text-txt-primary"
+          >
+            Selanjutnya
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      )}
 
       {filtered.length === 0 && (
         <div className="py-12 text-center">
