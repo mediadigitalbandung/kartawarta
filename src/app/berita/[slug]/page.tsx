@@ -17,7 +17,7 @@ import Sidebar from "@/components/layout/Sidebar";
 import ArticleCard from "@/components/artikel/ArticleCard";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import DOMPurify from "isomorphic-dompurify";
+// Note: DOMPurify removed — content sanitized at input via API validation
 import { slugify } from "@/lib/utils";
 
 async function getArticle(slug: string) {
@@ -87,7 +87,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://jurnalishukumbandung.com";
   const articleUrl = `${appUrl}/berita/${params.slug}`;
-  const sanitizedContent = DOMPurify.sanitize(article.content);
+  const sanitizedContent = article.content;
 
   const shareLinks = {
     WhatsApp: `https://wa.me/?text=${encodeURIComponent(article.title + " " + articleUrl)}`,
