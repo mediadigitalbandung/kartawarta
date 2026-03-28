@@ -125,13 +125,18 @@ export default function PengaturanPage() {
 
   return (
     <div>
-      {/* Toast */}
+      {/* Toast — animated slide-in */}
       {toast && (
-        <div className="fixed right-4 top-20 z-50 flex items-center gap-2 rounded-[12px] border border-goto-green/20 bg-goto-50 px-5 py-3 shadow-lg">
-          <CheckCircle size={18} className="text-goto-green" />
-          <span className="text-sm font-medium text-goto-green">
-            {toastMessage}
-          </span>
+        <div className="fixed right-4 top-20 z-50 animate-fade-up">
+          <div className="flex items-center gap-3 rounded-[12px] border border-goto-green/30 bg-goto-green px-6 py-4 shadow-xl">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
+              <CheckCircle size={20} className="text-white" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-white">{toastMessage}</p>
+              <p className="text-xs text-white/70 mt-0.5">Perubahan telah tersimpan</p>
+            </div>
+          </div>
         </div>
       )}
 
