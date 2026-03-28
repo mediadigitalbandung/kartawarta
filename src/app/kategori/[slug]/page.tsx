@@ -13,10 +13,10 @@ import VideoStory from "@/components/slider/VideoStory";
 import BannerAd, { SidebarAd } from "@/components/ads/BannerAd";
 import { videoStoryData } from "@/lib/video-data";
 
-type Poll = { question: string; options: { label: string; percentage: number }[]; totalVotes: number };
+type Poll = { question: string; image?: string; options: { label: string; percentage: number }[]; totalVotes: number };
 const categoryPolling: Record<string, Poll[]> = {
   "hukum-pidana": [
-    { question: "Apakah hukuman mati masih relevan dalam sistem hukum pidana Indonesia?", options: [{ label: "Sangat Relevan", percentage: 38 }, { label: "Relevan", percentage: 24 }, { label: "Netral", percentage: 16 }, { label: "Tidak Relevan", percentage: 15 }, { label: "Sangat Tidak Relevan", percentage: 7 }], totalVotes: 3842 },
+    { question: "Apakah hukuman mati masih relevan dalam sistem hukum pidana Indonesia?", image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&q=80", options: [{ label: "Sangat Relevan", percentage: 38 }, { label: "Relevan", percentage: 24 }, { label: "Netral", percentage: 16 }, { label: "Tidak Relevan", percentage: 15 }, { label: "Sangat Tidak Relevan", percentage: 7 }], totalVotes: 3842 },
     { question: "Setujukah Anda dengan penerapan restorative justice untuk kasus pidana ringan?", options: [{ label: "Sangat Setuju", percentage: 40 }, { label: "Setuju", percentage: 28 }, { label: "Netral", percentage: 15 }, { label: "Tidak Setuju", percentage: 12 }, { label: "Sangat Tidak Setuju", percentage: 5 }], totalVotes: 2910 },
     { question: "Apakah sistem peradilan pidana Indonesia sudah memberikan keadilan bagi korban?", options: [{ label: "Sudah Adil", percentage: 12 }, { label: "Cukup Adil", percentage: 22 }, { label: "Netral", percentage: 25 }, { label: "Kurang Adil", percentage: 28 }, { label: "Tidak Adil", percentage: 13 }], totalVotes: 4150 },
   ],
@@ -164,7 +164,13 @@ export default async function CategoryPage({ params }: { params: { slug: string 
             </div>
             <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
               {categoryPolling[params.slug].map((poll, idx) => (
-                <div key={idx} className="shrink-0 w-[300px] sm:w-[340px] rounded-[12px] border border-border bg-surface-secondary p-5">
+                <div key={idx} className="shrink-0 w-[300px] sm:w-[340px] rounded-[12px] border border-border bg-surface-secondary overflow-hidden">
+                  {poll.image && (
+                    <div className="relative w-full aspect-[2/1]">
+                      <Image src={poll.image} alt={poll.question} fill className="object-cover" />
+                    </div>
+                  )}
+                  <div className="p-5">
                   <p className="text-sm font-semibold text-txt-primary mb-4">{poll.question}</p>
                   <div className="space-y-2.5">
                     {poll.options.map((opt) => (
@@ -180,6 +186,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
                     ))}
                   </div>
                   <p className="text-[11px] text-txt-muted mt-3">{poll.totalVotes.toLocaleString("id-ID")} suara</p>
+                  </div>
                 </div>
               ))}
             </div>

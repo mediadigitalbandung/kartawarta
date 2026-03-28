@@ -42,6 +42,7 @@ const liveSidangData = [
 const pollingData = [
   {
     question: "Apakah Anda setuju dengan revisi UU ITE terbaru?",
+    image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80",
     options: [
       { label: "Sangat Setuju", percentage: 32 },
       { label: "Setuju", percentage: 28 },
@@ -53,6 +54,7 @@ const pollingData = [
   },
   {
     question: "Bagaimana penilaian Anda terhadap kinerja KPK saat ini?",
+    image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&q=80",
     options: [
       { label: "Sangat Baik", percentage: 18 },
       { label: "Baik", percentage: 25 },
@@ -64,6 +66,7 @@ const pollingData = [
   },
   {
     question: "Perlukah hukuman mati untuk koruptor di Indonesia?",
+    image: "https://images.unsplash.com/photo-1453945619913-79ec89a82c51?w=600&q=80",
     options: [
       { label: "Sangat Perlu", percentage: 45 },
       { label: "Perlu", percentage: 22 },
@@ -360,7 +363,13 @@ export default async function HomePage() {
           </div>
           <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
             {pollingData.map((poll, idx) => (
-              <div key={idx} className="shrink-0 w-[300px] sm:w-[340px] rounded-lg border border-border bg-surface-secondary p-5">
+              <div key={idx} className="shrink-0 w-[300px] sm:w-[340px] rounded-lg border border-border bg-surface-secondary overflow-hidden">
+                {poll.image && (
+                  <div className="relative w-full aspect-[2/1]">
+                    <Image src={poll.image} alt={poll.question} fill className="object-cover" />
+                  </div>
+                )}
+                <div className="p-5">
                 <p className="text-sm font-semibold text-txt-primary mb-4">{poll.question}</p>
                 <div className="space-y-2.5">
                   {poll.options.map((opt: { label: string; percentage: number }) => (
@@ -379,6 +388,7 @@ export default async function HomePage() {
                   ))}
                 </div>
                 <p className="text-[11px] text-txt-muted mt-3">{poll.totalVotes.toLocaleString("id-ID")} suara</p>
+                </div>
               </div>
             ))}
           </div>
