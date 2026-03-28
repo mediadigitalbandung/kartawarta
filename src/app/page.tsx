@@ -142,26 +142,20 @@ export default async function HomePage() {
       {/* Headline News Slider + Breaking News */}
       <section className="bg-surface py-6">
         <div className="container-main">
-          {/* Row 1: Headline + Breaking */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
+            {/* Left column: Headline + Sub-headline stacked */}
+            <div className="lg:col-span-2 flex flex-col gap-4">
               <HeadlineSlider items={JSON.parse(JSON.stringify(headlineArticles))} />
+              {subHeadlines.length > 0 && (
+                <SubHeadlineSlider items={JSON.parse(JSON.stringify(subHeadlines))} />
+              )}
             </div>
-            <div className="lg:col-span-1">
+            {/* Right column: Breaking + Sidebar Ad stacked */}
+            <div className="lg:col-span-1 flex flex-col gap-4">
               <BreakingSlider items={JSON.parse(JSON.stringify(breakingArticles))} />
+              <SidebarAd />
             </div>
           </div>
-          {/* Row 2: Sub-headline + Sidebar Ad — aligned bottom */}
-          {subHeadlines.length > 0 && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-4">
-              <div className="lg:col-span-2">
-                <SubHeadlineSlider items={JSON.parse(JSON.stringify(subHeadlines))} />
-              </div>
-              <div className="lg:col-span-1">
-                <SidebarAd />
-              </div>
-            </div>
-          )}
         </div>
       </section>
 
