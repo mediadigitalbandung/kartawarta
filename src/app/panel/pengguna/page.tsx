@@ -371,7 +371,7 @@ export default function PenggunaPage() {
       {/* Add User Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-md rounded-[12px] border border-border bg-surface p-6 shadow-lg">
+          <div className="w-[calc(100%-2rem)] max-w-md mx-auto rounded-[12px] border border-border bg-surface p-4 sm:p-6 shadow-lg">
             <h2 className="mb-4 text-lg font-bold text-txt-primary">
               {editingUser ? "Edit Pengguna" : "Tambah Pengguna Baru"}
             </h2>
