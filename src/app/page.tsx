@@ -358,9 +358,9 @@ export default async function HomePage() {
               Polling Hukum
             </h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
             {pollingData.map((poll, idx) => (
-              <div key={idx} className="rounded-lg border border-border bg-surface-secondary p-5">
+              <div key={idx} className="shrink-0 w-[300px] sm:w-[340px] rounded-lg border border-border bg-surface-secondary p-5">
                 <p className="text-sm font-semibold text-txt-primary mb-4">{poll.question}</p>
                 <div className="space-y-2.5">
                   {poll.options.map((opt: { label: string; percentage: number }) => (
