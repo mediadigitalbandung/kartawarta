@@ -75,13 +75,13 @@ export default function Header() {
             <form action="/search" className="relative w-28 sm:w-40 md:w-64 lg:w-80">
               <Search
                 size={16}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-txt-muted"
               />
               <input
                 type="text"
                 name="q"
                 placeholder="Cari di sini..."
-                className="w-full rounded-full border border-white/20 bg-white/10 py-2 pl-10 pr-4 text-sm text-white placeholder:text-white/60 transition-all focus:border-goto-green/50 focus:bg-white/15 focus:outline-none focus:ring-1 focus:ring-goto-green/20"
+                className="w-full rounded-full border border-border bg-white py-2 pl-10 pr-4 text-sm text-txt-primary placeholder:text-txt-muted transition-all focus:border-goto-green focus:outline-none focus:ring-2 focus:ring-goto-green/20"
               />
             </form>
 
