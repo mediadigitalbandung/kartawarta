@@ -21,7 +21,9 @@ import {
   Bell,
   Settings,
   BarChart3,
+  LogOut,
 } from "lucide-react";
+import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
 const roleLabelsMap: Record<string, string> = {
@@ -219,6 +221,14 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             </p>
           </div>
         </div>
+        <button
+          onClick={() => signOut({ callbackUrl: "/login" })}
+          className="mt-2 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-white"
+          aria-label="Keluar"
+        >
+          <LogOut size={16} />
+          Keluar
+        </button>
       </div>
     </div>
   );
