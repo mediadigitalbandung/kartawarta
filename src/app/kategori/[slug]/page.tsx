@@ -249,31 +249,12 @@ export default async function CategoryPage({ params }: { params: { slug: string 
                 Lihat Semua &rarr;
               </Link>
             </div>
-            {/* Articles grid (skip headline + side cards) */}
+            {/* Articles grid — max 6 articles */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               {articles.slice(11, 17).map((article) => (
                 <ArticleCard key={article.slug} {...article} />
               ))}
             </div>
-
-            {/* Inline ad between rows */}
-            {articles.length > 17 && (
-              <div className="my-6">
-                <div className="rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ height: "120px" }}>
-                  <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
-                  <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
-                </div>
-              </div>
-            )}
-
-            {/* Remaining articles */}
-            {articles.length > 17 && (
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                {articles.slice(17).map((article) => (
-                  <ArticleCard key={article.slug} {...article} />
-                ))}
-              </div>
-            )}
 
             {articles.length === 0 && (
               <div className="rounded-[12px] border-2 border-dashed border-border py-16 text-center">
