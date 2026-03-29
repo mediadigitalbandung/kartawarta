@@ -11,6 +11,7 @@ import {
   LogOut,
   LayoutDashboard,
   ChevronRight,
+  Bookmark,
 } from "lucide-react";
 
 const categoryNavMain = [
@@ -108,6 +109,16 @@ export default function Header() {
                 className="w-full rounded-full border border-border bg-white py-2 pl-10 pr-4 text-sm text-txt-primary placeholder:text-txt-muted transition-all focus:border-goto-green focus:outline-none focus:ring-2 focus:ring-goto-green/20"
               />
             </form>
+
+              {/* Bookmark link */}
+              <Link
+                href="/bookmark"
+                className="hidden md:flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-white/60 transition-colors hover:text-white hover:bg-white/10"
+                title="Bookmark Saya"
+              >
+                <Bookmark size={14} />
+                <span className="hidden lg:inline">Bookmark</span>
+              </Link>
 
               {/* User area */}
               {session ? (
@@ -285,6 +296,25 @@ export default function Header() {
                   </Link>
                 </li>
               ))}
+            </ul>
+
+            {/* Bookmark link in mobile menu */}
+            <div className="px-3 py-2">
+              <span className="px-3 text-[11px] font-semibold uppercase tracking-wider text-txt-muted">
+                Lainnya
+              </span>
+            </div>
+            <ul className="space-y-0.5 px-3 pb-3">
+              <li>
+                <Link
+                  href="/bookmark"
+                  className="flex items-center gap-2 rounded px-3 py-2.5 text-sm font-medium text-txt-primary transition-colors hover:bg-surface-secondary hover:text-goto-green"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Bookmark size={16} className="text-goto-green" />
+                  Bookmark Saya
+                </Link>
+              </li>
             </ul>
           </div>
 

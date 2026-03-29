@@ -12,6 +12,7 @@ const footerLinks = {
   ],
   kontak: [
     { name: "Kontak Redaksi", href: "/kontak" },
+    { name: "Bookmark Saya", href: "/bookmark" },
     { name: "Kebijakan Privasi", href: "/privasi" },
     { name: "Syarat & Ketentuan", href: "/syarat-ketentuan" },
     { name: "Pasang Iklan", href: "/kontak" },

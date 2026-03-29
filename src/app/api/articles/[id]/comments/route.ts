@@ -1,0 +1,89 @@
+import { NextRequest } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import {
+  successResponse,
+  errorResponse,
+  getSession,
+  ApiError,
+} from "@/lib/api-utils";
+
+const createCommentSchema = z.object({
+  authorName: z.string().min(2, "Nama minimal 2 karakter").max(100),
+  authorEmail: z.string().email("Email tidak valid").transform((v) => v.toLowerCase()),
+  content: z.string().min(3, "Komentar minimal 3 karakter").max(2000),
+  parentId: z.string().optional(),
+});
+
+// GET /api/articles/:id/comments — public: approved only, admin/editor: all
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const article = await prisma.article.findUnique({
+      where: { id: params.id },
+      select: { id: true },
+    });
+    if (!article) {
+      throw new ApiError("Artikel tidak ditemukan", 404);
+    }
+
+    // Check if user is admin/editor
+    const session = await getSession();
+    const role = session?.user?.role || "";
+    const isEditorOrAdmin = ["SUPER_ADMIN", "CHIEF_EDITOR", "EDITOR"].includes(role);
+
+    const comments = await prisma.comment.findMany({
+      where: {
+        articleId: params.id,
+        ...(isEditorOrAdmin ? {} : { isApproved: true }),
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return successResponse(comments);
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
+
+// POST /api/articles/:id/comments — public, creates unapproved comment
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const article = await prisma.article.findUnique({
+      where: { id: params.id },
+      select: { id: true, status: true },
+    });
+    if (!article) {
+      throw new ApiError("Artikel tidak ditemukan", 404);
+    }
+    if (article.status !== "PUBLISHED") {
+      throw new ApiError("Komentar hanya bisa dikirim pada artikel yang sudah dipublikasi", 400);
+    }
+
+    const body = await request.json();
+    const data = createCommentSchema.parse(body);
+
+    const comment = await prisma.comment.create({
+      data: {
+        authorName: data.authorName,
+        authorEmail: data.authorEmail,
+        content: data.content,
+        parentId: data.parentId || null,
+        articleId: params.id,
+        isApproved: false,
+      },
+    });
+
+    return successResponse(comment, 201);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return errorResponse(new ApiError(error.errors[0].message, 400));
+    }
+    return errorResponse(error);
+  }
+}

@@ -1204,6 +1204,27 @@ export default function EditArticlePage() {
         )}
       </div>
 
+      {/* Export buttons */}
+      {title && content && (
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <span className="text-xs font-semibold text-txt-muted uppercase tracking-wider">Export:</span>
+          <button
+            onClick={handleExportPdf}
+            className="btn-ghost flex items-center gap-1.5 rounded-[12px] px-3 py-1.5 text-xs font-medium text-txt-secondary hover:text-txt-primary"
+          >
+            <Printer size={14} />
+            Export PDF
+          </button>
+          <button
+            onClick={handleExportText}
+            className="btn-ghost flex items-center gap-1.5 rounded-[12px] px-3 py-1.5 text-xs font-medium text-txt-secondary hover:text-txt-primary"
+          >
+            <FileText size={14} />
+            Export Teks
+          </button>
+        </div>
+      )}
+
       {error && (
         <div className="mb-4 flex items-center gap-2 rounded-[12px] bg-red-50 px-4 py-3 text-sm text-red-700">
           <AlertCircle size={16} />

@@ -16,6 +16,8 @@ import CopyProtection from "@/components/artikel/CopyProtection";
 import Sidebar from "@/components/layout/Sidebar";
 import ArticleCard from "@/components/artikel/ArticleCard";
 import BannerAd from "@/components/ads/BannerAd";
+import CommentSection from "@/components/artikel/CommentSection";
+import BookmarkButton from "@/components/artikel/BookmarkButton";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 // Note: DOMPurify removed — content sanitized at input via API validation
@@ -242,13 +244,13 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                 <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
               </div>
 
-              {/* Share bar */}
+              {/* Share bar + bookmark */}
               <div className="mt-8 flex flex-wrap items-center gap-3 rounded-[12px] bg-surface-secondary p-3 sm:p-4">
                 <div className="flex items-center gap-2 text-txt-secondary">
                   <Share2 size={14} />
                   <span className="text-xs font-semibold uppercase tracking-wider">Bagikan</span>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {(Object.entries(shareLinks) as [string, string][]).map(([platform, url]) => (
                     <a
                       key={platform}
@@ -264,6 +266,9 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                       {platform}
                     </a>
                   ))}
+                </div>
+                <div className="ml-auto">
+                  <BookmarkButton slug={params.slug} />
                 </div>
               </div>
 
@@ -359,6 +364,9 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                   </div>
                 </section>
               )}
+
+              {/* Comments — only on published articles */}
+              {isPublished && <CommentSection articleId={article.id} />}
             </article>
 
             {/* Sidebar */}

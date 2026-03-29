@@ -1,0 +1,331 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
+import {
+  ImageIcon,
+  Trash2,
+  Copy,
+  CheckCircle,
+  ChevronLeft,
+  ChevronRight,
+  Upload,
+  Filter,
+} from "lucide-react";
+import ImageUploader from "@/components/editor/ImageUploader";
+
+interface MediaItem {
+  id: string;
+  filename: string;
+  url: string;
+  type: string;
+  size: number;
+  uploadedBy: string;
+  uploaderName: string;
+  createdAt: string;
+}
+
+function formatDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function formatSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      {Array.from({ length: 10 }).map((_, i) => (
+        <div
+          key={i}
+          className="animate-pulse rounded-[12px] border border-border bg-surface shadow-card overflow-hidden"
+        >
+          <div className="aspect-square bg-surface-tertiary" />
+          <div className="p-3">
+            <div className="h-3 w-2/3 rounded bg-surface-tertiary" />
+            <div className="mt-1.5 h-2.5 w-1/2 rounded bg-surface-secondary" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function MediaPage() {
+  const { data: session } = useSession();
+  const [media, setMedia] = useState<MediaItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [copied, setCopied] = useState<string | null>(null);
+  const [showUpload, setShowUpload] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [filterUser, setFilterUser] = useState<string>("");
+
+  const isAdmin = session?.user?.role === "SUPER_ADMIN";
+
+  const fetchMedia = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const params = new URLSearchParams({ page: String(page), limit: "20" });
+      if (filterUser) params.set("uploadedBy", filterUser);
+
+      const res = await fetch(`/api/media?${params}`);
+      if (!res.ok) throw new Error("Gagal memuat media");
+      const json = await res.json();
+      setMedia(json.data?.media || []);
+      setTotalPages(json.data?.pagination?.totalPages || 1);
+    } catch (err) {
+      setError("Gagal memuat media library. Silakan coba lagi.");
+      console.error("Fetch media error:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, filterUser]);
+
+  useEffect(() => {
+    fetchMedia();
+  }, [fetchMedia]);
+
+  async function handleDelete(id: string) {
+    if (!confirm("Hapus media ini secara permanen?")) return;
+    try {
+      setDeleting(id);
+      const res = await fetch(`/api/media?id=${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const json = await res.json();
+        throw new Error(json.error || "Gagal menghapus media");
+      }
+      setMedia((prev) => prev.filter((m) => m.id !== id));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Gagal menghapus media");
+    } finally {
+      setDeleting(null);
+    }
+  }
+
+  function handleCopyUrl(url: string, id: string) {
+    navigator.clipboard.writeText(url);
+    setCopied(id);
+    setTimeout(() => setCopied(null), 2000);
+  }
+
+  async function handleUploadComplete(url: string) {
+    // Save to media library
+    try {
+      const filename = url.split("/").pop() || "uploaded-image";
+      const res = await fetch("/api/media", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          filename,
+          url,
+          type: "image",
+          size: 0,
+        }),
+      });
+      if (res.ok) {
+        setShowUpload(false);
+        fetchMedia();
+      } else {
+        const json = await res.json();
+        alert(json.error || "Gagal menyimpan media");
+      }
+    } catch {
+      alert("Gagal menyimpan media");
+    }
+  }
+
+  // Get unique uploaders for filter
+  const uniqueUploaders = Array.from(
+    new Map(
+      media.map((m) => [m.uploadedBy, { id: m.uploadedBy, name: m.uploaderName }])
+    ).values()
+  );
+
+  return (
+    <div>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary flex items-center gap-2">
+            <ImageIcon size={24} />
+            Media Library
+          </h1>
+          <p className="text-sm text-txt-secondary">
+            {loading ? "Memuat..." : `${media.length} media ditemukan`}
+          </p>
+        </div>
+        <button
+          onClick={() => setShowUpload(!showUpload)}
+          className="btn-primary flex items-center gap-1.5 px-4 py-2 text-sm font-semibold"
+        >
+          <Upload size={16} />
+          Upload
+        </button>
+      </div>
+
+      {/* Upload area */}
+      {showUpload && (
+        <div className="mb-6 rounded-[12px] border-2 border-dashed border-goto-green/30 bg-goto-50 p-6">
+          <h3 className="mb-3 text-sm font-bold text-txt-primary">
+            Upload Gambar Baru
+          </h3>
+          <ImageUploader
+            onUpload={handleUploadComplete}
+            currentImage=""
+          />
+          <button
+            onClick={() => setShowUpload(false)}
+            className="mt-3 text-xs text-txt-muted hover:text-txt-secondary"
+          >
+            Tutup
+          </button>
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4 text-center text-sm text-red-700">
+          <p>{error}</p>
+          <button
+            onClick={fetchMedia}
+            className="mt-2 rounded-[12px] bg-red-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-red-700"
+          >
+            Coba Lagi
+          </button>
+        </div>
+      )}
+
+      {/* Filter by user */}
+      {uniqueUploaders.length > 1 && (
+        <div className="mb-4 flex items-center gap-2">
+          <Filter size={16} className="text-txt-muted" />
+          <button
+            onClick={() => { setFilterUser(""); setPage(1); }}
+            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+              !filterUser
+                ? "bg-goto-green text-white"
+                : "bg-surface-tertiary text-txt-secondary hover:bg-border"
+            }`}
+          >
+            Semua
+          </button>
+          {uniqueUploaders.map((u) => (
+            <button
+              key={u.id}
+              onClick={() => { setFilterUser(u.id); setPage(1); }}
+              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                filterUser === u.id
+                  ? "bg-goto-green text-white"
+                  : "bg-surface-tertiary text-txt-secondary hover:bg-border"
+              }`}
+            >
+              {u.name}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {loading ? (
+        <LoadingSkeleton />
+      ) : media.length === 0 ? (
+        <div className="rounded-[12px] border border-border bg-surface p-8 text-center text-txt-secondary shadow-card">
+          Belum ada media yang diupload.
+        </div>
+      ) : (
+        <>
+          {/* Media grid */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {media.map((item) => (
+              <div
+                key={item.id}
+                className="group relative rounded-[12px] border border-border bg-surface shadow-card overflow-hidden transition-all hover:shadow-lg"
+              >
+                {/* Thumbnail */}
+                <div className="relative aspect-square bg-surface-secondary">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={item.url}
+                    alt={item.filename}
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src =
+                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='%23666'%3E%3Crect width='100' height='100' fill='%23222'/%3E%3Ctext x='50' y='55' text-anchor='middle' font-size='12' fill='%23666'%3ENo Preview%3C/text%3E%3C/svg%3E";
+                    }}
+                  />
+                  {/* Overlay actions */}
+                  <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/60 opacity-0 transition-opacity group-hover:opacity-100">
+                    <button
+                      onClick={() => handleCopyUrl(item.url, item.id)}
+                      className="rounded-lg bg-white/90 p-2 text-txt-primary hover:bg-white"
+                      title="Salin URL"
+                    >
+                      {copied === item.id ? (
+                        <CheckCircle size={18} className="text-goto-green" />
+                      ) : (
+                        <Copy size={18} />
+                      )}
+                    </button>
+                    {(item.uploadedBy === session?.user?.id || isAdmin) && (
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        disabled={deleting === item.id}
+                        className="rounded-lg bg-red-500/90 p-2 text-white hover:bg-red-600 disabled:opacity-50"
+                        title="Hapus"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Info */}
+                <div className="p-2.5">
+                  <p className="truncate text-xs font-medium text-txt-primary">
+                    {item.filename}
+                  </p>
+                  <p className="mt-0.5 text-[10px] text-txt-muted">
+                    {item.uploaderName} &middot; {formatDate(item.createdAt)}
+                    {item.size > 0 && ` &middot; ${formatSize(item.size)}`}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-6 flex items-center justify-center gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="rounded-lg border border-border bg-surface p-2 text-txt-secondary hover:bg-surface-secondary disabled:opacity-30"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <span className="text-sm text-txt-secondary">
+                Halaman {page} dari {totalPages}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="rounded-lg border border-border bg-surface p-2 text-txt-secondary hover:bg-surface-secondary disabled:opacity-30"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
