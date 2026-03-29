@@ -140,6 +140,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         authorName={article.author.name}
         articleUrl={articleUrl}
         articleTitle={article.title}
+        categoryName={article.category.name}
+        publishedAt={article.publishedAt ? new Date(article.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" }) : ""}
       />
 
       <div className="bg-surface min-h-screen overflow-x-hidden">

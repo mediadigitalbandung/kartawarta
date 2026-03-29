@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { requireAuth, successResponse, errorResponse, ApiError } from "@/lib/api-utils";
 import { prisma } from "@/lib/prisma";
+import { aiRateLimit } from "@/lib/rate-limit";
 
 const PROMPTS: Record<string, (title: string, content: string) => string> = {
   tags: (title, content) =>
@@ -16,6 +17,12 @@ const PROMPTS: Record<string, (title: string, content: string) => string> = {
 export async function POST(req: NextRequest) {
   try {
     const session = await requireAuth();
+
+    // Rate limit per user
+    const { success: allowed } = aiRateLimit(session.user.id);
+    if (!allowed) {
+      throw new ApiError("Batas penggunaan AI tercapai (20 request/jam). Coba lagi nanti.", 429);
+    }
 
     const body = await req.json();
     const { feature, content, title } = body as {

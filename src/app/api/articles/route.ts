@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { sanitizeHtml } from "@/lib/sanitize";
 import {
   successResponse,
   errorResponse,
@@ -189,7 +190,7 @@ export async function POST(request: NextRequest) {
       data: {
         title: data.title,
         slug,
-        content: data.content,
+        content: sanitizeHtml(data.content),
         excerpt: data.excerpt || data.content.replace(/<[^>]*>/g, "").slice(0, 200),
         featuredImage: data.featuredImage,
         status: finalStatus as "DRAFT" | "IN_REVIEW",

@@ -7,6 +7,8 @@ import {
   getSession,
   ApiError,
 } from "@/lib/api-utils";
+import { commentRateLimit } from "@/lib/rate-limit";
+import { sanitizeText, sanitizeEmail } from "@/lib/sanitize";
 
 const createCommentSchema = z.object({
   authorName: z.string().min(2, "Nama minimal 2 karakter").max(100),
@@ -54,6 +56,13 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Rate limit by IP
+    const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown";
+    const { success: allowed } = commentRateLimit(ip);
+    if (!allowed) {
+      throw new ApiError("Terlalu banyak komentar. Coba lagi dalam beberapa menit.", 429);
+    }
+
     const article = await prisma.article.findUnique({
       where: { id: params.id },
       select: { id: true, status: true },
@@ -70,9 +79,9 @@ export async function POST(
 
     const comment = await prisma.comment.create({
       data: {
-        authorName: data.authorName,
-        authorEmail: data.authorEmail,
-        content: data.content,
+        authorName: sanitizeText(data.authorName),
+        authorEmail: sanitizeEmail(data.authorEmail),
+        content: sanitizeText(data.content),
         parentId: data.parentId || null,
         articleId: params.id,
         isApproved: false,
