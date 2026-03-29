@@ -1,16 +1,36 @@
 // Input sanitization utilities
 
-// Remove potentially dangerous HTML tags (script, iframe, object, embed, form)
+import DOMPurify from "isomorphic-dompurify";
+
+// Configure DOMPurify to allow safe HTML tags for article content
+const ALLOWED_TAGS = [
+  "h1", "h2", "h3", "h4", "h5", "h6",
+  "p", "br", "hr",
+  "strong", "b", "em", "i", "u", "s", "del",
+  "a", "img",
+  "ul", "ol", "li",
+  "blockquote", "pre", "code",
+  "table", "thead", "tbody", "tr", "th", "td",
+  "div", "span",
+  "figure", "figcaption",
+  "iframe", // for YouTube embeds
+];
+
+const ALLOWED_ATTR = [
+  "href", "src", "alt", "title", "class", "id",
+  "target", "rel",
+  "width", "height", "style",
+  "data-youtube-video", "allowfullscreen", "frameborder",
+  "start", "type",
+];
+
 export function sanitizeHtml(html: string): string {
-  return html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, "")
-    .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, "")
-    .replace(/<embed[^>]*>/gi, "")
-    .replace(/<form\b[^<]*(?:(?!<\/form>)<[^<]*)*<\/form>/gi, "")
-    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, "") // Remove inline event handlers
-    .replace(/javascript\s*:/gi, "") // Remove javascript: URLs
-    .replace(/data\s*:\s*text\/html/gi, ""); // Remove data:text/html
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS,
+    ALLOWED_ATTR,
+    ALLOW_DATA_ATTR: false,
+    ADD_ATTR: ["target"],
+  });
 }
 
 // Sanitize plain text input (no HTML allowed)
