@@ -114,7 +114,7 @@ export default async function HomePage() {
   const headlineArticles = articles.slice(0, 5);  // For headline slider
   const subHeadlines = articles.slice(5, 11);     // 6 items = 3 pages x 2 cards for sub-headline slider
   const breakingArticles = articles.slice(11, 16); // For breaking news slider
-  const terkiniArticles = articles.slice(16, 24); // Berita Terkini: 2x4 grid = 8
+  const terkiniArticles = articles.slice(16, 22); // Berita Terkini: 2x3 grid = 6
   const restArticles = articles.slice(24);
 
   const tickerItems = tickerArticles.map((a) => ({
@@ -165,7 +165,7 @@ export default async function HomePage() {
       {/* Berita Terkini + Terpopuler side by side */}
       <section className="bg-surface py-8">
         <div className="container-main">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left: Berita Terkini — 2/3 width, grid layout */}
             <div className="lg:col-span-2">
               <div className="flex items-center justify-between mb-5">
