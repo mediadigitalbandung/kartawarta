@@ -80,9 +80,12 @@ const pollingData = [
 
 const jadwalSidangData = [
   { date: "27 Mar", day: "Kamis", time: "09:00 WIB", cases: 12, highlight: "Sidang Tipikor Bupati Garut" },
-  { date: "28 Mar", day: "Jumat", time: "10:00 WIB", cases: 8, highlight: "Putusan Sengketa Pilkada" },
+  { date: "28 Mar", day: "Jumat", time: "10:00 WIB", cases: 8, highlight: "Putusan Sengketa Pilkada Jabar" },
   { date: "31 Mar", day: "Senin", time: "09:30 WIB", cases: 15, highlight: "Sidang Perdana Kasus Narkotika" },
   { date: "01 Apr", day: "Selasa", time: "13:00 WIB", cases: 10, highlight: "Mediasi Sengketa Tanah Lembang" },
+  { date: "02 Apr", day: "Rabu", time: "10:00 WIB", cases: 7, highlight: "Sidang Lanjutan Kasus Penipuan Online" },
+  { date: "03 Apr", day: "Kamis", time: "09:00 WIB", cases: 11, highlight: "Putusan Kasus Korupsi Dana Hibah" },
+  { date: "04 Apr", day: "Jumat", time: "14:00 WIB", cases: 6, highlight: "Praperadilan Tersangka TPPU" },
 ];
 // --- END SIMULATION DATA ---
 
@@ -256,7 +259,7 @@ export default async function HomePage() {
           </div>
           <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
             {jadwalSidangData.map((j) => (
-              <div key={j.date} className="shrink-0 w-[240px] sm:w-[260px] rounded-lg border border-border bg-surface-secondary p-4 hover:border-goto-green/40 transition-colors">
+              <div key={j.date} className="shrink-0 w-[260px] sm:w-[300px] rounded-lg border border-border bg-surface-secondary p-4 hover:border-goto-green/40 transition-colors">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="flex h-12 w-12 flex-col items-center justify-center rounded-lg bg-goto-green text-white">
                     <span className="text-lg font-extrabold leading-none">{j.date.split(" ")[0]}</span>
