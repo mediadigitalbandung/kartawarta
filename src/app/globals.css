@@ -5,8 +5,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
 @layer base {
-  html, body {
-    @apply overflow-x-hidden;
+  html {
+    overflow-x: clip;
   }
   body {
     @apply bg-surface text-txt-primary antialiased font-sans;
