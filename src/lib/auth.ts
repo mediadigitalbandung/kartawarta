@@ -63,11 +63,10 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Email atau password salah");
         }
 
-        // Check if user already has an active session
-        if (user.activeSessionId) {
-          // Block login — account is online on another device
-          throw new Error("Akun Anda sedang online di perangkat lain. Silakan logout terlebih dahulu dari perangkat tersebut.");
-        }
+        // Single-device login check — temporarily disabled
+        // if (user.activeSessionId) {
+        //   throw new Error("Akun Anda sedang online di perangkat lain. Silakan logout terlebih dahulu dari perangkat tersebut.");
+        // }
 
         // Generate unique session ID and save to DB
         const sessionId = crypto.randomUUID();
