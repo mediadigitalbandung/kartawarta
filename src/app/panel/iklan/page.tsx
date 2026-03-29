@@ -91,6 +91,8 @@ export default function IklanPage() {
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [editingAd, setEditingAd] = useState<Ad | null>(null);
+  const [page, setPage] = useState(1);
+  const ITEMS_PER_PAGE = 20;
 
   // Form state
   const [formName, setFormName] = useState("");
@@ -247,6 +249,9 @@ export default function IklanPage() {
     }
   }
 
+  const totalPages = Math.ceil(ads.length / ITEMS_PER_PAGE);
+  const paginatedAds = ads.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+
   const totalImpressions = ads.reduce((sum, ad) => sum + ad.impressions, 0);
   const totalClicks = ads.reduce((sum, ad) => sum + ad.clicks, 0);
   const avgCtr = totalImpressions > 0 ? ((totalClicks / totalImpressions) * 100).toFixed(2) : "0.00";
@@ -327,7 +332,7 @@ export default function IklanPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {ads.map((ad) => {
+                  {paginatedAds.map((ad) => {
                     const ctr = ad.impressions > 0
                       ? ((ad.clicks / ad.impressions) * 100).toFixed(2) + "%"
                       : "0.00%";
@@ -389,12 +394,37 @@ export default function IklanPage() {
               </table>
             </div>
 
-            {ads.length === 0 && (
+            {paginatedAds.length === 0 && (
               <div className="py-12 text-center text-txt-secondary">
                 Belum ada iklan.
               </div>
             )}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-6">
+              <p className="text-sm text-txt-secondary">
+                Halaman {page} dari {totalPages}
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40"
+                >
+                  Sebelumnya
+                </button>
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40"
+                >
+                  Selanjutnya
+                </button>
+              </div>
+            </div>
+          )}
         </>
       )}
 

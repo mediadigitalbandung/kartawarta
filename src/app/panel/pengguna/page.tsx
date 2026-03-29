@@ -76,6 +76,8 @@ export default function PenggunaPage() {
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [page, setPage] = useState(1);
+  const ITEMS_PER_PAGE = 20;
 
   // Form state
   const [formName, setFormName] = useState("");
@@ -230,6 +232,8 @@ export default function PenggunaPage() {
       u.name.toLowerCase().includes(search.toLowerCase()) ||
       u.email.toLowerCase().includes(search.toLowerCase())
   );
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paginatedUsers = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
   if (session && session.user.role !== "SUPER_ADMIN" && session.user.role !== "CHIEF_EDITOR") {
     return (
@@ -265,7 +269,7 @@ export default function PenggunaPage() {
           type="text"
           placeholder="Cari pengguna..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           className="input w-full pl-9"
         />
       </div>
@@ -286,6 +290,7 @@ export default function PenggunaPage() {
       {loading ? (
         <LoadingSkeleton />
       ) : (
+        <>
         <div className="overflow-hidden rounded-[12px] border border-border bg-surface shadow-card">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -300,7 +305,7 @@ export default function PenggunaPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {filtered.map((user) => {
+                {paginatedUsers.map((user) => {
                   const role = roleLabels[user.role] || { label: user.role, color: "bg-surface-tertiary text-txt-secondary" };
                   return (
                     <tr key={user.id} className="hover:bg-surface-secondary">
@@ -365,12 +370,38 @@ export default function PenggunaPage() {
             </table>
           </div>
 
-          {filtered.length === 0 && (
+          {paginatedUsers.length === 0 && (
             <div className="py-12 text-center text-txt-secondary">
               Tidak ada pengguna ditemukan.
             </div>
           )}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-6">
+            <p className="text-sm text-txt-secondary">
+              Halaman {page} dari {totalPages}
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40"
+              >
+                Sebelumnya
+              </button>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+                className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40"
+              >
+                Selanjutnya
+              </button>
+            </div>
+          </div>
+        )}
+        </>
       )}
 
       {/* Add User Modal */}

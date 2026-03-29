@@ -150,6 +150,8 @@ export default function ArtikelPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkProcessing, setBulkProcessing] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   // Update default filter when session loads
   useEffect(() => {
@@ -165,7 +167,7 @@ export default function ArtikelPage() {
       setError(null);
 
       // Creators only see their own articles
-      let url = `/api/articles?limit=50&status=ALL`;
+      let url = `/api/articles?page=${page}&limit=20&status=ALL`;
       if (isCreator) {
         url += `&authorId=${userId}`;
       }
@@ -178,13 +180,14 @@ export default function ArtikelPage() {
 
       const json = await res.json();
       setArticles(json.data?.articles || []);
+      setTotalPages(json.data?.pagination?.totalPages || 1);
     } catch (err) {
       setError("Gagal memuat daftar artikel. Silakan coba lagi.");
       console.error("Fetch articles error:", err);
     } finally {
       setLoading(false);
     }
-  }, [session?.user, isCreator, userId]);
+  }, [session?.user, isCreator, userId, page]);
 
   useEffect(() => {
     fetchArticles();
@@ -360,7 +363,7 @@ export default function ArtikelPage() {
               type="text"
               placeholder="Cari artikel..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
               className="input w-full pl-9"
               aria-label="Cari artikel"
             />
@@ -380,7 +383,7 @@ export default function ArtikelPage() {
           {["ALL", "DRAFT", "IN_REVIEW", "APPROVED", "PUBLISHED", "REJECTED"].map((status) => (
             <button
               key={status}
-              onClick={() => setFilterStatus(status)}
+              onClick={() => { setFilterStatus(status); setPage(1); }}
               className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
                 filterStatus === status
                   ? "bg-goto-green text-white"
@@ -533,6 +536,31 @@ export default function ArtikelPage() {
               </div>
             )}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-6">
+              <p className="text-sm text-txt-secondary">
+                Halaman {page} dari {totalPages}
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40"
+                >
+                  Sebelumnya
+                </button>
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40"
+                >
+                  Selanjutnya
+                </button>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
