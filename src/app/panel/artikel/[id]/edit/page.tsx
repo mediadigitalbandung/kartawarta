@@ -5,6 +5,8 @@ import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import {
   Save,
   Send,
@@ -91,6 +93,8 @@ export default function EditArticlePage() {
   const params = useParams();
   const articleId = params.id as string;
   const { data: session } = useSession();
+  const { success, error: showError } = useToast();
+  const { confirm } = useConfirm();
   const userRole = session?.user?.role || "";
   const userId = session?.user?.id || "";
   const isEditor = EDITOR_ROLES.includes(userRole);
@@ -333,7 +337,8 @@ export default function EditArticlePage() {
     }
 
     if (status === "IN_REVIEW") {
-      if (!confirm("Artikel akan dikirim untuk review oleh editor. Lanjutkan?")) return;
+      const ok = await confirm({ message: "Artikel akan dikirim untuk review oleh editor. Lanjutkan?", variant: "warning", title: "Konfirmasi" });
+      if (!ok) return;
     }
 
     setSaving(true);
@@ -365,7 +370,7 @@ export default function EditArticlePage() {
         return;
       }
 
-      alert(status === "IN_REVIEW" ? "Artikel dikirim untuk review" : "Artikel disimpan sebagai draf");
+      success(status === "IN_REVIEW" ? "Artikel dikirim untuk review" : "Artikel disimpan sebagai draf");
       router.push("/panel/artikel");
       router.refresh();
     } catch {
@@ -375,7 +380,8 @@ export default function EditArticlePage() {
   };
 
   const handleCancelReview = async () => {
-    if (!confirm("Batalkan review dan kembalikan artikel ke draf?")) return;
+    const ok = await confirm({ message: "Batalkan review dan kembalikan artikel ke draf?", variant: "warning", title: "Konfirmasi" });
+    if (!ok) return;
     setSaving(true);
     try {
       const res = await fetch(`/api/articles/${articleId}`, {
@@ -389,7 +395,7 @@ export default function EditArticlePage() {
         setSaving(false);
         return;
       }
-      alert("Review dibatalkan. Artikel kembali ke draf.");
+      success("Review dibatalkan. Artikel kembali ke draf.");
       router.push("/panel/artikel");
       router.refresh();
     } catch {
@@ -400,7 +406,8 @@ export default function EditArticlePage() {
 
   // --- EDITOR HANDLERS ---
   const handleEditorApprove = async () => {
-    if (!confirm("Setujui artikel ini? Artikel akan diteruskan ke admin untuk publikasi.")) return;
+    const ok = await confirm({ message: "Setujui artikel ini? Artikel akan diteruskan ke admin untuk publikasi.", variant: "warning", title: "Konfirmasi" });
+    if (!ok) return;
     setSaving(true);
     try {
       const res = await fetch(`/api/articles/${articleId}`, {
@@ -417,7 +424,7 @@ export default function EditArticlePage() {
         setSaving(false);
         return;
       }
-      alert("Artikel berhasil disetujui");
+      success("Artikel berhasil disetujui");
       router.push("/panel/artikel");
       router.refresh();
     } catch {
@@ -431,7 +438,8 @@ export default function EditArticlePage() {
       setError("Alasan penolakan wajib diisi");
       return;
     }
-    if (!confirm("Tolak artikel ini? Artikel akan dikembalikan ke penulis.")) return;
+    const ok = await confirm({ message: "Tolak artikel ini? Artikel akan dikembalikan ke penulis.", variant: "danger", title: "Konfirmasi" });
+    if (!ok) return;
     setSaving(true);
     try {
       const res = await fetch(`/api/articles/${articleId}`, {
@@ -448,7 +456,7 @@ export default function EditArticlePage() {
         setSaving(false);
         return;
       }
-      alert("Artikel ditolak dan dikembalikan ke penulis");
+      success("Artikel ditolak dan dikembalikan ke penulis");
       router.push("/panel/artikel");
       router.refresh();
     } catch {
@@ -458,7 +466,8 @@ export default function EditArticlePage() {
   };
 
   const handleEditorCancelApproval = async () => {
-    if (!confirm("Batalkan persetujuan? Artikel akan kembali ke status review.")) return;
+    const ok = await confirm({ message: "Batalkan persetujuan? Artikel akan kembali ke status review.", variant: "warning", title: "Konfirmasi" });
+    if (!ok) return;
     setSaving(true);
     try {
       const res = await fetch(`/api/articles/${articleId}`, {
@@ -472,7 +481,7 @@ export default function EditArticlePage() {
         setSaving(false);
         return;
       }
-      alert("Persetujuan dibatalkan. Artikel kembali ke review.");
+      success("Persetujuan dibatalkan. Artikel kembali ke review.");
       router.push("/panel/artikel");
       router.refresh();
     } catch {
@@ -483,7 +492,8 @@ export default function EditArticlePage() {
 
   // --- ADMIN HANDLERS ---
   const handleAdminPublish = async () => {
-    if (!confirm("Publikasi artikel ini sekarang? Artikel akan tampil di halaman publik.")) return;
+    const ok = await confirm({ message: "Publikasi artikel ini sekarang? Artikel akan tampil di halaman publik.", variant: "warning", title: "Konfirmasi" });
+    if (!ok) return;
     setSaving(true);
     try {
       const res = await fetch(`/api/articles/${articleId}`, {
@@ -497,7 +507,7 @@ export default function EditArticlePage() {
         setSaving(false);
         return;
       }
-      alert("Artikel berhasil dipublikasikan!");
+      success("Artikel berhasil dipublikasikan!");
       router.push("/panel/artikel");
       router.refresh();
     } catch {
@@ -516,7 +526,8 @@ export default function EditArticlePage() {
       setError("Jadwal publikasi harus di masa depan");
       return;
     }
-    if (!confirm(`Jadwalkan publikasi pada ${scheduledTime.toLocaleString("id-ID")}?`)) return;
+    const ok = await confirm({ message: `Jadwalkan publikasi pada ${scheduledTime.toLocaleString("id-ID")}?`, variant: "warning", title: "Konfirmasi" });
+    if (!ok) return;
     setSaving(true);
     try {
       const res = await fetch(`/api/articles/${articleId}`, {
@@ -530,7 +541,7 @@ export default function EditArticlePage() {
         setSaving(false);
         return;
       }
-      alert(`Publikasi dijadwalkan pada ${scheduledTime.toLocaleString("id-ID")}`);
+      success(`Publikasi dijadwalkan pada ${scheduledTime.toLocaleString("id-ID")}`);
       router.push("/panel/artikel");
       router.refresh();
     } catch {
@@ -540,7 +551,8 @@ export default function EditArticlePage() {
   };
 
   const handleAdminReturnToEditor = async () => {
-    if (!confirm("Kembalikan artikel ke editor untuk review ulang?")) return;
+    const ok = await confirm({ message: "Kembalikan artikel ke editor untuk review ulang?", variant: "warning", title: "Konfirmasi" });
+    if (!ok) return;
     setSaving(true);
     try {
       const res = await fetch(`/api/articles/${articleId}`, {
@@ -557,7 +569,7 @@ export default function EditArticlePage() {
         setSaving(false);
         return;
       }
-      alert("Artikel dikembalikan ke editor");
+      success("Artikel dikembalikan ke editor");
       router.push("/panel/artikel");
       router.refresh();
     } catch {
@@ -1109,7 +1121,7 @@ export default function EditArticlePage() {
                       body: JSON.stringify({ title, content, excerpt, categoryId, featuredImage, seoTitle, seoDescription, tags: tags.split(",").map(t => t.trim()).filter(Boolean) }),
                     });
                     if (res.ok) {
-                      alert("Artikel berhasil disimpan");
+                      success("Artikel berhasil disimpan");
                     } else {
                       const json = await res.json();
                       setError(json.error || "Gagal menyimpan");

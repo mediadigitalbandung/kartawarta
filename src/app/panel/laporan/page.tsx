@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { AlertTriangle, CheckCircle, Clock, Eye, XCircle } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 
 interface Report {
   id: string;
@@ -73,6 +75,8 @@ export default function LaporanPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState<string | null>(null);
+  const { success, error: showError } = useToast();
+  const { confirm } = useConfirm();
 
   const fetchReports = useCallback(async () => {
     try {
@@ -100,7 +104,8 @@ export default function LaporanPage() {
 
   async function handleUpdateStatus(id: string, newStatus: string) {
     const statusLabel = statusConfig[newStatus]?.label || newStatus;
-    if (!confirm(`Apakah Anda yakin ingin mengubah status laporan menjadi "${statusLabel}"?`)) {
+    const ok = await confirm({ message: `Apakah Anda yakin ingin mengubah status laporan menjadi "${statusLabel}"?`, variant: "warning", title: "Konfirmasi" });
+    if (!ok) {
       return;
     }
 
@@ -117,10 +122,10 @@ export default function LaporanPage() {
         throw new Error(json.error || "Gagal mengubah status laporan");
       }
 
-      alert(`Status laporan berhasil diubah menjadi: ${statusConfig[newStatus]?.label || newStatus}`);
+      success(`Status laporan berhasil diubah menjadi: ${statusConfig[newStatus]?.label || newStatus}`);
       fetchReports();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Gagal mengubah status laporan.");
+      showError(err instanceof Error ? err.message : "Gagal mengubah status laporan.");
       console.error("Update report error:", err);
     } finally {
       setUpdating(null);

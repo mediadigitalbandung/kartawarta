@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, FormEvent } from "react";
 import { useSession } from "next-auth/react";
 import { Plus, Edit, Trash2, Tag, FolderOpen, X } from "lucide-react";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 
 /* ── Types ─────────────────────────────────────────────────────────── */
 
@@ -87,6 +88,7 @@ function Modal({
 
 export default function KategoriPage() {
   const { data: session } = useSession();
+  const { confirm } = useConfirm();
   const [activeTab, setActiveTab] = useState<"kategori" | "tag">("kategori");
 
   // ── Category state ──
@@ -201,7 +203,8 @@ export default function KategoriPage() {
   }
 
   async function handleCatDelete(cat: Category) {
-    if (!confirm(`Hapus kategori "${cat.name}"? Tindakan ini tidak bisa dibatalkan.`)) return;
+    const ok = await confirm({ message: `Hapus kategori "${cat.name}"? Tindakan ini tidak bisa dibatalkan.`, variant: "danger", title: "Konfirmasi" });
+    if (!ok) return;
     setCatDeleting(cat.id);
     try {
       const res = await fetch(`/api/categories/${cat.id}`, { method: "DELETE" });
@@ -272,7 +275,8 @@ export default function KategoriPage() {
   }
 
   async function handleTagDelete(tag: TagItem) {
-    if (!confirm(`Hapus tag "${tag.name}"?`)) return;
+    const ok = await confirm({ message: `Hapus tag "${tag.name}"?`, variant: "danger", title: "Konfirmasi" });
+    if (!ok) return;
     setTagDeleting(tag.id);
     try {
       const res = await fetch(`/api/tags?id=${tag.id}`, { method: "DELETE" });

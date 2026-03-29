@@ -9,6 +9,8 @@ import {
   Clock,
   Filter,
 } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 
 interface Comment {
   id: string;
@@ -62,6 +64,8 @@ export default function KomentarPage() {
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "pending" | "approved">("pending");
+  const { success, error: showError } = useToast();
+  const { confirm } = useConfirm();
 
   const fetchComments = useCallback(async () => {
     try {
@@ -130,7 +134,7 @@ export default function KomentarPage() {
         prev.map((c) => (c.id === id ? { ...c, isApproved: true } : c))
       );
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Gagal menyetujui komentar");
+      showError(err instanceof Error ? err.message : "Gagal menyetujui komentar");
     } finally {
       setUpdating(null);
     }
@@ -152,14 +156,15 @@ export default function KomentarPage() {
         prev.map((c) => (c.id === id ? { ...c, isApproved: false } : c))
       );
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Gagal menolak komentar");
+      showError(err instanceof Error ? err.message : "Gagal menolak komentar");
     } finally {
       setUpdating(null);
     }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Hapus komentar ini secara permanen?")) return;
+    const ok = await confirm({ message: "Hapus komentar ini secara permanen?", variant: "danger", title: "Konfirmasi" });
+    if (!ok) return;
     try {
       setUpdating(id);
       const res = await fetch(`/api/comments/${id}`, { method: "DELETE" });
@@ -169,7 +174,7 @@ export default function KomentarPage() {
       }
       setComments((prev) => prev.filter((c) => c.id !== id));
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Gagal menghapus komentar");
+      showError(err instanceof Error ? err.message : "Gagal menghapus komentar");
     } finally {
       setUpdating(null);
     }
