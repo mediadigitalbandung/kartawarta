@@ -29,7 +29,7 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['"Inter"', '"DM Sans"', "system-ui", "sans-serif"],
+        sans: ["var(--font-inter)", '"DM Sans"', "system-ui", "sans-serif"],
       },
       borderRadius: {
         DEFAULT: "12px",

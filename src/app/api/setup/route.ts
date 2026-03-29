@@ -1,7 +1,14 @@
 import { NextRequest } from "next/server";
+import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { successResponse, errorResponse } from "@/lib/api-utils";
+
+function generateSecurePassword(length = 16): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%";
+  const bytes = crypto.randomBytes(length);
+  return Array.from(bytes, (b) => chars[b % chars.length]).join("");
+}
 
 // GET /api/setup — One-time setup endpoint to seed database
 // This will create default categories and admin user
@@ -47,8 +54,13 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    // Generate secure random passwords (never hardcoded)
+    const adminPlain = generateSecurePassword();
+    const editorPlain = generateSecurePassword();
+    const journalistPlain = generateSecurePassword();
+
     // Create super admin
-    const adminPassword = await bcrypt.hash("Admin@JHB2026!", 12);
+    const adminPassword = await bcrypt.hash(adminPlain, 12);
     const admin = await prisma.user.create({
       data: {
         email: "admin@jurnalishukumbandung.com",
@@ -60,7 +72,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Create editor
-    const editorPassword = await bcrypt.hash("Editor@JHB2026!", 12);
+    const editorPassword = await bcrypt.hash(editorPlain, 12);
     const editor = await prisma.user.create({
       data: {
         email: "editor@jurnalishukumbandung.com",
@@ -72,7 +84,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Create demo journalist
-    const journalistPassword = await bcrypt.hash("Jurnalis@JHB2026!", 12);
+    const journalistPassword = await bcrypt.hash(journalistPlain, 12);
     const journalist = await prisma.user.create({
       data: {
         email: "jurnalis@jurnalishukumbandung.com",
@@ -117,12 +129,12 @@ export async function GET(request: NextRequest) {
     return successResponse({
       message: "Setup berhasil! Database telah di-seed.",
       users: {
-        admin: { email: admin.email },
-        editor: { email: editor.email },
-        journalist: { email: journalist.email },
+        admin: { email: admin.email, password: adminPlain },
+        editor: { email: editor.email, password: editorPlain },
+        journalist: { email: journalist.email, password: journalistPlain },
       },
       categories: categories.length,
-      note: "SEGERA GANTI PASSWORD setelah login pertama kali!",
+      warning: "SIMPAN PASSWORD DI ATAS SEKARANG! Password hanya ditampilkan sekali dan tidak tersimpan di source code. SEGERA GANTI setelah login pertama kali!",
     });
   } catch (error) {
     return errorResponse(error);

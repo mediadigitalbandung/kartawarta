@@ -34,15 +34,29 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const article = await getArticle(params.slug);
   if (!article) return { title: "Artikel Tidak Ditemukan" };
 
+  const title = article.seoTitle || article.title;
+  const description = article.seoDescription || article.excerpt || "";
+
   return {
     title: article.title,
-    description: article.excerpt || "",
+    description,
     openGraph: {
-      title: article.seoTitle || article.title,
-      description: article.seoDescription || article.excerpt || "",
+      title,
+      description,
       type: "article",
       publishedTime: article.publishedAt?.toISOString(),
+      modifiedTime: article.updatedAt.toISOString(),
       authors: [article.author.name],
+      section: article.category.name,
+      ...(article.featuredImage && {
+        images: [{ url: article.featuredImage, width: 1200, height: 630, alt: article.title }],
+      }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      ...(article.featuredImage && { images: [article.featuredImage] }),
     },
   };
 }
@@ -119,8 +133,30 @@ export default async function ArticlePage({ params }: { params: { slug: string }
   const articleUrl = `${appUrl}/berita/${params.slug}`;
   const sanitizedContent = article.content;
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: article.title,
+    description: article.excerpt || "",
+    image: article.featuredImage ? [article.featuredImage] : [],
+    datePublished: article.publishedAt?.toISOString(),
+    dateModified: article.updatedAt.toISOString(),
+    author: { "@type": "Person", name: article.author.name },
+    publisher: {
+      "@type": "Organization",
+      name: "Jurnalis Hukum Bandung",
+      logo: { "@type": "ImageObject", url: `${appUrl}/logo.png` },
+    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },
+    articleSection: article.category.name,
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <ReadingProgress />
       <FontSizeControl />
       <CopyProtection
