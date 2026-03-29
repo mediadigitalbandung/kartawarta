@@ -70,11 +70,17 @@ function LoadingSkeleton() {
   );
 }
 
+const ITEMS_PER_PAGE = 20;
+
 export default function LaporanPage() {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [statusCounts, setStatusCounts] = useState<Record<string, number>>({});
   const { success, error: showError } = useToast();
   const { confirm } = useConfirm();
 
@@ -83,24 +89,48 @@ export default function LaporanPage() {
       setLoading(true);
       setError(null);
 
-      const res = await fetch("/api/reports");
+      const res = await fetch(`/api/reports?page=${page}&limit=${ITEMS_PER_PAGE}`);
       if (!res.ok) {
         throw new Error("Gagal memuat laporan");
       }
 
       const json = await res.json();
-      setReports(json.data || []);
-    } catch (err) {
+      const data = json.data;
+
+      setReports(data.reports || []);
+      setTotalPages(data.totalPages || 1);
+      setPendingCount(data.pendingCount || 0);
+    } catch {
       setError("Gagal memuat daftar laporan. Silakan coba lagi.");
-      console.error("Fetch reports error:", err);
     } finally {
       setLoading(false);
+    }
+  }, [page]);
+
+  // Fetch status counts separately (all reports, no pagination) for stats display
+  const fetchStatusCounts = useCallback(async () => {
+    try {
+      const counts: Record<string, number> = {};
+      for (const status of ["PENDING", "REVIEWED", "RESOLVED", "DISMISSED"]) {
+        const res = await fetch(`/api/reports?page=1&limit=1&status=${status}`);
+        if (res.ok) {
+          const json = await res.json();
+          counts[status] = json.data?.total || 0;
+        }
+      }
+      setStatusCounts(counts);
+    } catch {
+      // Non-critical, stats will just show 0
     }
   }, []);
 
   useEffect(() => {
     fetchReports();
   }, [fetchReports]);
+
+  useEffect(() => {
+    fetchStatusCounts();
+  }, [fetchStatusCounts]);
 
   async function handleUpdateStatus(id: string, newStatus: string) {
     const statusLabel = statusConfig[newStatus]?.label || newStatus;
@@ -124,15 +154,13 @@ export default function LaporanPage() {
 
       success(`Status laporan berhasil diubah menjadi: ${statusConfig[newStatus]?.label || newStatus}`);
       fetchReports();
+      fetchStatusCounts();
     } catch (err) {
       showError(err instanceof Error ? err.message : "Gagal mengubah status laporan.");
-      console.error("Update report error:", err);
     } finally {
       setUpdating(null);
     }
   }
-
-  const pendingCount = reports.filter((r) => r.status === "PENDING").length;
 
   return (
     <div>
@@ -166,7 +194,7 @@ export default function LaporanPage() {
           <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
             {Object.entries(statusConfig).map(([key, config]) => {
               const Icon = config.icon;
-              const count = reports.filter((r) => r.status === key).length;
+              const count = statusCounts[key] ?? reports.filter((r) => r.status === key).length;
               return (
                 <div key={key} className="rounded-[12px] border border-border bg-surface p-4 shadow-card">
                   <div className={`flex items-center gap-2 text-sm ${config.color}`}>
@@ -245,6 +273,17 @@ export default function LaporanPage() {
               })
             )}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-6">
+              <p className="text-sm text-txt-secondary">Halaman {page} dari {totalPages}</p>
+              <div className="flex gap-2">
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40">Sebelumnya</button>
+                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40">Selanjutnya</button>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>

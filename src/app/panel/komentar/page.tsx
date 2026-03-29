@@ -58,12 +58,19 @@ function LoadingSkeleton() {
   );
 }
 
+const ITEMS_PER_PAGE = 20;
+
 export default function KomentarPage() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "pending" | "approved">("pending");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [approvedCount, setApprovedCount] = useState(0);
   const { success, error: showError } = useToast();
   const { confirm } = useConfirm();
 
@@ -72,50 +79,35 @@ export default function KomentarPage() {
       setLoading(true);
       setError(null);
 
-      // Fetch all articles that have comments — we need article info
-      // We'll fetch comments grouped by fetching all articles with comments
-      const res = await fetch("/api/articles?limit=500&status=PUBLISHED");
-      if (!res.ok) throw new Error("Gagal memuat artikel");
-      const articlesJson = await res.json();
-      const articles = articlesJson.data?.articles || [];
-
-      const allComments: Comment[] = [];
-
-      // Fetch comments for each article
-      for (const article of articles) {
-        try {
-          const cRes = await fetch(`/api/articles/${article.id}/comments`);
-          if (cRes.ok) {
-            const cJson = await cRes.json();
-            const articleComments = (cJson.data || []).map((c: Comment) => ({
-              ...c,
-              article: { title: article.title, slug: article.slug },
-            }));
-            allComments.push(...articleComments);
-          }
-        } catch {
-          // Skip failed fetches
-        }
-      }
-
-      // Sort by createdAt desc
-      allComments.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      const filterParam = filter === "all" ? "" : `&filter=${filter}`;
+      const res = await fetch(
+        `/api/comments?page=${page}&limit=${ITEMS_PER_PAGE}${filterParam}`
       );
+      if (!res.ok) throw new Error("Gagal memuat komentar");
 
-      setComments(allComments);
-    } catch (err) {
+      const json = await res.json();
+      const data = json.data;
+
+      setComments(data.comments || []);
+      setTotalPages(data.totalPages || 1);
+      setTotalCount(data.total || 0);
+      setPendingCount(data.pendingCount || 0);
+      setApprovedCount(data.approvedCount || 0);
+    } catch {
       setError("Gagal memuat daftar komentar. Silakan coba lagi.");
-      // Error handled by state
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [filter, page]);
 
   useEffect(() => {
     fetchComments();
   }, [fetchComments]);
+
+  // Reset page when filter changes
+  useEffect(() => {
+    setPage(1);
+  }, [filter]);
 
   async function handleApprove(id: string) {
     try {
@@ -129,10 +121,8 @@ export default function KomentarPage() {
         const json = await res.json();
         throw new Error(json.error || "Gagal menyetujui komentar");
       }
-      // Update local state
-      setComments((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, isApproved: true } : c))
-      );
+      success("Komentar disetujui");
+      fetchComments();
     } catch (err) {
       showError(err instanceof Error ? err.message : "Gagal menyetujui komentar");
     } finally {
@@ -152,9 +142,8 @@ export default function KomentarPage() {
         const json = await res.json();
         throw new Error(json.error || "Gagal menolak komentar");
       }
-      setComments((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, isApproved: false } : c))
-      );
+      success("Komentar ditolak");
+      fetchComments();
     } catch (err) {
       showError(err instanceof Error ? err.message : "Gagal menolak komentar");
     } finally {
@@ -172,22 +161,14 @@ export default function KomentarPage() {
         const json = await res.json();
         throw new Error(json.error || "Gagal menghapus komentar");
       }
-      setComments((prev) => prev.filter((c) => c.id !== id));
+      success("Komentar dihapus");
+      fetchComments();
     } catch (err) {
       showError(err instanceof Error ? err.message : "Gagal menghapus komentar");
     } finally {
       setUpdating(null);
     }
   }
-
-  const filteredComments = comments.filter((c) => {
-    if (filter === "pending") return !c.isApproved;
-    if (filter === "approved") return c.isApproved;
-    return true;
-  });
-
-  const pendingCount = comments.filter((c) => !c.isApproved).length;
-  const approvedCount = comments.filter((c) => c.isApproved).length;
 
   return (
     <div>
@@ -226,7 +207,7 @@ export default function KomentarPage() {
                 <MessageCircle size={16} /> Total
               </div>
               <p className="mt-1 text-lg sm:text-2xl font-bold text-txt-primary">
-                {comments.length}
+                {pendingCount + approvedCount}
               </p>
             </div>
             <div className="rounded-[12px] border border-border bg-surface p-4 shadow-card">
@@ -273,7 +254,7 @@ export default function KomentarPage() {
 
           {/* Comments list */}
           <div className="space-y-3">
-            {filteredComments.length === 0 ? (
+            {comments.length === 0 ? (
               <div className="rounded-[12px] border border-border bg-surface p-8 text-center text-txt-secondary shadow-card">
                 Tidak ada komentar
                 {filter === "pending"
@@ -284,7 +265,7 @@ export default function KomentarPage() {
                 .
               </div>
             ) : (
-              filteredComments.map((comment) => (
+              comments.map((comment) => (
                 <div
                   key={comment.id}
                   className="rounded-[12px] border border-border bg-surface p-5 shadow-card"
@@ -382,6 +363,17 @@ export default function KomentarPage() {
               ))
             )}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-6">
+              <p className="text-sm text-txt-secondary">Halaman {page} dari {totalPages}</p>
+              <div className="flex gap-2">
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40">Sebelumnya</button>
+                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40">Selanjutnya</button>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>

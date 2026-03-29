@@ -15,21 +15,45 @@ const createReportSchema = z.object({
   email: z.string().email().optional(),
 });
 
-// GET /api/reports — admin only
-export async function GET() {
+// GET /api/reports — admin only (supports pagination)
+export async function GET(request: NextRequest) {
   try {
     await requireRole(["SUPER_ADMIN", "CHIEF_EDITOR", "EDITOR"]);
 
-    const reports = await prisma.report.findMany({
-      include: {
-        article: {
-          select: { id: true, title: true, slug: true, author: { select: { name: true } } },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    const { searchParams } = new URL(request.url);
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20", 10)));
+    const status = searchParams.get("status"); // "PENDING" | "REVIEWED" | "RESOLVED" | "DISMISSED" | null
 
-    return successResponse(reports);
+    const where: Record<string, unknown> = {};
+    if (status && ["PENDING", "REVIEWED", "RESOLVED", "DISMISSED"].includes(status)) {
+      where.status = status;
+    }
+
+    const [reports, total, pendingCount] = await Promise.all([
+      prisma.report.findMany({
+        where,
+        include: {
+          article: {
+            select: { id: true, title: true, slug: true, author: { select: { name: true } } },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.report.count({ where }),
+      prisma.report.count({ where: { status: "PENDING" } }),
+    ]);
+
+    return successResponse({
+      reports,
+      total,
+      pendingCount,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (error) {
     return errorResponse(error);
   }
