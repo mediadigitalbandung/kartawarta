@@ -282,10 +282,10 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
               {/* Report button */}
               <div className="mt-8 border-t border-border pt-5">
-                <button className="btn-ghost text-xs text-txt-secondary hover:text-red-600" aria-label="Laporkan berita ini">
+                <Link href="/kontak?subject=Laporkan Berita" className="btn-ghost text-xs text-txt-secondary hover:text-red-600" aria-label="Laporkan berita ini">
                   <Flag size={13} aria-hidden="true" />
                   Laporkan Berita Ini
-                </button>
+                </Link>
               </div>
 
               {/* Author box */}

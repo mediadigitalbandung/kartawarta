@@ -87,7 +87,7 @@ export default function MediaPage() {
       setTotalPages(json.data?.pagination?.totalPages || 1);
     } catch (err) {
       setError("Gagal memuat media library. Silakan coba lagi.");
-      console.error("Fetch media error:", err);
+      // Error handled by state
     } finally {
       setLoading(false);
     }

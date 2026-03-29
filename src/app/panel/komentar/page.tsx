@@ -103,7 +103,7 @@ export default function KomentarPage() {
       setComments(allComments);
     } catch (err) {
       setError("Gagal memuat daftar komentar. Silakan coba lagi.");
-      console.error("Fetch comments error:", err);
+      // Error handled by state
     } finally {
       setLoading(false);
     }
