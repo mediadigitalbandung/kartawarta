@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import {
   Plus,
   Search,
@@ -132,6 +134,8 @@ function LoadingSkeleton() {
 export default function ArtikelPage() {
   const router = useRouter();
   const { data: session } = useSession();
+  const { success, error: showError } = useToast();
+  const { confirm } = useConfirm();
   const userRole = session?.user?.role || "";
   const userId = session?.user?.id || "";
   const isEditor = EDITOR_ROLES.includes(userRole);
@@ -187,7 +191,8 @@ export default function ArtikelPage() {
   }, [fetchArticles]);
 
   async function handleDelete(id: string, title: string) {
-    if (!confirm(`Apakah Anda yakin ingin menghapus artikel ini? Tindakan ini tidak dapat dibatalkan.`)) {
+    const ok = await confirm({ message: "Apakah Anda yakin ingin menghapus artikel ini? Tindakan ini tidak dapat dibatalkan.", variant: "danger", title: "Konfirmasi" });
+    if (!ok) {
       return;
     }
 
@@ -200,10 +205,10 @@ export default function ArtikelPage() {
         throw new Error(json.error || "Gagal menghapus artikel");
       }
 
-      alert("Artikel berhasil dihapus");
+      success("Artikel berhasil dihapus");
       fetchArticles();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Gagal menghapus artikel.");
+      showError(err instanceof Error ? err.message : "Gagal menghapus artikel.");
       console.error("Delete article error:", err);
     } finally {
       setDeleting(null);
@@ -229,25 +234,27 @@ export default function ArtikelPage() {
   }
 
   async function handleBulkDelete() {
-    if (!confirm(`Apakah Anda yakin ingin menghapus ${selectedIds.size} artikel? Tindakan ini tidak dapat dibatalkan.`)) return;
+    const ok = await confirm({ message: `Apakah Anda yakin ingin menghapus ${selectedIds.size} artikel? Tindakan ini tidak dapat dibatalkan.`, variant: "danger", title: "Konfirmasi" });
+    if (!ok) return;
     setBulkProcessing(true);
     try {
       const ids = Array.from(selectedIds);
       for (const id of ids) {
         await fetch(`/api/articles/${id}`, { method: "DELETE" });
       }
-      alert(`${ids.length} artikel berhasil dihapus.`);
+      success(`${ids.length} artikel berhasil dihapus.`);
       setSelectedIds(new Set());
       fetchArticles();
     } catch {
-      alert("Terjadi kesalahan saat menghapus beberapa artikel.");
+      showError("Terjadi kesalahan saat menghapus beberapa artikel.");
     } finally {
       setBulkProcessing(false);
     }
   }
 
   async function handleBulkArchive() {
-    if (!confirm(`Arsipkan ${selectedIds.size} artikel yang dipilih?`)) return;
+    const ok = await confirm({ message: `Arsipkan ${selectedIds.size} artikel yang dipilih?`, variant: "warning", title: "Konfirmasi" });
+    if (!ok) return;
     setBulkProcessing(true);
     try {
       const ids = Array.from(selectedIds);
@@ -258,11 +265,11 @@ export default function ArtikelPage() {
           body: JSON.stringify({ status: "ARCHIVED" }),
         });
       }
-      alert(`${ids.length} artikel berhasil diarsipkan.`);
+      success(`${ids.length} artikel berhasil diarsipkan.`);
       setSelectedIds(new Set());
       fetchArticles();
     } catch {
-      alert("Terjadi kesalahan saat mengarsipkan beberapa artikel.");
+      showError("Terjadi kesalahan saat mengarsipkan beberapa artikel.");
     } finally {
       setBulkProcessing(false);
     }

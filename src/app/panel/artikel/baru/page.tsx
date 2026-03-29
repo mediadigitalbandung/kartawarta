@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import {
   Save,
   Send,
@@ -40,6 +42,8 @@ const CAN_SUBMIT_REVIEW = ["SUPER_ADMIN", "CHIEF_EDITOR", "EDITOR", "SENIOR_JOUR
 export default function NewArticlePage() {
   const router = useRouter();
   const { data: session } = useSession();
+  const { success, error: showError } = useToast();
+  const { confirm } = useConfirm();
   const userRole = session?.user?.role || "";
 
   const [categories, setCategories] = useState<Category[]>([]);
@@ -151,7 +155,8 @@ export default function NewArticlePage() {
 
     // Confirmation dialog for review submission
     if (status === "IN_REVIEW") {
-      if (!confirm("Artikel akan dikirim untuk review oleh editor. Lanjutkan?")) {
+      const ok = await confirm({ message: "Artikel akan dikirim untuk review oleh editor. Lanjutkan?", variant: "warning", title: "Konfirmasi" });
+      if (!ok) {
         return;
       }
     }
@@ -190,7 +195,7 @@ export default function NewArticlePage() {
         return;
       }
 
-      alert(status === "IN_REVIEW" ? "Artikel berhasil dikirim untuk review" : "Artikel berhasil disimpan sebagai draf");
+      success(status === "IN_REVIEW" ? "Artikel berhasil dikirim untuk review" : "Artikel berhasil disimpan sebagai draf");
       router.push("/panel/artikel");
       router.refresh();
     } catch {
