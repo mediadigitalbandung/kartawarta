@@ -165,9 +165,9 @@ export default async function HomePage() {
       {/* Berita Terkini + Terpopuler side by side */}
       <section className="bg-surface py-8">
         <div className="container-main">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-            {/* Left: Berita Terkini */}
-            <div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            {/* Left: Berita Terkini — 2/3 width, grid layout */}
+            <div className="lg:col-span-2">
               <div className="flex items-center justify-between mb-5">
                 <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
                   Berita Terkini
@@ -176,18 +176,16 @@ export default async function HomePage() {
                   Lihat Semua
                 </Link>
               </div>
-              <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {terkiniArticles.map((a) => (
-                  <div key={a.slug} className="shrink-0 w-[260px] sm:w-[280px]">
-                    <ArticleCard {...a} variant="standard" />
-                  </div>
+                  <ArticleCard key={a.slug} {...a} variant="standard" />
                 ))}
               </div>
             </div>
 
-            {/* Right: Berita Terpopuler — vertical list */}
+            {/* Right: Berita Terpopuler — 1/3 width, vertical list */}
             {trendingArticles.length > 0 && (
-              <div className="flex flex-col">
+              <div className="lg:col-span-1 flex flex-col">
                 <div className="flex items-center justify-between mb-5">
                   <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
                     <TrendingUp size={18} className="mr-2 text-goto-green" />
@@ -197,17 +195,16 @@ export default async function HomePage() {
                     Lihat Semua
                   </Link>
                 </div>
-                <ScrollableContainer maxHeight={800} className="flex-1">
                 <div className="space-y-0 divide-y divide-border">
                   {trendingArticles.slice(0, 8).map((article, i) => (
-                    <div key={article.slug} className="group flex items-start gap-3 sm:gap-4 py-3 sm:py-4 first:pt-0">
+                    <div key={article.slug} className="group flex items-start gap-3 py-3 first:pt-0">
                       {/* Rank number */}
-                      <span className="shrink-0 w-8 pt-2 text-center text-xl sm:text-2xl lg:text-3xl font-extrabold text-goto-green select-none">
+                      <span className="shrink-0 w-6 pt-1 text-center text-lg font-extrabold text-goto-green select-none">
                         {i + 1}
                       </span>
                       {/* Thumbnail */}
                       <Link href={`/berita/${article.slug}`} className="shrink-0">
-                        <div className="relative h-[70px] w-[100px] sm:h-[80px] sm:w-[120px] lg:h-[100px] lg:w-[150px] overflow-hidden rounded">
+                        <div className="relative h-[60px] w-[85px] overflow-hidden rounded">
                           {article.featuredImage ? (
                             <Image
                               src={article.featuredImage}
@@ -223,11 +220,11 @@ export default async function HomePage() {
                       {/* Text */}
                       <div className="flex-1 min-w-0">
                         <Link href={`/berita/${article.slug}`}>
-                          <h3 className="text-sm font-bold leading-snug text-txt-primary line-clamp-2 group-hover:text-goto-green transition-colors">
+                          <h3 className="text-[13px] font-bold leading-snug text-txt-primary line-clamp-2 group-hover:text-goto-green transition-colors">
                             {article.title}
                           </h3>
                         </Link>
-                        <div className="mt-1.5 flex items-center gap-2 text-xs text-txt-muted">
+                        <div className="mt-1 flex items-center gap-2 text-[11px] text-txt-muted">
                           <span className="text-goto-green font-semibold">{article.category.name}</span>
                           <span className="h-2.5 w-px bg-border" />
                           <span>{article.viewCount?.toLocaleString("id-ID")} views</span>
@@ -236,28 +233,14 @@ export default async function HomePage() {
                     </div>
                   ))}
                 </div>
-                </ScrollableContainer>
               </div>
             )}
           </div>
         </div>
       </section>
 
-      {/* Split Banner Ad — 70% / 30% */}
-      <div className="bg-surface-secondary py-4">
-        <div className="container-main">
-          <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
-            <div className="lg:col-span-7 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "6 / 1" }}>
-              <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
-              <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
-            </div>
-            <div className="lg:col-span-3 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "6 / 1" }}>
-              <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
-              <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Banner Ad — full width */}
+      <BannerAd size="leaderboard" className="bg-surface-secondary" />
 
       {/* Jadwal Sidang Mendatang */}
       <section className="bg-surface py-6">
