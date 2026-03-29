@@ -50,11 +50,39 @@ export default async function ArticlePage({ params }: { params: { slug: string }
   const article = await getArticle(params.slug);
   if (!article) notFound();
 
-  // Increment view count
-  await prisma.article.update({
-    where: { slug: params.slug },
-    data: { viewCount: { increment: 1 } },
-  });
+  // Non-published articles are private — only visible to author/editors/admins
+  const isPublished = article.status === "PUBLISHED";
+
+  if (!isPublished) {
+    // Check if current user has access
+    const { getServerSession } = await import("next-auth");
+    const { authOptions } = await import("@/lib/auth");
+    const session = await getServerSession(authOptions);
+    const userRole = session?.user?.role || "";
+    const isAuthor = session?.user?.id === article.authorId;
+    const hasAccess = isAuthor || ["SUPER_ADMIN", "CHIEF_EDITOR", "EDITOR"].includes(userRole);
+
+    if (!hasAccess) {
+      notFound();
+    }
+  }
+
+  // Increment view count only for published articles
+  if (isPublished) {
+    await prisma.article.update({
+      where: { slug: params.slug },
+      data: { viewCount: { increment: 1 } },
+    });
+  }
+
+  // Status label mapping for non-published preview
+  const statusLabels: Record<string, { label: string; color: string }> = {
+    DRAFT: { label: "Draf", color: "bg-gray-500" },
+    IN_REVIEW: { label: "Sedang Direview", color: "bg-yellow-500" },
+    APPROVED: { label: "Disetujui — Menunggu Publikasi", color: "bg-blue-500" },
+    REJECTED: { label: "Ditolak", color: "bg-red-500" },
+    ARCHIVED: { label: "Diarsipkan", color: "bg-gray-600" },
+  };
 
   // Fetch related articles (same category, exclude current)
   const relatedArticles = await prisma.article.findMany({
@@ -113,8 +141,21 @@ export default async function ArticlePage({ params }: { params: { slug: string }
       />
 
       <div className="bg-surface min-h-screen overflow-x-hidden">
-        {/* Ad — Top leaderboard */}
-        <BannerAd size="slim" className="bg-surface-secondary" />
+        {/* Status banner for non-published articles */}
+        {!isPublished && statusLabels[article.status] && (
+          <div className={`${statusLabels[article.status].color} text-white`}>
+            <div className="container-main flex items-center justify-between py-3">
+              <div className="flex items-center gap-2">
+                <span className="flex h-2 w-2 rounded-full bg-white animate-pulse" />
+                <span className="text-sm font-bold uppercase tracking-wider">Preview — {statusLabels[article.status].label}</span>
+              </div>
+              <span className="text-xs text-white/70">Halaman ini hanya dapat dilihat oleh pihak terkait</span>
+            </div>
+          </div>
+        )}
+
+        {/* Ad — Top leaderboard (only on published) */}
+        {isPublished && <BannerAd size="slim" className="bg-surface-secondary" />}
 
         <div className="container-main py-8 overflow-hidden">
           {/* Breadcrumb */}

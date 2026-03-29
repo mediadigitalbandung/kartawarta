@@ -77,7 +77,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   const notifRef = useRef<HTMLDivElement>(null);
 
   const userRole = session?.user?.role || "";
-  const isAdmin = userRole === "SUPER_ADMIN" || userRole === "CHIEF_EDITOR";
+  const isAdmin = userRole === "SUPER_ADMIN";
   const isEditor = EDITOR_ROLES.includes(userRole);
   const isCreator = CREATOR_ROLES.includes(userRole);
 
