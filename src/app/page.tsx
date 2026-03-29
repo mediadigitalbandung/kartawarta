@@ -12,6 +12,7 @@ import VideoStory from "@/components/slider/VideoStory";
 import BannerAd, { SidebarAd } from "@/components/ads/BannerAd";
 import ScrollableContainer from "@/components/layout/ScrollableContainer";
 import { videoStoryData } from "@/lib/video-data";
+import HorizontalScroll from "@/components/layout/HorizontalScroll";
 import { Scale, BookOpen, Gavel, Shield, Users, Landmark, LucideIcon, Globe, Monitor, Building2, FileText, AlertTriangle, Radio,Calendar, Play, Vote, TrendingUp } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
@@ -257,7 +258,7 @@ export default async function HomePage() {
               Lihat Semua
             </Link>
           </div>
-          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+          <HorizontalScroll>
             {jadwalSidangData.map((j) => (
               <div key={j.date} className="shrink-0 w-[260px] sm:w-[300px] rounded-lg border border-border bg-surface-secondary p-4 hover:border-goto-green/40 transition-colors">
                 <div className="flex items-center gap-3 mb-3">
@@ -274,7 +275,7 @@ export default async function HomePage() {
                 <p className="text-xs font-semibold text-goto-green mt-1.5">{j.time}</p>
               </div>
             ))}
-          </div>
+          </HorizontalScroll>
         </div>
       </section>
 
