@@ -58,6 +58,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       description,
       ...(article.featuredImage && { images: [article.featuredImage] }),
     },
+    alternates: {
+      canonical: `/berita/${params.slug}`,
+    },
   };
 }
 

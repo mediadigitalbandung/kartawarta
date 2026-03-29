@@ -81,6 +81,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return {
     title: `${category.name} - Berita Hukum Terkini`,
     description: `Kumpulan berita ${category.name.toLowerCase()} terbaru dari Jurnalis Hukum Bandung.`,
+    alternates: {
+      canonical: `/kategori/${params.slug}`,
+    },
   };
 }
 

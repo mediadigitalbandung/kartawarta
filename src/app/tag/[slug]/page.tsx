@@ -20,6 +20,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `Tag: #${tag.name}`,
     description: `Kumpulan berita dengan tag #${tag.name} di Jurnalis Hukum Bandung.`,
+    alternates: {
+      canonical: `/tag/${params.slug}`,
+    },
   };
 }
 
