@@ -210,46 +210,39 @@ function StatusDonutChart({ articles }: { articles: Article[] }) {
   );
 }
 
-// Sparkline chart for daily views (last 14 days)
+// Bar chart for daily views (last 14 days)
 function ViewsSparkline({ articles }: { articles: Article[] }) {
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+
   const data = useMemo(() => {
     const published = articles.filter((a) => a.status === "PUBLISHED" && a.publishedAt);
     const now = new Date();
-    const days: { label: string; views: number }[] = [];
+    const days: { label: string; shortLabel: string; views: number }[] = [];
 
     for (let i = 13; i >= 0; i--) {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
       const dayStr = d.toISOString().split("T")[0];
       const label = d.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
+      const shortLabel = d.toLocaleDateString("id-ID", { day: "numeric" });
 
       const dayArticles = published.filter((a) => {
         const pubDate = new Date(a.publishedAt!).toISOString().split("T")[0];
         return pubDate === dayStr;
       });
       const views = dayArticles.reduce((sum, a) => sum + (a.viewCount || 0), 0);
-      days.push({ label, views });
+      days.push({ label, shortLabel, views });
     }
     return days;
   }, [articles]);
 
   const totalViews = articles.filter(a => a.status === "PUBLISHED").reduce((s, a) => s + (a.viewCount || 0), 0);
   const maxViews = Math.max(...data.map((d) => d.views), 1);
-  const height = 80;
-  const width = 280;
-  const stepX = width / (data.length - 1);
-
-  // Build SVG path
-  const points = data.map((d, i) => ({
-    x: i * stepX,
-    y: height - (d.views / maxViews) * (height - 10) - 5,
-  }));
-  const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
-  const areaPath = `${linePath} L ${width} ${height} L 0 ${height} Z`;
 
   const todayViews = data[data.length - 1]?.views || 0;
   const yesterdayViews = data[data.length - 2]?.views || 0;
   const change = yesterdayViews > 0 ? ((todayViews - yesterdayViews) / yesterdayViews) * 100 : 0;
+  const avgViews = Math.round(data.reduce((s, d) => s + d.views, 0) / data.length);
 
   return (
     <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
@@ -263,38 +256,71 @@ function ViewsSparkline({ articles }: { articles: Article[] }) {
       </div>
       <div className="p-6">
         {/* Stats row */}
-        <div className="flex items-end justify-between mb-6">
-          <div>
-            <p className="text-sm text-txt-muted mb-1">Total Tayangan</p>
-            <p className="text-3xl font-extrabold text-txt-primary">{formatNumber(totalViews)}</p>
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="rounded-xl bg-surface-secondary p-4">
+            <p className="text-xs text-txt-muted mb-1">Total Tayangan</p>
+            <p className="text-2xl font-extrabold text-txt-primary">{formatNumber(totalViews)}</p>
           </div>
-          <div className="text-right">
-            <p className="text-sm text-txt-muted mb-1">Hari Ini</p>
-            <p className="text-xl font-bold text-txt-primary">{formatNumber(todayViews)}</p>
+          <div className="rounded-xl bg-surface-secondary p-4">
+            <p className="text-xs text-txt-muted mb-1">Hari Ini</p>
+            <p className="text-2xl font-extrabold text-txt-primary">{formatNumber(todayViews)}</p>
             {change !== 0 && (
-              <p className={`text-xs font-semibold ${change > 0 ? "text-goto-green" : "text-red-500"}`}>
-                {change > 0 ? "+" : ""}{change.toFixed(0)}% dari kemarin
+              <p className={`text-xs font-semibold mt-0.5 ${change > 0 ? "text-goto-green" : "text-red-500"}`}>
+                {change > 0 ? "+" : ""}{change.toFixed(0)}%
               </p>
             )}
           </div>
+          <div className="rounded-xl bg-surface-secondary p-4">
+            <p className="text-xs text-txt-muted mb-1">Rata-rata/Hari</p>
+            <p className="text-2xl font-extrabold text-txt-primary">{formatNumber(avgViews)}</p>
+          </div>
         </div>
-        {/* Chart */}
-        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-24" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="viewsGradient" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" stopColor="#00AA13" stopOpacity="0.2" />
-              <stop offset="100%" stopColor="#00AA13" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <path d={areaPath} fill="url(#viewsGradient)" />
-          <path d={linePath} fill="none" stroke="#00AA13" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-          {points.map((p, i) => (
-            <circle key={i} cx={p.x} cy={p.y} r="3" fill="#fff" stroke="#00AA13" strokeWidth="2">
-              <title>{data[i].label}: {formatNumber(data[i].views)} tayangan</title>
-            </circle>
-          ))}
-        </svg>
-        <div className="flex justify-between mt-2">
+
+        {/* Tooltip */}
+        {hoveredIdx !== null && (
+          <div className="mb-2 text-center">
+            <span className="inline-flex items-center gap-2 rounded-lg bg-surface-dark px-3 py-1.5 text-sm text-white shadow-lg">
+              <span className="font-medium">{data[hoveredIdx].label}</span>
+              <span className="font-bold">{formatNumber(data[hoveredIdx].views)} tayangan</span>
+            </span>
+          </div>
+        )}
+
+        {/* Bar chart */}
+        <div className="flex items-end gap-1.5 h-36">
+          {data.map((d, i) => {
+            const heightPct = maxViews > 0 ? (d.views / maxViews) * 100 : 0;
+            const isToday = i === data.length - 1;
+            const isHovered = hoveredIdx === i;
+            return (
+              <div
+                key={i}
+                className="flex-1 flex flex-col items-center gap-1 cursor-pointer group"
+                onMouseEnter={() => setHoveredIdx(i)}
+                onMouseLeave={() => setHoveredIdx(null)}
+              >
+                <div className="w-full relative" style={{ height: "120px" }}>
+                  <div
+                    className={`absolute bottom-0 left-0 right-0 rounded-t-md transition-all duration-300 ${
+                      isToday
+                        ? "bg-goto-green"
+                        : isHovered
+                          ? "bg-goto-green/80"
+                          : "bg-goto-green/30"
+                    }`}
+                    style={{ height: `${Math.max(heightPct, 2)}%` }}
+                  />
+                </div>
+                <span className={`text-[10px] leading-none ${isToday ? "font-bold text-goto-green" : "text-txt-muted"}`}>
+                  {d.shortLabel}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* X-axis labels */}
+        <div className="flex justify-between mt-2 pt-2 border-t border-border">
           <span className="text-xs text-txt-muted">{data[0].label}</span>
           <span className="text-xs text-txt-secondary font-medium">14 hari terakhir</span>
           <span className="text-xs text-txt-muted">{data[data.length - 1].label}</span>
