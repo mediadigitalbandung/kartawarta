@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import TopLoader from "@/components/layout/TopLoader";
 import PublicNav from "@/components/layout/PublicNav";
 import PublicFooter from "@/components/layout/PublicFooter";
+import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -40,6 +41,7 @@ export const metadata: Metadata = {
     locale: "id_ID",
     siteName: "Jurnalis Hukum Bandung",
   },
+  manifest: "/manifest.json",
   robots: {
     index: true,
     follow: true,
@@ -73,6 +75,7 @@ export default function RootLayout({
           <PublicNav />
           <main id="main-content" className="flex-1">{children}</main>
           <PublicFooter />
+          <ServiceWorkerRegistration />
         </Providers>
       </body>
     </html>
