@@ -165,9 +165,9 @@ export default async function HomePage() {
       {/* Berita Terkini + Terpopuler side by side */}
       <section className="bg-surface py-8">
         <div className="container-main">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             {/* Left: Berita Terkini — 2/3 width, grid layout */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-3">
               <div className="flex items-center justify-between mb-5">
                 <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
                   Berita Terkini
@@ -185,7 +185,7 @@ export default async function HomePage() {
 
             {/* Right: Berita Terpopuler — 1/3 width, vertical list */}
             {trendingArticles.length > 0 && (
-              <div className="lg:col-span-1 flex flex-col">
+              <div className="lg:col-span-2 flex flex-col">
                 <div className="flex items-center justify-between mb-5">
                   <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
                     <TrendingUp size={18} className="mr-2 text-goto-green" />
@@ -199,12 +199,12 @@ export default async function HomePage() {
                   {trendingArticles.slice(0, 8).map((article, i) => (
                     <div key={article.slug} className="group flex flex-1 items-center gap-3 py-3 first:pt-0">
                       {/* Rank number */}
-                      <span className="shrink-0 w-7 text-center text-xl font-extrabold text-goto-green select-none">
+                      <span className="shrink-0 w-8 text-center text-2xl font-extrabold text-goto-green select-none">
                         {i + 1}
                       </span>
                       {/* Thumbnail */}
                       <Link href={`/berita/${article.slug}`} className="shrink-0">
-                        <div className="relative h-[70px] w-[100px] overflow-hidden rounded">
+                        <div className="relative h-[80px] w-[115px] overflow-hidden rounded">
                           {article.featuredImage ? (
                             <Image
                               src={article.featuredImage}
@@ -220,7 +220,7 @@ export default async function HomePage() {
                       {/* Text */}
                       <div className="flex-1 min-w-0">
                         <Link href={`/berita/${article.slug}`}>
-                          <h3 className="text-[13px] font-bold leading-snug text-txt-primary line-clamp-2 group-hover:text-goto-green transition-colors">
+                          <h3 className="text-sm font-bold leading-snug text-txt-primary line-clamp-2 group-hover:text-goto-green transition-colors">
                             {article.title}
                           </h3>
                         </Link>
