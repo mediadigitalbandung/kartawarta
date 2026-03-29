@@ -71,7 +71,7 @@ function StatusTimeline({ status }: { status: string }) {
         return (
           <div key={step} className="flex items-center">
             <div
-              className={`flex items-center justify-center rounded-full text-[9px] font-bold transition-colors ${
+              className={`flex items-center justify-center rounded-full text-xs font-bold transition-colors ${
                 isRejected
                   ? "h-4 w-4 border border-red-500/40 bg-red-500/10 text-red-400"
                   : isCompleted
@@ -97,10 +97,10 @@ function StatusTimeline({ status }: { status: string }) {
         );
       })}
       {isRejected && (
-        <span className="ml-1 text-[9px] font-medium text-red-400">Ditolak</span>
+        <span className="ml-1 text-xs font-medium text-red-400">Ditolak</span>
       )}
       {isArchived && (
-        <span className="ml-1 text-[9px] font-medium text-txt-muted">Arsip</span>
+        <span className="ml-1 text-xs font-medium text-txt-muted">Arsip</span>
       )}
     </div>
   );
@@ -312,8 +312,8 @@ export default function ArtikelPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">Artikel</h1>
-          <p className="text-sm text-txt-secondary">
+          <h1 className="text-xl sm:text-3xl font-bold text-txt-primary">Artikel</h1>
+          <p className="text-base text-txt-secondary">
             {isCreator ? "Kelola artikel Anda" : "Kelola semua artikel"}
           </p>
         </div>
@@ -366,13 +366,13 @@ export default function ArtikelPage() {
               placeholder="Cari artikel..."
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
-              className="input w-full pl-9"
+              className="input w-full pl-9 text-base py-2.5"
               aria-label="Cari artikel"
             />
           </div>
           <button
             onClick={handleExportCsv}
-            className="btn-secondary flex items-center gap-1.5 rounded-full px-3 py-2.5 text-xs font-semibold whitespace-nowrap"
+            className="btn-secondary flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-semibold whitespace-nowrap"
             title="Export CSV"
             aria-label="Export daftar artikel ke CSV"
           >
@@ -386,7 +386,7 @@ export default function ArtikelPage() {
             <button
               key={status}
               onClick={() => { setFilterStatus(status); setPage(1); }}
-              className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                 filterStatus === status
                   ? "bg-goto-green text-white"
                   : "bg-surface-tertiary text-txt-secondary hover:bg-border"
@@ -399,11 +399,11 @@ export default function ArtikelPage() {
       </div>
 
       {error && (
-        <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4 text-center text-sm text-red-700">
+        <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4 text-center text-base text-red-700">
           <p>{error}</p>
           <button
             onClick={fetchArticles}
-            className="mt-2 rounded-[12px] bg-red-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-red-700"
+            className="mt-2 rounded-[12px] bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
             aria-label="Coba muat ulang daftar artikel"
           >
             Coba Lagi
@@ -421,7 +421,7 @@ export default function ArtikelPage() {
               <table className="w-full text-sm">
                 <thead className="border-b border-border bg-surface-secondary">
                   <tr>
-                    <th className="w-10 px-3 py-3 text-center">
+                    <th className="w-10 px-3 py-3.5 text-center">
                       <input
                         type="checkbox"
                         checked={allFilteredSelected}
@@ -430,17 +430,17 @@ export default function ArtikelPage() {
                         aria-label="Pilih semua artikel"
                       />
                     </th>
-                    <th className="px-3 sm:px-5 py-3 text-left font-medium text-txt-secondary">Judul</th>
-                    <th className="hidden md:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Kategori</th>
+                    <th className="px-3 sm:px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Judul</th>
+                    <th className="hidden md:table-cell px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Kategori</th>
                     {isEditor && (
-                      <th className="hidden lg:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Penulis</th>
+                      <th className="hidden lg:table-cell px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Penulis</th>
                     )}
-                    <th className="px-3 sm:px-5 py-3 text-left font-medium text-txt-secondary">Status</th>
-                    <th className="hidden lg:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Progres</th>
-                    <th className="hidden xl:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Editor</th>
-                    <th className="hidden sm:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Views</th>
-                    <th className="hidden md:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Tanggal</th>
-                    <th className="px-3 sm:px-5 py-3 text-right font-medium text-txt-secondary">Aksi</th>
+                    <th className="px-3 sm:px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Status</th>
+                    <th className="hidden lg:table-cell px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Progres</th>
+                    <th className="hidden xl:table-cell px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Editor</th>
+                    <th className="hidden sm:table-cell px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Views</th>
+                    <th className="hidden md:table-cell px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Tanggal</th>
+                    <th className="px-3 sm:px-5 py-3.5 text-right text-sm font-medium text-txt-secondary">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -449,7 +449,7 @@ export default function ArtikelPage() {
                     const StatusIcon = config.icon;
                     return (
                       <tr key={article.id} className={`hover:bg-surface-secondary ${selectedIds.has(article.id) ? "bg-goto-50" : ""}`}>
-                        <td className="w-10 px-3 py-3 text-center">
+                        <td className="w-10 px-3 py-4 text-center">
                           <input
                             type="checkbox"
                             checked={selectedIds.has(article.id)}
@@ -458,31 +458,31 @@ export default function ArtikelPage() {
                             aria-label={`Pilih artikel ${article.title}`}
                           />
                         </td>
-                        <td className="max-w-[200px] sm:max-w-[300px] px-3 sm:px-5 py-3">
-                          <p className="truncate font-medium text-txt-primary text-xs sm:text-sm">
+                        <td className="max-w-[200px] sm:max-w-[300px] px-3 sm:px-5 py-4">
+                          <p className="truncate font-medium text-txt-primary text-sm">
                             {article.title}
                           </p>
                         </td>
-                        <td className="hidden md:table-cell px-5 py-3 text-txt-secondary">
+                        <td className="hidden md:table-cell px-5 py-4 text-sm text-txt-secondary">
                           {article.category?.name || "\u2014"}
                         </td>
                         {isEditor && (
-                          <td className="hidden lg:table-cell px-5 py-3 text-txt-secondary">
+                          <td className="hidden lg:table-cell px-5 py-4 text-sm text-txt-secondary">
                             {article.author?.name || "\u2014"}
                           </td>
                         )}
-                        <td className="px-3 sm:px-5 py-3">
-                          <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-medium ${config.color}`}>
+                        <td className="px-3 sm:px-5 py-4">
+                          <span className={`inline-flex items-center gap-1 rounded-full px-3 py-0.5 text-sm font-medium ${config.color}`}>
                             <StatusIcon size={12} />
                             {config.label}
                           </span>
                         </td>
-                        <td className="hidden lg:table-cell px-5 py-3">
+                        <td className="hidden lg:table-cell px-5 py-4">
                           <StatusTimeline status={article.status} />
                         </td>
-                        <td className="hidden xl:table-cell px-5 py-3 text-txt-secondary">
+                        <td className="hidden xl:table-cell px-5 py-4 text-txt-secondary">
                           {article.reviewerName ? (
-                            <span className="inline-flex items-center gap-1 text-xs">
+                            <span className="inline-flex items-center gap-1 text-sm">
                               <UserCheck size={12} className="text-goto-green" />
                               {article.reviewerName}
                             </span>
@@ -490,17 +490,17 @@ export default function ArtikelPage() {
                             "\u2014"
                           )}
                         </td>
-                        <td className="hidden sm:table-cell px-5 py-3 text-txt-secondary">
+                        <td className="hidden sm:table-cell px-5 py-4 text-sm text-txt-secondary">
                           {article.viewCount > 0 ? article.viewCount.toLocaleString("id-ID") : "\u2014"}
                         </td>
-                        <td className="hidden md:table-cell px-5 py-3 text-txt-secondary">
+                        <td className="hidden md:table-cell px-5 py-4 text-sm text-txt-secondary">
                           {formatDate(article.publishedAt || article.createdAt)}
                         </td>
-                        <td className="px-5 py-3 text-right">
+                        <td className="px-5 py-4 text-right">
                           <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => router.push(`/berita/${article.slug}`)}
-                              className="btn-ghost rounded p-1"
+                              className="btn-ghost rounded p-2"
                               title="Lihat"
                               aria-label="Lihat artikel"
                             >
@@ -508,7 +508,7 @@ export default function ArtikelPage() {
                             </button>
                             <button
                               onClick={() => router.push(`/panel/artikel/${article.id}/edit`)}
-                              className="btn-ghost rounded p-1"
+                              className="btn-ghost rounded p-2"
                               title="Edit"
                               aria-label="Edit artikel"
                             >
@@ -517,7 +517,7 @@ export default function ArtikelPage() {
                             <button
                               onClick={() => handleDelete(article.id, article.title)}
                               disabled={deleting === article.id}
-                              className="btn-ghost rounded p-1 hover:text-red-500 disabled:opacity-50"
+                              className="btn-ghost rounded p-2 hover:text-red-500 disabled:opacity-50"
                               title="Hapus"
                               aria-label="Hapus artikel"
                             >
@@ -533,7 +533,7 @@ export default function ArtikelPage() {
             </div>
 
             {filtered.length === 0 && (
-              <div className="py-12 text-center text-txt-secondary">
+              <div className="py-12 text-center text-base text-txt-secondary">
                 Tidak ada artikel ditemukan.
               </div>
             )}
@@ -542,21 +542,21 @@ export default function ArtikelPage() {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-6">
-              <p className="text-sm text-txt-secondary">
+              <p className="text-base text-txt-secondary">
                 Halaman {page} dari {totalPages}
               </p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
-                  className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40"
+                  className="btn-secondary px-5 py-2.5 text-base disabled:opacity-40"
                 >
                   Sebelumnya
                 </button>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
-                  className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40"
+                  className="btn-secondary px-5 py-2.5 text-base disabled:opacity-40"
                 >
                   Selanjutnya
                 </button>

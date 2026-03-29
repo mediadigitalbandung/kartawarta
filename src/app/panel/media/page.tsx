@@ -162,11 +162,11 @@ export default function MediaPage() {
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary flex items-center gap-2">
+          <h1 className="text-xl sm:text-3xl font-bold text-txt-primary flex items-center gap-2">
             <ImageIcon size={24} />
             Media Library
           </h1>
-          <p className="text-sm text-txt-secondary">
+          <p className="text-base text-txt-secondary">
             {loading ? "Memuat..." : `${media.length} media ditemukan`}
           </p>
         </div>
@@ -182,7 +182,7 @@ export default function MediaPage() {
       {/* Upload area */}
       {showUpload && (
         <div className="mb-6 rounded-[12px] border-2 border-dashed border-goto-green/30 bg-goto-50 p-6">
-          <h3 className="mb-3 text-sm font-bold text-txt-primary">
+          <h3 className="mb-3 text-base font-bold text-txt-primary">
             Upload Gambar Baru
           </h3>
           <ImageUploader
@@ -191,7 +191,7 @@ export default function MediaPage() {
           />
           <button
             onClick={() => setShowUpload(false)}
-            className="mt-3 text-xs text-txt-muted hover:text-txt-secondary"
+            className="mt-3 text-sm text-txt-muted hover:text-txt-secondary"
           >
             Tutup
           </button>
@@ -199,11 +199,11 @@ export default function MediaPage() {
       )}
 
       {error && (
-        <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4 text-center text-sm text-red-700">
+        <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4 text-center text-base text-red-700">
           <p>{error}</p>
           <button
             onClick={fetchMedia}
-            className="mt-2 rounded-[12px] bg-red-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-red-700"
+            className="mt-2 rounded-[12px] bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
           >
             Coba Lagi
           </button>
@@ -216,7 +216,7 @@ export default function MediaPage() {
           <Filter size={16} className="text-txt-muted" />
           <button
             onClick={() => { setFilterUser(""); setPage(1); }}
-            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+            className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
               !filterUser
                 ? "bg-goto-green text-white"
                 : "bg-surface-tertiary text-txt-secondary hover:bg-border"
@@ -228,7 +228,7 @@ export default function MediaPage() {
             <button
               key={u.id}
               onClick={() => { setFilterUser(u.id); setPage(1); }}
-              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                 filterUser === u.id
                   ? "bg-goto-green text-white"
                   : "bg-surface-tertiary text-txt-secondary hover:bg-border"
@@ -243,7 +243,7 @@ export default function MediaPage() {
       {loading ? (
         <LoadingSkeleton />
       ) : media.length === 0 ? (
-        <div className="rounded-[12px] border border-border bg-surface p-8 text-center text-txt-secondary shadow-card">
+        <div className="rounded-[12px] border border-border bg-surface p-8 text-center text-base text-txt-secondary shadow-card">
           Belum ada media yang diupload.
         </div>
       ) : (
@@ -294,11 +294,11 @@ export default function MediaPage() {
                 </div>
 
                 {/* Info */}
-                <div className="p-2.5">
-                  <p className="truncate text-xs font-medium text-txt-primary">
+                <div className="p-3">
+                  <p className="truncate text-sm font-medium text-txt-primary">
                     {item.filename}
                   </p>
-                  <p className="mt-0.5 text-[10px] text-txt-muted">
+                  <p className="mt-0.5 text-xs text-txt-muted">
                     {item.uploaderName} &middot; {formatDate(item.createdAt)}
                     {item.size > 0 && ` &middot; ${formatSize(item.size)}`}
                   </p>
@@ -317,7 +317,7 @@ export default function MediaPage() {
               >
                 <ChevronLeft size={16} />
               </button>
-              <span className="text-sm text-txt-secondary">
+              <span className="text-base text-txt-secondary">
                 Halaman {page} dari {totalPages}
               </span>
               <button

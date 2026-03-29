@@ -71,7 +71,7 @@ function Modal({
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="w-[calc(100%-2rem)] max-w-md mx-auto rounded-[12px] border border-border bg-surface p-6 shadow-xl">
+      <div className="w-[calc(100%-2rem)] max-w-lg mx-auto rounded-[12px] border border-border bg-surface p-8 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-txt-primary">{title}</h3>
           <button onClick={onClose} className="rounded-lg p-1 text-txt-secondary hover:text-txt-primary" aria-label="Tutup">
@@ -320,8 +320,8 @@ export default function KategoriPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">Kelola Kategori &amp; Tag</h1>
-          <p className="mt-1 text-sm text-txt-secondary">Atur kategori dan tag untuk artikel</p>
+          <h1 className="text-xl sm:text-3xl font-bold text-txt-primary">Kelola Kategori &amp; Tag</h1>
+          <p className="mt-1 text-base text-txt-secondary">Atur kategori dan tag untuk artikel</p>
         </div>
       </div>
 
@@ -380,33 +380,33 @@ export default function KategoriPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border bg-surface-secondary text-left">
-                      <th className="px-4 py-3 font-medium text-txt-secondary">Nama</th>
-                      <th className="px-4 py-3 font-medium text-txt-secondary">Slug</th>
-                      <th className="hidden px-4 py-3 font-medium text-txt-secondary md:table-cell">Deskripsi</th>
-                      <th className="px-4 py-3 font-medium text-txt-secondary text-center">Urutan</th>
-                      <th className="px-4 py-3 font-medium text-txt-secondary text-center">Artikel</th>
-                      <th className="px-4 py-3 font-medium text-txt-secondary text-right">Aksi</th>
+                      <th className="px-5 py-3.5 text-sm font-medium text-txt-secondary">Nama</th>
+                      <th className="px-5 py-3.5 text-sm font-medium text-txt-secondary">Slug</th>
+                      <th className="hidden px-5 py-3.5 text-sm font-medium text-txt-secondary md:table-cell">Deskripsi</th>
+                      <th className="px-5 py-3.5 text-sm font-medium text-txt-secondary text-center">Urutan</th>
+                      <th className="px-5 py-3.5 text-sm font-medium text-txt-secondary text-center">Artikel</th>
+                      <th className="px-5 py-3.5 text-sm font-medium text-txt-secondary text-right">Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
                     {categories.map((cat) => (
                       <tr key={cat.id} className="border-b border-border last:border-0 hover:bg-surface-secondary/50 transition-colors">
-                        <td className="px-4 py-3 font-medium text-txt-primary">{cat.name}</td>
-                        <td className="px-4 py-3 text-txt-secondary">{cat.slug}</td>
-                        <td className="hidden px-4 py-3 text-txt-secondary md:table-cell">
+                        <td className="px-5 py-4 text-sm font-medium text-txt-primary">{cat.name}</td>
+                        <td className="px-5 py-4 text-sm text-txt-secondary">{cat.slug}</td>
+                        <td className="hidden px-5 py-4 text-sm text-txt-secondary md:table-cell">
                           {cat.description ? (cat.description.length > 40 ? cat.description.slice(0, 40) + "..." : cat.description) : "-"}
                         </td>
-                        <td className="px-4 py-3 text-center text-txt-secondary">{cat.order}</td>
-                        <td className="px-4 py-3 text-center">
-                          <span className="inline-flex items-center rounded-full bg-goto-green/10 px-2.5 py-0.5 text-xs font-medium text-goto-green">
+                        <td className="px-5 py-4 text-center text-sm text-txt-secondary">{cat.order}</td>
+                        <td className="px-5 py-4 text-center">
+                          <span className="inline-flex items-center rounded-full bg-goto-green/10 px-3 py-0.5 text-sm font-medium text-goto-green">
                             {cat._count.articles}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-5 py-4 text-right">
                           <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => openCatModal(cat)}
-                              className="rounded-lg p-1.5 text-txt-secondary hover:bg-surface-secondary hover:text-goto-green transition-colors"
+                              className="rounded-lg p-2 text-txt-secondary hover:bg-surface-secondary hover:text-goto-green transition-colors"
                               title="Edit"
                               aria-label="Edit kategori"
                             >
@@ -415,7 +415,7 @@ export default function KategoriPage() {
                             <button
                               onClick={() => handleCatDelete(cat)}
                               disabled={catDeleting === cat.id}
-                              className="rounded-lg p-1.5 text-txt-secondary hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50"
+                              className="rounded-lg p-2 text-txt-secondary hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50"
                               title="Hapus"
                               aria-label="Hapus kategori"
                             >
@@ -439,7 +439,7 @@ export default function KategoriPage() {
           >
             <form onSubmit={handleCatSubmit} className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-txt-primary">Nama</label>
+                <label className="mb-1 block text-base font-medium text-txt-primary">Nama</label>
                 <input
                   type="text"
                   value={catForm.name}
@@ -447,39 +447,39 @@ export default function KategoriPage() {
                     const name = e.target.value;
                     setCatForm((f) => ({ ...f, name, slug: slugify(name) }));
                   }}
-                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2 text-sm text-txt-primary placeholder:text-txt-secondary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
+                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2.5 text-base text-txt-primary placeholder:text-txt-secondary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
                   placeholder="Nama kategori"
                   required
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-txt-primary">Slug</label>
+                <label className="mb-1 block text-base font-medium text-txt-primary">Slug</label>
                 <input
                   type="text"
                   value={catForm.slug}
                   onChange={(e) => setCatForm((f) => ({ ...f, slug: e.target.value }))}
-                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2 text-sm text-txt-primary placeholder:text-txt-secondary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
+                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2.5 text-base text-txt-primary placeholder:text-txt-secondary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
                   placeholder="slug-kategori"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-txt-primary">Deskripsi</label>
+                <label className="mb-1 block text-base font-medium text-txt-primary">Deskripsi</label>
                 <textarea
                   value={catForm.description}
                   onChange={(e) => setCatForm((f) => ({ ...f, description: e.target.value }))}
                   rows={2}
-                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2 text-sm text-txt-primary placeholder:text-txt-secondary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
+                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2.5 text-base text-txt-primary placeholder:text-txt-secondary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
                   placeholder="Deskripsi singkat (opsional)"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-txt-primary">Urutan</label>
+                <label className="mb-1 block text-base font-medium text-txt-primary">Urutan</label>
                 <input
                   type="number"
                   min={0}
                   value={catForm.order}
                   onChange={(e) => setCatForm((f) => ({ ...f, order: parseInt(e.target.value) || 0 }))}
-                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2 text-sm text-txt-primary placeholder:text-txt-secondary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
+                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2.5 text-base text-txt-primary placeholder:text-txt-secondary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
@@ -528,27 +528,27 @@ export default function KategoriPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border bg-surface-secondary text-left">
-                      <th className="px-4 py-3 font-medium text-txt-secondary">Nama</th>
-                      <th className="px-4 py-3 font-medium text-txt-secondary">Slug</th>
-                      <th className="px-4 py-3 font-medium text-txt-secondary text-center">Artikel</th>
-                      <th className="px-4 py-3 font-medium text-txt-secondary text-right">Aksi</th>
+                      <th className="px-5 py-3.5 text-sm font-medium text-txt-secondary">Nama</th>
+                      <th className="px-5 py-3.5 text-sm font-medium text-txt-secondary">Slug</th>
+                      <th className="px-5 py-3.5 text-sm font-medium text-txt-secondary text-center">Artikel</th>
+                      <th className="px-5 py-3.5 text-sm font-medium text-txt-secondary text-right">Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
                     {tags.map((tag) => (
                       <tr key={tag.id} className="border-b border-border last:border-0 hover:bg-surface-secondary/50 transition-colors">
-                        <td className="px-4 py-3 font-medium text-txt-primary">{tag.name}</td>
-                        <td className="px-4 py-3 text-txt-secondary">{tag.slug}</td>
-                        <td className="px-4 py-3 text-center">
-                          <span className="inline-flex items-center rounded-full bg-goto-green/10 px-2.5 py-0.5 text-xs font-medium text-goto-green">
+                        <td className="px-5 py-4 text-sm font-medium text-txt-primary">{tag.name}</td>
+                        <td className="px-5 py-4 text-sm text-txt-secondary">{tag.slug}</td>
+                        <td className="px-5 py-4 text-center">
+                          <span className="inline-flex items-center rounded-full bg-goto-green/10 px-3 py-0.5 text-sm font-medium text-goto-green">
                             {tag._count.articles}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-5 py-4 text-right">
                           <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => openTagModal(tag)}
-                              className="rounded-lg p-1.5 text-txt-secondary hover:bg-surface-secondary hover:text-goto-green transition-colors"
+                              className="rounded-lg p-2 text-txt-secondary hover:bg-surface-secondary hover:text-goto-green transition-colors"
                               title="Edit"
                               aria-label="Edit tag"
                             >
@@ -557,7 +557,7 @@ export default function KategoriPage() {
                             <button
                               onClick={() => handleTagDelete(tag)}
                               disabled={tagDeleting === tag.id}
-                              className="rounded-lg p-1.5 text-txt-secondary hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50"
+                              className="rounded-lg p-2 text-txt-secondary hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50"
                               title="Hapus"
                               aria-label="Hapus tag"
                             >
@@ -581,7 +581,7 @@ export default function KategoriPage() {
           >
             <form onSubmit={handleTagSubmit} className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-txt-primary">Nama</label>
+                <label className="mb-1 block text-base font-medium text-txt-primary">Nama</label>
                 <input
                   type="text"
                   value={tagForm.name}
@@ -589,18 +589,18 @@ export default function KategoriPage() {
                     const name = e.target.value;
                     setTagForm({ name, slug: slugify(name) });
                   }}
-                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2 text-sm text-txt-primary placeholder:text-txt-secondary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
+                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2.5 text-base text-txt-primary placeholder:text-txt-secondary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
                   placeholder="Nama tag"
                   required
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-txt-primary">Slug</label>
+                <label className="mb-1 block text-base font-medium text-txt-primary">Slug</label>
                 <input
                   type="text"
                   value={tagForm.slug}
                   onChange={(e) => setTagForm((f) => ({ ...f, slug: e.target.value }))}
-                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2 text-sm text-txt-primary placeholder:text-txt-secondary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
+                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2.5 text-base text-txt-primary placeholder:text-txt-secondary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
                   placeholder="slug-tag"
                 />
               </div>

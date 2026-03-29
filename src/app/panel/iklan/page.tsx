@@ -260,8 +260,8 @@ export default function IklanPage() {
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">Kelola Iklan</h1>
-          <p className="text-sm text-txt-secondary">Atur banner iklan di berbagai posisi</p>
+          <h1 className="text-xl sm:text-3xl font-bold text-txt-primary">Kelola Iklan</h1>
+          <p className="text-base text-txt-secondary">Atur banner iklan di berbagai posisi</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
@@ -273,11 +273,11 @@ export default function IklanPage() {
       </div>
 
       {error && (
-        <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4 text-center text-sm text-red-700">
+        <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4 text-center text-base text-red-700">
           <p>{error}</p>
           <button
             onClick={fetchAds}
-            className="mt-2 rounded-[12px] bg-red-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-red-700"
+            className="mt-2 rounded-[12px] bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
             aria-label="Coba muat ulang daftar iklan"
           >
             Coba Lagi
@@ -321,14 +321,14 @@ export default function IklanPage() {
               <table className="w-full text-sm">
                 <thead className="border-b border-border bg-surface-secondary">
                   <tr>
-                    <th className="px-3 sm:px-5 py-3 text-left font-medium text-txt-secondary">Nama Iklan</th>
-                    <th className="px-3 sm:px-5 py-3 text-left font-medium text-txt-secondary">Posisi</th>
-                    <th className="hidden md:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Periode</th>
-                    <th className="hidden sm:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Tayangan</th>
-                    <th className="hidden sm:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Klik</th>
-                    <th className="hidden lg:table-cell px-5 py-3 text-left font-medium text-txt-secondary">CTR</th>
-                    <th className="px-3 sm:px-5 py-3 text-left font-medium text-txt-secondary">Status</th>
-                    <th className="px-3 sm:px-5 py-3 text-right font-medium text-txt-secondary">Aksi</th>
+                    <th className="px-3 sm:px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Nama Iklan</th>
+                    <th className="px-3 sm:px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Posisi</th>
+                    <th className="hidden md:table-cell px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Periode</th>
+                    <th className="hidden sm:table-cell px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Tayangan</th>
+                    <th className="hidden sm:table-cell px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Klik</th>
+                    <th className="hidden lg:table-cell px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">CTR</th>
+                    <th className="px-3 sm:px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Status</th>
+                    <th className="px-3 sm:px-5 py-3.5 text-right text-sm font-medium text-txt-secondary">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -338,39 +338,39 @@ export default function IklanPage() {
                       : "0.00%";
                     return (
                       <tr key={ad.id} className="hover:bg-surface-secondary">
-                        <td className="px-3 sm:px-5 py-3">
-                          <p className="font-medium text-txt-primary text-xs sm:text-sm">{ad.name}</p>
-                          <p className="text-[10px] sm:text-xs text-txt-muted">{typeLabels[ad.type] || ad.type}</p>
+                        <td className="px-3 sm:px-5 py-4">
+                          <p className="font-medium text-txt-primary text-sm">{ad.name}</p>
+                          <p className="text-xs text-txt-muted">{typeLabels[ad.type] || ad.type}</p>
                         </td>
-                        <td className="px-3 sm:px-5 py-3">
-                          <span className="rounded bg-surface-tertiary px-2 py-0.5 text-[10px] sm:text-xs font-medium text-txt-secondary">
+                        <td className="px-3 sm:px-5 py-4">
+                          <span className="rounded bg-surface-tertiary px-3 py-0.5 text-sm font-medium text-txt-secondary">
                             {slotLabels[ad.slot] || ad.slot}
                           </span>
                         </td>
-                        <td className="hidden md:table-cell px-5 py-3 text-txt-secondary">
-                          <div className="flex items-center gap-1 text-xs">
-                            <Calendar size={10} />
+                        <td className="hidden md:table-cell px-5 py-4 text-txt-secondary">
+                          <div className="flex items-center gap-1 text-sm">
+                            <Calendar size={12} />
                             {formatDate(ad.startDate)} — {formatDate(ad.endDate)}
                           </div>
                         </td>
-                        <td className="hidden sm:table-cell px-5 py-3 text-txt-secondary">
+                        <td className="hidden sm:table-cell px-5 py-4 text-sm text-txt-secondary">
                           {ad.impressions.toLocaleString("id-ID")}
                         </td>
-                        <td className="hidden sm:table-cell px-5 py-3 text-txt-secondary">
+                        <td className="hidden sm:table-cell px-5 py-4 text-sm text-txt-secondary">
                           {ad.clicks.toLocaleString("id-ID")}
                         </td>
-                        <td className="hidden lg:table-cell px-5 py-3 font-bold text-txt-primary">{ctr}</td>
-                        <td className="px-3 sm:px-5 py-3">
-                          <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${ad.isActive ? "bg-goto-light text-goto-green" : "bg-red-50 text-red-600"}`}>
+                        <td className="hidden lg:table-cell px-5 py-4 text-sm font-bold text-txt-primary">{ctr}</td>
+                        <td className="px-3 sm:px-5 py-4">
+                          <span className={`inline-flex items-center gap-1 rounded-full px-3 py-0.5 text-sm font-medium ${ad.isActive ? "bg-goto-light text-goto-green" : "bg-red-50 text-red-600"}`}>
                             <Power size={10} />
                             {ad.isActive ? "Aktif" : "Nonaktif"}
                           </span>
                         </td>
-                        <td className="px-5 py-3 text-right">
+                        <td className="px-5 py-4 text-right">
                           <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => openEditModal(ad)}
-                              className="btn-ghost rounded p-1"
+                              className="btn-ghost rounded p-2"
                               title="Edit"
                               aria-label="Edit iklan"
                             >
@@ -379,7 +379,7 @@ export default function IklanPage() {
                             <button
                               onClick={() => handleDelete(ad.id, ad.name)}
                               disabled={deleting === ad.id}
-                              className="btn-ghost rounded p-1 hover:text-red-500 disabled:opacity-50"
+                              className="btn-ghost rounded p-2 hover:text-red-500 disabled:opacity-50"
                               title="Hapus"
                               aria-label="Hapus iklan"
                             >
@@ -395,7 +395,7 @@ export default function IklanPage() {
             </div>
 
             {paginatedAds.length === 0 && (
-              <div className="py-12 text-center text-txt-secondary">
+              <div className="py-12 text-center text-base text-txt-secondary">
                 Belum ada iklan.
               </div>
             )}
@@ -404,21 +404,21 @@ export default function IklanPage() {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-6">
-              <p className="text-sm text-txt-secondary">
+              <p className="text-base text-txt-secondary">
                 Halaman {page} dari {totalPages}
               </p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
-                  className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40"
+                  className="btn-secondary px-5 py-2.5 text-base disabled:opacity-40"
                 >
                   Sebelumnya
                 </button>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
-                  className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40"
+                  className="btn-secondary px-5 py-2.5 text-base disabled:opacity-40"
                 >
                   Selanjutnya
                 </button>
@@ -431,11 +431,11 @@ export default function IklanPage() {
       {/* Add Ad Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-[calc(100%-2rem)] max-w-md mx-auto rounded-[12px] border border-border bg-surface p-4 sm:p-6 shadow-lg">
+          <div className="w-[calc(100%-2rem)] max-w-lg mx-auto rounded-[12px] border border-border bg-surface p-6 sm:p-8 shadow-lg">
             <h2 className="mb-4 text-lg font-bold text-txt-primary">
               {editingAd ? "Edit Iklan" : "Tambah Iklan Baru"}
             </h2>
-            <form className="space-y-3" onSubmit={handleSubmitAd}>
+            <form className="space-y-4" onSubmit={handleSubmitAd}>
               <input
                 type="text"
                 placeholder="Nama iklan"
@@ -489,7 +489,7 @@ export default function IklanPage() {
               />
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-xs text-txt-secondary">Tanggal Mulai</label>
+                  <label className="mb-1 block text-sm text-txt-secondary">Tanggal Mulai</label>
                   <input
                     type="date"
                     value={formStartDate}
@@ -499,7 +499,7 @@ export default function IklanPage() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs text-txt-secondary">Tanggal Selesai</label>
+                  <label className="mb-1 block text-sm text-txt-secondary">Tanggal Selesai</label>
                   <input
                     type="date"
                     value={formEndDate}

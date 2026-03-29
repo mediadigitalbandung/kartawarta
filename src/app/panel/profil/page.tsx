@@ -132,8 +132,8 @@ export default function ProfilPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">Profil Saya</h1>
-        <p className="text-sm text-txt-secondary">Kelola informasi profil Anda</p>
+        <h1 className="text-xl sm:text-3xl font-bold text-txt-primary">Profil Saya</h1>
+        <p className="text-base text-txt-secondary">Kelola informasi profil Anda</p>
       </div>
 
       {message && (
@@ -157,7 +157,7 @@ export default function ProfilPage() {
             </div>
             <h2 className="text-lg font-semibold text-txt-primary">{profile?.name}</h2>
             <p className="text-sm text-txt-secondary">{profile?.email}</p>
-            <span className="mt-2 inline-block rounded-full bg-goto-green/10 px-3 py-1 text-xs font-medium text-goto-green">
+            <span className="mt-2 inline-block rounded-full bg-goto-green/10 px-3 py-1 text-sm font-medium text-goto-green">
               {roleLabelsMap[profile?.role || ""] || profile?.role}
             </span>
           </div>
@@ -194,7 +194,7 @@ export default function ProfilPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Nama</label>
+              <label className="mb-1.5 block text-base font-medium text-txt-secondary">Nama</label>
               <input
                 type="text"
                 value={name}
@@ -207,33 +207,33 @@ export default function ProfilPage() {
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Email</label>
+              <label className="mb-1.5 block text-base font-medium text-txt-secondary">Email</label>
               <input
                 type="email"
                 value={profile?.email || ""}
                 className="input w-full cursor-not-allowed opacity-60"
                 disabled
               />
-              <p className="mt-1 text-xs text-txt-muted">
+              <p className="mt-1 text-sm text-txt-muted">
                 Email tidak dapat diubah. Hubungi admin untuk perubahan.
               </p>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Peran</label>
+              <label className="mb-1.5 block text-base font-medium text-txt-secondary">Peran</label>
               <input
                 type="text"
                 value={roleLabelsMap[profile?.role || ""] || profile?.role || ""}
                 className="input w-full cursor-not-allowed opacity-60"
                 disabled
               />
-              <p className="mt-1 text-xs text-txt-muted">
+              <p className="mt-1 text-sm text-txt-muted">
                 Peran hanya dapat diubah oleh admin.
               </p>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Bio</label>
+              <label className="mb-1.5 block text-base font-medium text-txt-secondary">Bio</label>
               <textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
@@ -242,59 +242,59 @@ export default function ProfilPage() {
                 maxLength={500}
                 placeholder="Tulis bio singkat tentang Anda..."
               />
-              <p className="mt-1 text-xs text-txt-muted">{bio.length}/500 karakter</p>
+              <p className="mt-1 text-sm text-txt-muted">{bio.length}/500 karakter</p>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Spesialisasi</label>
+              <label className="mb-1.5 block text-base font-medium text-txt-secondary">Spesialisasi</label>
               <input type="text" value={specialization} onChange={(e) => setSpecialization(e.target.value)} className="input w-full" maxLength={200} placeholder="Mis: Hukum Pidana, Hukum Tata Negara..." />
             </div>
 
-            <h4 className="pt-4 text-sm font-bold text-txt-primary border-t border-border mt-2">Informasi Profesional</h4>
+            <h4 className="pt-4 text-base font-bold text-txt-primary border-t border-border mt-2">Informasi Profesional</h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">No. Telepon</label>
+                <label className="mb-1.5 block text-base font-medium text-txt-secondary">No. Telepon</label>
                 <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="input w-full" placeholder="08xx-xxxx-xxxx" />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Nomor Kartu Pers</label>
+                <label className="mb-1.5 block text-base font-medium text-txt-secondary">Nomor Kartu Pers</label>
                 <input type="text" value={nomorKartuPers} onChange={(e) => setNomorKartuPers(e.target.value)} className="input w-full" placeholder="Nomor kartu pers / ID pers" />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Organisasi Pers</label>
+                <label className="mb-1.5 block text-base font-medium text-txt-secondary">Organisasi Pers</label>
                 <input type="text" value={organisasiPers} onChange={(e) => setOrganisasiPers(e.target.value)} className="input w-full" placeholder="Mis: AJI, PWI, IJTI, SMSI..." />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Pendidikan Terakhir</label>
+                <label className="mb-1.5 block text-base font-medium text-txt-secondary">Pendidikan Terakhir</label>
                 <input type="text" value={pendidikan} onChange={(e) => setPendidikan(e.target.value)} className="input w-full" placeholder="Mis: S1 Ilmu Hukum — UNPAD" />
               </div>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Keahlian / Skill</label>
+              <label className="mb-1.5 block text-base font-medium text-txt-secondary">Keahlian / Skill</label>
               <input type="text" value={keahlian} onChange={(e) => setKeahlian(e.target.value)} className="input w-full" placeholder="Mis: Investigasi, Hukum Pidana, Data Journalism..." />
-              <p className="mt-1 text-xs text-txt-muted">Pisahkan dengan koma</p>
+              <p className="mt-1 text-sm text-txt-muted">Pisahkan dengan koma</p>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Pengalaman Kerja</label>
+              <label className="mb-1.5 block text-base font-medium text-txt-secondary">Pengalaman Kerja</label>
               <textarea value={pengalaman} onChange={(e) => setPengalaman(e.target.value)} rows={3} className="input w-full" placeholder="Ceritakan pengalaman kerja Anda di bidang jurnalistik..." />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Portofolio / Website</label>
+                <label className="mb-1.5 block text-base font-medium text-txt-secondary">Portofolio / Website</label>
                 <input type="url" value={portofolio} onChange={(e) => setPortofolio(e.target.value)} className="input w-full" placeholder="https://portofolio-anda.com" />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Media Sosial</label>
+                <label className="mb-1.5 block text-base font-medium text-txt-secondary">Media Sosial</label>
                 <input type="text" value={mediaSosial} onChange={(e) => setMediaSosial(e.target.value)} className="input w-full" placeholder="@username (Twitter/Instagram)" />
               </div>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Alamat</label>
+              <label className="mb-1.5 block text-base font-medium text-txt-secondary">Alamat</label>
               <textarea value={alamat} onChange={(e) => setAlamat(e.target.value)} rows={2} className="input w-full" placeholder="Alamat domisili saat ini" />
             </div>
 

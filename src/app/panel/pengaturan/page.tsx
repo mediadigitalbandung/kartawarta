@@ -144,24 +144,24 @@ export default function PengaturanPage() {
       <div className="mb-6">
         <div className="flex items-center gap-2">
           <Settings size={24} className="text-goto-green" />
-          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">
+          <h1 className="text-xl sm:text-3xl font-bold text-txt-primary">
             Pengaturan Sistem
           </h1>
         </div>
-        <p className="mt-1 text-sm text-txt-secondary">
+        <p className="mt-1 text-base text-txt-secondary">
           Kelola konfigurasi umum website
         </p>
       </div>
 
       <div className="space-y-6">
         {/* Informasi Website */}
-        <div className="rounded-[12px] border border-border bg-surface p-5 shadow-card">
+        <div className="rounded-[12px] border border-border bg-surface p-6 shadow-card">
           <h2 className="mb-4 text-lg font-semibold text-txt-primary">
             Informasi Website
           </h2>
           <div className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-primary">
+              <label className="mb-1.5 block text-base font-medium text-txt-primary">
                 Nama Website
               </label>
               <input
@@ -172,7 +172,7 @@ export default function PengaturanPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-primary">
+              <label className="mb-1.5 block text-base font-medium text-txt-primary">
                 Deskripsi
               </label>
               <textarea
@@ -185,7 +185,7 @@ export default function PengaturanPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-primary">
+              <label className="mb-1.5 block text-base font-medium text-txt-primary">
                 Email Redaksi
               </label>
               <input
@@ -196,7 +196,7 @@ export default function PengaturanPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-primary">
+              <label className="mb-1.5 block text-base font-medium text-txt-primary">
                 Alamat Redaksi
               </label>
               <textarea
@@ -212,13 +212,13 @@ export default function PengaturanPage() {
         </div>
 
         {/* SEO Default */}
-        <div className="rounded-[12px] border border-border bg-surface p-5 shadow-card">
+        <div className="rounded-[12px] border border-border bg-surface p-6 shadow-card">
           <h2 className="mb-4 text-lg font-semibold text-txt-primary">
             SEO Default
           </h2>
           <div className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-primary">
+              <label className="mb-1.5 block text-base font-medium text-txt-primary">
                 Meta Title
               </label>
               <input
@@ -229,7 +229,7 @@ export default function PengaturanPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-primary">
+              <label className="mb-1.5 block text-base font-medium text-txt-primary">
                 Meta Description
               </label>
               <textarea
@@ -242,7 +242,7 @@ export default function PengaturanPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-primary">
+              <label className="mb-1.5 block text-base font-medium text-txt-primary">
                 Keywords
               </label>
               <input
@@ -257,13 +257,13 @@ export default function PengaturanPage() {
         </div>
 
         {/* Pengaturan Konten */}
-        <div className="rounded-[12px] border border-border bg-surface p-5 shadow-card">
+        <div className="rounded-[12px] border border-border bg-surface p-6 shadow-card">
           <h2 className="mb-4 text-lg font-semibold text-txt-primary">
             Pengaturan Konten
           </h2>
           <div className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-primary">
+              <label className="mb-1.5 block text-base font-medium text-txt-primary">
                 Jumlah artikel per halaman
               </label>
               <input
@@ -282,10 +282,10 @@ export default function PengaturanPage() {
             </div>
             <div className="flex items-center justify-between rounded-[12px] border border-border bg-surface-secondary px-4 py-3">
               <div>
-                <p className="text-sm font-medium text-txt-primary">
+                <p className="text-base font-medium text-txt-primary">
                   Aktifkan komentar
                 </p>
-                <p className="text-xs text-txt-muted">
+                <p className="text-sm text-txt-muted">
                   Izinkan pembaca meninggalkan komentar pada artikel
                 </p>
               </div>
@@ -310,10 +310,10 @@ export default function PengaturanPage() {
             </div>
             <div className="flex items-center justify-between rounded-[12px] border border-border bg-surface-secondary px-4 py-3">
               <div>
-                <p className="text-sm font-medium text-txt-primary">
+                <p className="text-base font-medium text-txt-primary">
                   Moderasi komentar otomatis
                 </p>
-                <p className="text-xs text-txt-muted">
+                <p className="text-sm text-txt-muted">
                   Komentar harus disetujui sebelum ditampilkan
                 </p>
               </div>
@@ -343,7 +343,7 @@ export default function PengaturanPage() {
         </div>
 
         {/* Konfigurasi AI */}
-        <div className="rounded-[12px] border border-border bg-surface p-5 shadow-card">
+        <div className="rounded-[12px] border border-border bg-surface p-6 shadow-card">
           <div className="mb-4 flex items-center gap-2">
             <Bot size={20} className="text-goto-green" />
             <h2 className="text-lg font-semibold text-txt-primary">
@@ -352,7 +352,7 @@ export default function PengaturanPage() {
           </div>
           <div className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-primary">
+              <label className="mb-1.5 block text-base font-medium text-txt-primary">
                 DeepSeek API Key
               </label>
               <div className="relative">
@@ -371,7 +371,7 @@ export default function PengaturanPage() {
                   {aiKeyVisible ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-              <p className="mt-1 text-xs text-txt-muted">
+              <p className="mt-1 text-sm text-txt-muted">
                 Dapatkan API key dari{" "}
                 <a
                   href="https://platform.deepseek.com"

@@ -173,11 +173,11 @@ export default function KomentarPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-lg sm:text-2xl font-bold text-txt-primary flex items-center gap-2">
+        <h1 className="text-xl sm:text-3xl font-bold text-txt-primary flex items-center gap-2">
           <MessageCircle size={24} />
           Komentar
         </h1>
-        <p className="text-sm text-txt-secondary">
+        <p className="text-base text-txt-secondary">
           {loading
             ? "Memuat..."
             : `${pendingCount} komentar menunggu moderasi`}
@@ -185,11 +185,11 @@ export default function KomentarPage() {
       </div>
 
       {error && (
-        <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4 text-center text-sm text-red-700">
+        <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4 text-center text-base text-red-700">
           <p>{error}</p>
           <button
             onClick={fetchComments}
-            className="mt-2 rounded-[12px] bg-red-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-red-700"
+            className="mt-2 rounded-[12px] bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
           >
             Coba Lagi
           </button>
@@ -241,7 +241,7 @@ export default function KomentarPage() {
               <button
                 key={f.key}
                 onClick={() => setFilter(f.key)}
-                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                   filter === f.key
                     ? "bg-goto-green text-white"
                     : "bg-surface-tertiary text-txt-secondary hover:bg-border"
@@ -255,7 +255,7 @@ export default function KomentarPage() {
           {/* Comments list */}
           <div className="space-y-3">
             {comments.length === 0 ? (
-              <div className="rounded-[12px] border border-border bg-surface p-8 text-center text-txt-secondary shadow-card">
+              <div className="rounded-[12px] border border-border bg-surface p-8 text-center text-base text-txt-secondary shadow-card">
                 Tidak ada komentar
                 {filter === "pending"
                   ? " yang menunggu moderasi"
@@ -275,7 +275,7 @@ export default function KomentarPage() {
                       {/* Status + meta */}
                       <div className="mb-2 flex flex-wrap items-center gap-2">
                         <span
-                          className={`badge text-xs ${
+                          className={`badge text-sm ${
                             comment.isApproved
                               ? "bg-goto-light text-goto-green"
                               : "bg-yellow-50 text-yellow-600"
@@ -293,14 +293,14 @@ export default function KomentarPage() {
                             </>
                           )}
                         </span>
-                        <span className="text-xs text-txt-muted">
+                        <span className="text-sm text-txt-muted">
                           {formatDate(comment.createdAt)}
                         </span>
                       </div>
 
                       {/* Article title */}
                       {comment.article && (
-                        <p className="mb-1 text-xs text-txt-muted">
+                        <p className="mb-1 text-sm text-txt-muted">
                           Pada:{" "}
                           <a
                             href={`/berita/${comment.article.slug}`}
@@ -316,7 +316,7 @@ export default function KomentarPage() {
                       {/* Author info */}
                       <p className="text-sm font-semibold text-txt-primary">
                         {comment.authorName}
-                        <span className="ml-2 text-xs font-normal text-txt-muted">
+                        <span className="ml-2 text-sm font-normal text-txt-muted">
                           ({comment.authorEmail})
                         </span>
                       </p>
@@ -367,10 +367,10 @@ export default function KomentarPage() {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-6">
-              <p className="text-sm text-txt-secondary">Halaman {page} dari {totalPages}</p>
+              <p className="text-base text-txt-secondary">Halaman {page} dari {totalPages}</p>
               <div className="flex gap-2">
-                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40">Sebelumnya</button>
-                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40">Selanjutnya</button>
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="btn-secondary px-5 py-2.5 text-base disabled:opacity-40">Sebelumnya</button>
+                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="btn-secondary px-5 py-2.5 text-base disabled:opacity-40">Selanjutnya</button>
               </div>
             </div>
           )}

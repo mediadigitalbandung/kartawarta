@@ -240,7 +240,7 @@ export default function PenggunaPage() {
       <div className="flex min-h-[40vh] flex-col items-center justify-center text-center">
         <ShieldAlert size={48} className="mb-4 text-red-400" />
         <h1 className="text-xl font-bold text-txt-primary">Akses Ditolak</h1>
-        <p className="mt-2 text-sm text-txt-secondary">
+        <p className="mt-2 text-base text-txt-secondary">
           Halaman ini hanya dapat diakses oleh Super Admin atau Editor Kepala.
         </p>
       </div>
@@ -251,8 +251,8 @@ export default function PenggunaPage() {
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">Kelola Pengguna</h1>
-          <p className="text-sm text-txt-secondary">{users.length} pengguna terdaftar</p>
+          <h1 className="text-xl sm:text-3xl font-bold text-txt-primary">Kelola Pengguna</h1>
+          <p className="text-base text-txt-secondary">{users.length} pengguna terdaftar</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
@@ -270,16 +270,16 @@ export default function PenggunaPage() {
           placeholder="Cari pengguna..."
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          className="input w-full pl-9"
+          className="input w-full pl-9 text-base py-2.5"
         />
       </div>
 
       {error && (
-        <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4 text-center text-sm text-red-700">
+        <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4 text-center text-base text-red-700">
           <p>{error}</p>
           <button
             onClick={fetchUsers}
-            className="mt-2 rounded-[12px] bg-red-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-red-700"
+            className="mt-2 rounded-[12px] bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
             aria-label="Coba muat ulang daftar pengguna"
           >
             Coba Lagi
@@ -296,12 +296,12 @@ export default function PenggunaPage() {
             <table className="w-full text-sm">
               <thead className="border-b border-border bg-surface-secondary">
                 <tr>
-                  <th className="px-3 sm:px-5 py-3 text-left font-medium text-txt-secondary">Pengguna</th>
-                  <th className="px-3 sm:px-5 py-3 text-left font-medium text-txt-secondary">Role</th>
-                  <th className="hidden sm:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Artikel</th>
-                  <th className="hidden md:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Status</th>
-                  <th className="hidden lg:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Terdaftar</th>
-                  <th className="px-3 sm:px-5 py-3 text-right font-medium text-txt-secondary">Aksi</th>
+                  <th className="px-3 sm:px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Pengguna</th>
+                  <th className="px-3 sm:px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Role</th>
+                  <th className="hidden sm:table-cell px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Artikel</th>
+                  <th className="hidden md:table-cell px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Status</th>
+                  <th className="hidden lg:table-cell px-5 py-3.5 text-left text-sm font-medium text-txt-secondary">Terdaftar</th>
+                  <th className="px-3 sm:px-5 py-3.5 text-right text-sm font-medium text-txt-secondary">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -309,44 +309,44 @@ export default function PenggunaPage() {
                   const role = roleLabels[user.role] || { label: user.role, color: "bg-surface-tertiary text-txt-secondary" };
                   return (
                     <tr key={user.id} className="hover:bg-surface-secondary">
-                      <td className="px-3 sm:px-5 py-3">
+                      <td className="px-3 sm:px-5 py-4">
                         <div className="flex items-center gap-2 sm:gap-3">
                           <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-goto-green text-xs sm:text-sm font-bold text-white">
                             {user.name.charAt(0)}
                           </div>
                           <div className="min-w-0">
-                            <p className="font-medium text-txt-primary text-xs sm:text-sm truncate">{user.name}</p>
-                            <p className="flex items-center gap-1 text-[10px] sm:text-xs text-txt-secondary truncate">
+                            <p className="font-medium text-txt-primary text-sm truncate">{user.name}</p>
+                            <p className="flex items-center gap-1 text-xs text-txt-secondary truncate">
                               <Mail size={10} /> {user.email}
                             </p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-3 sm:px-5 py-3">
-                        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-medium ${role.color}`}>
+                      <td className="px-3 sm:px-5 py-4">
+                        <span className={`inline-flex items-center gap-1 rounded-full px-3 py-0.5 text-sm font-medium ${role.color}`}>
                           <Shield size={10} /> {role.label}
                         </span>
                       </td>
-                      <td className="hidden sm:table-cell px-5 py-3 text-txt-secondary">
+                      <td className="hidden sm:table-cell px-5 py-4 text-sm text-txt-secondary">
                         {user._count?.articles ?? 0}
                       </td>
-                      <td className="hidden md:table-cell px-5 py-3">
+                      <td className="hidden md:table-cell px-5 py-4">
                         {user.isActive ? (
-                          <span className="flex items-center gap-1 text-xs text-goto-green">
+                          <span className="flex items-center gap-1 text-sm text-goto-green">
                             <UserCheck size={12} /> Aktif
                           </span>
                         ) : (
-                          <span className="flex items-center gap-1 text-xs text-red-500">
+                          <span className="flex items-center gap-1 text-sm text-red-500">
                             <UserX size={12} /> Nonaktif
                           </span>
                         )}
                       </td>
-                      <td className="hidden lg:table-cell px-5 py-3 text-txt-secondary">{formatDate(user.createdAt)}</td>
-                      <td className="px-3 sm:px-5 py-3 text-right">
+                      <td className="hidden lg:table-cell px-5 py-4 text-sm text-txt-secondary">{formatDate(user.createdAt)}</td>
+                      <td className="px-3 sm:px-5 py-4 text-right">
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => openEditModal(user)}
-                            className="btn-ghost rounded p-1"
+                            className="btn-ghost rounded p-2"
                             title="Edit"
                             aria-label="Edit pengguna"
                           >
@@ -355,7 +355,7 @@ export default function PenggunaPage() {
                           <button
                             onClick={() => handleDelete(user.id, user.name)}
                             disabled={deleting === user.id}
-                            className="btn-ghost rounded p-1 hover:text-red-500 disabled:opacity-50"
+                            className="btn-ghost rounded p-2 hover:text-red-500 disabled:opacity-50"
                             title="Hapus"
                             aria-label="Hapus pengguna"
                           >
@@ -371,7 +371,7 @@ export default function PenggunaPage() {
           </div>
 
           {paginatedUsers.length === 0 && (
-            <div className="py-12 text-center text-txt-secondary">
+            <div className="py-12 text-center text-base text-txt-secondary">
               Tidak ada pengguna ditemukan.
             </div>
           )}
@@ -380,21 +380,21 @@ export default function PenggunaPage() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-6">
-            <p className="text-sm text-txt-secondary">
+            <p className="text-base text-txt-secondary">
               Halaman {page} dari {totalPages}
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40"
+                className="btn-secondary px-5 py-2.5 text-base disabled:opacity-40"
               >
                 Sebelumnya
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40"
+                className="btn-secondary px-5 py-2.5 text-base disabled:opacity-40"
               >
                 Selanjutnya
               </button>
@@ -407,11 +407,11 @@ export default function PenggunaPage() {
       {/* Add User Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-[calc(100%-2rem)] max-w-md mx-auto rounded-[12px] border border-border bg-surface p-4 sm:p-6 shadow-lg">
+          <div className="w-[calc(100%-2rem)] max-w-lg mx-auto rounded-[12px] border border-border bg-surface p-6 sm:p-8 shadow-lg">
             <h2 className="mb-4 text-lg font-bold text-txt-primary">
               {editingUser ? "Edit Pengguna" : "Tambah Pengguna Baru"}
             </h2>
-            <form className="space-y-3" onSubmit={handleSubmitUser}>
+            <form className="space-y-4" onSubmit={handleSubmitUser}>
               <input
                 type="text"
                 placeholder="Nama lengkap"
@@ -440,7 +440,7 @@ export default function PenggunaPage() {
                   aria-label="Password"
                 />
                 {editingUser && (
-                  <p className="mt-1 text-xs text-txt-muted">Kosongkan jika tidak ingin mengubah password</p>
+                  <p className="mt-1 text-sm text-txt-muted">Kosongkan jika tidak ingin mengubah password</p>
                 )}
               </div>
               <select

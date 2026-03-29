@@ -165,20 +165,20 @@ export default function LaporanPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">
+        <h1 className="text-xl sm:text-3xl font-bold text-txt-primary">
           Laporan Berita
         </h1>
-        <p className="text-sm text-txt-secondary">
+        <p className="text-base text-txt-secondary">
           {loading ? "Memuat..." : `${pendingCount} laporan menunggu ditinjau`}
         </p>
       </div>
 
       {error && (
-        <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4 text-center text-sm text-red-700">
+        <div className="mb-4 rounded-[12px] border border-red-200 bg-red-50 p-4 text-center text-base text-red-700">
           <p>{error}</p>
           <button
             onClick={fetchReports}
-            className="mt-2 rounded-[12px] bg-red-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-red-700"
+            className="mt-2 rounded-[12px] bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
             aria-label="Coba muat ulang daftar laporan"
           >
             Coba Lagi
@@ -229,11 +229,11 @@ export default function LaporanPage() {
                             <AlertTriangle size={10} className="mr-1" />
                             {reason.label}
                           </span>
-                          <span className={`flex items-center gap-1 text-xs ${status.color}`}>
+                          <span className={`flex items-center gap-1 text-sm ${status.color}`}>
                             <StatusIcon size={12} />
                             {status.label}
                           </span>
-                          <span className="text-xs text-txt-muted">{formatDate(report.createdAt)}</span>
+                          <span className="text-sm text-txt-muted">{formatDate(report.createdAt)}</span>
                         </div>
                         <h3 className="font-medium text-txt-primary">
                           {report.article?.title || "Artikel tidak ditemukan"}
@@ -242,7 +242,7 @@ export default function LaporanPage() {
                           {report.detail || "Tidak ada detail."}
                         </p>
                         {report.email && (
-                          <p className="mt-1 text-xs text-txt-muted">
+                          <p className="mt-1 text-sm text-txt-muted">
                             Pelapor: {report.email}
                           </p>
                         )}
@@ -252,7 +252,7 @@ export default function LaporanPage() {
                           <button
                             onClick={() => handleUpdateStatus(report.id, "REVIEWED")}
                             disabled={updating === report.id}
-                            className="rounded-[12px] bg-goto-light px-3 py-1.5 text-xs font-medium text-goto-green hover:bg-goto-green/20 disabled:opacity-50"
+                            className="rounded-[12px] bg-goto-light px-4 py-2 text-sm font-medium text-goto-green hover:bg-goto-green/20 disabled:opacity-50"
                             aria-label="Tinjau laporan"
                           >
                             {updating === report.id ? "..." : "Tinjau"}
@@ -260,7 +260,7 @@ export default function LaporanPage() {
                           <button
                             onClick={() => handleUpdateStatus(report.id, "DISMISSED")}
                             disabled={updating === report.id}
-                            className="rounded-[12px] bg-surface-tertiary px-3 py-1.5 text-xs font-medium text-txt-secondary hover:bg-border disabled:opacity-50"
+                            className="rounded-[12px] bg-surface-tertiary px-4 py-2 text-sm font-medium text-txt-secondary hover:bg-border disabled:opacity-50"
                             aria-label="Tolak laporan"
                           >
                             {updating === report.id ? "..." : "Tolak"}
@@ -277,10 +277,10 @@ export default function LaporanPage() {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-6">
-              <p className="text-sm text-txt-secondary">Halaman {page} dari {totalPages}</p>
+              <p className="text-base text-txt-secondary">Halaman {page} dari {totalPages}</p>
               <div className="flex gap-2">
-                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40">Sebelumnya</button>
-                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="btn-secondary px-3 py-1.5 text-sm disabled:opacity-40">Selanjutnya</button>
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="btn-secondary px-5 py-2.5 text-base disabled:opacity-40">Sebelumnya</button>
+                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="btn-secondary px-5 py-2.5 text-base disabled:opacity-40">Selanjutnya</button>
               </div>
             </div>
           )}
