@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import Link from "next/link";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
@@ -1091,7 +1092,7 @@ export default function EditArticlePage() {
                   <input type="url" value={featuredImage} onChange={(e) => setFeaturedImage(e.target.value)} placeholder="Atau paste URL gambar" className="input w-full text-xs" />
                 </div>
                 {featuredImage && !featuredImage.startsWith("data:") && (
-                  <img src={featuredImage} alt="Preview" className="mt-2 w-full rounded-[8px] object-cover" style={{ maxHeight: 200 }} onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                  <Image src={featuredImage} alt="Preview" width={800} height={400} className="mt-2 w-full rounded-[8px] object-cover" style={{ maxHeight: 200 }} unoptimized />
                 )}
               </div>
               <div className="rounded-[12px] border border-border bg-surface p-5">
@@ -1434,7 +1435,7 @@ export default function EditArticlePage() {
                 <input type="url" value={featuredImage} onChange={(e) => setFeaturedImage(e.target.value)} placeholder="Atau paste URL gambar" className="input w-full text-xs" />
               </div>
               {featuredImage && !featuredImage.startsWith("data:") && (
-                <img src={featuredImage} alt="Preview" className="mt-2 w-full rounded-[8px] object-cover" style={{ maxHeight: 200 }} onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                <Image src={featuredImage} alt="Preview" width={800} height={400} className="mt-2 w-full rounded-[8px] object-cover" style={{ maxHeight: 200 }} unoptimized />
               )}
             </div>
             {/* Journalism Checklist */}

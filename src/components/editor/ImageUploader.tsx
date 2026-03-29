@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import NextImage from "next/image";
 import { Upload, X, Loader2, ImageIcon } from "lucide-react";
 
 interface ImageUploaderProps {
@@ -148,11 +149,14 @@ export default function ImageUploader({ onUpload, currentImage }: ImageUploaderP
     <div className="space-y-2">
       {preview ? (
         <div className="relative">
-          <img
+          <NextImage
             src={preview}
             alt="Preview"
+            width={800}
+            height={400}
             className="w-full rounded-[8px] object-cover"
             style={{ maxHeight: 200 }}
+            unoptimized
           />
           <button
             type="button"
