@@ -121,6 +121,7 @@ export default function EditArticlePage() {
 
   // Admin return-to-editor note
   const [returnNote, setReturnNote] = useState("");
+  const [showReturnNote, setShowReturnNote] = useState(false);
 
   const [checklist, setChecklist] = useState({
     notClickbait: false,
@@ -588,19 +589,6 @@ export default function EditArticlePage() {
             </p>
 
             <div className="mt-4 space-y-3">
-              <div>
-                <label className="mb-1 block text-sm font-medium text-txt-secondary">
-                  Catatan untuk editor (opsional, jika mengembalikan)
-                </label>
-                <textarea
-                  value={returnNote}
-                  onChange={(e) => setReturnNote(e.target.value)}
-                  rows={2}
-                  placeholder="Catatan jika ingin mengembalikan ke editor..."
-                  className="input w-full text-sm"
-                />
-              </div>
-
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleAdminPublish}
@@ -611,14 +599,45 @@ export default function EditArticlePage() {
                   Publikasi
                 </button>
                 <button
-                  onClick={handleAdminReturnToEditor}
-                  disabled={saving}
-                  className="flex items-center gap-1.5 rounded-[12px] border border-yellow-300 bg-yellow-50 px-5 py-2.5 text-sm font-semibold text-yellow-700 hover:bg-yellow-100 disabled:opacity-50"
+                  onClick={() => setShowReturnNote(!showReturnNote)}
+                  className="flex items-center gap-1.5 rounded-[12px] border border-yellow-300 bg-yellow-50 px-5 py-2.5 text-sm font-semibold text-yellow-700 hover:bg-yellow-100"
                 >
                   <Undo2 size={16} />
                   Kembalikan ke Editor
                 </button>
               </div>
+
+              {showReturnNote && (
+                <div className="rounded-[12px] border border-yellow-300 bg-yellow-50 p-4 mt-3">
+                  <label className="mb-1 block text-sm font-medium text-yellow-800">
+                    Catatan untuk editor
+                  </label>
+                  <textarea
+                    value={returnNote}
+                    onChange={(e) => setReturnNote(e.target.value)}
+                    rows={3}
+                    placeholder="Tuliskan catatan mengapa artikel dikembalikan..."
+                    className="input w-full text-sm"
+                    autoFocus
+                  />
+                  <div className="mt-3 flex items-center gap-2">
+                    <button
+                      onClick={handleAdminReturnToEditor}
+                      disabled={saving}
+                      className="flex items-center gap-1.5 rounded-[12px] bg-yellow-500 px-4 py-2 text-sm font-semibold text-white hover:bg-yellow-600 disabled:opacity-50"
+                    >
+                      <Undo2 size={14} />
+                      Konfirmasi Kembalikan
+                    </button>
+                    <button
+                      onClick={() => { setShowReturnNote(false); setReturnNote(""); }}
+                      className="rounded-[12px] px-4 py-2 text-sm font-medium text-txt-secondary hover:bg-surface-secondary"
+                    >
+                      Batal
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
