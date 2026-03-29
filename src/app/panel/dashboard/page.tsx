@@ -37,6 +37,7 @@ interface Article {
   reviewedAt?: string | null;
   author?: { name: string };
   category?: { name: string; id: string };
+  reviewerName?: string | null;
 }
 
 interface StatsItem {
@@ -991,60 +992,16 @@ export default function DashboardPage() {
         })}
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Recent articles */}
-        <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
-          <div className="border-b border-border bg-surface-secondary px-5 py-4">
-            <h2 className="font-semibold text-txt-primary">
-              {isCreator ? "Artikel Saya Terbaru" : isEditorRole ? "Antrean Review" : "Artikel Terbaru"}
-            </h2>
-          </div>
-          <div className="overflow-x-auto">
-          <div className="divide-y divide-border">
-            {recentArticles.length === 0 ? (
-              <div className="px-5 py-8 text-center text-sm text-txt-secondary">
-                {isCreator ? "Anda belum memiliki artikel." : "Belum ada artikel."}
-              </div>
-            ) : (
-              recentArticles.map((article) => (
-                <Link
-                  key={article.id}
-                  href={`/panel/artikel/${article.id}/edit`}
-                  className="flex items-center justify-between px-5 py-3 hover:bg-surface-secondary"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-txt-primary">
-                      {article.title}
-                    </p>
-                    <p className="text-xs text-txt-secondary">
-                      {isEditorRole && article.author?.name ? `${article.author.name} — ` : ""}
-                      {formatDate(article.createdAt)}
-                    </p>
-                  </div>
-                  <div className="ml-4 flex items-center gap-3">
-                    {article.viewCount > 0 && (
-                      <span className="flex items-center gap-1 text-xs text-txt-muted">
-                        <Eye size={12} /> {article.viewCount}
-                      </span>
-                    )}
-                    <span className={`badge ${statusColors[article.status] || "bg-surface-tertiary text-txt-secondary"}`}>
-                      {statusLabels[article.status] || article.status}
-                    </span>
-                  </div>
-                </Link>
-              ))
-            )}
-          </div>
-          </div>
+      {/* Quick actions FIRST */}
+      <div className="mb-6 rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
+        <div className="border-b border-border px-6 py-5">
+          <h2 className="flex items-center gap-2.5 text-base font-bold text-txt-primary">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-goto-light">
+              <Layers size={16} className="text-goto-green" />
+            </div>
+            Aksi Cepat
+          </h2>
         </div>
-
-        {/* Quick actions */}
-        <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
-          <div className="border-b border-border bg-surface-secondary px-5 py-4">
-            <h2 className="font-semibold text-txt-primary">
-              Aksi Cepat
-            </h2>
-          </div>
           <div className="grid grid-cols-2 gap-3 p-5">
             <Link
               href="/panel/artikel/baru"
@@ -1117,7 +1074,80 @@ export default function DashboardPage() {
               </>
             )}
           </div>
+      </div>
+
+      {/* Recent articles - full width, rich info */}
+      <div className="mb-6 rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
+        <div className="border-b border-border px-6 py-5 flex items-center justify-between">
+          <h2 className="flex items-center gap-2.5 text-base font-bold text-txt-primary">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
+              <FileText size={16} className="text-blue-500" />
+            </div>
+            {isCreator ? "Artikel Saya Terbaru" : isEditorRole ? "Antrean Review" : "Artikel Terbaru"}
+          </h2>
+          <Link href="/panel/artikel" className="text-sm font-semibold text-goto-green hover:text-goto-dark transition-colors">
+            Lihat Semua &rarr;
+          </Link>
         </div>
+        {recentArticles.length === 0 ? (
+          <div className="px-6 py-12 text-center">
+            <FileText size={40} className="mx-auto text-border mb-3" />
+            <p className="text-base text-txt-secondary">
+              {isCreator ? "Anda belum memiliki artikel." : "Belum ada artikel."}
+            </p>
+          </div>
+        ) : (
+          <div className="divide-y divide-border">
+            {recentArticles.map((article) => (
+              <Link
+                key={article.id}
+                href={`/panel/artikel/${article.id}/edit`}
+                className="block px-6 py-5 hover:bg-surface-secondary/50 transition-colors"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-base font-semibold text-txt-primary mb-2 line-clamp-1">
+                      {article.title}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+                      {article.author?.name && (
+                        <span className="flex items-center gap-1.5 text-sm text-txt-secondary">
+                          <UserCheck size={14} className="text-txt-muted" />
+                          {article.author.name}
+                        </span>
+                      )}
+                      {article.category?.name && (
+                        <span className="flex items-center gap-1.5 text-sm text-txt-secondary">
+                          <Layers size={14} className="text-txt-muted" />
+                          {article.category.name}
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1.5 text-sm text-txt-secondary">
+                        <CalendarClock size={14} className="text-txt-muted" />
+                        {formatDate(article.createdAt)}
+                      </span>
+                      {article.reviewerName && (
+                        <span className="flex items-center gap-1.5 text-sm text-txt-secondary">
+                          <UserCheck size={14} className="text-goto-green" />
+                          Editor: {article.reviewerName}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2 shrink-0">
+                    <span className={`badge text-sm ${statusColors[article.status] || "bg-surface-tertiary text-txt-secondary"}`}>
+                      {statusLabels[article.status] || article.status}
+                    </span>
+                    <span className="flex items-center gap-1.5 text-sm font-medium text-txt-muted">
+                      <Eye size={14} />
+                      {formatNumber(article.viewCount)} tayangan
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Analytics Section */}
