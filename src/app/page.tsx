@@ -114,7 +114,7 @@ export default async function HomePage() {
   const headlineArticles = articles.slice(0, 5);  // For headline slider
   const subHeadlines = articles.slice(5, 11);     // 6 items = 3 pages x 2 cards for sub-headline slider
   const breakingArticles = articles.slice(11, 16); // For breaking news slider
-  const terkiniArticles = articles.slice(16, 22); // Berita Terkini: 2x3 grid = 6
+  const terkiniArticles = articles.slice(16, 24); // Berita Terkini: 2x4 grid = 8
   const restArticles = articles.slice(24);
 
   const tickerItems = tickerArticles.map((a) => ({
@@ -195,16 +195,16 @@ export default async function HomePage() {
                     Lihat Semua
                   </Link>
                 </div>
-                <div className="space-y-0 divide-y divide-border">
+                <div className="flex-1 flex flex-col divide-y divide-border">
                   {trendingArticles.slice(0, 8).map((article, i) => (
-                    <div key={article.slug} className="group flex items-start gap-3 py-3 first:pt-0">
+                    <div key={article.slug} className="group flex flex-1 items-center gap-3 py-3 first:pt-0">
                       {/* Rank number */}
-                      <span className="shrink-0 w-6 pt-1 text-center text-lg font-extrabold text-goto-green select-none">
+                      <span className="shrink-0 w-7 text-center text-xl font-extrabold text-goto-green select-none">
                         {i + 1}
                       </span>
                       {/* Thumbnail */}
                       <Link href={`/berita/${article.slug}`} className="shrink-0">
-                        <div className="relative h-[60px] w-[85px] overflow-hidden rounded">
+                        <div className="relative h-[70px] w-[100px] overflow-hidden rounded">
                           {article.featuredImage ? (
                             <Image
                               src={article.featuredImage}
