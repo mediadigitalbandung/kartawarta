@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+export const revalidate = 120; // ISR: revalidate author page every 2 minutes
 
 import { Metadata } from "next";
 import ArticleCard from "@/components/artikel/ArticleCard";

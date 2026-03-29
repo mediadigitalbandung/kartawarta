@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+export const revalidate = 60; // ISR: revalidate homepage every 60 seconds
 
 import Link from "next/link";
 import Image from "next/image";
