@@ -1112,26 +1112,26 @@ export default function DashboardPage() {
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
                       {article.author?.name && (
                         <span className="flex items-center gap-1.5 text-sm text-txt-secondary">
-                          <Users size={14} className="text-txt-muted" />
-                          {article.author.name}
+                          <Users size={14} className="text-blue-500" />
+                          <span className="text-txt-muted">Penulis:</span> {article.author.name}
+                        </span>
+                      )}
+                      {article.reviewerName && (
+                        <span className="flex items-center gap-1.5 text-sm text-txt-secondary">
+                          <CheckCircle size={14} className="text-goto-green" />
+                          <span className="text-txt-muted">Editor:</span> {article.reviewerName}
                         </span>
                       )}
                       {article.category?.name && (
                         <span className="flex items-center gap-1.5 text-sm text-txt-secondary">
-                          <Layers size={14} className="text-txt-muted" />
-                          {article.category.name}
+                          <Layers size={14} className="text-purple-500" />
+                          <span className="text-txt-muted">Kategori:</span> {article.category.name}
                         </span>
                       )}
                       <span className="flex items-center gap-1.5 text-sm text-txt-secondary">
                         <CalendarClock size={14} className="text-txt-muted" />
-                        {formatDate(article.createdAt)}
+                        <span className="text-txt-muted">Tanggal:</span> {formatDate(article.createdAt)}
                       </span>
-                      {article.reviewerName && (
-                        <span className="flex items-center gap-1.5 text-sm text-txt-secondary">
-                          <Users size={14} className="text-goto-green" />
-                          Editor: {article.reviewerName}
-                        </span>
-                      )}
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-2 shrink-0">
