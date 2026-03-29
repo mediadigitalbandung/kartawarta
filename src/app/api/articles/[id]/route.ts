@@ -275,6 +275,16 @@ export async function PUT(
 
       // Editor can edit content (title, content, excerpt, category, tags)
       if (!data.status || !["APPROVED", "REJECTED"].includes(data.status)) {
+        // Save revision before editor edits content
+        await prisma.revision.create({
+          data: {
+            articleId: article.id,
+            title: article.title,
+            content: article.content,
+            changedBy: session.user.name || session.user.email,
+          },
+        });
+
         // Content edit by editor — save changes without status change
         const updateData: Record<string, unknown> = {};
         if (data.title) updateData.title = data.title;
@@ -403,14 +413,51 @@ export async function PUT(
         return successResponse(updated);
       }
 
-      // Admin publish: APPROVED -> PUBLISHED
+      // Admin publish: APPROVED -> PUBLISHED (or schedule)
       if (data.status === "PUBLISHED" && article.status === "APPROVED") {
+        // Save revision before publish
+        await prisma.revision.create({
+          data: {
+            articleId: article.id,
+            title: article.title,
+            content: article.content,
+            changedBy: session.user.name || session.user.email,
+          },
+        });
+
+        // If scheduledAt is provided, schedule instead of publishing immediately
+        if (data.scheduledAt) {
+          const updated = await prisma.article.update({
+            where: { id: params.id },
+            data: {
+              scheduledAt: new Date(data.scheduledAt),
+            },
+            include: {
+              author: { select: { id: true, name: true } },
+              category: { select: { id: true, name: true, slug: true } },
+              tags: true,
+              sources: true,
+            },
+          });
+
+          await logAudit(
+            session.user.id,
+            "STATUS_CHANGE",
+            "article",
+            article.id,
+            `Admin menjadwalkan publikasi artikel: ${article.title} pada ${new Date(data.scheduledAt).toLocaleString("id-ID")}`
+          );
+
+          return successResponse(updated);
+        }
+
         const updated = await prisma.article.update({
           where: { id: params.id },
           data: {
             status: "PUBLISHED",
             verificationLabel: "VERIFIED",
             publishedAt: new Date(),
+            scheduledAt: null,
           },
           include: {
             author: { select: { id: true, name: true } },

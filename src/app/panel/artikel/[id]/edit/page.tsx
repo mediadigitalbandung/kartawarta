@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import {
   Save,
   Send,
@@ -24,8 +25,13 @@ import {
   Upload,
   ArrowRight,
   Eye,
+  History,
+  CalendarClock,
+  FileText,
+  Printer,
 } from "lucide-react";
 import ImageUploader from "@/components/editor/ImageUploader";
+import { stripHtml, downloadTextFile } from "@/lib/export-utils";
 
 const RichTextEditor = dynamic(
   () => import("@/components/editor/RichTextEditor"),
@@ -123,6 +129,10 @@ export default function EditArticlePage() {
   const [returnNote, setReturnNote] = useState("");
   const [showReturnNote, setShowReturnNote] = useState(false);
 
+  // Scheduling state
+  const [showSchedule, setShowSchedule] = useState(false);
+  const [scheduleDate, setScheduleDate] = useState("");
+
   const [checklist, setChecklist] = useState({
     notClickbait: false,
     hasSource: false,
@@ -132,6 +142,44 @@ export default function EditArticlePage() {
   });
 
   const allChecked = Object.values(checklist).every(Boolean);
+
+  // Export functions
+  const handleExportPdf = () => {
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${title}</title>
+        <style>
+          body { font-family: Georgia, serif; max-width: 700px; margin: 40px auto; padding: 0 20px; color: #222; line-height: 1.8; }
+          h1 { font-size: 28px; margin-bottom: 8px; }
+          .meta { color: #666; font-size: 14px; margin-bottom: 24px; border-bottom: 1px solid #ddd; padding-bottom: 16px; }
+          .excerpt { font-style: italic; color: #555; margin-bottom: 24px; font-size: 16px; }
+          .content { font-size: 16px; }
+          .content img { max-width: 100%; height: auto; }
+          @media print { body { margin: 20px; } }
+        </style>
+      </head>
+      <body>
+        <h1>${title}</h1>
+        <div class="meta">Kategori: ${categories.find(c => c.id === categoryId)?.name || "-"} | Penulis: ${articleAuthorName || "-"}</div>
+        ${excerpt ? `<div class="excerpt">${excerpt}</div>` : ""}
+        <div class="content">${content}</div>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => printWindow.print(), 500);
+  };
+
+  const handleExportText = () => {
+    const plainText = `${title}\n\n${excerpt ? excerpt + "\n\n" : ""}${stripHtml(content)}`;
+    const safeFilename = title.replace(/[^a-zA-Z0-9\s-]/g, "").replace(/\s+/g, "-").substring(0, 80);
+    downloadTextFile(`${safeFilename}.txt`, plainText);
+  };
 
   const [aiLoading, setAiLoading] = useState<Record<string, boolean>>({});
 
@@ -435,7 +483,7 @@ export default function EditArticlePage() {
 
   // --- ADMIN HANDLERS ---
   const handleAdminPublish = async () => {
-    if (!confirm("Publikasi artikel ini? Artikel akan tampil di halaman publik.")) return;
+    if (!confirm("Publikasi artikel ini sekarang? Artikel akan tampil di halaman publik.")) return;
     setSaving(true);
     try {
       const res = await fetch(`/api/articles/${articleId}`, {
@@ -450,6 +498,39 @@ export default function EditArticlePage() {
         return;
       }
       alert("Artikel berhasil dipublikasikan!");
+      router.push("/panel/artikel");
+      router.refresh();
+    } catch {
+      setError("Terjadi kesalahan.");
+      setSaving(false);
+    }
+  };
+
+  const handleAdminSchedule = async () => {
+    if (!scheduleDate) {
+      setError("Pilih tanggal dan waktu publikasi terlebih dahulu");
+      return;
+    }
+    const scheduledTime = new Date(scheduleDate);
+    if (scheduledTime <= new Date()) {
+      setError("Jadwal publikasi harus di masa depan");
+      return;
+    }
+    if (!confirm(`Jadwalkan publikasi pada ${scheduledTime.toLocaleString("id-ID")}?`)) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/articles/${articleId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "PUBLISHED", scheduledAt: scheduledTime.toISOString() }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        setError(data.error || "Gagal menjadwalkan publikasi");
+        setSaving(false);
+        return;
+      }
+      alert(`Publikasi dijadwalkan pada ${scheduledTime.toLocaleString("id-ID")}`);
       router.push("/panel/artikel");
       router.refresh();
     } catch {
@@ -585,27 +666,66 @@ export default function EditArticlePage() {
               Artikel Disetujui — Siap Dipublikasi
             </h3>
             <p className="mt-1 text-sm text-goto-green">
-              Artikel ini telah disetujui oleh editor. Anda dapat mempublikasi atau mengembalikan ke editor.
+              Artikel ini telah disetujui oleh editor. Anda dapat mempublikasi sekarang, menjadwalkan, atau mengembalikan ke editor.
             </p>
 
             <div className="mt-4 space-y-3">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <button
                   onClick={handleAdminPublish}
                   disabled={saving}
                   className="flex items-center gap-1.5 rounded-[12px] bg-goto-green px-5 py-2.5 text-sm font-semibold text-white hover:bg-goto-dark disabled:opacity-50"
                 >
                   <Upload size={16} />
-                  Publikasi
+                  Publikasi Sekarang
                 </button>
                 <button
-                  onClick={() => setShowReturnNote(!showReturnNote)}
+                  onClick={() => { setShowSchedule(!showSchedule); setShowReturnNote(false); }}
+                  className="flex items-center gap-1.5 rounded-[12px] border border-blue-300 bg-blue-50 px-5 py-2.5 text-sm font-semibold text-blue-700 hover:bg-blue-100"
+                >
+                  <CalendarClock size={16} />
+                  Jadwalkan Publikasi
+                </button>
+                <button
+                  onClick={() => { setShowReturnNote(!showReturnNote); setShowSchedule(false); }}
                   className="flex items-center gap-1.5 rounded-[12px] border border-yellow-300 bg-yellow-50 px-5 py-2.5 text-sm font-semibold text-yellow-700 hover:bg-yellow-100"
                 >
                   <Undo2 size={16} />
                   Kembalikan ke Editor
                 </button>
               </div>
+
+              {/* Schedule picker */}
+              {showSchedule && (
+                <div className="rounded-[12px] border border-blue-300 bg-blue-50 p-4 mt-3">
+                  <label className="mb-2 block text-sm font-medium text-blue-800">
+                    Pilih tanggal & waktu publikasi
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={scheduleDate}
+                    onChange={(e) => setScheduleDate(e.target.value)}
+                    min={new Date().toISOString().slice(0, 16)}
+                    className="input w-full max-w-xs text-sm"
+                  />
+                  <div className="mt-3 flex items-center gap-2">
+                    <button
+                      onClick={handleAdminSchedule}
+                      disabled={saving || !scheduleDate}
+                      className="flex items-center gap-1.5 rounded-[12px] bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      <CalendarClock size={14} />
+                      Konfirmasi Jadwal
+                    </button>
+                    <button
+                      onClick={() => { setShowSchedule(false); setScheduleDate(""); }}
+                      className="rounded-[12px] px-4 py-2 text-sm font-medium text-txt-secondary hover:bg-surface-secondary"
+                    >
+                      Batal
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {showReturnNote && (
                 <div className="rounded-[12px] border border-yellow-300 bg-yellow-50 p-4 mt-3">
@@ -662,6 +782,17 @@ export default function EditArticlePage() {
             </p>
           </div>
         )}
+
+        {/* Riwayat Revisi link */}
+        <div className="mb-6">
+          <Link
+            href={`/panel/artikel/${articleId}/revisions`}
+            className="inline-flex items-center gap-1.5 rounded-[12px] border border-border bg-surface px-4 py-2.5 text-sm font-medium text-txt-primary hover:bg-surface-secondary transition-colors"
+          >
+            <History size={16} className="text-goto-green" />
+            Riwayat Revisi
+          </Link>
+        </div>
 
         {/* Read-only article content */}
         <div className="space-y-4">
@@ -889,6 +1020,17 @@ export default function EditArticlePage() {
             </h3>
           </div>
         )}
+
+        {/* Riwayat Revisi link (editor view) */}
+        <div className="mb-6">
+          <Link
+            href={`/panel/artikel/${articleId}/revisions`}
+            className="inline-flex items-center gap-1.5 rounded-[12px] border border-border bg-surface px-4 py-2.5 text-sm font-medium text-txt-primary hover:bg-surface-secondary transition-colors"
+          >
+            <History size={16} className="text-goto-green" />
+            Riwayat Revisi
+          </Link>
+        </div>
 
         {/* Editable article content — editor can edit like journalist */}
         {currentStatus === "IN_REVIEW" && isAssignedEditor ? (
@@ -1144,6 +1286,17 @@ export default function EditArticlePage() {
           </h3>
         </div>
       )}
+
+      {/* Riwayat Revisi link (journalist view) */}
+      <div className="mb-4">
+        <Link
+          href={`/panel/artikel/${articleId}/revisions`}
+          className="inline-flex items-center gap-1.5 rounded-[12px] border border-border bg-surface px-4 py-2.5 text-sm font-medium text-txt-primary hover:bg-surface-secondary transition-colors"
+        >
+          <History size={16} className="text-goto-green" />
+          Riwayat Revisi
+        </Link>
+      </div>
 
       {/* Article content — editable only when DRAFT or REJECTED */}
       {canJurnalisEdit ? (

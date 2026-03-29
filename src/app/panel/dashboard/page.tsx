@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   FileText,
@@ -14,6 +14,11 @@ import {
   Megaphone,
   XCircle,
   Send,
+  BarChart3,
+  Award,
+  Layers,
+  Timer,
+  CalendarClock,
 } from "lucide-react";
 
 interface Article {
@@ -23,9 +28,12 @@ interface Article {
   status: string;
   viewCount: number;
   publishedAt: string | null;
+  scheduledAt?: string | null;
   createdAt: string;
+  updatedAt: string;
+  reviewedAt?: string | null;
   author?: { name: string };
-  category?: { name: string };
+  category?: { name: string; id: string };
 }
 
 interface StatsItem {
@@ -106,6 +114,244 @@ function formatDate(dateStr: string): string {
   return d.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
 }
 
+// --- Analytics Components ---
+
+function WeeklyArticleTrend({ articles }: { articles: Article[] }) {
+  const weekData = useMemo(() => {
+    const now = new Date();
+    const days: { label: string; count: number }[] = [];
+
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const dayStr = d.toISOString().split("T")[0];
+      const label = d.toLocaleDateString("id-ID", { weekday: "short", day: "numeric" });
+
+      const count = articles.filter((a) => {
+        const created = new Date(a.createdAt).toISOString().split("T")[0];
+        return created === dayStr;
+      }).length;
+
+      days.push({ label, count });
+    }
+    return days;
+  }, [articles]);
+
+  const maxCount = Math.max(...weekData.map((d) => d.count), 1);
+
+  return (
+    <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
+      <div className="border-b border-border bg-surface-secondary px-5 py-4">
+        <h2 className="flex items-center gap-2 font-semibold text-txt-primary">
+          <BarChart3 size={18} className="text-goto-green" />
+          Tren Artikel Mingguan
+        </h2>
+      </div>
+      <div className="p-5 space-y-2.5">
+        {weekData.map((day, i) => (
+          <div key={i} className="flex items-center gap-3">
+            <span className="w-16 text-xs text-txt-secondary text-right shrink-0">
+              {day.label}
+            </span>
+            <div className="flex-1 h-6 bg-surface-secondary rounded-[6px] overflow-hidden">
+              <div
+                className="h-full bg-goto-green rounded-[6px] transition-all duration-500"
+                style={{ width: `${(day.count / maxCount) * 100}%`, minWidth: day.count > 0 ? "8px" : "0px" }}
+              />
+            </div>
+            <span className="w-8 text-xs font-bold text-txt-primary text-right">
+              {day.count}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TopArticlesByViews({ articles }: { articles: Article[] }) {
+  const topArticles = useMemo(() => {
+    return [...articles]
+      .filter((a) => a.status === "PUBLISHED")
+      .sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
+      .slice(0, 5);
+  }, [articles]);
+
+  return (
+    <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
+      <div className="border-b border-border bg-surface-secondary px-5 py-4">
+        <h2 className="flex items-center gap-2 font-semibold text-txt-primary">
+          <Award size={18} className="text-gold" />
+          Top 5 Artikel by Views
+        </h2>
+      </div>
+      <div className="divide-y divide-border">
+        {topArticles.length === 0 ? (
+          <div className="px-5 py-8 text-center text-sm text-txt-secondary">
+            Belum ada artikel yang dipublikasi.
+          </div>
+        ) : (
+          topArticles.map((article, i) => (
+            <Link
+              key={article.id}
+              href={`/panel/artikel/${article.id}/edit`}
+              className="flex items-center gap-3 px-5 py-3 hover:bg-surface-secondary transition-colors"
+            >
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-goto-light text-xs font-bold text-goto-green">
+                {i + 1}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-txt-primary">
+                  {article.title}
+                </p>
+                <p className="text-xs text-txt-muted">
+                  {article.category?.name || "—"}
+                </p>
+              </div>
+              <div className="flex items-center gap-1 text-xs font-semibold text-gold shrink-0">
+                <Eye size={12} />
+                {formatNumber(article.viewCount)}
+              </div>
+            </Link>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CategoryPerformance({ articles }: { articles: Article[] }) {
+  const categoryData = useMemo(() => {
+    const map = new Map<string, { name: string; count: number; views: number }>();
+
+    articles.forEach((a) => {
+      const catName = a.category?.name || "Tanpa Kategori";
+      const existing = map.get(catName) || { name: catName, count: 0, views: 0 };
+      existing.count += 1;
+      existing.views += a.viewCount || 0;
+      map.set(catName, existing);
+    });
+
+    return Array.from(map.values()).sort((a, b) => b.views - a.views);
+  }, [articles]);
+
+  return (
+    <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
+      <div className="border-b border-border bg-surface-secondary px-5 py-4">
+        <h2 className="flex items-center gap-2 font-semibold text-txt-primary">
+          <Layers size={18} className="text-blue-500" />
+          Performa per Kategori
+        </h2>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border bg-surface-secondary/50">
+              <th className="px-5 py-2.5 text-left text-xs font-semibold text-txt-muted uppercase tracking-wider">
+                Kategori
+              </th>
+              <th className="px-5 py-2.5 text-right text-xs font-semibold text-txt-muted uppercase tracking-wider">
+                Artikel
+              </th>
+              <th className="px-5 py-2.5 text-right text-xs font-semibold text-txt-muted uppercase tracking-wider">
+                Total Views
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {categoryData.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="px-5 py-6 text-center text-txt-secondary">
+                  Belum ada data.
+                </td>
+              </tr>
+            ) : (
+              categoryData.map((cat) => (
+                <tr key={cat.name} className="hover:bg-surface-secondary/50">
+                  <td className="px-5 py-2.5 font-medium text-txt-primary">{cat.name}</td>
+                  <td className="px-5 py-2.5 text-right text-txt-secondary">{cat.count}</td>
+                  <td className="px-5 py-2.5 text-right font-semibold text-gold">
+                    {formatNumber(cat.views)}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function AverageReviewTime({ articles }: { articles: Article[] }) {
+  const avgTime = useMemo(() => {
+    // Calculate average time between articles entering IN_REVIEW (using createdAt or updatedAt)
+    // and being APPROVED/REJECTED (reviewedAt is in updatedAt)
+    // We look at articles that have been reviewed (status APPROVED, REJECTED, PUBLISHED)
+    const reviewed = articles.filter(
+      (a) =>
+        ["APPROVED", "REJECTED", "PUBLISHED"].includes(a.status) &&
+        a.reviewedAt &&
+        a.createdAt
+    );
+
+    if (reviewed.length === 0) return null;
+
+    let totalMs = 0;
+    let count = 0;
+
+    reviewed.forEach((a) => {
+      if (a.reviewedAt) {
+        const created = new Date(a.createdAt).getTime();
+        const reviewedAt = new Date(a.reviewedAt).getTime();
+        const diff = reviewedAt - created;
+        if (diff > 0) {
+          totalMs += diff;
+          count += 1;
+        }
+      }
+    });
+
+    if (count === 0) return null;
+
+    const avgMs = totalMs / count;
+    const hours = avgMs / (1000 * 60 * 60);
+
+    if (hours < 1) {
+      const mins = Math.round(avgMs / (1000 * 60));
+      return `${mins} menit`;
+    } else if (hours < 24) {
+      return `${hours.toFixed(1)} jam`;
+    } else {
+      const days = hours / 24;
+      return `${days.toFixed(1)} hari`;
+    }
+  }, [articles]);
+
+  return (
+    <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
+      <div className="border-b border-border bg-surface-secondary px-5 py-4">
+        <h2 className="flex items-center gap-2 font-semibold text-txt-primary">
+          <Timer size={18} className="text-purple-500" />
+          Rata-rata Waktu Review
+        </h2>
+      </div>
+      <div className="flex items-center justify-center p-8">
+        {avgTime ? (
+          <div className="text-center">
+            <p className="text-3xl font-extrabold text-txt-primary">{avgTime}</p>
+            <p className="mt-1 text-xs text-txt-secondary">
+              dari artikel dikirim hingga direview
+            </p>
+          </div>
+        ) : (
+          <p className="text-sm text-txt-secondary">Belum ada data review.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const { data: session } = useSession();
   const userRole = session?.user?.role || "";
@@ -118,6 +364,7 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<StatsItem[]>([]);
   const [recentArticles, setRecentArticles] = useState<Article[]>([]);
+  const [allArticles, setAllArticles] = useState<Article[]>([]);
 
   const fetchData = useCallback(async () => {
       if (!session?.user) return;
@@ -138,12 +385,12 @@ export default function DashboardPage() {
 
         const results = await Promise.all(fetches);
 
-        let allArticles: Article[] = [];
+        let fetchedArticles: Article[] = [];
         let reportsPending = 0;
 
         if (results[0].ok) {
           const articlesJson = await results[0].json();
-          allArticles = articlesJson.data?.articles || [];
+          fetchedArticles = articlesJson.data?.articles || [];
         }
 
         if (!isCreator && results[1]?.ok) {
@@ -154,13 +401,16 @@ export default function DashboardPage() {
           ).length;
         }
 
+        // Store all articles for analytics
+        setAllArticles(fetchedArticles);
+
         // Build stats based on role
         if (isCreator) {
           // Creator stats: my articles, my drafts, pending review, published
-          const myTotal = allArticles.length;
-          const myDrafts = allArticles.filter((a) => a.status === "DRAFT").length;
-          const myPendingReview = allArticles.filter((a) => a.status === "IN_REVIEW").length;
-          const myPublished = allArticles.filter((a) => a.status === "PUBLISHED").length;
+          const myTotal = fetchedArticles.length;
+          const myDrafts = fetchedArticles.filter((a) => a.status === "DRAFT").length;
+          const myPendingReview = fetchedArticles.filter((a) => a.status === "IN_REVIEW").length;
+          const myPublished = fetchedArticles.filter((a) => a.status === "PUBLISHED").length;
 
           setStats([
             { label: "Artikel Saya", value: formatNumber(myTotal), icon: FileText, color: "text-blue-500 bg-blue-50" },
@@ -170,19 +420,19 @@ export default function DashboardPage() {
           ]);
 
           // Recent: my articles sorted by createdAt
-          const sorted = [...allArticles].sort(
+          const sorted = [...fetchedArticles].sort(
             (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
           setRecentArticles(sorted.slice(0, 5));
         } else if (isEditorRole) {
           // Editor stats: review queue, approved today, rejected, total
-          const reviewQueue = allArticles.filter((a) => a.status === "IN_REVIEW").length;
+          const reviewQueue = fetchedArticles.filter((a) => a.status === "IN_REVIEW").length;
           const today = new Date().toDateString();
-          const approvedToday = allArticles.filter(
+          const approvedToday = fetchedArticles.filter(
             (a) => a.status === "APPROVED" || (a.status === "PUBLISHED" && a.publishedAt && new Date(a.publishedAt).toDateString() === today)
           ).length;
-          const rejected = allArticles.filter((a) => a.status === "REJECTED").length;
-          const totalArticles = allArticles.length;
+          const rejected = fetchedArticles.filter((a) => a.status === "REJECTED").length;
+          const totalArticles = fetchedArticles.length;
 
           setStats([
             { label: "Antrean Review", value: reviewQueue.toString(), icon: Clock, color: "text-yellow-500 bg-yellow-50" },
@@ -192,7 +442,7 @@ export default function DashboardPage() {
           ]);
 
           // Recent: IN_REVIEW first, then by createdAt
-          const sorted = [...allArticles].sort((a, b) => {
+          const sorted = [...fetchedArticles].sort((a, b) => {
             if (a.status === "IN_REVIEW" && b.status !== "IN_REVIEW") return -1;
             if (a.status !== "IN_REVIEW" && b.status === "IN_REVIEW") return 1;
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -200,12 +450,13 @@ export default function DashboardPage() {
           setRecentArticles(sorted.slice(0, 5));
         } else {
           // Admin (SUPER_ADMIN): full stats
-          const totalArticles = allArticles.length;
-          const totalViews = allArticles.reduce((sum, a) => sum + (a.viewCount || 0), 0);
-          const pendingReview = allArticles.filter((a) => a.status === "IN_REVIEW").length;
-          const published = allArticles.filter((a) => a.status === "PUBLISHED").length;
+          const totalArticles = fetchedArticles.length;
+          const totalViews = fetchedArticles.reduce((sum, a) => sum + (a.viewCount || 0), 0);
+          const pendingReview = fetchedArticles.filter((a) => a.status === "IN_REVIEW").length;
+          const published = fetchedArticles.filter((a) => a.status === "PUBLISHED").length;
+          const scheduled = fetchedArticles.filter((a) => a.scheduledAt && a.status === "APPROVED").length;
           const today = new Date().toDateString();
-          const todayViews = allArticles
+          const todayViews = fetchedArticles
             .filter((a) => a.publishedAt && new Date(a.publishedAt).toDateString() === today)
             .reduce((sum, a) => sum + (a.viewCount || 0), 0);
 
@@ -214,11 +465,12 @@ export default function DashboardPage() {
             { label: "Total Tayangan", value: formatNumber(totalViews), icon: Eye, color: "text-goto-green bg-goto-light" },
             { label: "Menunggu Review", value: pendingReview.toString(), icon: Clock, color: "text-yellow-500 bg-yellow-50" },
             { label: "Dipublikasi", value: formatNumber(published), icon: CheckCircle, color: "text-goto-green bg-goto-light" },
+            { label: "Dijadwalkan", value: scheduled.toString(), icon: CalendarClock, color: "text-blue-500 bg-blue-50" },
             { label: "Laporan Masuk", value: reportsPending.toString(), icon: AlertTriangle, color: "text-red-500 bg-red-50" },
             { label: "Tayangan Hari Ini", value: formatNumber(todayViews), icon: TrendingUp, color: "text-purple-500 bg-purple-50" },
           ]);
 
-          const sorted = [...allArticles].sort(
+          const sorted = [...fetchedArticles].sort(
             (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
           setRecentArticles(sorted.slice(0, 5));
@@ -289,7 +541,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats grid */}
-      <div className={`mb-8 grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4 sm:grid-cols-3 ${isAdmin ? "md:grid-cols-4 lg:grid-cols-6" : "md:grid-cols-4"}`}>
+      <div className={`mb-8 grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4 sm:grid-cols-3 ${isAdmin ? "md:grid-cols-4 lg:grid-cols-7" : "md:grid-cols-4"}`}>
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
@@ -436,6 +688,14 @@ export default function DashboardPage() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Analytics Section */}
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <WeeklyArticleTrend articles={allArticles} />
+        <TopArticlesByViews articles={allArticles} />
+        <CategoryPerformance articles={allArticles} />
+        <AverageReviewTime articles={allArticles} />
       </div>
 
       {/* Editorial checklist reminder */}
