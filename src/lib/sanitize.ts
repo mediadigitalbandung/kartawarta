@@ -1,8 +1,5 @@
 // Input sanitization utilities
 
-import DOMPurify from "isomorphic-dompurify";
-
-// Configure DOMPurify to allow safe HTML tags for article content
 const ALLOWED_TAGS = [
   "h1", "h2", "h3", "h4", "h5", "h6",
   "p", "br", "hr",
@@ -24,7 +21,8 @@ const ALLOWED_ATTR = [
   "start", "type",
 ];
 
-export function sanitizeHtml(html: string): string {
+export async function sanitizeHtml(html: string): Promise<string> {
+  const DOMPurify = (await import("isomorphic-dompurify")).default;
   return DOMPurify.sanitize(html, {
     ALLOWED_TAGS,
     ALLOWED_ATTR,
