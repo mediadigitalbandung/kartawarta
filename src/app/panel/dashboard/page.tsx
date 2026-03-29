@@ -123,71 +123,86 @@ function StatusDonutChart({ articles }: { articles: Article[] }) {
     articles.forEach((a) => {
       counts[a.status] = (counts[a.status] || 0) + 1;
     });
-    const colors: Record<string, string> = {
-      PUBLISHED: "#00AA13",
-      IN_REVIEW: "#EAB308",
-      DRAFT: "#9CA3AF",
-      APPROVED: "#3B82F6",
-      REJECTED: "#EF4444",
-      ARCHIVED: "#6B7280",
+    const colors: Record<string, { stroke: string; bg: string; text: string }> = {
+      PUBLISHED: { stroke: "#00AA13", bg: "bg-goto-light", text: "text-goto-green" },
+      IN_REVIEW: { stroke: "#EAB308", bg: "bg-yellow-50", text: "text-yellow-600" },
+      DRAFT: { stroke: "#9CA3AF", bg: "bg-surface-tertiary", text: "text-txt-secondary" },
+      APPROVED: { stroke: "#3B82F6", bg: "bg-blue-50", text: "text-blue-600" },
+      REJECTED: { stroke: "#EF4444", bg: "bg-red-50", text: "text-red-600" },
+      ARCHIVED: { stroke: "#6B7280", bg: "bg-surface-tertiary", text: "text-txt-muted" },
     };
     return Object.entries(counts)
-      .map(([status, count]) => ({ status, count, color: colors[status] || "#9CA3AF" }))
+      .map(([status, count]) => ({ status, count, ...(colors[status] || colors.DRAFT) }))
       .sort((a, b) => b.count - a.count);
   }, [articles]);
 
   const total = articles.length;
   if (total === 0) return null;
 
-  // SVG donut
-  const radius = 60;
+  const radius = 52;
   const circumference = 2 * Math.PI * radius;
   let offset = 0;
 
   return (
-    <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
-      <div className="border-b border-border bg-surface-secondary px-5 py-4">
-        <h2 className="flex items-center gap-2 font-semibold text-txt-primary">
-          <Layers size={18} className="text-purple-500" />
-          Distribusi Status Artikel
+    <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
+      <div className="border-b border-border px-6 py-5">
+        <h2 className="flex items-center gap-2.5 text-base font-bold text-txt-primary">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-50">
+            <Layers size={16} className="text-purple-500" />
+          </div>
+          Distribusi Status
         </h2>
       </div>
-      <div className="p-5 flex items-center gap-6">
-        <div className="relative shrink-0">
-          <svg width="150" height="150" viewBox="0 0 150 150">
+      <div className="p-6">
+        <div className="flex items-center gap-8">
+          <div className="relative shrink-0">
+            <svg width="130" height="130" viewBox="0 0 130 130">
+              <circle cx="65" cy="65" r={radius} fill="none" stroke="#F0F1F3" strokeWidth="14" />
+              {data.map((d) => {
+                const pct = d.count / total;
+                const dash = pct * circumference;
+                const off = -offset * circumference;
+                offset += pct;
+                return (
+                  <circle
+                    key={d.status}
+                    cx="65" cy="65" r={radius}
+                    fill="none"
+                    stroke={d.stroke}
+                    strokeWidth="14"
+                    strokeLinecap="round"
+                    strokeDasharray={`${dash} ${circumference - dash}`}
+                    strokeDashoffset={off}
+                    className="transition-all duration-700"
+                  />
+                );
+              })}
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-2xl font-extrabold text-txt-primary">{total}</span>
+              <span className="text-xs text-txt-muted">Artikel</span>
+            </div>
+          </div>
+          <div className="flex-1 space-y-3">
             {data.map((d) => {
-              const pct = d.count / total;
-              const dashArray = pct * circumference;
-              const dashOffset = -offset * circumference;
-              offset += pct;
+              const pct = ((d.count / total) * 100).toFixed(0);
               return (
-                <circle
-                  key={d.status}
-                  cx="75" cy="75" r={radius}
-                  fill="none"
-                  stroke={d.color}
-                  strokeWidth="20"
-                  strokeDasharray={`${dashArray} ${circumference - dashArray}`}
-                  strokeDashoffset={dashOffset}
-                  className="transition-all duration-500"
-                />
+                <div key={d.status} className="group">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2.5">
+                      <span className={`inline-flex h-7 items-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold ${d.bg} ${d.text}`}>
+                        {statusLabels[d.status] || d.status}
+                      </span>
+                    </div>
+                    <span className="text-sm font-bold text-txt-primary">{d.count} <span className="text-xs font-normal text-txt-muted">({pct}%)</span></span>
+                  </div>
+                  <div className="h-1.5 w-full rounded-full bg-surface-tertiary overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, backgroundColor: d.stroke }} />
+                  </div>
+                </div>
               );
             })}
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-2xl font-extrabold text-txt-primary">{total}</span>
-            <span className="text-[10px] text-txt-muted">Total</span>
           </div>
-        </div>
-        <div className="flex-1 space-y-2">
-          {data.map((d) => (
-            <div key={d.status} className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
-              <span className="text-xs text-txt-secondary flex-1">{statusLabels[d.status] || d.status}</span>
-              <span className="text-xs font-bold text-txt-primary">{d.count}</span>
-              <span className="text-[10px] text-txt-muted w-10 text-right">{((d.count / total) * 100).toFixed(0)}%</span>
-            </div>
-          ))}
         </div>
       </div>
     </div>
@@ -231,37 +246,57 @@ function ViewsSparkline({ articles }: { articles: Article[] }) {
   const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
   const areaPath = `${linePath} L ${width} ${height} L 0 ${height} Z`;
 
+  const todayViews = data[data.length - 1]?.views || 0;
+  const yesterdayViews = data[data.length - 2]?.views || 0;
+  const change = yesterdayViews > 0 ? ((todayViews - yesterdayViews) / yesterdayViews) * 100 : 0;
+
   return (
-    <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
-      <div className="border-b border-border bg-surface-secondary px-5 py-4">
-        <h2 className="flex items-center gap-2 font-semibold text-txt-primary">
-          <TrendingUp size={18} className="text-goto-green" />
-          Tren Tayangan (14 Hari)
+    <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
+      <div className="border-b border-border px-6 py-5">
+        <h2 className="flex items-center gap-2.5 text-base font-bold text-txt-primary">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-goto-light">
+            <TrendingUp size={16} className="text-goto-green" />
+          </div>
+          Tren Tayangan
         </h2>
       </div>
-      <div className="p-5">
-        <div className="flex items-baseline gap-2 mb-4">
-          <span className="text-3xl font-extrabold text-txt-primary">{formatNumber(totalViews)}</span>
-          <span className="text-xs text-txt-muted">total tayangan</span>
+      <div className="p-6">
+        {/* Stats row */}
+        <div className="flex items-end justify-between mb-6">
+          <div>
+            <p className="text-sm text-txt-muted mb-1">Total Tayangan</p>
+            <p className="text-3xl font-extrabold text-txt-primary">{formatNumber(totalViews)}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-txt-muted mb-1">Hari Ini</p>
+            <p className="text-xl font-bold text-txt-primary">{formatNumber(todayViews)}</p>
+            {change !== 0 && (
+              <p className={`text-xs font-semibold ${change > 0 ? "text-goto-green" : "text-red-500"}`}>
+                {change > 0 ? "+" : ""}{change.toFixed(0)}% dari kemarin
+              </p>
+            )}
+          </div>
         </div>
-        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-20" preserveAspectRatio="none">
+        {/* Chart */}
+        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-24" preserveAspectRatio="none">
           <defs>
             <linearGradient id="viewsGradient" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" stopColor="#00AA13" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#00AA13" stopOpacity="0.02" />
+              <stop offset="0%" stopColor="#00AA13" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="#00AA13" stopOpacity="0" />
             </linearGradient>
           </defs>
           <path d={areaPath} fill="url(#viewsGradient)" />
-          <path d={linePath} fill="none" stroke="#00AA13" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d={linePath} fill="none" stroke="#00AA13" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           {points.map((p, i) => (
-            <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="#00AA13" className="opacity-0 hover:opacity-100 transition-opacity">
-              <title>{data[i].label}: {data[i].views} views</title>
+            <circle key={i} cx={p.x} cy={p.y} r="3" fill="#fff" stroke="#00AA13" strokeWidth="2">
+              <title>{data[i].label}: {formatNumber(data[i].views)} tayangan</title>
             </circle>
           ))}
         </svg>
-        <div className="flex justify-between mt-1">
-          <span className="text-[10px] text-txt-muted">{data[0].label}</span>
-          <span className="text-[10px] text-txt-muted">{data[data.length - 1].label}</span>
+        <div className="flex justify-between mt-2">
+          <span className="text-xs text-txt-muted">{data[0].label}</span>
+          <span className="text-xs text-txt-secondary font-medium">14 hari terakhir</span>
+          <span className="text-xs text-txt-muted">{data[data.length - 1].label}</span>
         </div>
       </div>
     </div>
@@ -284,48 +319,63 @@ function PublicationRate({ articles }: { articles: Article[] }) {
   const inReview = articles.filter((a) => a.status === "IN_REVIEW").length;
   const draft = articles.filter((a) => a.status === "DRAFT").length;
 
+  const breakdownData = [
+    { label: "Dipublikasi", value: published, color: "bg-goto-green", textColor: "text-goto-green" },
+    { label: "Menunggu Review", value: inReview, color: "bg-yellow-500", textColor: "text-yellow-600" },
+    { label: "Draf", value: draft, color: "bg-gray-400", textColor: "text-txt-secondary" },
+    { label: "Ditolak", value: rejected, color: "bg-red-500", textColor: "text-red-500" },
+  ];
+
   return (
-    <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
-      <div className="border-b border-border bg-surface-secondary px-5 py-4">
-        <h2 className="flex items-center gap-2 font-semibold text-txt-primary">
-          <CheckCircle size={18} className="text-goto-green" />
+    <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
+      <div className="border-b border-border px-6 py-5">
+        <h2 className="flex items-center gap-2.5 text-base font-bold text-txt-primary">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-goto-light">
+            <CheckCircle size={16} className="text-goto-green" />
+          </div>
           Tingkat Publikasi
         </h2>
       </div>
-      <div className="p-5 flex items-center gap-6">
-        <div className="relative shrink-0">
-          <svg width="110" height="110" viewBox="0 0 110 110">
-            <circle cx="55" cy="55" r={radius} fill="none" stroke="#F0F1F3" strokeWidth="10" />
-            <circle
-              cx="55" cy="55" r={radius}
-              fill="none" stroke="#00AA13" strokeWidth="10"
-              strokeDasharray={`${dashArray} ${circumference - dashArray}`}
-              strokeDashoffset={circumference * 0.25}
-              strokeLinecap="round"
-              className="transition-all duration-700"
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-xl font-extrabold text-goto-green">{rate.toFixed(0)}%</span>
+      <div className="p-6">
+        {/* Big rate display */}
+        <div className="flex items-center gap-6 mb-6">
+          <div className="relative shrink-0">
+            <svg width="100" height="100" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r={radius} fill="none" stroke="#F0F1F3" strokeWidth="8" />
+              <circle
+                cx="50" cy="50" r={radius}
+                fill="none" stroke="#00AA13" strokeWidth="8"
+                strokeDasharray={`${dashArray} ${circumference - dashArray}`}
+                strokeDashoffset={circumference * 0.25}
+                strokeLinecap="round"
+                className="transition-all duration-700"
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-2xl font-extrabold text-goto-green">{rate.toFixed(0)}%</span>
+            </div>
+          </div>
+          <div>
+            <p className="text-sm text-txt-muted">Dari total {total} artikel</p>
+            <p className="text-lg font-bold text-txt-primary">{published} berhasil dipublikasi</p>
           </div>
         </div>
-        <div className="flex-1 space-y-3">
-          <div className="flex justify-between text-sm">
-            <span className="text-txt-secondary">Dipublikasi</span>
-            <span className="font-bold text-goto-green">{published}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-txt-secondary">Menunggu Review</span>
-            <span className="font-bold text-yellow-500">{inReview}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-txt-secondary">Draf</span>
-            <span className="font-bold text-txt-muted">{draft}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-txt-secondary">Ditolak</span>
-            <span className="font-bold text-red-500">{rejected}</span>
-          </div>
+        {/* Breakdown bars */}
+        <div className="space-y-3">
+          {breakdownData.map((item) => (
+            <div key={item.label}>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-sm text-txt-secondary">{item.label}</span>
+                <span className={`text-sm font-bold ${item.textColor}`}>{item.value}</span>
+              </div>
+              <div className="h-2 w-full rounded-full bg-surface-tertiary overflow-hidden">
+                <div
+                  className={`h-full rounded-full ${item.color} transition-all duration-500`}
+                  style={{ width: total > 0 ? `${(item.value / total) * 100}%` : "0%" }}
+                />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -355,29 +405,38 @@ function WeeklyArticleTrend({ articles }: { articles: Article[] }) {
 
   const maxCount = Math.max(...weekData.map((d) => d.count), 1);
 
+  const totalWeek = weekData.reduce((s, d) => s + d.count, 0);
+
   return (
-    <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
-      <div className="border-b border-border bg-surface-secondary px-5 py-4">
-        <h2 className="flex items-center gap-2 font-semibold text-txt-primary">
-          <BarChart3 size={18} className="text-goto-green" />
-          Tren Artikel Mingguan
+    <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
+      <div className="border-b border-border px-6 py-5 flex items-center justify-between">
+        <h2 className="flex items-center gap-2.5 text-base font-bold text-txt-primary">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
+            <BarChart3 size={16} className="text-blue-500" />
+          </div>
+          Aktivitas Mingguan
         </h2>
+        <span className="text-sm text-txt-muted">{totalWeek} artikel</span>
       </div>
-      <div className="p-5 space-y-2.5">
+      <div className="p-6 space-y-3">
         {weekData.map((day, i) => (
-          <div key={i} className="flex items-center gap-3">
-            <span className="w-16 text-xs text-txt-secondary text-right shrink-0">
+          <div key={i} className="flex items-center gap-4">
+            <span className="w-20 text-sm text-txt-secondary text-right shrink-0 font-medium">
               {day.label}
             </span>
-            <div className="flex-1 h-6 bg-surface-secondary rounded-[6px] overflow-hidden">
+            <div className="flex-1 h-7 bg-surface-secondary rounded-lg overflow-hidden">
               <div
-                className="h-full bg-goto-green rounded-[6px] transition-all duration-500"
-                style={{ width: `${(day.count / maxCount) * 100}%`, minWidth: day.count > 0 ? "8px" : "0px" }}
-              />
+                className="h-full bg-gradient-to-r from-goto-green to-goto-dark rounded-lg transition-all duration-500 flex items-center justify-end pr-2"
+                style={{ width: `${(day.count / maxCount) * 100}%`, minWidth: day.count > 0 ? "32px" : "0px" }}
+              >
+                {day.count > 0 && (
+                  <span className="text-xs font-bold text-white">{day.count}</span>
+                )}
+              </div>
             </div>
-            <span className="w-8 text-xs font-bold text-txt-primary text-right">
-              {day.count}
-            </span>
+            {day.count === 0 && (
+              <span className="w-6 text-sm text-txt-muted text-right">0</span>
+            )}
           </div>
         ))}
       </div>
