@@ -38,7 +38,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 
 export default function Sidebar({ trending = [], recent = [], popular = [] }: SidebarProps) {
   return (
-    <aside className="space-y-8">
+    <aside className="space-y-8" aria-label="Sidebar artikel">
       {/* Trending */}
       {trending.length > 0 && (
         <div>

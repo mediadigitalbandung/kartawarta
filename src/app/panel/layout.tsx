@@ -24,6 +24,10 @@ import {
   LogOut,
   MessageCircle,
   ImageIcon,
+  XCircle,
+  CheckCircle,
+  AlertCircle,
+  Clock,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
@@ -65,10 +69,47 @@ const menuItems: MenuItem[] = [
   { name: "Profil", href: "/panel/profil", icon: UserCircle },
 ];
 
+type NotifType = "rejected" | "review" | "comment" | "approved";
+
 interface NotificationItem {
+  id: string;
+  type: NotifType;
   label: string;
+  message: string;
   count: number;
   href: string;
+  time: string;
+  read: boolean;
+}
+
+const NOTIF_ICON_MAP: Record<NotifType, { icon: React.ElementType; bg: string; color: string }> = {
+  rejected: { icon: XCircle, bg: "bg-red-50", color: "text-red-500" },
+  review: { icon: ClipboardCheck, bg: "bg-yellow-50", color: "text-yellow-500" },
+  comment: { icon: MessageCircle, bg: "bg-blue-50", color: "text-blue-500" },
+  approved: { icon: CheckCircle, bg: "bg-green-50", color: "text-goto-green" },
+};
+
+function getReadNotifIds(userId: string): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(`notif_read_${userId}`);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function setReadNotifIds(userId: string, ids: string[]) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(`notif_read_${userId}`, JSON.stringify(ids));
+  } catch {
+    // localStorage not available
+  }
+}
+
+function timeAgoShort(): string {
+  return "Baru saja";
 }
 
 export default function PanelLayout({ children }: { children: React.ReactNode }) {
@@ -81,6 +122,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   const notifRef = useRef<HTMLDivElement>(null);
 
   const userRole = session?.user?.role || "";
+  const userId = session?.user?.id || "";
   const isAdmin = userRole === "SUPER_ADMIN";
   const isEditor = EDITOR_ROLES.includes(userRole);
   const isCreator = CREATOR_ROLES.includes(userRole);
@@ -89,6 +131,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
     if (!session?.user) return;
     try {
       const items: NotificationItem[] = [];
+      const readIds = getReadNotifIds(userId);
 
       if (isCreator) {
         // Count rejected articles for this creator
@@ -97,10 +140,36 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           const json = await res.json();
           const count = json.data?.pagination?.total || 0;
           if (count > 0) {
+            const id = `rejected_${count}`;
             items.push({
-              label: `${count} artikel ditolak`,
+              id,
+              type: "rejected",
+              label: "Artikel Ditolak",
+              message: `${count} artikel Anda ditolak oleh editor`,
               count,
               href: "/panel/artikel",
+              time: timeAgoShort(),
+              read: readIds.includes(id),
+            });
+          }
+        }
+
+        // Count approved articles for this creator
+        const resApproved = await fetch(`/api/articles?status=APPROVED&authorId=${session.user.id}&limit=100`);
+        if (resApproved.ok) {
+          const json = await resApproved.json();
+          const count = json.data?.pagination?.total || 0;
+          if (count > 0) {
+            const id = `approved_${count}`;
+            items.push({
+              id,
+              type: "approved",
+              label: "Artikel Disetujui",
+              message: `${count} artikel Anda telah disetujui`,
+              count,
+              href: "/panel/artikel",
+              time: timeAgoShort(),
+              read: readIds.includes(id),
             });
           }
         }
@@ -113,10 +182,16 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           const json = await res.json();
           const count = json.data?.pagination?.total || 0;
           if (count > 0) {
+            const id = `review_${count}`;
             items.push({
-              label: `${count} artikel menunggu review`,
+              id,
+              type: "review",
+              label: "Artikel Baru untuk Review",
+              message: `${count} artikel menunggu review Anda`,
               count,
               href: "/panel/artikel",
+              time: timeAgoShort(),
+              read: readIds.includes(id),
             });
           }
         }
@@ -129,10 +204,16 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           const json = await res.json();
           const count = json.data?.pagination?.total || json.data?.reports?.length || 0;
           if (count > 0) {
+            const id = `report_${count}`;
             items.push({
-              label: `${count} laporan menunggu`,
+              id,
+              type: "comment",
+              label: "Komentar Baru",
+              message: `${count} laporan menunggu ditinjau`,
               count,
               href: "/panel/laporan",
+              time: timeAgoShort(),
+              read: readIds.includes(id),
             });
           }
         }
@@ -142,7 +223,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
     } catch {
       // Silently fail — notifications are non-critical
     }
-  }, [session?.user, isCreator, isEditor, isAdmin]);
+  }, [session?.user, userId, isCreator, isEditor, isAdmin]);
 
   useEffect(() => {
     fetchNotifications();
@@ -184,7 +265,25 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
     return null;
   }
 
+  const unreadCount = notifications.filter((n) => !n.read).length;
   const totalNotifCount = notifications.reduce((sum, n) => sum + n.count, 0);
+
+  const markAllRead = () => {
+    const allIds = notifications.map((n) => n.id);
+    setReadNotifIds(userId, allIds);
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  };
+
+  const markOneRead = (id: string) => {
+    const readIds = getReadNotifIds(userId);
+    if (!readIds.includes(id)) {
+      const updated = [...readIds, id];
+      setReadNotifIds(userId, updated);
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+      );
+    }
+  };
 
   const filteredMenu = menuItems.filter((item) => {
     if (item.adminOnly && !isAdmin) return false;
@@ -312,38 +411,72 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
                 aria-label="Notifikasi"
               >
                 <Bell size={20} />
-                {totalNotifCount > 0 && (
+                {unreadCount > 0 && (
                   <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
-                    {totalNotifCount > 99 ? "99+" : totalNotifCount}
+                    {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 )}
               </button>
 
               {/* Notification dropdown */}
               {notifOpen && (
-                <div className="absolute right-0 top-full mt-2 w-72 overflow-hidden rounded-[12px] border border-border bg-surface shadow-lg">
-                  <div className="border-b border-border px-4 py-3">
+                <div className="absolute right-0 top-full mt-2 w-80 overflow-hidden rounded-[12px] border border-border bg-surface shadow-lg">
+                  {/* Header */}
+                  <div className="border-b border-border px-4 py-3 flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-txt-primary">Notifikasi</h3>
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={markAllRead}
+                        className="text-xs font-medium text-goto-green hover:text-goto-dark transition-colors"
+                      >
+                        Tandai semua dibaca
+                      </button>
+                    )}
                   </div>
+
+                  {/* Notification list */}
                   {notifications.length === 0 ? (
-                    <div className="px-4 py-6 text-center text-sm text-txt-muted">
-                      Tidak ada notifikasi baru
+                    <div className="px-4 py-8 text-center">
+                      <Bell size={32} className="mx-auto text-border mb-2" />
+                      <p className="text-sm text-txt-muted">Tidak ada notifikasi baru</p>
                     </div>
                   ) : (
-                    <div className="max-h-64 overflow-y-auto">
-                      {notifications.map((notif, i) => (
-                        <Link
-                          key={i}
-                          href={notif.href}
-                          onClick={() => setNotifOpen(false)}
-                          className="flex items-center gap-3 px-4 py-3 hover:bg-surface-secondary transition-colors"
-                        >
-                          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-red-500/10">
-                            <span className="text-xs font-bold text-red-400">{notif.count}</span>
-                          </div>
-                          <p className="text-sm text-txt-primary">{notif.label}</p>
-                        </Link>
-                      ))}
+                    <div className="max-h-80 overflow-y-auto">
+                      {notifications.map((notif) => {
+                        const config = NOTIF_ICON_MAP[notif.type];
+                        const Icon = config.icon;
+                        return (
+                          <Link
+                            key={notif.id}
+                            href={notif.href}
+                            onClick={() => {
+                              markOneRead(notif.id);
+                              setNotifOpen(false);
+                            }}
+                            className={cn(
+                              "flex items-start gap-3 px-4 py-3 hover:bg-surface-secondary transition-colors border-b border-border last:border-b-0",
+                              !notif.read && "bg-goto-50/50"
+                            )}
+                          >
+                            <div className={cn("flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full", config.bg)}>
+                              <Icon size={16} className={config.color} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm font-semibold text-txt-primary truncate">{notif.label}</p>
+                                {!notif.read && (
+                                  <span className="h-2 w-2 rounded-full bg-goto-green flex-shrink-0" />
+                                )}
+                              </div>
+                              <p className="text-xs text-txt-secondary mt-0.5">{notif.message}</p>
+                              <div className="flex items-center gap-1 mt-1">
+                                <Clock size={10} className="text-txt-muted" />
+                                <span className="text-[10px] text-txt-muted">{notif.time}</span>
+                              </div>
+                            </div>
+                          </Link>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -354,7 +487,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           {/* Warning: login attempt from another device */}
           {!!((session as unknown as Record<string, boolean>)?.loginAttempt) && (
             <div className="mx-4 mt-4 sm:mx-6 rounded-[12px] bg-yellow-50 border border-yellow-200 px-4 py-3 flex items-start gap-3">
-              <span className="text-yellow-600 mt-0.5">⚠️</span>
+              <AlertCircle size={18} className="text-yellow-600 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-sm font-semibold text-yellow-800">Percobaan login dari perangkat lain</p>
                 <p className="text-xs text-yellow-600 mt-0.5">Seseorang mencoba masuk ke akun Anda dari perangkat lain. Jika bukan Anda, segera ubah password.</p>

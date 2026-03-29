@@ -72,7 +72,7 @@ export default function Header() {
   return (
     <>
       {/* Row 1: Top bar — sticky dark header */}
-      <header className="sticky top-0 z-50 bg-surface-dark">
+      <header className="sticky top-0 z-50 bg-surface-dark" role="banner" aria-label="Header utama">
         <div className="container-main">
           {/* Row 1: Logo + date + actions */}
           <div className="flex items-center justify-between py-3">
@@ -97,15 +97,17 @@ export default function Header() {
             </span>
             <div className="hidden h-5 w-px bg-white/20 md:block" />
             {/* Search — hidden on mobile, shown inline on md+ */}
-            <form action="/search" className="relative hidden md:block md:w-64 lg:w-80">
+            <form action="/search" className="relative hidden md:block md:w-64 lg:w-80" role="search" aria-label="Pencarian artikel">
               <Search
                 size={16}
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-txt-muted"
+                aria-hidden="true"
               />
               <input
                 type="text"
                 name="q"
                 placeholder="Cari di sini..."
+                aria-label="Cari artikel"
                 className="w-full rounded-full border border-border bg-white py-2 pl-10 pr-4 text-sm text-txt-primary placeholder:text-txt-muted transition-all focus:border-goto-green focus:outline-none focus:ring-2 focus:ring-goto-green/20"
               />
             </form>
@@ -126,6 +128,8 @@ export default function Header() {
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                     className="flex h-10 w-10 items-center justify-center rounded-full bg-goto-green text-xs font-bold text-white transition-opacity hover:opacity-90"
+                    aria-label="Menu pengguna"
+                    aria-expanded={userMenuOpen}
                   >
                     {session.user?.name?.charAt(0)?.toUpperCase() || "U"}
                   </button>
@@ -177,15 +181,17 @@ export default function Header() {
           </div>
           {/* Mobile search bar — smooth hide on scroll */}
           <div className={`overflow-hidden md:hidden transition-all duration-500 ease-in-out ${scrolled || mobileMenuOpen ? "max-h-0 pb-0 opacity-0 -translate-y-2" : "max-h-14 pb-3 opacity-100 translate-y-0"}`}>
-            <form action="/search" className="relative">
+            <form action="/search" className="relative" role="search" aria-label="Pencarian artikel (mobile)">
               <Search
                 size={16}
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-txt-muted"
+                aria-hidden="true"
               />
               <input
                 type="text"
                 name="q"
                 placeholder="Cari di sini..."
+                aria-label="Cari artikel"
                 className="w-full rounded-full border border-border bg-white py-2 pl-10 pr-4 text-sm text-txt-primary placeholder:text-txt-muted transition-all focus:border-goto-green focus:outline-none focus:ring-2 focus:ring-goto-green/20"
               />
             </form>
@@ -194,7 +200,7 @@ export default function Header() {
       </header>
 
       {/* Row 2: Category navigation — prominent white bar */}
-      <nav className="bg-surface border-b border-border relative">
+      <nav className="bg-surface border-b border-border relative" aria-label="Navigasi kategori">
         <div className="container-main">
           <ul className="flex items-center gap-1 overflow-x-auto scrollbar-hide lg:justify-between lg:gap-0">
             {categoryNavMain.map((item) => {
@@ -219,6 +225,8 @@ export default function Header() {
               <button
                 onClick={() => setMoreOpen(!moreOpen)}
                 className="inline-flex items-center gap-1 px-3 py-2.5 text-sm sm:text-base font-semibold text-txt-secondary hover:text-goto-green transition-colors whitespace-nowrap"
+                aria-label="Kategori lainnya"
+                aria-expanded={moreOpen}
               >
                 Lainnya
                 <ChevronRight size={14} className={`transition-transform duration-200 ${moreOpen ? "rotate-90" : ""}`} />
@@ -271,6 +279,7 @@ export default function Header() {
             <button
               onClick={() => setMobileMenuOpen(false)}
               className="rounded p-1.5 text-txt-secondary transition-colors hover:bg-surface-secondary hover:text-txt-primary"
+              aria-label="Tutup menu"
             >
               <X size={20} />
             </button>

@@ -44,11 +44,17 @@ export default function RootLayout({
     <html lang="id">
       <body className="flex min-h-screen flex-col font-sans bg-surface text-txt-primary">
         <Providers>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-[200] focus:bg-goto-green focus:text-white focus:px-4 focus:py-2 focus:text-sm"
+          >
+            Langsung ke konten
+          </a>
           <Suspense fallback={null}>
             <TopLoader />
           </Suspense>
           <PublicNav />
-          <main className="flex-1">{children}</main>
+          <main id="main-content" className="flex-1">{children}</main>
           <PublicFooter />
         </Providers>
       </body>

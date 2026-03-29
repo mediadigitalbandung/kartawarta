@@ -19,6 +19,9 @@ import {
   Layers,
   Timer,
   CalendarClock,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 interface Article {
@@ -346,6 +349,161 @@ function AverageReviewTime({ articles }: { articles: Article[] }) {
           </div>
         ) : (
           <p className="text-sm text-txt-secondary">Belum ada data review.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ArticleCalendar({ articles }: { articles: Article[] }) {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
+
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+
+  const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0=Sun
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const monthName = currentDate.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
+
+  // Map: day number -> articles for that day
+  const dayArticles = useMemo(() => {
+    const map = new Map<number, Article[]>();
+    articles.forEach((a) => {
+      const dateStr = a.publishedAt || a.scheduledAt || a.createdAt;
+      if (!dateStr) return;
+      const d = new Date(dateStr);
+      if (d.getFullYear() === year && d.getMonth() === month) {
+        const day = d.getDate();
+        const arr = map.get(day) || [];
+        arr.push(a);
+        map.set(day, arr);
+      }
+    });
+    return map;
+  }, [articles, year, month]);
+
+  function prevMonth() {
+    setCurrentDate(new Date(year, month - 1, 1));
+    setSelectedDay(null);
+  }
+  function nextMonth() {
+    setCurrentDate(new Date(year, month + 1, 1));
+    setSelectedDay(null);
+  }
+
+  const dayNames = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+
+  const cells: (number | null)[] = [];
+  for (let i = 0; i < firstDayOfMonth; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+  const selectedArticles = selectedDay ? dayArticles.get(selectedDay) || [] : [];
+
+  return (
+    <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
+      <div className="border-b border-border bg-surface-secondary px-5 py-4 flex items-center justify-between">
+        <h2 className="flex items-center gap-2 font-semibold text-txt-primary">
+          <Calendar size={18} className="text-goto-green" />
+          Kalender Artikel
+        </h2>
+        <div className="flex items-center gap-2">
+          <button onClick={prevMonth} className="btn-ghost rounded p-1" aria-label="Bulan sebelumnya">
+            <ChevronLeft size={16} />
+          </button>
+          <span className="text-sm font-medium text-txt-primary min-w-[140px] text-center">{monthName}</span>
+          <button onClick={nextMonth} className="btn-ghost rounded p-1" aria-label="Bulan berikutnya">
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      </div>
+      <div className="p-4">
+        {/* Day headers */}
+        <div className="grid grid-cols-7 gap-1 mb-1">
+          {dayNames.map((dn) => (
+            <div key={dn} className="text-center text-[10px] font-semibold text-txt-muted uppercase tracking-wider py-1">
+              {dn}
+            </div>
+          ))}
+        </div>
+        {/* Calendar grid */}
+        <div className="grid grid-cols-7 gap-1">
+          {cells.map((day, i) => {
+            if (day === null) {
+              return <div key={`empty-${i}`} className="h-10" />;
+            }
+            const count = dayArticles.get(day)?.length || 0;
+            const isToday =
+              day === new Date().getDate() &&
+              month === new Date().getMonth() &&
+              year === new Date().getFullYear();
+            const isSelected = selectedDay === day;
+
+            return (
+              <button
+                key={day}
+                onClick={() => setSelectedDay(isSelected ? null : day)}
+                className={`relative flex flex-col items-center justify-center h-10 rounded-lg text-xs font-medium transition-colors ${
+                  isSelected
+                    ? "bg-goto-green text-white"
+                    : isToday
+                      ? "bg-goto-light text-goto-green font-bold"
+                      : count > 0
+                        ? "bg-surface-secondary text-txt-primary hover:bg-goto-light"
+                        : "text-txt-muted hover:bg-surface-secondary"
+                }`}
+                aria-label={`${day} ${monthName}${count > 0 ? `, ${count} artikel` : ""}`}
+              >
+                {day}
+                {count > 0 && (
+                  <span
+                    className={`absolute bottom-1 h-1 w-1 rounded-full ${
+                      isSelected ? "bg-white" : "bg-goto-green"
+                    }`}
+                  />
+                )}
+              </button>
+            );
+          })}
+        </div>
+        {/* Selected day articles */}
+        {selectedDay !== null && (
+          <div className="mt-4 border-t border-border pt-3">
+            <p className="text-xs font-semibold text-txt-secondary mb-2">
+              Artikel tanggal {selectedDay} {monthName}
+            </p>
+            {selectedArticles.length === 0 ? (
+              <p className="text-xs text-txt-muted">Tidak ada artikel pada tanggal ini.</p>
+            ) : (
+              <ul className="space-y-1.5">
+                {selectedArticles.map((a) => (
+                  <li key={a.id}>
+                    <Link
+                      href={`/panel/artikel/${a.id}/edit`}
+                      className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs hover:bg-surface-secondary transition-colors"
+                    >
+                      <span
+                        className={`inline-block h-2 w-2 rounded-full shrink-0 ${
+                          a.status === "PUBLISHED"
+                            ? "bg-goto-green"
+                            : a.status === "APPROVED"
+                              ? "bg-blue-500"
+                              : a.status === "IN_REVIEW"
+                                ? "bg-yellow-500"
+                                : "bg-surface-tertiary"
+                        }`}
+                      />
+                      <span className="truncate font-medium text-txt-primary">{a.title}</span>
+                      <span className="ml-auto shrink-0 text-[10px] text-txt-muted">
+                        {statusLabels[a.status] || a.status}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         )}
       </div>
     </div>
@@ -696,6 +854,7 @@ export default function DashboardPage() {
         <TopArticlesByViews articles={allArticles} />
         <CategoryPerformance articles={allArticles} />
         <AverageReviewTime articles={allArticles} />
+        <ArticleCalendar articles={allArticles} />
       </div>
 
       {/* Editorial checklist reminder */}

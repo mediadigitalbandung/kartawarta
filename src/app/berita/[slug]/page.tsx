@@ -4,15 +4,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { Metadata } from "next";
 import {
-  Calendar,
-  Clock,
-  Eye,
-  User,
-  Share2,
   Flag,
   CheckCircle,
 } from "lucide-react";
 import CopyProtection from "@/components/artikel/CopyProtection";
+import ReadingProgress from "@/components/artikel/ReadingProgress";
+import FontSizeControl from "@/components/artikel/FontSizeControl";
+import PrintButton from "@/components/artikel/PrintButton";
+import ShareBar from "@/components/artikel/ShareBar";
 import Sidebar from "@/components/layout/Sidebar";
 import ArticleCard from "@/components/artikel/ArticleCard";
 import BannerAd from "@/components/ads/BannerAd";
@@ -120,22 +119,10 @@ export default async function ArticlePage({ params }: { params: { slug: string }
   const articleUrl = `${appUrl}/berita/${params.slug}`;
   const sanitizedContent = article.content;
 
-  const shareLinks = {
-    WhatsApp: `https://wa.me/?text=${encodeURIComponent(article.title + " " + articleUrl)}`,
-    Twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(article.title)}&url=${encodeURIComponent(articleUrl)}`,
-    Facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}`,
-    Telegram: `https://t.me/share/url?url=${encodeURIComponent(articleUrl)}&text=${encodeURIComponent(article.title)}`,
-  };
-
-  const sharePlatformLetters: Record<string, string> = {
-    WhatsApp: "W",
-    Twitter: "X",
-    Facebook: "F",
-    Telegram: "T",
-  };
-
   return (
     <>
+      <ReadingProgress />
+      <FontSizeControl />
       <CopyProtection
         authorName={article.author.name}
         articleUrl={articleUrl}
@@ -163,7 +150,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
         <div className="container-main py-8 overflow-hidden">
           {/* Breadcrumb */}
-          <nav className="mb-6 flex items-center gap-2 text-sm text-txt-secondary">
+          <nav className="mb-6 flex items-center gap-2 text-sm text-txt-secondary" aria-label="Breadcrumb">
             <Link href="/" className="transition-colors hover:text-goto-green">Beranda</Link>
             <span>&gt;</span>
             <Link href={`/kategori/${article.category.slug}`} className="transition-colors hover:text-goto-green">
@@ -247,29 +234,10 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               </div>
 
               {/* Share bar + bookmark */}
-              <div className="mt-8 flex flex-wrap items-center gap-3 rounded-[12px] bg-surface-secondary p-3 sm:p-4">
-                <div className="flex items-center gap-2 text-txt-secondary">
-                  <Share2 size={14} />
-                  <span className="text-xs font-semibold uppercase tracking-wider">Bagikan</span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {(Object.entries(shareLinks) as [string, string][]).map(([platform, url]) => (
-                    <a
-                      key={platform}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-ghost rounded-full px-3 py-1.5 text-xs"
-                      title={platform}
-                    >
-                      <span className="mr-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-surface text-[10px] font-bold text-txt-primary border border-border">
-                        {sharePlatformLetters[platform]}
-                      </span>
-                      {platform}
-                    </a>
-                  ))}
-                </div>
-                <div className="ml-auto">
+              <div className="mt-8">
+                <ShareBar articleUrl={articleUrl} articleTitle={article.title} />
+                <div className="mt-3 flex items-center justify-end gap-2">
+                  <PrintButton />
                   <BookmarkButton slug={params.slug} />
                 </div>
               </div>
@@ -314,8 +282,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
               {/* Report button */}
               <div className="mt-8 border-t border-border pt-5">
-                <button className="btn-ghost text-xs text-txt-secondary hover:text-red-600">
-                  <Flag size={13} />
+                <button className="btn-ghost text-xs text-txt-secondary hover:text-red-600" aria-label="Laporkan berita ini">
+                  <Flag size={13} aria-hidden="true" />
                   Laporkan Berita Ini
                 </button>
               </div>

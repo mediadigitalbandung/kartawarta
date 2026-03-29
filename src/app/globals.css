@@ -16,6 +16,10 @@
     background-color: rgba(0, 170, 19, 0.15);
     color: #1C1C1E;
   }
+  /* Accessibility: focus-visible ring for all interactive elements */
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    @apply ring-2 ring-goto-green ring-offset-2 outline-none;
+  }
 }
 
 @layer components {
@@ -156,4 +160,18 @@
 @keyframes scrollX {
   0% { transform: translateX(100%); }
   100% { transform: translateX(-100%); }
+}
+
+/* Print-friendly styles */
+@media print {
+  header, footer, nav, .no-print, aside {
+    display: none !important;
+  }
+  .article-content {
+    font-size: 12pt !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
 }

@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect, useMemo, Suspense } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Search as SearchIcon, SlidersHorizontal, Clock, Calendar, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { Search as SearchIcon, SlidersHorizontal, Clock, Calendar, TrendingUp, ChevronLeft, ChevronRight, X, History } from "lucide-react";
 import ArticleCard from "@/components/artikel/ArticleCard";
 
 interface SearchResult {
@@ -18,8 +20,63 @@ interface SearchResult {
   verificationLabel: string;
 }
 
+interface SuggestItem {
+  title: string;
+  slug: string;
+}
+
 type SortBy = "terbaru" | "terlama" | "terpopuler";
 type TimeRange = "semua" | "minggu" | "bulan" | "tahun";
+
+const HISTORY_KEY = "search_history_jhb";
+const MAX_HISTORY = 5;
+
+function getSearchHistory(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function addSearchHistory(q: string) {
+  if (typeof window === "undefined" || !q.trim()) return;
+  try {
+    let history = getSearchHistory();
+    history = history.filter((h) => h.toLowerCase() !== q.toLowerCase());
+    history.unshift(q.trim());
+    if (history.length > MAX_HISTORY) history = history.slice(0, MAX_HISTORY);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  } catch {
+    // localStorage not available
+  }
+}
+
+function clearSearchHistory() {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(HISTORY_KEY);
+  } catch {
+    // localStorage not available
+  }
+}
+
+function highlightText(text: string, keyword: string): React.ReactNode {
+  if (!keyword || keyword.length < 2) return text;
+  const regex = new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
+  const parts = text.split(regex);
+  return parts.map((part, i) =>
+    regex.test(part) ? (
+      <mark key={i} className="bg-goto-light text-goto-green font-semibold rounded px-0.5">
+        {part}
+      </mark>
+    ) : (
+      part
+    )
+  );
+}
 
 function SearchContent() {
   const searchParams = useSearchParams();
@@ -34,6 +91,64 @@ function SearchContent() {
   const [timeRange, setTimeRange] = useState<TimeRange>("semua");
   const [page, setPage] = useState(0);
   const perPage = 9;
+
+  // Autocomplete state
+  const [suggestions, setSuggestions] = useState<SuggestItem[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [inputFocused, setInputFocused] = useState(false);
+  const suggestRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Load search history on mount
+  useEffect(() => {
+    setSearchHistory(getSearchHistory());
+  }, []);
+
+  // Close suggestions on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (suggestRef.current && !suggestRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  // Debounced autocomplete fetch
+  const fetchSuggestions = useCallback(async (q: string) => {
+    if (q.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    try {
+      const res = await fetch(`/api/search/suggest?q=${encodeURIComponent(q)}`);
+      const json = await res.json();
+      if (json.success) {
+        setSuggestions(json.data || []);
+      }
+    } catch {
+      setSuggestions([]);
+    }
+  }, []);
+
+  const handleInputChange = (value: string) => {
+    setQuery(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (value.length >= 2) {
+      debounceRef.current = setTimeout(() => {
+        fetchSuggestions(value);
+        setShowSuggestions(true);
+      }, 300);
+    } else {
+      setSuggestions([]);
+      // Show history when input is empty and focused
+      if (value.length === 0 && inputFocused) {
+        setShowSuggestions(true);
+      }
+    }
+  };
 
   const fetchResults = async (q: string) => {
     if (q.length < 2) {
@@ -72,8 +187,32 @@ function SearchContent() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    if (query.trim()) {
+      addSearchHistory(query.trim());
+      setSearchHistory(getSearchHistory());
+    }
+    setShowSuggestions(false);
     router.push(`/search?q=${encodeURIComponent(query)}`);
     fetchResults(query);
+  };
+
+  const handleSuggestionClick = (slug: string, title: string) => {
+    addSearchHistory(title);
+    setSearchHistory(getSearchHistory());
+    setShowSuggestions(false);
+    router.push(`/berita/${slug}`);
+  };
+
+  const handleHistoryClick = (q: string) => {
+    setQuery(q);
+    setShowSuggestions(false);
+    router.push(`/search?q=${encodeURIComponent(q)}`);
+    fetchResults(q);
+  };
+
+  const handleClearHistory = () => {
+    clearSearchHistory();
+    setSearchHistory([]);
   };
 
   // Filter & sort results
@@ -114,25 +253,98 @@ function SearchContent() {
     { value: "tahun", label: "1 Tahun" },
   ];
 
+  // Whether to show the dropdown
+  const shouldShowDropdown = showSuggestions && inputFocused && (
+    (query.length >= 2 && suggestions.length > 0) ||
+    (query.length === 0 && searchHistory.length > 0)
+  );
+
   return (
     <>
-      {/* Search input */}
-      <form onSubmit={handleSearch} className="mt-4">
-        <div className="relative">
-          <SearchIcon
-            size={20}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-txt-muted"
-          />
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Cari berita hukum..."
-            className="input w-full py-3 pl-12 pr-4 text-lg"
-            autoFocus
-          />
-        </div>
-      </form>
+      {/* Search input with autocomplete */}
+      <div className="relative mt-4" ref={suggestRef}>
+        <form onSubmit={handleSearch}>
+          <div className="relative">
+            <SearchIcon
+              size={20}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-txt-muted"
+            />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => handleInputChange(e.target.value)}
+              onFocus={() => {
+                setInputFocused(true);
+                if (query.length === 0 && searchHistory.length > 0) {
+                  setShowSuggestions(true);
+                } else if (query.length >= 2) {
+                  setShowSuggestions(true);
+                }
+              }}
+              onBlur={() => {
+                // Delay to allow clicks on suggestions
+                setTimeout(() => setInputFocused(false), 200);
+              }}
+              placeholder="Cari berita hukum..."
+              className="input w-full py-3 pl-12 pr-4 text-lg"
+              autoFocus
+            />
+          </div>
+        </form>
+
+        {/* Autocomplete dropdown */}
+        {shouldShowDropdown && (
+          <div className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-[12px] border border-border bg-surface shadow-lg">
+            {/* Search suggestions */}
+            {query.length >= 2 && suggestions.length > 0 && (
+              <div>
+                <div className="px-4 py-2 text-xs font-semibold text-txt-muted uppercase tracking-wider">
+                  Saran Pencarian
+                </div>
+                {suggestions.map((item) => (
+                  <button
+                    key={item.slug}
+                    onClick={() => handleSuggestionClick(item.slug, item.title)}
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-surface-secondary transition-colors"
+                  >
+                    <SearchIcon size={14} className="text-txt-muted flex-shrink-0" />
+                    <span className="text-sm text-txt-primary truncate">
+                      {highlightText(item.title, query)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Search history */}
+            {query.length === 0 && searchHistory.length > 0 && (
+              <div>
+                <div className="px-4 py-2 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-txt-muted uppercase tracking-wider">
+                    Riwayat Pencarian
+                  </span>
+                  <button
+                    onClick={handleClearHistory}
+                    className="text-xs font-medium text-red-500 hover:text-red-600 transition-colors"
+                  >
+                    Hapus Semua
+                  </button>
+                </div>
+                {searchHistory.map((h, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handleHistoryClick(h)}
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-surface-secondary transition-colors"
+                  >
+                    <History size={14} className="text-txt-muted flex-shrink-0" />
+                    <span className="text-sm text-txt-primary truncate">{h}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Filters — only show after search */}
       {searched && results.length > 0 && (
@@ -193,11 +405,44 @@ function SearchContent() {
         </p>
       )}
 
-      {/* Results grid */}
+      {/* Results grid — with keyword highlighting in titles */}
       {!loading && (
         <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {paginated.map((article) => (
-            <ArticleCard key={article.slug} {...article} />
+            <article key={article.slug} className="group">
+              <Link href={`/berita/${article.slug}`} className="block">
+                <div className="relative aspect-[16/9] w-full overflow-hidden rounded-sm">
+                  {article.featuredImage ? (
+                    <Image
+                      src={article.featuredImage}
+                      alt={article.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-surface-secondary" />
+                  )}
+                </div>
+              </Link>
+              <div className="mt-2">
+                <Link
+                  href={`/kategori/${article.category.slug}`}
+                  className="text-xs font-bold uppercase tracking-wide text-goto-green"
+                >
+                  {article.category.name}
+                </Link>
+                <Link href={`/berita/${article.slug}`}>
+                  <h3 className="mt-1 line-clamp-2 text-base font-bold leading-snug text-txt-primary hover:underline">
+                    {searched && query ? highlightText(article.title, query) : article.title}
+                  </h3>
+                </Link>
+                <p className="mt-2 text-xs text-txt-muted">
+                  {new Date(article.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                  <span className="mx-1">&middot;</span>
+                  {article.author.name}
+                </p>
+              </div>
+            </article>
           ))}
         </div>
       )}

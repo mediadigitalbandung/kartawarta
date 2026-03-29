@@ -16,7 +16,10 @@ import {
   FileText,
   XCircle,
   UserCheck,
+  Download,
+  Archive,
 } from "lucide-react";
+import { exportToCsv } from "@/lib/csv-utils";
 
 interface Article {
   id: string;
@@ -141,6 +144,8 @@ export default function ArtikelPage() {
   // Editors default to IN_REVIEW, creators default to ALL
   const [filterStatus, setFilterStatus] = useState(isEditor ? "IN_REVIEW" : "ALL");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkProcessing, setBulkProcessing] = useState(false);
 
   // Update default filter when session loads
   useEffect(() => {
@@ -205,11 +210,85 @@ export default function ArtikelPage() {
     }
   }
 
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAll(filteredIds: string[]) {
+    const allSelected = filteredIds.every((id) => selectedIds.has(id));
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredIds));
+    }
+  }
+
+  async function handleBulkDelete() {
+    if (!confirm(`Apakah Anda yakin ingin menghapus ${selectedIds.size} artikel? Tindakan ini tidak dapat dibatalkan.`)) return;
+    setBulkProcessing(true);
+    try {
+      const ids = Array.from(selectedIds);
+      for (const id of ids) {
+        await fetch(`/api/articles/${id}`, { method: "DELETE" });
+      }
+      alert(`${ids.length} artikel berhasil dihapus.`);
+      setSelectedIds(new Set());
+      fetchArticles();
+    } catch {
+      alert("Terjadi kesalahan saat menghapus beberapa artikel.");
+    } finally {
+      setBulkProcessing(false);
+    }
+  }
+
+  async function handleBulkArchive() {
+    if (!confirm(`Arsipkan ${selectedIds.size} artikel yang dipilih?`)) return;
+    setBulkProcessing(true);
+    try {
+      const ids = Array.from(selectedIds);
+      for (const id of ids) {
+        await fetch(`/api/articles/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "ARCHIVED" }),
+        });
+      }
+      alert(`${ids.length} artikel berhasil diarsipkan.`);
+      setSelectedIds(new Set());
+      fetchArticles();
+    } catch {
+      alert("Terjadi kesalahan saat mengarsipkan beberapa artikel.");
+    } finally {
+      setBulkProcessing(false);
+    }
+  }
+
+  function handleExportCsv() {
+    const headers = ["Judul", "Kategori", "Status", "Penulis", "Views", "Tanggal"];
+    const rows = filtered.map((a) => [
+      a.title,
+      a.category?.name || "",
+      statusConfig[a.status]?.label || a.status,
+      a.author?.name || "",
+      String(a.viewCount),
+      formatDate(a.publishedAt || a.createdAt),
+    ]);
+    exportToCsv("artikel-jhb.csv", headers, rows);
+  }
+
   const filtered = articles.filter((a) => {
     const matchStatus = filterStatus === "ALL" || a.status === filterStatus;
     const matchSearch = a.title.toLowerCase().includes(searchQuery.toLowerCase());
     return matchStatus && matchSearch;
   });
+
+  const filteredIds = filtered.map((a) => a.id);
+  const allFilteredSelected = filteredIds.length > 0 && filteredIds.every((id) => selectedIds.has(id));
 
   return (
     <div>
@@ -229,17 +308,65 @@ export default function ArtikelPage() {
         </Link>
       </div>
 
+      {/* Bulk action bar */}
+      {selectedIds.size > 0 && (
+        <div className="mb-4 flex items-center gap-3 rounded-[12px] border border-goto-green/30 bg-goto-50 px-4 py-3">
+          <span className="text-sm font-semibold text-goto-green">
+            {selectedIds.size} artikel dipilih
+          </span>
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={handleBulkArchive}
+              disabled={bulkProcessing}
+              className="btn-ghost rounded-full px-3 py-1.5 text-xs font-medium text-txt-secondary hover:text-goto-green disabled:opacity-50"
+              aria-label="Arsipkan artikel terpilih"
+            >
+              <Archive size={14} />
+              Arsipkan
+            </button>
+            <button
+              onClick={handleBulkDelete}
+              disabled={bulkProcessing}
+              className="btn-ghost rounded-full px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+              aria-label="Hapus artikel terpilih"
+            >
+              <Trash2 size={14} />
+              Hapus
+            </button>
+            <button
+              onClick={() => setSelectedIds(new Set())}
+              className="btn-ghost rounded-full px-3 py-1.5 text-xs font-medium text-txt-muted"
+              aria-label="Batal pilih semua"
+            >
+              Batal
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Filters */}
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex-1 sm:max-w-xs">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted" />
-          <input
-            type="text"
-            placeholder="Cari artikel..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="input w-full pl-9"
-          />
+        <div className="flex items-center gap-2 flex-1 sm:max-w-xs">
+          <div className="relative flex-1">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted" />
+            <input
+              type="text"
+              placeholder="Cari artikel..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="input w-full pl-9"
+              aria-label="Cari artikel"
+            />
+          </div>
+          <button
+            onClick={handleExportCsv}
+            className="btn-secondary flex items-center gap-1.5 rounded-full px-3 py-2.5 text-xs font-semibold whitespace-nowrap"
+            title="Export CSV"
+            aria-label="Export daftar artikel ke CSV"
+          >
+            <Download size={14} />
+            Export CSV
+          </button>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Filter size={14} className="text-txt-muted" />
@@ -282,6 +409,15 @@ export default function ArtikelPage() {
               <table className="w-full text-sm">
                 <thead className="border-b border-border bg-surface-secondary">
                   <tr>
+                    <th className="w-10 px-3 py-3 text-center">
+                      <input
+                        type="checkbox"
+                        checked={allFilteredSelected}
+                        onChange={() => toggleSelectAll(filteredIds)}
+                        className="h-4 w-4 rounded border-border text-goto-green accent-goto-green"
+                        aria-label="Pilih semua artikel"
+                      />
+                    </th>
                     <th className="px-3 sm:px-5 py-3 text-left font-medium text-txt-secondary">Judul</th>
                     <th className="hidden md:table-cell px-5 py-3 text-left font-medium text-txt-secondary">Kategori</th>
                     {isEditor && (
@@ -300,7 +436,16 @@ export default function ArtikelPage() {
                     const config = statusConfig[article.status] || statusConfig.DRAFT;
                     const StatusIcon = config.icon;
                     return (
-                      <tr key={article.id} className="hover:bg-surface-secondary">
+                      <tr key={article.id} className={`hover:bg-surface-secondary ${selectedIds.has(article.id) ? "bg-goto-50" : ""}`}>
+                        <td className="w-10 px-3 py-3 text-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.has(article.id)}
+                            onChange={() => toggleSelect(article.id)}
+                            className="h-4 w-4 rounded border-border text-goto-green accent-goto-green"
+                            aria-label={`Pilih artikel ${article.title}`}
+                          />
+                        </td>
                         <td className="max-w-[200px] sm:max-w-[300px] px-3 sm:px-5 py-3">
                           <p className="truncate font-medium text-txt-primary text-xs sm:text-sm">
                             {article.title}
