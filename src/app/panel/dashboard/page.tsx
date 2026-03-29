@@ -1112,7 +1112,7 @@ export default function DashboardPage() {
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
                       {article.author?.name && (
                         <span className="flex items-center gap-1.5 text-sm text-txt-secondary">
-                          <UserCheck size={14} className="text-txt-muted" />
+                          <Users size={14} className="text-txt-muted" />
                           {article.author.name}
                         </span>
                       )}
@@ -1128,7 +1128,7 @@ export default function DashboardPage() {
                       </span>
                       {article.reviewerName && (
                         <span className="flex items-center gap-1.5 text-sm text-txt-secondary">
-                          <UserCheck size={14} className="text-goto-green" />
+                          <Users size={14} className="text-goto-green" />
                           Editor: {article.reviewerName}
                         </span>
                       )}
