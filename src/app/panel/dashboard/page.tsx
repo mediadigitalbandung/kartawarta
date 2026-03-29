@@ -210,39 +210,19 @@ function StatusDonutChart({ articles }: { articles: Article[] }) {
   );
 }
 
-// Bar chart for daily views (last 14 days)
-function ViewsSparkline({ articles }: { articles: Article[] }) {
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-
+// Top articles ranked by views with horizontal bar
+function ViewsRanking({ articles }: { articles: Article[] }) {
   const data = useMemo(() => {
-    const published = articles.filter((a) => a.status === "PUBLISHED" && a.publishedAt);
-    const now = new Date();
-    const days: { label: string; shortLabel: string; views: number }[] = [];
-
-    for (let i = 13; i >= 0; i--) {
-      const d = new Date(now);
-      d.setDate(d.getDate() - i);
-      const dayStr = d.toISOString().split("T")[0];
-      const label = d.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
-      const shortLabel = d.toLocaleDateString("id-ID", { day: "numeric" });
-
-      const dayArticles = published.filter((a) => {
-        const pubDate = new Date(a.publishedAt!).toISOString().split("T")[0];
-        return pubDate === dayStr;
-      });
-      const views = dayArticles.reduce((sum, a) => sum + (a.viewCount || 0), 0);
-      days.push({ label, shortLabel, views });
-    }
-    return days;
+    return [...articles]
+      .filter((a) => a.status === "PUBLISHED")
+      .sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
+      .slice(0, 10);
   }, [articles]);
 
   const totalViews = articles.filter(a => a.status === "PUBLISHED").reduce((s, a) => s + (a.viewCount || 0), 0);
-  const maxViews = Math.max(...data.map((d) => d.views), 1);
-
-  const todayViews = data[data.length - 1]?.views || 0;
-  const yesterdayViews = data[data.length - 2]?.views || 0;
-  const change = yesterdayViews > 0 ? ((todayViews - yesterdayViews) / yesterdayViews) * 100 : 0;
-  const avgViews = Math.round(data.reduce((s, d) => s + d.views, 0) / data.length);
+  const publishedCount = articles.filter(a => a.status === "PUBLISHED").length;
+  const avgViews = publishedCount > 0 ? Math.round(totalViews / publishedCount) : 0;
+  const maxViews = data[0]?.viewCount || 1;
 
   return (
     <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
@@ -251,7 +231,7 @@ function ViewsSparkline({ articles }: { articles: Article[] }) {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-goto-light">
             <TrendingUp size={16} className="text-goto-green" />
           </div>
-          Tren Tayangan
+          Statistik Tayangan
         </h2>
       </div>
       <div className="p-6">
@@ -262,69 +242,55 @@ function ViewsSparkline({ articles }: { articles: Article[] }) {
             <p className="text-2xl font-extrabold text-txt-primary">{formatNumber(totalViews)}</p>
           </div>
           <div className="rounded-xl bg-surface-secondary p-4">
-            <p className="text-xs text-txt-muted mb-1">Hari Ini</p>
-            <p className="text-2xl font-extrabold text-txt-primary">{formatNumber(todayViews)}</p>
-            {change !== 0 && (
-              <p className={`text-xs font-semibold mt-0.5 ${change > 0 ? "text-goto-green" : "text-red-500"}`}>
-                {change > 0 ? "+" : ""}{change.toFixed(0)}%
-              </p>
-            )}
+            <p className="text-xs text-txt-muted mb-1">Artikel Terpublikasi</p>
+            <p className="text-2xl font-extrabold text-txt-primary">{formatNumber(publishedCount)}</p>
           </div>
           <div className="rounded-xl bg-surface-secondary p-4">
-            <p className="text-xs text-txt-muted mb-1">Rata-rata/Hari</p>
+            <p className="text-xs text-txt-muted mb-1">Rata-rata/Artikel</p>
             <p className="text-2xl font-extrabold text-txt-primary">{formatNumber(avgViews)}</p>
           </div>
         </div>
 
-        {/* Tooltip */}
-        {hoveredIdx !== null && (
-          <div className="mb-2 text-center">
-            <span className="inline-flex items-center gap-2 rounded-lg bg-surface-dark px-3 py-1.5 text-sm text-white shadow-lg">
-              <span className="font-medium">{data[hoveredIdx].label}</span>
-              <span className="font-bold">{formatNumber(data[hoveredIdx].views)} tayangan</span>
-            </span>
+        {/* Ranked bar list */}
+        <p className="text-sm font-semibold text-txt-secondary mb-3">Top 10 Artikel Terpopuler</p>
+        {data.length === 0 ? (
+          <p className="text-sm text-txt-muted py-4 text-center">Belum ada artikel terpublikasi.</p>
+        ) : (
+          <div className="space-y-3">
+            {data.map((article, i) => {
+              const pct = (article.viewCount / maxViews) * 100;
+              return (
+                <Link
+                  key={article.id}
+                  href={`/panel/artikel/${article.id}/edit`}
+                  className="block group"
+                >
+                  <div className="flex items-center gap-3 mb-1">
+                    <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-xs font-bold ${
+                      i < 3 ? "bg-goto-green text-white" : "bg-surface-tertiary text-txt-secondary"
+                    }`}>
+                      {i + 1}
+                    </span>
+                    <span className="flex-1 text-sm font-medium text-txt-primary truncate group-hover:text-goto-green transition-colors">
+                      {article.title}
+                    </span>
+                    <span className="text-sm font-bold text-txt-primary shrink-0">
+                      {formatNumber(article.viewCount)}
+                    </span>
+                  </div>
+                  <div className="ml-9 h-2 rounded-full bg-surface-tertiary overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        i === 0 ? "bg-goto-green" : i < 3 ? "bg-goto-green/70" : "bg-goto-green/30"
+                      }`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
-
-        {/* Bar chart */}
-        <div className="flex items-end gap-1.5 h-36">
-          {data.map((d, i) => {
-            const heightPct = maxViews > 0 ? (d.views / maxViews) * 100 : 0;
-            const isToday = i === data.length - 1;
-            const isHovered = hoveredIdx === i;
-            return (
-              <div
-                key={i}
-                className="flex-1 flex flex-col items-center gap-1 cursor-pointer group"
-                onMouseEnter={() => setHoveredIdx(i)}
-                onMouseLeave={() => setHoveredIdx(null)}
-              >
-                <div className="w-full relative" style={{ height: "120px" }}>
-                  <div
-                    className={`absolute bottom-0 left-0 right-0 rounded-t-md transition-all duration-300 ${
-                      isToday
-                        ? "bg-goto-green"
-                        : isHovered
-                          ? "bg-goto-green/80"
-                          : "bg-goto-green/30"
-                    }`}
-                    style={{ height: `${Math.max(heightPct, 2)}%` }}
-                  />
-                </div>
-                <span className={`text-[10px] leading-none ${isToday ? "font-bold text-goto-green" : "text-txt-muted"}`}>
-                  {d.shortLabel}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* X-axis labels */}
-        <div className="flex justify-between mt-2 pt-2 border-t border-border">
-          <span className="text-xs text-txt-muted">{data[0].label}</span>
-          <span className="text-xs text-txt-secondary font-medium">14 hari terakhir</span>
-          <span className="text-xs text-txt-muted">{data[data.length - 1].label}</span>
-        </div>
       </div>
     </div>
   );
@@ -1178,11 +1144,10 @@ export default function DashboardPage() {
 
       {/* Analytics Section */}
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <ViewsSparkline articles={allArticles} />
+        <ViewsRanking articles={allArticles} />
         <StatusDonutChart articles={allArticles} />
         <WeeklyArticleTrend articles={allArticles} />
         <PublicationRate articles={allArticles} />
-        <TopArticlesByViews articles={allArticles} />
         <CategoryPerformance articles={allArticles} />
         <AverageReviewTime articles={allArticles} />
         <ArticleCalendar articles={allArticles} />
