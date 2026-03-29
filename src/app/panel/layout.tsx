@@ -214,9 +214,9 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
     <div className="flex h-full flex-col px-3 py-4 overflow-y-auto overscroll-contain">
       <a
         href="/"
-        className="mb-4 flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/60 hover:text-white hover:bg-white/5"
+        className="mb-5 flex items-center gap-2.5 rounded-xl px-4 py-3 text-base text-white/60 hover:text-white hover:bg-white/5 transition-colors"
       >
-        <ChevronLeft size={16} />
+        <ChevronLeft size={18} />
         Kembali ke Situs
       </a>
 
@@ -230,13 +230,13 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
               href={item.href}
               onClick={() => setSidebarOpen(false)}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium transition-colors",
                 isActive
-                  ? "bg-goto-green/10 text-goto-green"
+                  ? "bg-goto-green/15 text-goto-green"
                   : "text-white/60 hover:text-white hover:bg-white/5"
               )}
             >
-              <Icon size={18} />
+              <Icon size={20} />
               {item.name}
             </Link>
           );
@@ -244,16 +244,16 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
       </nav>
 
       {/* User info */}
-      <div className="border-t border-white/10 pt-3">
-        <div className="flex items-center gap-3 rounded-lg px-3 py-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-goto-green text-sm font-bold text-white">
+      <div className="border-t border-white/10 pt-4">
+        <div className="flex items-center gap-3 rounded-xl px-4 py-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-goto-green text-base font-bold text-white">
             {session.user.name?.charAt(0)}
           </div>
           <div className="truncate">
-            <p className="truncate text-sm font-medium text-white">
+            <p className="truncate text-[15px] font-semibold text-white">
               {session.user.name}
             </p>
-            <p className="text-xs text-white/50">
+            <p className="text-sm text-white/50">
               {roleLabelsMap[session.user.role] || session.user.role.replace(/_/g, " ")}
             </p>
           </div>
@@ -263,10 +263,10 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             await fetch("/api/auth/logout", { method: "POST" });
             signOut({ callbackUrl: "/login" });
           }}
-          className="mt-2 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-white"
+          className="mt-2 flex w-full items-center gap-2.5 rounded-xl px-4 py-3 text-[15px] text-white/50 transition-colors hover:bg-white/5 hover:text-white"
           aria-label="Keluar"
         >
-          <LogOut size={16} />
+          <LogOut size={18} />
           Keluar
         </button>
       </div>
@@ -310,16 +310,16 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         {/* Main content */}
         <main className="flex-1 lg:ml-60 min-w-0" style={{ overflowX: "clip" }}>
           {/* Top bar */}
-          <div className="sticky top-0 z-30 flex items-center justify-between bg-surface border-b border-border h-14 px-4">
+          <div className="sticky top-0 z-30 flex items-center justify-between bg-surface border-b border-border h-16 px-5">
             <div className="flex items-center">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="rounded-lg p-1.5 text-txt-primary hover:bg-surface-secondary lg:hidden"
+                className="rounded-xl p-2 text-txt-primary hover:bg-surface-secondary lg:hidden"
                 aria-label="Buka menu navigasi"
               >
-                <Menu size={22} />
+                <Menu size={24} />
               </button>
-              <span className="ml-3 text-sm font-semibold text-txt-primary lg:ml-0">Panel Admin</span>
+              <span className="ml-3 text-base font-bold text-txt-primary lg:ml-0">Panel Admin</span>
             </div>
 
             {/* Notification bell */}

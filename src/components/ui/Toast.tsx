@@ -50,7 +50,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const addToast = useCallback((message: string, type: ToastType = "info") => {
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => removeToast(id), 4000);
+    setTimeout(() => removeToast(id), 5000);
   }, [removeToast]);
 
   const value: ToastContextType = {
@@ -63,21 +63,22 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div className="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm">
+      <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-3 max-w-md w-full pointer-events-none">
         {toasts.map((t) => {
           const Icon = icons[t.type];
           return (
             <div
               key={t.id}
-              className={`${colors[t.type]} flex items-center gap-3 rounded-[12px] px-4 py-3 shadow-lg text-sm font-medium animate-fade-in`}
+              className={`${colors[t.type]} pointer-events-auto flex items-center gap-4 rounded-2xl px-5 py-4 shadow-xl text-base font-medium animate-fade-in`}
             >
-              <Icon className="h-5 w-5 shrink-0" />
-              <span className="flex-1">{t.message}</span>
+              <Icon className="h-6 w-6 shrink-0" />
+              <span className="flex-1 leading-snug">{t.message}</span>
               <button
                 onClick={() => removeToast(t.id)}
-                className="shrink-0 opacity-70 hover:opacity-100 transition-opacity"
+                className="shrink-0 opacity-70 hover:opacity-100 transition-opacity p-1"
+                aria-label="Tutup notifikasi"
               >
-                <X className="h-4 w-4" />
+                <X className="h-5 w-5" />
               </button>
             </div>
           );
