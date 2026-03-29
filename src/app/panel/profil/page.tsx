@@ -20,6 +20,15 @@ interface UserProfile {
   role: string;
   bio: string | null;
   specialization: string | null;
+  phone: string | null;
+  nomorKartuPers: string | null;
+  organisasiPers: string | null;
+  pendidikan: string | null;
+  pengalaman: string | null;
+  keahlian: string | null;
+  portofolio: string | null;
+  mediaSosial: string | null;
+  alamat: string | null;
   avatar: string | null;
   createdAt: string;
   _count: { articles: number };
@@ -36,6 +45,15 @@ export default function ProfilPage() {
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [specialization, setSpecialization] = useState("");
+  const [phone, setPhone] = useState("");
+  const [nomorKartuPers, setNomorKartuPers] = useState("");
+  const [organisasiPers, setOrganisasiPers] = useState("");
+  const [pendidikan, setPendidikan] = useState("");
+  const [pengalaman, setPengalaman] = useState("");
+  const [keahlian, setKeahlian] = useState("");
+  const [portofolio, setPortofolio] = useState("");
+  const [mediaSosial, setMediaSosial] = useState("");
+  const [alamat, setAlamat] = useState("");
 
   useEffect(() => {
     async function fetchProfile() {
@@ -48,6 +66,15 @@ export default function ProfilPage() {
         setName(user.name || "");
         setBio(user.bio || "");
         setSpecialization(user.specialization || "");
+        setPhone(user.phone || "");
+        setNomorKartuPers(user.nomorKartuPers || "");
+        setOrganisasiPers(user.organisasiPers || "");
+        setPendidikan(user.pendidikan || "");
+        setPengalaman(user.pengalaman || "");
+        setKeahlian(user.keahlian || "");
+        setPortofolio(user.portofolio || "");
+        setMediaSosial(user.mediaSosial || "");
+        setAlamat(user.alamat || "");
       } catch {
         setMessage({ type: "error", text: "Gagal memuat data profil." });
       } finally {
@@ -66,7 +93,14 @@ export default function ProfilPage() {
       const res = await fetch("/api/users/me", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, bio: bio || null, specialization: specialization || null }),
+        body: JSON.stringify({
+          name, bio: bio || null, specialization: specialization || null,
+          phone: phone || null, nomorKartuPers: nomorKartuPers || null,
+          organisasiPers: organisasiPers || null, pendidikan: pendidikan || null,
+          pengalaman: pengalaman || null, keahlian: keahlian || null,
+          portofolio: portofolio || null, mediaSosial: mediaSosial || null,
+          alamat: alamat || null,
+        }),
       });
 
       if (!res.ok) {
@@ -212,17 +246,56 @@ export default function ProfilPage() {
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-secondary">
-                Spesialisasi
-              </label>
-              <input
-                type="text"
-                value={specialization}
-                onChange={(e) => setSpecialization(e.target.value)}
-                className="input w-full"
-                maxLength={200}
-                placeholder="Mis: Hukum Pidana, Hukum Tata Negara..."
-              />
+              <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Spesialisasi</label>
+              <input type="text" value={specialization} onChange={(e) => setSpecialization(e.target.value)} className="input w-full" maxLength={200} placeholder="Mis: Hukum Pidana, Hukum Tata Negara..." />
+            </div>
+
+            <h4 className="pt-4 text-sm font-bold text-txt-primary border-t border-border mt-2">Informasi Profesional</h4>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">No. Telepon</label>
+                <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="input w-full" placeholder="08xx-xxxx-xxxx" />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Nomor Kartu Pers</label>
+                <input type="text" value={nomorKartuPers} onChange={(e) => setNomorKartuPers(e.target.value)} className="input w-full" placeholder="Nomor kartu pers / ID pers" />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Organisasi Pers</label>
+                <input type="text" value={organisasiPers} onChange={(e) => setOrganisasiPers(e.target.value)} className="input w-full" placeholder="Mis: AJI, PWI, IJTI, SMSI..." />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Pendidikan Terakhir</label>
+                <input type="text" value={pendidikan} onChange={(e) => setPendidikan(e.target.value)} className="input w-full" placeholder="Mis: S1 Ilmu Hukum — UNPAD" />
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Keahlian / Skill</label>
+              <input type="text" value={keahlian} onChange={(e) => setKeahlian(e.target.value)} className="input w-full" placeholder="Mis: Investigasi, Hukum Pidana, Data Journalism..." />
+              <p className="mt-1 text-xs text-txt-muted">Pisahkan dengan koma</p>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Pengalaman Kerja</label>
+              <textarea value={pengalaman} onChange={(e) => setPengalaman(e.target.value)} rows={3} className="input w-full" placeholder="Ceritakan pengalaman kerja Anda di bidang jurnalistik..." />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Portofolio / Website</label>
+                <input type="url" value={portofolio} onChange={(e) => setPortofolio(e.target.value)} className="input w-full" placeholder="https://portofolio-anda.com" />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Media Sosial</label>
+                <input type="text" value={mediaSosial} onChange={(e) => setMediaSosial(e.target.value)} className="input w-full" placeholder="@username (Twitter/Instagram)" />
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Alamat</label>
+              <textarea value={alamat} onChange={(e) => setAlamat(e.target.value)} rows={2} className="input w-full" placeholder="Alamat domisili saat ini" />
             </div>
 
             <div className="pt-2">

@@ -73,6 +73,14 @@ model User {
   role             Role       @default(JOURNALIST)
   specialization   String?
   phone            String?
+  nomorKartuPers   String?
+  organisasiPers   String?
+  pendidikan       String?
+  pengalaman       String?    @db.Text
+  keahlian         String?
+  portofolio       String?
+  mediaSosial      String?
+  alamat           String?
   isActive         Boolean    @default(true)
   twoFactorEnabled Boolean    @default(false)
   activeSessionId  String?
