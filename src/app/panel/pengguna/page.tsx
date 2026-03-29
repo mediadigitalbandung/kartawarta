@@ -388,7 +388,7 @@ export default function PenggunaPage() {
                 type="email"
                 placeholder="Email"
                 value={formEmail}
-                onChange={(e) => setFormEmail(e.target.value)}
+                onChange={(e) => setFormEmail(e.target.value.toLowerCase())}
                 required
                 className="input w-full"
               />

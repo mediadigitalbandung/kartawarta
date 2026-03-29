@@ -84,7 +84,7 @@ function LoginContent() {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value.toLowerCase())}
                 placeholder="nama@email.com"
                 required
                 className="input pl-11"

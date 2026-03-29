@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
     const session = await requireRole(["SUPER_ADMIN"]);
     const body = await request.json();
     const data = createUserSchema.parse(body);
+    data.email = data.email.toLowerCase();
 
     const existing = await prisma.user.findUnique({ where: { email: data.email } });
     if (existing) {
