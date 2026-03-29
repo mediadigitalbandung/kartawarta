@@ -242,14 +242,20 @@ export default function ArtikelPage() {
     setBulkProcessing(true);
     try {
       const ids = Array.from(selectedIds);
-      for (const id of ids) {
-        await fetch(`/api/articles/${id}`, { method: "DELETE" });
+      const res = await fetch("/api/articles/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete", ids }),
+      });
+      if (!res.ok) {
+        const json = await res.json();
+        throw new Error(json.error || "Gagal menghapus artikel");
       }
       success(`${ids.length} artikel berhasil dihapus.`);
       setSelectedIds(new Set());
       fetchArticles();
-    } catch {
-      showError("Terjadi kesalahan saat menghapus beberapa artikel.");
+    } catch (err) {
+      showError(err instanceof Error ? err.message : "Terjadi kesalahan saat menghapus beberapa artikel.");
     } finally {
       setBulkProcessing(false);
     }
@@ -261,18 +267,20 @@ export default function ArtikelPage() {
     setBulkProcessing(true);
     try {
       const ids = Array.from(selectedIds);
-      for (const id of ids) {
-        await fetch(`/api/articles/${id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: "ARCHIVED" }),
-        });
+      const res = await fetch("/api/articles/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "archive", ids }),
+      });
+      if (!res.ok) {
+        const json = await res.json();
+        throw new Error(json.error || "Gagal mengarsipkan artikel");
       }
       success(`${ids.length} artikel berhasil diarsipkan.`);
       setSelectedIds(new Set());
       fetchArticles();
-    } catch {
-      showError("Terjadi kesalahan saat mengarsipkan beberapa artikel.");
+    } catch (err) {
+      showError(err instanceof Error ? err.message : "Terjadi kesalahan saat mengarsipkan beberapa artikel.");
     } finally {
       setBulkProcessing(false);
     }
@@ -318,39 +326,33 @@ export default function ArtikelPage() {
         </Link>
       </div>
 
-      {/* Bulk action bar */}
+      {/* Floating bulk action bar */}
       {selectedIds.size > 0 && (
-        <div className="mb-4 flex items-center gap-3 rounded-[12px] border border-goto-green/30 bg-goto-50 px-4 py-3">
-          <span className="text-sm font-semibold text-goto-green">
-            {selectedIds.size} artikel dipilih
-          </span>
-          <div className="ml-auto flex items-center gap-2">
-            <button
-              onClick={handleBulkArchive}
-              disabled={bulkProcessing}
-              className="btn-ghost rounded-full px-3 py-1.5 text-xs font-medium text-txt-secondary hover:text-goto-green disabled:opacity-50"
-              aria-label="Arsipkan artikel terpilih"
-            >
-              <Archive size={14} />
-              Arsipkan
-            </button>
-            <button
-              onClick={handleBulkDelete}
-              disabled={bulkProcessing}
-              className="btn-ghost rounded-full px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
-              aria-label="Hapus artikel terpilih"
-            >
-              <Trash2 size={14} />
-              Hapus
-            </button>
-            <button
-              onClick={() => setSelectedIds(new Set())}
-              className="btn-ghost rounded-full px-3 py-1.5 text-xs font-medium text-txt-muted"
-              aria-label="Batal pilih semua"
-            >
-              Batal
-            </button>
-          </div>
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-full bg-surface-dark px-6 py-3 shadow-lg border border-white/10">
+          <span className="text-sm text-white">{selectedIds.size} dipilih</span>
+          <button
+            onClick={handleBulkArchive}
+            disabled={bulkProcessing}
+            className="text-sm font-medium text-yellow-400 hover:text-yellow-300 disabled:opacity-50"
+            aria-label="Arsipkan artikel terpilih"
+          >
+            Arsipkan
+          </button>
+          <button
+            onClick={handleBulkDelete}
+            disabled={bulkProcessing}
+            className="text-sm font-medium text-red-400 hover:text-red-300 disabled:opacity-50"
+            aria-label="Hapus artikel terpilih"
+          >
+            Hapus
+          </button>
+          <button
+            onClick={() => setSelectedIds(new Set())}
+            className="text-sm text-white/50 hover:text-white"
+            aria-label="Batal pilih semua"
+          >
+            Batal
+          </button>
         </div>
       )}
 

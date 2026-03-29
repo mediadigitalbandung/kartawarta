@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
@@ -60,6 +60,68 @@ export default function NewArticlePage() {
   const [error, setError] = useState("");
   const [showSeo, setShowSeo] = useState(false);
   const [showChecklist, setShowChecklist] = useState(false);
+  const [showAutosaveBanner, setShowAutosaveBanner] = useState(false);
+  const autosaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const AUTOSAVE_KEY = "autosave_draft_new";
+
+  // Check for auto-saved draft on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(AUTOSAVE_KEY);
+      if (saved) {
+        setShowAutosaveBanner(true);
+      }
+    } catch {
+      // localStorage not available
+    }
+  }, []);
+
+  // Auto-save every 30 seconds (only for drafts)
+  useEffect(() => {
+    autosaveTimerRef.current = setInterval(() => {
+      if (title.trim() || content.trim()) {
+        try {
+          const draft = { title, content, categoryId, excerpt, tags, featuredImage, sources };
+          localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(draft));
+        } catch {
+          // localStorage not available
+        }
+      }
+    }, 30000);
+
+    return () => {
+      if (autosaveTimerRef.current) clearInterval(autosaveTimerRef.current);
+    };
+  }, [title, content, categoryId, excerpt, tags, featuredImage, sources]);
+
+  function loadAutosaveDraft() {
+    try {
+      const saved = localStorage.getItem(AUTOSAVE_KEY);
+      if (saved) {
+        const draft = JSON.parse(saved);
+        if (draft.title) setTitle(draft.title);
+        if (draft.content) setContent(draft.content);
+        if (draft.categoryId) setCategoryId(draft.categoryId);
+        if (draft.excerpt) setExcerpt(draft.excerpt);
+        if (draft.tags) setTags(draft.tags);
+        if (draft.featuredImage) setFeaturedImage(draft.featuredImage);
+        if (draft.sources) setSources(draft.sources);
+      }
+    } catch {
+      // ignore
+    }
+    setShowAutosaveBanner(false);
+  }
+
+  function discardAutosaveDraft() {
+    try {
+      localStorage.removeItem(AUTOSAVE_KEY);
+    } catch {
+      // ignore
+    }
+    setShowAutosaveBanner(false);
+  }
 
   const [checklist, setChecklist] = useState({
     notClickbait: false,
@@ -195,6 +257,8 @@ export default function NewArticlePage() {
         return;
       }
 
+      // Clear auto-save after successful creation
+      try { localStorage.removeItem(AUTOSAVE_KEY); } catch { /* ignore */ }
       success(status === "IN_REVIEW" ? "Artikel berhasil dikirim untuk review" : "Artikel berhasil disimpan sebagai draf");
       router.push("/panel/artikel");
       router.refresh();
@@ -238,6 +302,26 @@ export default function NewArticlePage() {
           )}
         </div>
       </div>
+
+      {/* Auto-save recovery banner */}
+      {showAutosaveBanner && (
+        <div className="mb-4 flex items-center gap-3 rounded-[12px] border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
+          <AlertCircle size={16} className="flex-shrink-0" />
+          <span className="flex-1">Ada draf tersimpan otomatis. Muat draf?</span>
+          <button
+            onClick={loadAutosaveDraft}
+            className="rounded-full bg-yellow-500 px-3 py-1 text-xs font-semibold text-white hover:bg-yellow-600"
+          >
+            Muat
+          </button>
+          <button
+            onClick={discardAutosaveDraft}
+            className="rounded-full border border-yellow-400 px-3 py-1 text-xs font-medium text-yellow-700 hover:bg-yellow-100"
+          >
+            Abaikan
+          </button>
+        </div>
+      )}
 
       {error && (
         <div className="mb-4 flex items-center gap-2 rounded-[12px] bg-red-50 px-4 py-3 text-sm text-red-700">

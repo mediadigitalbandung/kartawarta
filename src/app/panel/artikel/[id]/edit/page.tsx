@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
@@ -137,6 +137,39 @@ export default function EditArticlePage() {
   // Scheduling state
   const [showSchedule, setShowSchedule] = useState(false);
   const [scheduleDate, setScheduleDate] = useState("");
+
+  // Auto-save state
+  const [autoSaveIndicator, setAutoSaveIndicator] = useState("");
+  const autosaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const AUTOSAVE_KEY = `autosave_draft_${articleId}`;
+
+  // Auto-save every 30 seconds (only when status is DRAFT)
+  useEffect(() => {
+    if (loading) return;
+    if (currentStatus !== "DRAFT" && currentStatus !== "REJECTED") return;
+
+    autosaveTimerRef.current = setInterval(() => {
+      if (title.trim() || content.trim()) {
+        try {
+          const draft = { title, content, categoryId, excerpt, tags, featuredImage, sources };
+          localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(draft));
+          setAutoSaveIndicator("Draft tersimpan otomatis");
+          setTimeout(() => setAutoSaveIndicator(""), 3000);
+        } catch {
+          // localStorage not available
+        }
+      }
+    }, 30000);
+
+    return () => {
+      if (autosaveTimerRef.current) clearInterval(autosaveTimerRef.current);
+    };
+  }, [loading, currentStatus, title, content, categoryId, excerpt, tags, featuredImage, sources, AUTOSAVE_KEY]);
+
+  // Clear auto-save helper
+  const clearAutosave = useCallback(() => {
+    try { localStorage.removeItem(AUTOSAVE_KEY); } catch { /* ignore */ }
+  }, [AUTOSAVE_KEY]);
 
   const [checklist, setChecklist] = useState({
     notClickbait: false,
@@ -371,6 +404,7 @@ export default function EditArticlePage() {
         return;
       }
 
+      clearAutosave();
       success(status === "IN_REVIEW" ? "Artikel dikirim untuk review" : "Artikel disimpan sebagai draf");
       router.push("/panel/artikel");
       router.refresh();
@@ -1122,6 +1156,7 @@ export default function EditArticlePage() {
                       body: JSON.stringify({ title, content, excerpt, categoryId, featuredImage, seoTitle, seoDescription, tags: tags.split(",").map(t => t.trim()).filter(Boolean) }),
                     });
                     if (res.ok) {
+                      clearAutosave();
                       success("Artikel berhasil disimpan");
                     } else {
                       const json = await res.json();
@@ -1195,6 +1230,9 @@ export default function EditArticlePage() {
         {/* Action buttons only for editable states */}
         {canJurnalisEdit && (
           <div className="flex flex-wrap items-center gap-2">
+            {autoSaveIndicator && (
+              <span className="text-xs text-txt-muted">{autoSaveIndicator}</span>
+            )}
             <button
               onClick={() => handleJurnalisSubmit("DRAFT")}
               disabled={saving}

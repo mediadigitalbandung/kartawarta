@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { ChevronLeft, ChevronRight, Filter } from "lucide-react";
+import { ChevronLeft, ChevronRight, Filter, Download } from "lucide-react";
+import { exportToCsv } from "@/lib/csv-utils";
 
 /* ── Types ─────────────────────────────────────────────────────────── */
 
@@ -96,7 +97,53 @@ export default function AktivitasPage() {
   const [page, setPage] = useState(1);
   const [actionFilter, setActionFilter] = useState("");
 
+  const [exporting, setExporting] = useState(false);
+
   const isSuperAdmin = session?.user?.role === "SUPER_ADMIN";
+
+  const handleExportCsv = async () => {
+    setExporting(true);
+    try {
+      // Fetch all logs without pagination limit
+      const params = new URLSearchParams({ page: "1", limit: "50" });
+      if (actionFilter) params.set("action", actionFilter);
+
+      // Fetch pages until we have all logs
+      const allLogs: AuditLog[] = [];
+      let currentPage = 1;
+      let totalPages = 1;
+
+      do {
+        params.set("page", String(currentPage));
+        const res = await fetch(`/api/audit-logs?${params.toString()}`);
+        const json = await res.json();
+        if (json.success) {
+          allLogs.push(...json.data.logs);
+          totalPages = json.data.pagination.totalPages;
+        } else {
+          break;
+        }
+        currentPage++;
+      } while (currentPage <= totalPages);
+
+      const headers = ["Tanggal", "User", "Email", "Aksi", "Entitas", "ID Entitas", "Detail"];
+      const rows = allLogs.map((log) => [
+        formatDateTime(log.createdAt),
+        log.user.name,
+        log.user.email,
+        actionLabels[log.action]?.label || log.action,
+        entityLabels[log.entity] || log.entity,
+        log.entityId,
+        log.detail || "",
+      ]);
+
+      exportToCsv("audit-logs-jhb.csv", headers, rows);
+    } catch {
+      console.error("Failed to export CSV");
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const fetchLogs = useCallback(async () => {
     setLoading(true);
@@ -143,6 +190,16 @@ export default function AktivitasPage() {
             {pagination && <span className="ml-1">({pagination.total} total)</span>}
           </p>
         </div>
+        <button
+          onClick={handleExportCsv}
+          disabled={exporting || loading}
+          className="btn-secondary flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-semibold whitespace-nowrap disabled:opacity-50"
+          title="Export CSV"
+          aria-label="Export log aktivitas ke CSV"
+        >
+          <Download size={14} />
+          {exporting ? "Mengexport..." : "Export CSV"}
+        </button>
       </div>
 
       {/* Filter */}
