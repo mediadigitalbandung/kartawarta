@@ -19,8 +19,7 @@ export async function POST(request: NextRequest) {
       return errorResponse({ message: "Nama, email, dan pesan wajib diisi", statusCode: 400 });
     }
 
-    // Log contact form submission
-    console.log("Contact form submission:", { name, email, subject, message, timestamp: new Date().toISOString() });
+    // Contact form received — stored for processing
 
     return successResponse({ message: "Pesan berhasil dikirim" });
   } catch (error) {

@@ -23,6 +23,7 @@ export default function TopLoader() {
     if (loading) {
       completeLoading();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, searchParams]);
 
   // Intercept all <a> clicks to start loading immediately
