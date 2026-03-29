@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback, FormEvent } from "react";
 import { useSession } from "next-auth/react";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import {
   Plus,
   Search,
@@ -64,6 +66,8 @@ function LoadingSkeleton() {
 
 export default function PenggunaPage() {
   const { data: session } = useSession();
+  const { success, error: showError } = useToast();
+  const { confirm } = useConfirm();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -127,12 +131,12 @@ export default function PenggunaPage() {
     e.preventDefault();
 
     if (!formName || !formEmail || !formRole) {
-      alert("Nama, email, dan role wajib diisi.");
+      showError("Nama, email, dan role wajib diisi.");
       return;
     }
 
     if (!editingUser && !formPassword) {
-      alert("Password wajib diisi untuk pengguna baru.");
+      showError("Password wajib diisi untuk pengguna baru.");
       return;
     }
 
@@ -162,7 +166,7 @@ export default function PenggunaPage() {
           throw new Error(json.error || "Gagal mengupdate pengguna");
         }
 
-        alert("Pengguna berhasil diperbarui");
+        success("Pengguna berhasil diperbarui");
       } else {
         // Create new user
         const res = await fetch("/api/users", {
@@ -182,14 +186,14 @@ export default function PenggunaPage() {
           throw new Error(json.error || "Gagal menambah pengguna");
         }
 
-        alert("Pengguna berhasil ditambahkan");
+        success("Pengguna berhasil ditambahkan");
       }
 
       setShowModal(false);
       resetForm();
       fetchUsers();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Gagal menyimpan pengguna.");
+      showError(err instanceof Error ? err.message : "Gagal menyimpan pengguna.");
       console.error("Save user error:", err);
     } finally {
       setSubmitting(false);
@@ -197,7 +201,8 @@ export default function PenggunaPage() {
   }
 
   async function handleDelete(id: string, name: string) {
-    if (!confirm("Apakah Anda yakin ingin menghapus pengguna ini?")) {
+    const ok = await confirm({ message: "Apakah Anda yakin ingin menghapus pengguna ini?", variant: "danger", title: "Konfirmasi" });
+    if (!ok) {
       return;
     }
 
@@ -210,10 +215,10 @@ export default function PenggunaPage() {
         throw new Error(json.error || "Gagal menghapus pengguna");
       }
 
-      alert("Pengguna berhasil dihapus");
+      success("Pengguna berhasil dihapus");
       fetchUsers();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Gagal menghapus pengguna.");
+      showError(err instanceof Error ? err.message : "Gagal menghapus pengguna.");
       console.error("Delete user error:", err);
     } finally {
       setDeleting(null);

@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import {
   ImageIcon,
   Trash2,
@@ -61,6 +63,8 @@ function LoadingSkeleton() {
 
 export default function MediaPage() {
   const { data: session } = useSession();
+  const { success, error: showError } = useToast();
+  const { confirm } = useConfirm();
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -98,7 +102,8 @@ export default function MediaPage() {
   }, [fetchMedia]);
 
   async function handleDelete(id: string) {
-    if (!confirm("Hapus media ini secara permanen?")) return;
+    const ok = await confirm({ message: "Hapus media ini secara permanen?", variant: "danger", title: "Konfirmasi" });
+    if (!ok) return;
     try {
       setDeleting(id);
       const res = await fetch(`/api/media?id=${id}`, { method: "DELETE" });
@@ -108,7 +113,7 @@ export default function MediaPage() {
       }
       setMedia((prev) => prev.filter((m) => m.id !== id));
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Gagal menghapus media");
+      showError(err instanceof Error ? err.message : "Gagal menghapus media");
     } finally {
       setDeleting(null);
     }
@@ -139,10 +144,10 @@ export default function MediaPage() {
         fetchMedia();
       } else {
         const json = await res.json();
-        alert(json.error || "Gagal menyimpan media");
+        showError(json.error || "Gagal menyimpan media");
       }
     } catch {
-      alert("Gagal menyimpan media");
+      showError("Gagal menyimpan media");
     }
   }
 

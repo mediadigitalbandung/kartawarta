@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback, FormEvent } from "react";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import {
   Plus,
   Eye,
@@ -80,6 +82,8 @@ function LoadingSkeleton() {
 }
 
 export default function IklanPage() {
+  const { success, error: showError } = useToast();
+  const { confirm } = useConfirm();
   const [ads, setAds] = useState<Ad[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -151,17 +155,17 @@ export default function IklanPage() {
     e.preventDefault();
 
     if (!formName || !formStartDate || !formEndDate) {
-      alert("Nama, tanggal mulai, dan tanggal selesai wajib diisi.");
+      showError("Nama, tanggal mulai, dan tanggal selesai wajib diisi.");
       return;
     }
 
     if (!formType) {
-      alert("Tipe iklan wajib dipilih.");
+      showError("Tipe iklan wajib dipilih.");
       return;
     }
 
     if (!formSlot) {
-      alert("Posisi slot iklan wajib dipilih.");
+      showError("Posisi slot iklan wajib dipilih.");
       return;
     }
 
@@ -191,7 +195,7 @@ export default function IklanPage() {
           throw new Error(json.error || "Gagal mengupdate iklan");
         }
 
-        alert("Iklan berhasil diperbarui");
+        success("Iklan berhasil diperbarui");
       } else {
         const res = await fetch("/api/ads", {
           method: "POST",
@@ -204,14 +208,14 @@ export default function IklanPage() {
           throw new Error(json.error || "Gagal menambah iklan");
         }
 
-        alert("Iklan berhasil ditambahkan");
+        success("Iklan berhasil ditambahkan");
       }
 
       setShowModal(false);
       resetForm();
       fetchAds();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Gagal menyimpan iklan.");
+      showError(err instanceof Error ? err.message : "Gagal menyimpan iklan.");
       console.error("Save ad error:", err);
     } finally {
       setSubmitting(false);
@@ -219,7 +223,8 @@ export default function IklanPage() {
   }
 
   async function handleDelete(id: string, name: string) {
-    if (!confirm("Apakah Anda yakin ingin menghapus iklan ini? Tindakan ini tidak dapat dibatalkan.")) {
+    const ok = await confirm({ message: "Apakah Anda yakin ingin menghapus iklan ini? Tindakan ini tidak dapat dibatalkan.", variant: "danger", title: "Konfirmasi" });
+    if (!ok) {
       return;
     }
 
@@ -232,10 +237,10 @@ export default function IklanPage() {
         throw new Error(json.error || "Gagal menghapus iklan");
       }
 
-      alert("Iklan berhasil dihapus");
+      success("Iklan berhasil dihapus");
       fetchAds();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Gagal menghapus iklan.");
+      showError(err instanceof Error ? err.message : "Gagal menghapus iklan.");
       console.error("Delete ad error:", err);
     } finally {
       setDeleting(null);
