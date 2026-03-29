@@ -69,47 +69,43 @@ const menuItems: MenuItem[] = [
   { name: "Profil", href: "/panel/profil", icon: UserCircle },
 ];
 
-type NotifType = "rejected" | "review" | "comment" | "approved";
-
 interface NotificationItem {
   id: string;
-  type: NotifType;
-  label: string;
+  userId: string;
+  type: string;
+  title: string;
   message: string;
-  count: number;
-  href: string;
-  time: string;
-  read: boolean;
+  link: string | null;
+  isRead: boolean;
+  createdAt: string;
 }
 
-const NOTIF_ICON_MAP: Record<NotifType, { icon: React.ElementType; bg: string; color: string }> = {
-  rejected: { icon: XCircle, bg: "bg-red-50", color: "text-red-500" },
-  review: { icon: ClipboardCheck, bg: "bg-yellow-50", color: "text-yellow-500" },
-  comment: { icon: MessageCircle, bg: "bg-blue-50", color: "text-blue-500" },
-  approved: { icon: CheckCircle, bg: "bg-green-50", color: "text-goto-green" },
+type NotifIconType = "article_rejected" | "article_in_review" | "article_approved" | "article_published" | "default";
+
+const NOTIF_ICON_MAP: Record<NotifIconType, { icon: React.ElementType; bg: string; color: string }> = {
+  article_rejected: { icon: XCircle, bg: "bg-red-50", color: "text-red-500" },
+  article_in_review: { icon: ClipboardCheck, bg: "bg-yellow-50", color: "text-yellow-500" },
+  article_approved: { icon: CheckCircle, bg: "bg-green-50", color: "text-goto-green" },
+  article_published: { icon: CheckCircle, bg: "bg-blue-50", color: "text-blue-500" },
+  default: { icon: Bell, bg: "bg-zinc-800", color: "text-zinc-400" },
 };
 
-function getReadNotifIds(userId: string): string[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(`notif_read_${userId}`);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
+function getNotifIcon(type: string) {
+  return NOTIF_ICON_MAP[type as NotifIconType] || NOTIF_ICON_MAP.default;
 }
 
-function setReadNotifIds(userId: string, ids: string[]) {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(`notif_read_${userId}`, JSON.stringify(ids));
-  } catch {
-    // localStorage not available
-  }
-}
-
-function timeAgoShort(): string {
-  return "Baru saja";
+function timeAgo(dateStr: string): string {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return "Baru saja";
+  if (diffMin < 60) return `${diffMin} menit lalu`;
+  const diffHour = Math.floor(diffMin / 60);
+  if (diffHour < 24) return `${diffHour} jam lalu`;
+  const diffDay = Math.floor(diffHour / 24);
+  if (diffDay < 30) return `${diffDay} hari lalu`;
+  return date.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
 }
 
 export default function PanelLayout({ children }: { children: React.ReactNode }) {
@@ -118,115 +114,32 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   const { data: session, status } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
   const userRole = session?.user?.role || "";
-  const userId = session?.user?.id || "";
   const isAdmin = userRole === "SUPER_ADMIN";
   const isEditor = EDITOR_ROLES.includes(userRole);
-  const isCreator = CREATOR_ROLES.includes(userRole);
 
   const fetchNotifications = useCallback(async () => {
     if (!session?.user) return;
     try {
-      const items: NotificationItem[] = [];
-      const readIds = getReadNotifIds(userId);
-
-      if (isCreator) {
-        // Count rejected articles for this creator
-        const res = await fetch(`/api/articles?status=REJECTED&authorId=${session.user.id}&limit=100`);
-        if (res.ok) {
-          const json = await res.json();
-          const count = json.data?.pagination?.total || 0;
-          if (count > 0) {
-            const id = `rejected_${count}`;
-            items.push({
-              id,
-              type: "rejected",
-              label: "Artikel Ditolak",
-              message: `${count} artikel Anda ditolak oleh editor`,
-              count,
-              href: "/panel/artikel",
-              time: timeAgoShort(),
-              read: readIds.includes(id),
-            });
-          }
-        }
-
-        // Count approved articles for this creator
-        const resApproved = await fetch(`/api/articles?status=APPROVED&authorId=${session.user.id}&limit=100`);
-        if (resApproved.ok) {
-          const json = await resApproved.json();
-          const count = json.data?.pagination?.total || 0;
-          if (count > 0) {
-            const id = `approved_${count}`;
-            items.push({
-              id,
-              type: "approved",
-              label: "Artikel Disetujui",
-              message: `${count} artikel Anda telah disetujui`,
-              count,
-              href: "/panel/artikel",
-              time: timeAgoShort(),
-              read: readIds.includes(id),
-            });
-          }
-        }
+      const res = await fetch("/api/notifications?limit=20");
+      if (res.ok) {
+        const json = await res.json();
+        setNotifications(json.data?.notifications || []);
+        setUnreadCount(json.data?.unreadCount || 0);
       }
-
-      if (isEditor) {
-        // Count articles pending review
-        const res = await fetch("/api/articles?status=IN_REVIEW&limit=1");
-        if (res.ok) {
-          const json = await res.json();
-          const count = json.data?.pagination?.total || 0;
-          if (count > 0) {
-            const id = `review_${count}`;
-            items.push({
-              id,
-              type: "review",
-              label: "Artikel Baru untuk Review",
-              message: `${count} artikel menunggu review Anda`,
-              count,
-              href: "/panel/artikel",
-              time: timeAgoShort(),
-              read: readIds.includes(id),
-            });
-          }
-        }
-      }
-
-      if (isAdmin) {
-        // Count pending reports
-        const res = await fetch("/api/reports?status=PENDING&limit=1");
-        if (res.ok) {
-          const json = await res.json();
-          const count = json.data?.pagination?.total || json.data?.reports?.length || 0;
-          if (count > 0) {
-            const id = `report_${count}`;
-            items.push({
-              id,
-              type: "comment",
-              label: "Komentar Baru",
-              message: `${count} laporan menunggu ditinjau`,
-              count,
-              href: "/panel/laporan",
-              time: timeAgoShort(),
-              read: readIds.includes(id),
-            });
-          }
-        }
-      }
-
-      setNotifications(items);
     } catch {
       // Silently fail — notifications are non-critical
     }
-  }, [session?.user, userId, isCreator, isEditor, isAdmin]);
+  }, [session?.user]);
 
   useEffect(() => {
     fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
   }, [fetchNotifications]);
 
   // Lock body scroll when mobile sidebar is open
@@ -265,24 +178,30 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
     return null;
   }
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
-  const totalNotifCount = notifications.reduce((sum, n) => sum + n.count, 0);
-
-  const markAllRead = () => {
-    const allIds = notifications.map((n) => n.id);
-    setReadNotifIds(userId, allIds);
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  const markAllRead = async () => {
+    try {
+      await fetch("/api/notifications", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ all: true }),
+      });
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch { /* non-critical */ }
   };
 
-  const markOneRead = (id: string) => {
-    const readIds = getReadNotifIds(userId);
-    if (!readIds.includes(id)) {
-      const updated = [...readIds, id];
-      setReadNotifIds(userId, updated);
+  const markOneRead = async (id: string) => {
+    try {
+      await fetch("/api/notifications", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: [id] }),
+      });
       setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
       );
-    }
+      setUnreadCount((c) => Math.max(0, c - 1));
+    } catch { /* non-critical */ }
   };
 
   const filteredMenu = menuItems.filter((item) => {
@@ -443,19 +362,19 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
                   ) : (
                     <div className="max-h-80 overflow-y-auto">
                       {notifications.map((notif) => {
-                        const config = NOTIF_ICON_MAP[notif.type];
+                        const config = getNotifIcon(notif.type);
                         const Icon = config.icon;
                         return (
                           <Link
                             key={notif.id}
-                            href={notif.href}
+                            href={notif.link || "/panel/dashboard"}
                             onClick={() => {
                               markOneRead(notif.id);
                               setNotifOpen(false);
                             }}
                             className={cn(
                               "flex items-start gap-3 px-4 py-3 hover:bg-surface-secondary transition-colors border-b border-border last:border-b-0",
-                              !notif.read && "bg-goto-50/50"
+                              !notif.isRead && "bg-goto-50/50"
                             )}
                           >
                             <div className={cn("flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full", config.bg)}>
@@ -463,15 +382,15 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2">
-                                <p className="text-sm font-semibold text-txt-primary truncate">{notif.label}</p>
-                                {!notif.read && (
+                                <p className="text-sm font-semibold text-txt-primary truncate">{notif.title}</p>
+                                {!notif.isRead && (
                                   <span className="h-2 w-2 rounded-full bg-goto-green flex-shrink-0" />
                                 )}
                               </div>
-                              <p className="text-xs text-txt-secondary mt-0.5">{notif.message}</p>
+                              <p className="text-xs text-txt-secondary mt-0.5 line-clamp-2">{notif.message}</p>
                               <div className="flex items-center gap-1 mt-1">
                                 <Clock size={10} className="text-txt-muted" />
-                                <span className="text-[10px] text-txt-muted">{notif.time}</span>
+                                <span className="text-[10px] text-txt-muted">{timeAgo(notif.createdAt)}</span>
                               </div>
                             </div>
                           </Link>

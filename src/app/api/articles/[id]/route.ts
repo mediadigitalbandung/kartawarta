@@ -10,6 +10,13 @@ import {
 } from "@/lib/api-utils";
 import { calculateReadTime } from "@/lib/utils";
 import { canApproveArticles } from "@/lib/auth";
+import { notifyArticleStatusChange } from "@/lib/notifications";
+import {
+  sendArticleApprovedEmail,
+  sendArticleRejectedEmail,
+  sendArticlePublishedEmail,
+  sendNewReviewEmail,
+} from "@/lib/email";
 
 const updateArticleSchema = z.object({
   title: z.string().min(5).max(255).optional(),
@@ -22,6 +29,7 @@ const updateArticleSchema = z.object({
   status: z.enum(["DRAFT", "IN_REVIEW", "APPROVED", "PUBLISHED", "REJECTED", "ARCHIVED"]).optional(),
   scheduledAt: z.string().datetime().optional().nullable(),
   reviewNote: z.string().max(1000).optional().nullable(),
+  assignedEditorId: z.string().optional().nullable(),
 });
 
 // GET /api/articles/:id
@@ -226,6 +234,13 @@ export async function PUT(
         `${data.status ? `Status → ${data.status}. ` : ""}Jurnalis mengedit artikel: ${article.title}`
       );
 
+      // Notify & email assigned editor when article submitted for review
+      if (data.status === "IN_REVIEW" && assignedReviewerId) {
+        await notifyArticleStatusChange(article.id, updated.title, "IN_REVIEW", assignedReviewerId);
+        const editor = await prisma.user.findUnique({ where: { id: assignedReviewerId }, select: { email: true } });
+        if (editor) await sendNewReviewEmail(editor.email, updated.title, session.user.name || "");
+      }
+
       return successResponse(updated);
     }
 
@@ -342,6 +357,17 @@ export async function PUT(
         `Editor ${data.status === "APPROVED" ? "menyetujui" : "menolak"} artikel: ${article.title}${data.reviewNote ? ` — Catatan: ${data.reviewNote}` : ""}`
       );
 
+      // Notify & email article author about approval/rejection
+      await notifyArticleStatusChange(article.id, article.title, data.status!, article.authorId, data.reviewNote || undefined);
+      const authorForEmail = await prisma.user.findUnique({ where: { id: article.authorId }, select: { email: true } });
+      if (authorForEmail) {
+        if (data.status === "APPROVED") {
+          await sendArticleApprovedEmail(authorForEmail.email, article.title, article.slug);
+        } else {
+          await sendArticleRejectedEmail(authorForEmail.email, article.title, data.reviewNote || undefined);
+        }
+      }
+
       return successResponse(updated);
     }
 
@@ -410,6 +436,17 @@ export async function PUT(
           `Admin ${data.status === "APPROVED" ? "menyetujui" : "menolak"} artikel: ${article.title}${data.reviewNote ? ` — Catatan: ${data.reviewNote}` : ""}`
         );
 
+        // Notify & email article author
+        await notifyArticleStatusChange(article.id, article.title, data.status!, article.authorId, data.reviewNote || undefined);
+        const authorAdmin = await prisma.user.findUnique({ where: { id: article.authorId }, select: { email: true } });
+        if (authorAdmin) {
+          if (data.status === "APPROVED") {
+            await sendArticleApprovedEmail(authorAdmin.email, article.title, article.slug);
+          } else {
+            await sendArticleRejectedEmail(authorAdmin.email, article.title, data.reviewNote || undefined);
+          }
+        }
+
         return successResponse(updated);
       }
 
@@ -475,6 +512,11 @@ export async function PUT(
           `Admin mempublikasi artikel: ${article.title}`
         );
 
+        // Notify & email article author about publication
+        await notifyArticleStatusChange(article.id, article.title, "PUBLISHED", article.authorId);
+        const authorPub = await prisma.user.findUnique({ where: { id: article.authorId }, select: { email: true } });
+        if (authorPub) await sendArticlePublishedEmail(authorPub.email, article.title, updated.slug);
+
         return successResponse(updated);
       }
 
@@ -513,6 +555,96 @@ export async function PUT(
 
     // Fallback - shouldn't reach here
     throw new ApiError("Aksi tidak diizinkan", 403);
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
+
+// PATCH /api/articles/:id — assign editor
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await requireAuth();
+    const isAdmin = session.user.role === "SUPER_ADMIN" || session.user.role === "CHIEF_EDITOR";
+
+    if (!isAdmin) {
+      throw new ApiError("Hanya admin/chief editor yang dapat menugaskan editor", 403);
+    }
+
+    const body = await request.json();
+    const { assignedEditorId } = body;
+
+    const article = await prisma.article.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!article) {
+      throw new ApiError("Artikel tidak ditemukan", 404);
+    }
+
+    // Validate that the assigned user exists and has editor role
+    if (assignedEditorId) {
+      const editor = await prisma.user.findUnique({
+        where: { id: assignedEditorId },
+        select: { id: true, role: true, name: true },
+      });
+
+      if (!editor) {
+        throw new ApiError("User tidak ditemukan", 404);
+      }
+
+      if (!["EDITOR", "CHIEF_EDITOR"].includes(editor.role)) {
+        throw new ApiError("User yang ditugaskan harus memiliki role Editor atau Chief Editor", 400);
+      }
+
+      const updated = await prisma.article.update({
+        where: { id: params.id },
+        data: {
+          assignedEditorId,
+          reviewedBy: assignedEditorId,
+        },
+        include: {
+          author: { select: { id: true, name: true } },
+          category: { select: { id: true, name: true, slug: true } },
+          tags: true,
+        },
+      });
+
+      await logAudit(
+        session.user.id,
+        "ASSIGN_EDITOR",
+        "article",
+        article.id,
+        `Menugaskan editor ${editor.name} untuk artikel: ${article.title}`
+      );
+
+      return successResponse(updated);
+    } else {
+      // Unassign editor
+      const updated = await prisma.article.update({
+        where: { id: params.id },
+        data: {
+          assignedEditorId: null,
+        },
+        include: {
+          author: { select: { id: true, name: true } },
+          category: { select: { id: true, name: true, slug: true } },
+          tags: true,
+        },
+      });
+
+      await logAudit(
+        session.user.id,
+        "UNASSIGN_EDITOR",
+        "article",
+        article.id,
+        `Menghapus penugasan editor dari artikel: ${article.title}`
+      );
+
+      return successResponse(updated);
+    }
   } catch (error) {
     return errorResponse(error);
   }

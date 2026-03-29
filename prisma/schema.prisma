@@ -121,6 +121,7 @@ model Article {
   reviewNote        String?
   reviewedBy        String?
   reviewedAt        DateTime?
+  assignedEditorId  String?
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
@@ -128,6 +129,7 @@ model Article {
   @@index([authorId])
   @@index([categoryId])
   @@index([publishedAt])
+  @@index([assignedEditorId])
   @@map("articles")
 }
 
@@ -286,4 +288,19 @@ model SystemSetting {
   value String @db.Text
 
   @@map("system_settings")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // "article_approved", "article_rejected", "article_published", "article_submitted", "new_review"
+  title     String
+  message   String
+  link      String?  // URL to navigate to
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@map("notifications")
 }
