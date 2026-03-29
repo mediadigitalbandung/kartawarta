@@ -106,10 +106,7 @@ function LoadingSkeleton() {
 }
 
 function formatNumber(num: number): string {
-  if (num >= 1000) {
-    return (num / 1000).toFixed(1).replace(/\.0$/, "") + "K";
-  }
-  return num.toString();
+  return num.toLocaleString("id-ID");
 }
 
 function formatDate(dateStr: string): string {
@@ -118,6 +115,222 @@ function formatDate(dateStr: string): string {
 }
 
 // --- Analytics Components ---
+
+// Donut chart for article status distribution
+function StatusDonutChart({ articles }: { articles: Article[] }) {
+  const data = useMemo(() => {
+    const counts: Record<string, number> = {};
+    articles.forEach((a) => {
+      counts[a.status] = (counts[a.status] || 0) + 1;
+    });
+    const colors: Record<string, string> = {
+      PUBLISHED: "#00AA13",
+      IN_REVIEW: "#EAB308",
+      DRAFT: "#9CA3AF",
+      APPROVED: "#3B82F6",
+      REJECTED: "#EF4444",
+      ARCHIVED: "#6B7280",
+    };
+    return Object.entries(counts)
+      .map(([status, count]) => ({ status, count, color: colors[status] || "#9CA3AF" }))
+      .sort((a, b) => b.count - a.count);
+  }, [articles]);
+
+  const total = articles.length;
+  if (total === 0) return null;
+
+  // SVG donut
+  const radius = 60;
+  const circumference = 2 * Math.PI * radius;
+  let offset = 0;
+
+  return (
+    <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
+      <div className="border-b border-border bg-surface-secondary px-5 py-4">
+        <h2 className="flex items-center gap-2 font-semibold text-txt-primary">
+          <Layers size={18} className="text-purple-500" />
+          Distribusi Status Artikel
+        </h2>
+      </div>
+      <div className="p-5 flex items-center gap-6">
+        <div className="relative shrink-0">
+          <svg width="150" height="150" viewBox="0 0 150 150">
+            {data.map((d) => {
+              const pct = d.count / total;
+              const dashArray = pct * circumference;
+              const dashOffset = -offset * circumference;
+              offset += pct;
+              return (
+                <circle
+                  key={d.status}
+                  cx="75" cy="75" r={radius}
+                  fill="none"
+                  stroke={d.color}
+                  strokeWidth="20"
+                  strokeDasharray={`${dashArray} ${circumference - dashArray}`}
+                  strokeDashoffset={dashOffset}
+                  className="transition-all duration-500"
+                />
+              );
+            })}
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-2xl font-extrabold text-txt-primary">{total}</span>
+            <span className="text-[10px] text-txt-muted">Total</span>
+          </div>
+        </div>
+        <div className="flex-1 space-y-2">
+          {data.map((d) => (
+            <div key={d.status} className="flex items-center gap-2">
+              <span className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
+              <span className="text-xs text-txt-secondary flex-1">{statusLabels[d.status] || d.status}</span>
+              <span className="text-xs font-bold text-txt-primary">{d.count}</span>
+              <span className="text-[10px] text-txt-muted w-10 text-right">{((d.count / total) * 100).toFixed(0)}%</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Sparkline chart for daily views (last 14 days)
+function ViewsSparkline({ articles }: { articles: Article[] }) {
+  const data = useMemo(() => {
+    const published = articles.filter((a) => a.status === "PUBLISHED" && a.publishedAt);
+    const now = new Date();
+    const days: { label: string; views: number }[] = [];
+
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const dayStr = d.toISOString().split("T")[0];
+      const label = d.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
+
+      const dayArticles = published.filter((a) => {
+        const pubDate = new Date(a.publishedAt!).toISOString().split("T")[0];
+        return pubDate === dayStr;
+      });
+      const views = dayArticles.reduce((sum, a) => sum + (a.viewCount || 0), 0);
+      days.push({ label, views });
+    }
+    return days;
+  }, [articles]);
+
+  const totalViews = articles.filter(a => a.status === "PUBLISHED").reduce((s, a) => s + (a.viewCount || 0), 0);
+  const maxViews = Math.max(...data.map((d) => d.views), 1);
+  const height = 80;
+  const width = 280;
+  const stepX = width / (data.length - 1);
+
+  // Build SVG path
+  const points = data.map((d, i) => ({
+    x: i * stepX,
+    y: height - (d.views / maxViews) * (height - 10) - 5,
+  }));
+  const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+  const areaPath = `${linePath} L ${width} ${height} L 0 ${height} Z`;
+
+  return (
+    <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
+      <div className="border-b border-border bg-surface-secondary px-5 py-4">
+        <h2 className="flex items-center gap-2 font-semibold text-txt-primary">
+          <TrendingUp size={18} className="text-goto-green" />
+          Tren Tayangan (14 Hari)
+        </h2>
+      </div>
+      <div className="p-5">
+        <div className="flex items-baseline gap-2 mb-4">
+          <span className="text-3xl font-extrabold text-txt-primary">{formatNumber(totalViews)}</span>
+          <span className="text-xs text-txt-muted">total tayangan</span>
+        </div>
+        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-20" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="viewsGradient" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="#00AA13" stopOpacity="0.3" />
+              <stop offset="100%" stopColor="#00AA13" stopOpacity="0.02" />
+            </linearGradient>
+          </defs>
+          <path d={areaPath} fill="url(#viewsGradient)" />
+          <path d={linePath} fill="none" stroke="#00AA13" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          {points.map((p, i) => (
+            <circle key={i} cx={p.x} cy={p.y} r="2.5" fill="#00AA13" className="opacity-0 hover:opacity-100 transition-opacity">
+              <title>{data[i].label}: {data[i].views} views</title>
+            </circle>
+          ))}
+        </svg>
+        <div className="flex justify-between mt-1">
+          <span className="text-[10px] text-txt-muted">{data[0].label}</span>
+          <span className="text-[10px] text-txt-muted">{data[data.length - 1].label}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Publication rate ring
+function PublicationRate({ articles }: { articles: Article[] }) {
+  const { published, total, rate } = useMemo(() => {
+    const pub = articles.filter((a) => a.status === "PUBLISHED").length;
+    const all = articles.length;
+    return { published: pub, total: all, rate: all > 0 ? (pub / all) * 100 : 0 };
+  }, [articles]);
+
+  const radius = 45;
+  const circumference = 2 * Math.PI * radius;
+  const dashArray = (rate / 100) * circumference;
+
+  const rejected = articles.filter((a) => a.status === "REJECTED").length;
+  const inReview = articles.filter((a) => a.status === "IN_REVIEW").length;
+  const draft = articles.filter((a) => a.status === "DRAFT").length;
+
+  return (
+    <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
+      <div className="border-b border-border bg-surface-secondary px-5 py-4">
+        <h2 className="flex items-center gap-2 font-semibold text-txt-primary">
+          <CheckCircle size={18} className="text-goto-green" />
+          Tingkat Publikasi
+        </h2>
+      </div>
+      <div className="p-5 flex items-center gap-6">
+        <div className="relative shrink-0">
+          <svg width="110" height="110" viewBox="0 0 110 110">
+            <circle cx="55" cy="55" r={radius} fill="none" stroke="#F0F1F3" strokeWidth="10" />
+            <circle
+              cx="55" cy="55" r={radius}
+              fill="none" stroke="#00AA13" strokeWidth="10"
+              strokeDasharray={`${dashArray} ${circumference - dashArray}`}
+              strokeDashoffset={circumference * 0.25}
+              strokeLinecap="round"
+              className="transition-all duration-700"
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-xl font-extrabold text-goto-green">{rate.toFixed(0)}%</span>
+          </div>
+        </div>
+        <div className="flex-1 space-y-3">
+          <div className="flex justify-between text-sm">
+            <span className="text-txt-secondary">Dipublikasi</span>
+            <span className="font-bold text-goto-green">{published}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-txt-secondary">Menunggu Review</span>
+            <span className="font-bold text-yellow-500">{inReview}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-txt-secondary">Draf</span>
+            <span className="font-bold text-txt-muted">{draft}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-txt-secondary">Ditolak</span>
+            <span className="font-bold text-red-500">{rejected}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function WeeklyArticleTrend({ articles }: { articles: Article[] }) {
   const weekData = useMemo(() => {
@@ -850,7 +1063,10 @@ export default function DashboardPage() {
 
       {/* Analytics Section */}
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <ViewsSparkline articles={allArticles} />
+        <StatusDonutChart articles={allArticles} />
         <WeeklyArticleTrend articles={allArticles} />
+        <PublicationRate articles={allArticles} />
         <TopArticlesByViews articles={allArticles} />
         <CategoryPerformance articles={allArticles} />
         <AverageReviewTime articles={allArticles} />
