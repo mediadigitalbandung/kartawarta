@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 import CopyProtection from "@/components/artikel/CopyProtection";
 import ReadingProgress from "@/components/artikel/ReadingProgress";
-import FontSizeControl from "@/components/artikel/FontSizeControl";
 import PrintButton from "@/components/artikel/PrintButton";
 import ShareBar from "@/components/artikel/ShareBar";
 import Sidebar from "@/components/layout/Sidebar";
@@ -161,7 +160,6 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <ReadingProgress />
-      <FontSizeControl />
       <CopyProtection
         authorName={article.author.name}
         articleUrl={articleUrl}
