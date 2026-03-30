@@ -152,17 +152,15 @@ function RecentActivity({ articles }: { articles: Article[] }) {
           <div className="p-5 text-center text-sm text-txt-muted">Belum ada aktivitas.</div>
         ) : (
           activities.map((a, i) => (
-            <Link key={`${a.id}-${i}`} href={`/panel/artikel/${a.id}/edit`} className="flex items-start gap-3 px-5 py-3 hover:bg-surface-secondary/50 transition-colors">
-              <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${a.action.icon}`} />
+            <Link key={`${a.id}-${i}`} href={`/panel/artikel/${a.id}/edit`} className="flex items-center gap-3 px-5 py-3 hover:bg-surface-secondary/50 transition-colors">
+              <div className={`h-2 w-2 rounded-full shrink-0 ${a.action.icon}`} />
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-txt-primary">
-                  <span className="font-semibold">{a.title.length > 40 ? a.title.slice(0, 40) + "..." : a.title}</span>
-                  {" "}<span className={a.action.color}>{a.action.label}</span>
-                </p>
+                <p className="text-xs font-semibold text-txt-primary truncate">{a.title}</p>
                 <p className="text-[11px] text-txt-muted mt-0.5">
                   {a.author?.name || "—"} &middot; {a.timeAgo}
                 </p>
               </div>
+              <span className={`shrink-0 text-xs font-semibold ${a.action.color}`}>{a.action.label}</span>
             </Link>
           ))
         )}
