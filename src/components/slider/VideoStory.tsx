@@ -132,6 +132,27 @@ export default function VideoStory({ items }: VideoStoryProps) {
           <ChevronRight size={18} strokeWidth={1.5} />
         </button>
       )}
+
+      {/* Dot indicators */}
+      {items.length > 5 && (
+        <div className="flex justify-center gap-1.5 mt-4">
+          {Array.from({ length: Math.ceil(items.length / 5) }).map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => {
+                const el = scrollRef.current;
+                if (!el) return;
+                const card = el.querySelector("article");
+                const cardWidth = card ? card.offsetWidth + 16 : 216;
+                el.scrollTo({ left: idx * cardWidth * 5, behavior: "smooth" });
+                setTimeout(checkScroll, 400);
+              }}
+              className="h-1.5 w-6 rounded-full bg-border hover:bg-goto-green transition-colors"
+              aria-label={`Halaman ${idx + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -7,4 +7,8 @@ export const videoStoryData = [
   { title: "Opini Hukum: Dampak Omnibus Law terhadap Pekerja Indonesia", slug: "opini-dampak-omnibus-law", thumbnail: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&q=80", duration: "03:48", source: "JHB News" },
   { title: "Profil Hakim: Sosok di Balik Putusan Kontroversial PN Bandung", slug: "profil-hakim-pn-bandung", thumbnail: "https://images.unsplash.com/photo-1521791055366-0d553872125f?w=400&q=80", duration: "04:55", source: "JHB News" },
   { title: "Live Report: OTT KPK di Kantor Dinas PUPR Jawa Barat", slug: "live-ott-kpk-pupr-jabar", thumbnail: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&q=80", duration: "01:30", source: "JHB News" },
+  { title: "Kronologi Lengkap Kasus Vina Cirebon: Fakta vs Narasi Publik", slug: "kronologi-kasus-vina-cirebon", thumbnail: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&q=80", duration: "08:15", source: "JHB News" },
+  { title: "Analisis: Putusan MK Soal Ambang Batas Pencalonan Presiden", slug: "analisis-putusan-mk-ambang-batas", thumbnail: "https://images.unsplash.com/photo-1575505586569-646b2ca898fc?w=400&q=80", duration: "05:42", source: "JHB News" },
+  { title: "Dokumenter: Perjuangan Warga Tamansari Melawan Penggusuran", slug: "dokumenter-warga-tamansari", thumbnail: "https://images.unsplash.com/photo-1453945619913-79ec89a82c51?w=400&q=80", duration: "12:30", source: "JHB News" },
+  { title: "Debat Hukum: Pro-Kontra RUU Perampasan Aset Koruptor", slug: "debat-ruu-perampasan-aset", thumbnail: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&q=80", duration: "07:20", source: "JHB News" },
 ];
