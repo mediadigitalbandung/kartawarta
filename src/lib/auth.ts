@@ -161,7 +161,7 @@ const WRITER_ROLES: Role[] = [
 ];
 
 export function canPublishDirectly(role: Role): boolean {
-  return role === "SUPER_ADMIN" || role === "CHIEF_EDITOR" || role === "SENIOR_JOURNALIST";
+  return role === "SUPER_ADMIN" || role === "CHIEF_EDITOR" || role === "EDITOR" || role === "SENIOR_JOURNALIST";
 }
 
 export function canApproveArticles(role: Role): boolean {

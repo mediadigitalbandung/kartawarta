@@ -372,6 +372,26 @@ export async function PUT(
       return successResponse(updated);
     }
 
+    // --- EDITOR publish: APPROVED -> PUBLISHED ---
+    if (isEditor && !isAdmin && data.status === "PUBLISHED" && article.status === "APPROVED") {
+      await prisma.revision.create({
+        data: { articleId: article.id, title: article.title, content: article.content, changedBy: session.user.name || session.user.email },
+      });
+
+      const updated = await prisma.article.update({
+        where: { id: params.id },
+        data: { status: "PUBLISHED", verificationLabel: "VERIFIED", publishedAt: new Date(), scheduledAt: null },
+        include: { author: { select: { id: true, name: true } }, category: { select: { id: true, name: true, slug: true } }, tags: true, sources: true },
+      });
+
+      await logAudit(session.user.id, "STATUS_CHANGE", "article", article.id, `Editor mempublikasi artikel: ${article.title}`);
+      await notifyArticleStatusChange(article.id, article.title, "PUBLISHED", article.authorId);
+      const authorPub = await prisma.user.findUnique({ where: { id: article.authorId }, select: { email: true } });
+      if (authorPub) await sendArticlePublishedEmail(authorPub.email, article.title, updated.slug);
+
+      return successResponse(updated);
+    }
+
     // --- ADMIN (SUPER_ADMIN / CHIEF_EDITOR) ---
     if (isAdmin) {
       // Admin "Kembalikan ke Editor": APPROVED -> IN_REVIEW
