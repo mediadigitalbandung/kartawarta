@@ -2,42 +2,48 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { notifyArticleStatusChange } from "@/lib/notifications";
 import { sendArticlePublishedEmail } from "@/lib/email";
+import { ApiError, successResponse, errorResponse } from "@/lib/api-utils";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+  try {
+    const authHeader = request.headers.get("authorization");
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      throw new ApiError("Unauthorized", 401);
+    }
 
-  const now = new Date();
-  const articles = await prisma.article.findMany({
-    where: {
-      status: "APPROVED",
-      scheduledAt: { lte: now },
-    },
-    select: { id: true, title: true, slug: true, authorId: true, scheduledAt: true },
-  });
-
-  const published = [];
-  for (const article of articles) {
-    await prisma.article.update({
-      where: { id: article.id },
-      data: {
-        status: "PUBLISHED",
-        publishedAt: article.scheduledAt || now,
-        scheduledAt: null,
+    const now = new Date();
+    const articles = await prisma.article.findMany({
+      where: {
+        status: "APPROVED",
+        scheduledAt: { lte: now },
       },
+      select: { id: true, title: true, slug: true, authorId: true, scheduledAt: true },
     });
-    // Notify & email author about auto-publication
-    await notifyArticleStatusChange(article.id, article.title, "PUBLISHED", article.authorId);
-    const author = await prisma.user.findUnique({ where: { id: article.authorId }, select: { email: true } });
-    if (author) await sendArticlePublishedEmail(author.email, article.title, article.slug);
-    published.push(article.title);
-  }
 
-  return Response.json({
-    success: true,
-    published: published.length,
-    titles: published,
-  });
+    const published = [];
+    for (const article of articles) {
+      await prisma.article.update({
+        where: { id: article.id },
+        data: {
+          status: "PUBLISHED",
+          publishedAt: article.scheduledAt || now,
+          scheduledAt: null,
+        },
+      });
+      // Notify & email author about auto-publication
+      await notifyArticleStatusChange(article.id, article.title, "PUBLISHED", article.authorId);
+      const author = await prisma.user.findUnique({ where: { id: article.authorId }, select: { email: true } });
+      if (author) await sendArticlePublishedEmail(author.email, article.title, article.slug);
+      published.push(article.title);
+    }
+
+    return successResponse({
+      published: published.length,
+      titles: published,
+    });
+  } catch (error) {
+    return errorResponse(error);
+  }
 }

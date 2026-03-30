@@ -112,8 +112,8 @@ export default function ImageUploader({ onUpload, currentImage }: ImageUploaderP
         return;
       }
 
-      setPreview(data.url);
-      onUpload(data.url);
+      setPreview(data.data.url);
+      onUpload(data.data.url);
     } catch {
       setError("Terjadi kesalahan saat mengupload gambar");
     } finally {

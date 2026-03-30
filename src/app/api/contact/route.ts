@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { successResponse, errorResponse } from "@/lib/api-utils";
+import { NextRequest } from "next/server";
+import { successResponse, errorResponse, ApiError } from "@/lib/api-utils";
 import { commentRateLimit } from "@/lib/rate-limit";
-import { sanitizeText, sanitizeEmail } from "@/lib/sanitize";
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,14 +8,14 @@ export async function POST(request: NextRequest) {
     const ip = request.headers.get("x-forwarded-for") || "unknown";
     const { success: allowed } = commentRateLimit(ip);
     if (!allowed) {
-      return NextResponse.json({ success: false, error: "Terlalu banyak pesan. Coba lagi nanti." }, { status: 429 });
+      throw new ApiError("Terlalu banyak pesan. Coba lagi nanti.", 429);
     }
 
     const body = await request.json();
-    const { name, email, subject, message } = body;
+    const { name, email, message } = body;
 
     if (!name || !email || !message) {
-      return errorResponse({ message: "Nama, email, dan pesan wajib diisi", statusCode: 400 });
+      throw new ApiError("Nama, email, dan pesan wajib diisi", 400);
     }
 
     // Contact form received — stored for processing

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { successResponse } from "@/lib/api-utils";
 
 export const revalidate = 3600; // Cache for 1 hour
 
@@ -32,22 +32,14 @@ export async function GET() {
           if (i < 3) tag.hot = true;
         });
 
-        return NextResponse.json({ success: true, data: tags, source: "google_trends" });
+        return successResponse(tags);
       }
     }
 
     // Fallback: curated tags
-    return NextResponse.json({
-      success: true,
-      data: getFallbackTags(),
-      source: "fallback",
-    });
+    return successResponse(getFallbackTags());
   } catch {
-    return NextResponse.json({
-      success: true,
-      data: getFallbackTags(),
-      source: "fallback",
-    });
+    return successResponse(getFallbackTags());
   }
 }
 
