@@ -273,6 +273,159 @@ function ViewsRanking({ articles }: { articles: Article[] }) {
   );
 }
 
+// Creator-specific stats component
+function MyArticleStats({ articles }: { articles: Article[] }) {
+  const totalViews = articles.reduce((s, a) => s + (a.viewCount || 0), 0);
+  const avgViews = articles.length > 0 ? Math.round(totalViews / articles.length) : 0;
+  const totalArticles = articles.length;
+
+  // Top 5 articles by views
+  const top5 = useMemo(() => {
+    return [...articles]
+      .sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
+      .slice(0, 5);
+  }, [articles]);
+  const maxViews = top5[0]?.viewCount || 1;
+
+  // Status breakdown
+  const statusBreakdown = useMemo(() => {
+    const map = new Map<string, number>();
+    articles.forEach((a) => {
+      map.set(a.status, (map.get(a.status) || 0) + 1);
+    });
+    return Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
+  }, [articles]);
+
+  // Monthly productivity (last 6 months)
+  const monthlyData = useMemo(() => {
+    const now = new Date();
+    const months: { label: string; count: number }[] = [];
+    for (let i = 0; i < 6; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const label = d.toLocaleDateString("id-ID", { month: "short", year: "numeric" });
+      const monthNum = d.getMonth();
+      const yearNum = d.getFullYear();
+      const count = articles.filter((a) => {
+        const created = new Date(a.createdAt);
+        return created.getMonth() === monthNum && created.getFullYear() === yearNum;
+      }).length;
+      months.push({ label, count });
+    }
+    return months;
+  }, [articles]);
+  const maxMonthly = Math.max(...monthlyData.map((m) => m.count), 1);
+
+  return (
+    <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
+      <div className="border-b border-border px-6 py-5">
+        <h2 className="flex items-center gap-2.5 text-base font-bold text-txt-primary">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-goto-light">
+            <TrendingUp size={16} className="text-goto-green" />
+          </div>
+          Statistik Artikel Saya
+        </h2>
+      </div>
+      <div className="p-6">
+        {/* Stats row */}
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="rounded-xl bg-surface-secondary p-4">
+            <p className="text-xs text-txt-muted mb-1">Total Views Saya</p>
+            <p className="text-2xl font-extrabold text-txt-primary">{formatNumber(totalViews)}</p>
+          </div>
+          <div className="rounded-xl bg-surface-secondary p-4">
+            <p className="text-xs text-txt-muted mb-1">Rata-rata Views/Artikel</p>
+            <p className="text-2xl font-extrabold text-txt-primary">{formatNumber(avgViews)}</p>
+          </div>
+          <div className="rounded-xl bg-surface-secondary p-4">
+            <p className="text-xs text-txt-muted mb-1">Total Artikel Saya</p>
+            <p className="text-2xl font-extrabold text-txt-primary">{formatNumber(totalArticles)}</p>
+          </div>
+        </div>
+
+        {/* Status breakdown */}
+        {statusBreakdown.length > 0 && (
+          <div className="mb-6">
+            <p className="text-sm font-semibold text-txt-secondary mb-3">Artikel per Status</p>
+            <div className="flex flex-wrap gap-2">
+              {statusBreakdown.map(([status, count]) => (
+                <span key={status} className={`rounded-full px-3 py-1 text-xs font-semibold ${statusColors[status] || "bg-surface-tertiary text-txt-secondary"}`}>
+                  {statusLabels[status] || status}: {count}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Top 5 articles by views */}
+        <p className="text-sm font-semibold text-txt-secondary mb-3">Top 5 Artikel Saya</p>
+        {top5.length === 0 ? (
+          <p className="text-sm text-txt-muted py-4 text-center">Belum ada artikel.</p>
+        ) : (
+          <div className="space-y-3 mb-6">
+            {top5.map((article, i) => {
+              const pct = (article.viewCount / maxViews) * 100;
+              return (
+                <Link
+                  key={article.id}
+                  href={`/panel/artikel/${article.id}/edit`}
+                  className="block group"
+                >
+                  <div className="flex items-center gap-3 mb-1">
+                    <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-xs font-bold ${
+                      i < 3 ? "bg-goto-green text-white" : "bg-surface-tertiary text-txt-secondary"
+                    }`}>
+                      {i + 1}
+                    </span>
+                    <span className="flex-1 text-sm font-medium text-txt-primary truncate group-hover:text-goto-green transition-colors">
+                      {article.title}
+                    </span>
+                    <span className="text-sm font-bold text-txt-primary shrink-0">
+                      {formatNumber(article.viewCount)}
+                    </span>
+                  </div>
+                  <div className="ml-9 h-2 rounded-full bg-surface-tertiary overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        i === 0 ? "bg-goto-green" : i < 3 ? "bg-goto-green/70" : "bg-goto-green/30"
+                      }`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Monthly productivity */}
+        <p className="text-sm font-semibold text-txt-secondary mb-3">Produktivitas Bulanan</p>
+        <div className="space-y-2">
+          {monthlyData.map((month, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <span className="w-20 text-xs text-txt-secondary text-right shrink-0 font-medium">
+                {month.label}
+              </span>
+              <div className="flex-1 h-5 bg-surface-secondary rounded-md overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-goto-green to-goto-dark rounded-md transition-all duration-500 flex items-center justify-end pr-1.5"
+                  style={{ width: `${(month.count / maxMonthly) * 100}%`, minWidth: month.count > 0 ? "24px" : "0px" }}
+                >
+                  {month.count > 0 && (
+                    <span className="text-[10px] font-bold text-white">{month.count}</span>
+                  )}
+                </div>
+              </div>
+              {month.count === 0 && (
+                <span className="w-4 text-xs text-txt-muted text-right">0</span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Publication rate ring
 function WeeklyArticleTrend({ articles }: { articles: Article[] }) {
   const weekData = useMemo(() => {
@@ -917,7 +1070,11 @@ export default function DashboardPage() {
 
       {/* Analytics Section */}
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <ViewsRanking articles={allArticles} />
+        {isCreator ? (
+          <MyArticleStats articles={allArticles} />
+        ) : (
+          <ViewsRanking articles={allArticles} />
+        )}
         <RecentActivity articles={allArticles} />
         <WeeklyArticleTrend articles={allArticles} />
         <CategoryPerformance articles={allArticles} />

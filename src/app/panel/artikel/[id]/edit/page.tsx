@@ -32,6 +32,7 @@ import {
   CalendarClock,
   FileText,
   Printer,
+  StickyNote,
 } from "lucide-react";
 import ImageUploader from "@/components/editor/ImageUploader";
 import { stripHtml, downloadTextFile } from "@/lib/export-utils";
@@ -141,6 +142,16 @@ export default function EditArticlePage() {
   const autosaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const AUTOSAVE_KEY = `autosave_draft_${articleId}`;
 
+  // Research notes state
+  const [researchNotes, setResearchNotes] = useState("");
+  const [notesOpen, setNotesOpen] = useState(false);
+
+  // Word counter calculations
+  const plainText = content.replace(/<[^>]*>/g, "").trim();
+  const wordCount = plainText ? plainText.split(/\s+/).length : 0;
+  const charCount = plainText.length;
+  const readTime = Math.max(1, Math.ceil(wordCount / 200));
+
   // Auto-save every 30 seconds (only when status is DRAFT)
   useEffect(() => {
     if (loading) return;
@@ -169,6 +180,19 @@ export default function EditArticlePage() {
     try { localStorage.removeItem(AUTOSAVE_KEY); } catch { /* ignore */ }
   }, [AUTOSAVE_KEY]);
 
+  // Load research notes from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem(`research_notes_${params.id}`);
+    if (saved) setResearchNotes(saved);
+  }, [params.id]);
+
+  // Auto-save research notes on change
+  useEffect(() => {
+    if (researchNotes) {
+      localStorage.setItem(`research_notes_${params.id}`, researchNotes);
+    }
+  }, [researchNotes, params.id]);
+
   const [checklist, setChecklist] = useState({
     notClickbait: false,
     hasSource: false,
@@ -183,29 +207,36 @@ export default function EditArticlePage() {
   const handleExportPdf = () => {
     const printWindow = window.open("", "_blank");
     if (!printWindow) return;
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>${title}</title>
-        <style>
-          body { font-family: Georgia, serif; max-width: 700px; margin: 40px auto; padding: 0 20px; color: #222; line-height: 1.8; }
-          h1 { font-size: 28px; margin-bottom: 8px; }
-          .meta { color: #666; font-size: 14px; margin-bottom: 24px; border-bottom: 1px solid #ddd; padding-bottom: 16px; }
-          .excerpt { font-style: italic; color: #555; margin-bottom: 24px; font-size: 16px; }
-          .content { font-size: 16px; }
-          .content img { max-width: 100%; height: auto; }
-          @media print { body { margin: 20px; } }
-        </style>
-      </head>
-      <body>
-        <h1>${title}</h1>
-        <div class="meta">Kategori: ${categories.find(c => c.id === categoryId)?.name || "-"} | Penulis: ${articleAuthorName || "-"}</div>
-        ${excerpt ? `<div class="excerpt">${excerpt}</div>` : ""}
-        <div class="content">${content}</div>
-      </body>
-      </html>
-    `);
+    const categoryName = categories.find(c => c.id === categoryId)?.name || "-";
+    const authorName = articleAuthorName || "-";
+    const dateStr = new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+    const yearStr = new Date().getFullYear();
+    printWindow.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <title>${title}</title>
+  <style>
+    body { font-family: 'Georgia', serif; max-width: 700px; margin: 40px auto; padding: 0 20px; color: #1a1a1a; line-height: 1.8; }
+    h1 { font-size: 28px; margin-bottom: 8px; }
+    .meta { color: #666; font-size: 14px; margin-bottom: 24px; border-bottom: 1px solid #ddd; padding-bottom: 16px; }
+    .excerpt { font-style: italic; color: #555; margin-bottom: 24px; font-size: 16px; }
+    .content { font-size: 16px; }
+    .content h2 { font-size: 22px; margin-top: 32px; }
+    .content h3 { font-size: 18px; margin-top: 24px; }
+    .content blockquote { border-left: 3px solid #00AA13; padding-left: 16px; margin: 16px 0; font-style: italic; color: #555; }
+    .content img { max-width: 100%; height: auto; margin: 16px 0; }
+    .footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #ddd; font-size: 12px; color: #999; }
+    @media print { body { margin: 0; } }
+  </style>
+</head>
+<body>
+  <h1>${title}</h1>
+  <div class="meta">Penulis: ${authorName} | Kategori: ${categoryName} | ${dateStr}</div>
+  ${excerpt ? `<div class="excerpt">${excerpt}</div>` : ""}
+  <div class="content">${content}</div>
+  <div class="footer">&copy; ${yearStr} Jurnalis Hukum Bandung &mdash; jurnalishukumbandung.com</div>
+</body>
+</html>`);
     printWindow.document.close();
     printWindow.focus();
     setTimeout(() => printWindow.print(), 500);
@@ -1088,7 +1119,16 @@ export default function EditArticlePage() {
               </div>
               <div className="rounded-[12px] border border-border bg-surface p-5">
                 <label className="mb-2 block text-sm font-medium text-txt-primary">Konten</label>
-                <RichTextEditor content={content} onChange={setContent} />
+                <div className="rounded-[12px] border border-border overflow-hidden">
+                  <RichTextEditor content={content} onChange={setContent} />
+                  <div className="flex items-center gap-4 px-4 py-2 border-t border-border text-sm text-txt-muted">
+                    <span>{wordCount} kata</span>
+                    <span className="text-border">|</span>
+                    <span>{charCount} karakter</span>
+                    <span className="text-border">|</span>
+                    <span>{readTime} menit baca</span>
+                  </div>
+                </div>
               </div>
             </div>
             {/* Sidebar — 1/3 */}
@@ -1382,6 +1422,13 @@ export default function EditArticlePage() {
             />
             <div className="rounded-[12px] border border-border overflow-hidden">
               <RichTextEditor content={content} onChange={setContent} />
+              <div className="flex items-center gap-4 px-4 py-2 border-t border-border text-sm text-txt-muted">
+                <span>{wordCount} kata</span>
+                <span className="text-border">|</span>
+                <span>{charCount} karakter</span>
+                <span className="text-border">|</span>
+                <span>{readTime} menit baca</span>
+              </div>
             </div>
             {/* Sources */}
             <div className="rounded-[12px] border border-border bg-surface p-6">
@@ -1507,6 +1554,32 @@ export default function EditArticlePage() {
                       <CheckCircle size={12} /> Semua checklist terpenuhi
                     </p>
                   )}
+                </div>
+              )}
+            </div>
+
+            {/* Catatan Riset */}
+            <div className="rounded-xl border border-border bg-surface shadow-card overflow-hidden">
+              <button
+                onClick={() => setNotesOpen(!notesOpen)}
+                className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-txt-primary hover:bg-surface-secondary"
+              >
+                <span className="flex items-center gap-2">
+                  <StickyNote size={16} className="text-yellow-500" />
+                  Catatan Riset
+                </span>
+                <ChevronDown size={16} className={`transition-transform ${notesOpen ? "rotate-180" : ""}`} />
+              </button>
+              {notesOpen && (
+                <div className="px-4 pb-4">
+                  <textarea
+                    value={researchNotes}
+                    onChange={(e) => setResearchNotes(e.target.value)}
+                    className="input w-full resize-none text-sm"
+                    rows={6}
+                    placeholder="Catatan wawancara, referensi, kutipan yang belum dipakai... (tersimpan otomatis, tidak ikut terpublikasi)"
+                  />
+                  <p className="mt-1 text-xs text-txt-muted">Catatan ini hanya tersimpan di browser Anda</p>
                 </div>
               )}
             </div>
