@@ -9,6 +9,7 @@ import BreakingSlider from "@/components/slider/BreakingSlider";
 import PopularCarousel from "@/components/slider/PopularCarousel";
 import SubHeadlineSlider from "@/components/slider/SubHeadlineSlider";
 import VideoStory from "@/components/slider/VideoStory";
+import PollingCarousel from "@/components/slider/PollingCarousel";
 import BannerAd, { SidebarAd } from "@/components/ads/BannerAd";
 import ScrollableContainer from "@/components/layout/ScrollableContainer";
 import { videoStoryData } from "@/lib/video-data";
@@ -76,6 +77,42 @@ const pollingData = [
       { label: "Sangat Tidak Perlu", percentage: 6 },
     ],
     totalVotes: 6521,
+  },
+  {
+    question: "Apakah sistem peradilan di Indonesia sudah adil?",
+    image: "https://images.unsplash.com/photo-1575505586569-646b2ca898fc?w=600&q=80",
+    options: [
+      { label: "Sudah Adil", percentage: 12 },
+      { label: "Cukup Adil", percentage: 23 },
+      { label: "Netral", percentage: 20 },
+      { label: "Kurang Adil", percentage: 30 },
+      { label: "Tidak Adil", percentage: 15 },
+    ],
+    totalVotes: 3890,
+  },
+  {
+    question: "Setujukah Anda dengan wacana restorative justice untuk kasus ringan?",
+    image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&q=80",
+    options: [
+      { label: "Sangat Setuju", percentage: 38 },
+      { label: "Setuju", percentage: 30 },
+      { label: "Netral", percentage: 14 },
+      { label: "Tidak Setuju", percentage: 12 },
+      { label: "Sangat Tidak Setuju", percentage: 6 },
+    ],
+    totalVotes: 5120,
+  },
+  {
+    question: "Bagaimana pendapat Anda tentang Omnibus Law Cipta Kerja?",
+    image: "https://images.unsplash.com/photo-1521791055366-0d553872125f?w=600&q=80",
+    options: [
+      { label: "Sangat Mendukung", percentage: 15 },
+      { label: "Mendukung", percentage: 20 },
+      { label: "Netral", percentage: 25 },
+      { label: "Menolak", percentage: 28 },
+      { label: "Sangat Menolak", percentage: 12 },
+    ],
+    totalVotes: 7340,
   },
 ];
 
@@ -348,37 +385,7 @@ export default async function HomePage() {
               Polling Hukum
             </h2>
           </div>
-          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
-            {pollingData.map((poll, idx) => (
-              <div key={idx} className="shrink-0 w-[300px] sm:w-[340px] rounded-lg border border-border bg-surface-secondary overflow-hidden">
-                {poll.image && (
-                  <div className="relative w-full aspect-[2/1]">
-                    <Image src={poll.image} alt={poll.question} fill className="object-cover" />
-                  </div>
-                )}
-                <div className="p-5">
-                <p className="text-sm font-semibold text-txt-primary mb-4">{poll.question}</p>
-                <div className="space-y-2.5">
-                  {poll.options.map((opt: { label: string; percentage: number }) => (
-                    <div key={opt.label}>
-                      <div className="flex items-center justify-between text-sm mb-1">
-                        <span className="text-txt-primary text-xs">{opt.label}</span>
-                        <span className="font-bold text-txt-primary text-xs">{opt.percentage}%</span>
-                      </div>
-                      <div className="h-1.5 rounded-full bg-border">
-                        <div
-                          className="h-1.5 rounded-full bg-goto-green transition-all"
-                          style={{ width: `${opt.percentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <p className="text-[11px] text-txt-muted mt-3">{poll.totalVotes.toLocaleString("id-ID")} suara</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <PollingCarousel items={pollingData} />
         </div>
       </section>
 
