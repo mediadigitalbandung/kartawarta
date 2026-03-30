@@ -377,7 +377,7 @@ export default function NewArticlePage() {
       )}
 
       {/* Trending Suggestions */}
-      {trendingSuggestions.length > 0 && showSuggestions && !title.trim() && (
+      {trendingSuggestions.length > 0 && showSuggestions && (
         <div className="mb-4 rounded-[12px] border border-border bg-surface p-4 shadow-card">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -400,10 +400,7 @@ export default function NewArticlePage() {
               <button
                 key={i}
                 type="button"
-                onClick={() => {
-                  setTitle(item.label);
-                  setShowSuggestions(false);
-                }}
+                onClick={() => setTitle(item.label)}
                 className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors hover:border-goto-green hover:text-goto-green ${
                   item.hot
                     ? "border-red-200 bg-red-50 text-red-600 hover:bg-red-50"
