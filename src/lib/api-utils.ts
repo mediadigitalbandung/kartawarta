@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "./auth";
 import { Role } from "@prisma/client";
 import { prisma } from "./prisma";
+import { ZodError } from "zod";
 
 export async function getSession() {
   return getServerSession(authOptions);
@@ -44,9 +45,17 @@ export function errorResponse(error: unknown) {
       { status: error.statusCode }
     );
   }
+  if (error instanceof ZodError) {
+    const messages = error.errors.map((e) => e.message).join(", ");
+    return NextResponse.json(
+      { success: false, error: messages || "Validasi gagal" },
+      { status: 400 }
+    );
+  }
   console.error("API Error:", error);
+  const message = error instanceof Error ? error.message : "Internal server error";
   return NextResponse.json(
-    { success: false, error: "Internal server error" },
+    { success: false, error: message },
     { status: 500 }
   );
 }
