@@ -204,7 +204,7 @@ export default function ProfilPage() {
                   className="h-20 w-20 rounded-full object-cover border-2 border-border"
                 />
               ) : (
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-goto-green text-xl sm:text-3xl font-bold text-white">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-surface-tertiary text-xl sm:text-3xl font-bold text-txt-secondary">
                   {profile?.name?.charAt(0) || <UserCircle size={40} />}
                 </div>
               )}

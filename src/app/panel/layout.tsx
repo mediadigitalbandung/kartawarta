@@ -235,7 +235,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
       {/* User info */}
       <div className="border-t border-white/10 pt-4">
         <div className="flex items-center gap-3 rounded-xl px-4 py-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-goto-green text-base font-bold text-white">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-base font-bold text-white/70">
             {session.user.name?.charAt(0)}
           </div>
           <div className="truncate">
