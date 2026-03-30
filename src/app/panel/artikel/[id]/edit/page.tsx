@@ -35,7 +35,7 @@ import {
   StickyNote,
 } from "lucide-react";
 import ImageUploader from "@/components/editor/ImageUploader";
-import { stripHtml, downloadTextFile } from "@/lib/export-utils";
+import { stripHtml, downloadTextFile, exportArticlePdf } from "@/lib/export-utils";
 
 const RichTextEditor = dynamic(
   () => import("@/components/editor/RichTextEditor"),
@@ -210,41 +210,20 @@ export default function EditArticlePage() {
 
   // Export functions
   const handleExportPdf = () => {
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) return;
     const categoryName = categories.find(c => c.id === categoryId)?.name || "-";
     const authorName = articleAuthorName || "-";
     const dateStr = new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
-    const yearStr = new Date().getFullYear();
-    printWindow.document.write(`<!DOCTYPE html>
-<html>
-<head>
-  <title>${title}</title>
-  <style>
-    body { font-family: 'Georgia', serif; max-width: 700px; margin: 40px auto; padding: 0 20px; color: #1a1a1a; line-height: 1.8; }
-    h1 { font-size: 28px; margin-bottom: 8px; }
-    .meta { color: #666; font-size: 14px; margin-bottom: 24px; border-bottom: 1px solid #ddd; padding-bottom: 16px; }
-    .excerpt { font-style: italic; color: #555; margin-bottom: 24px; font-size: 16px; }
-    .content { font-size: 16px; }
-    .content h2 { font-size: 22px; margin-top: 32px; }
-    .content h3 { font-size: 18px; margin-top: 24px; }
-    .content blockquote { border-left: 3px solid #00AA13; padding-left: 16px; margin: 16px 0; font-style: italic; color: #555; }
-    .content img { max-width: 100%; height: auto; margin: 16px 0; }
-    .footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid #ddd; font-size: 12px; color: #999; }
-    @media print { body { margin: 0; } }
-  </style>
-</head>
-<body>
-  <h1>${title}</h1>
-  <div class="meta">Penulis: ${authorName} | Kategori: ${categoryName} | ${dateStr}</div>
-  ${excerpt ? `<div class="excerpt">${excerpt}</div>` : ""}
-  <div class="content">${content}</div>
-  <div class="footer">&copy; ${yearStr} Jurnalis Hukum Bandung &mdash; jurnalishukumbandung.com</div>
-</body>
-</html>`);
-    printWindow.document.close();
-    printWindow.focus();
-    setTimeout(() => printWindow.print(), 500);
+
+    exportArticlePdf({
+      title,
+      excerpt: excerpt || undefined,
+      content,
+      author: authorName,
+      category: categoryName,
+      date: dateStr,
+      tags: tags.split(",").map((t: string) => t.trim()).filter(Boolean),
+      sources: sources.filter((s: { name: string }) => s.name?.trim()),
+    });
   };
 
   const handleExportText = () => {
