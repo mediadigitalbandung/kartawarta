@@ -444,109 +444,102 @@ function ArticleCalendar({ articles }: { articles: Article[] }) {
   const selectedArticles = selectedDay ? dayArticles.get(selectedDay) || [] : [];
 
   return (
-    <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
-      <div className="border-b border-border bg-surface-secondary px-5 py-4 flex items-center justify-between">
-        <h2 className="flex items-center gap-2 font-semibold text-txt-primary">
-          <Calendar size={18} className="text-goto-green" />
+    <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
+      <div className="border-b border-border px-5 py-3.5 flex items-center justify-between">
+        <h2 className="flex items-center gap-2 text-sm font-bold text-txt-primary">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-goto-light">
+            <Calendar size={14} className="text-goto-green" />
+          </div>
           Kalender Artikel
         </h2>
         <div className="flex items-center gap-2">
-          <button onClick={prevMonth} className="btn-ghost rounded p-1" aria-label="Bulan sebelumnya">
+          <button onClick={prevMonth} className="btn-ghost rounded-lg p-1.5" aria-label="Bulan sebelumnya">
             <ChevronLeft size={16} />
           </button>
-          <span className="text-sm font-medium text-txt-primary min-w-[140px] text-center">{monthName}</span>
-          <button onClick={nextMonth} className="btn-ghost rounded p-1" aria-label="Bulan berikutnya">
+          <span className="text-sm font-semibold text-txt-primary min-w-[140px] text-center">{monthName}</span>
+          <button onClick={nextMonth} className="btn-ghost rounded-lg p-1.5" aria-label="Bulan berikutnya">
             <ChevronRight size={16} />
           </button>
         </div>
       </div>
-      <div className="p-4">
-        {/* Day headers */}
-        <div className="grid grid-cols-7 gap-1 mb-1">
-          {dayNames.map((dn) => (
-            <div key={dn} className="text-center text-[10px] font-semibold text-txt-muted uppercase tracking-wider py-1">
-              {dn}
-            </div>
-          ))}
+      <div className="flex flex-col lg:flex-row">
+        {/* Calendar grid — left side */}
+        <div className="p-4 lg:w-1/2 lg:border-r lg:border-border">
+          <div className="grid grid-cols-7 gap-1 mb-1">
+            {dayNames.map((dn) => (
+              <div key={dn} className="text-center text-xs font-semibold text-txt-muted uppercase tracking-wider py-1">
+                {dn}
+              </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-1">
+            {cells.map((day, i) => {
+              if (day === null) return <div key={`empty-${i}`} className="h-10" />;
+              const count = dayArticles.get(day)?.length || 0;
+              const isToday = day === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear();
+              const isSelected = selectedDay === day;
+              return (
+                <button
+                  key={day}
+                  onClick={() => setSelectedDay(isSelected ? null : day)}
+                  className={`relative flex flex-col items-center justify-center h-10 rounded-lg text-sm font-medium transition-colors ${
+                    isSelected ? "bg-goto-green text-white" : isToday ? "bg-goto-light text-goto-green font-bold" : count > 0 ? "bg-surface-secondary text-txt-primary hover:bg-goto-light" : "text-txt-muted hover:bg-surface-secondary"
+                  }`}
+                  aria-label={`${day} ${monthName}${count > 0 ? `, ${count} artikel` : ""}`}
+                >
+                  {day}
+                  {count > 0 && (
+                    <span className={`absolute bottom-1 h-1 w-1 rounded-full ${isSelected ? "bg-white" : "bg-goto-green"}`} />
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
-        {/* Calendar grid */}
-        <div className="grid grid-cols-7 gap-1">
-          {cells.map((day, i) => {
-            if (day === null) {
-              return <div key={`empty-${i}`} className="h-10" />;
-            }
-            const count = dayArticles.get(day)?.length || 0;
-            const isToday =
-              day === new Date().getDate() &&
-              month === new Date().getMonth() &&
-              year === new Date().getFullYear();
-            const isSelected = selectedDay === day;
 
-            return (
-              <button
-                key={day}
-                onClick={() => setSelectedDay(isSelected ? null : day)}
-                className={`relative flex flex-col items-center justify-center h-10 rounded-lg text-xs font-medium transition-colors ${
-                  isSelected
-                    ? "bg-goto-green text-white"
-                    : isToday
-                      ? "bg-goto-light text-goto-green font-bold"
-                      : count > 0
-                        ? "bg-surface-secondary text-txt-primary hover:bg-goto-light"
-                        : "text-txt-muted hover:bg-surface-secondary"
-                }`}
-                aria-label={`${day} ${monthName}${count > 0 ? `, ${count} artikel` : ""}`}
-              >
-                {day}
-                {count > 0 && (
-                  <span
-                    className={`absolute bottom-1 h-1 w-1 rounded-full ${
-                      isSelected ? "bg-white" : "bg-goto-green"
-                    }`}
-                  />
-                )}
-              </button>
-            );
-          })}
-        </div>
-        {/* Selected day articles */}
-        {selectedDay !== null && (
-          <div className="mt-4 border-t border-border pt-3">
-            <p className="text-xs font-semibold text-txt-secondary mb-2">
-              Artikel tanggal {selectedDay} {monthName}
+        {/* Article list — right side, scrollable */}
+        <div className="lg:w-1/2 border-t lg:border-t-0 border-border">
+          <div className="px-4 py-3 border-b border-border bg-surface-secondary/50">
+            <p className="text-xs font-semibold text-txt-secondary">
+              {selectedDay ? `Artikel tanggal ${selectedDay} ${monthName}` : "Klik tanggal untuk lihat artikel"}
+              {selectedDay !== null && selectedArticles.length > 0 && (
+                <span className="ml-2 text-goto-green">({selectedArticles.length} artikel)</span>
+              )}
             </p>
-            {selectedArticles.length === 0 ? (
-              <p className="text-xs text-txt-muted">Tidak ada artikel pada tanggal ini.</p>
+          </div>
+          <div className="max-h-[280px] overflow-y-auto">
+            {selectedDay === null ? (
+              <div className="flex items-center justify-center h-[200px] text-sm text-txt-muted">
+                <div className="text-center">
+                  <Calendar size={32} className="mx-auto text-border mb-2" />
+                  <p>Pilih tanggal di kalender</p>
+                </div>
+              </div>
+            ) : selectedArticles.length === 0 ? (
+              <div className="flex items-center justify-center h-[200px] text-sm text-txt-muted">
+                Tidak ada artikel pada tanggal ini.
+              </div>
             ) : (
-              <ul className="space-y-1.5">
+              <div className="divide-y divide-border">
                 {selectedArticles.map((a) => (
-                  <li key={a.id}>
-                    <Link
-                      href={`/panel/artikel/${a.id}/edit`}
-                      className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs hover:bg-surface-secondary transition-colors"
-                    >
-                      <span
-                        className={`inline-block h-2 w-2 rounded-full shrink-0 ${
-                          a.status === "PUBLISHED"
-                            ? "bg-goto-green"
-                            : a.status === "APPROVED"
-                              ? "bg-blue-500"
-                              : a.status === "IN_REVIEW"
-                                ? "bg-yellow-500"
-                                : "bg-surface-tertiary"
-                        }`}
-                      />
-                      <span className="truncate font-medium text-txt-primary">{a.title}</span>
-                      <span className="ml-auto shrink-0 text-[10px] text-txt-muted">
-                        {statusLabels[a.status] || a.status}
-                      </span>
-                    </Link>
-                  </li>
+                  <Link
+                    key={a.id}
+                    href={`/panel/artikel/${a.id}/edit`}
+                    className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface-secondary/50 transition-colors"
+                  >
+                    <span className={`h-2 w-2 rounded-full shrink-0 ${
+                      a.status === "PUBLISHED" ? "bg-goto-green" : a.status === "APPROVED" ? "bg-blue-500" : a.status === "IN_REVIEW" ? "bg-yellow-500" : "bg-gray-400"
+                    }`} />
+                    <span className="flex-1 text-sm font-medium text-txt-primary truncate">{a.title}</span>
+                    <span className={`shrink-0 text-xs rounded px-2 py-0.5 font-semibold ${statusColors[a.status] || "bg-surface-tertiary text-txt-secondary"}`}>
+                      {statusLabels[a.status] || a.status}
+                    </span>
+                  </Link>
                 ))}
-              </ul>
+              </div>
             )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
@@ -925,7 +918,9 @@ export default function DashboardPage() {
         <RecentActivity articles={allArticles} />
         <WeeklyArticleTrend articles={allArticles} />
         <CategoryPerformance articles={allArticles} />
-        <ArticleCalendar articles={allArticles} />
+        <div className="lg:col-span-2">
+          <ArticleCalendar articles={allArticles} />
+        </div>
       </div>
 
       {/* Editorial checklist reminder */}
