@@ -744,17 +744,40 @@ export default function DashboardPage() {
 
         if (!isCreator && results[1]?.ok) {
           const reportsJson = await results[1].json();
-          const reports = reportsJson.data || [];
-          reportsPending = reports.filter(
-            (r: { status: string }) => r.status === "PENDING"
-          ).length;
+          reportsPending = reportsJson.data?.pendingCount || 0;
         }
 
         // Store all articles for analytics
         setAllArticles(fetchedArticles);
 
-        // Build stats based on role
-        if (isCreator) {
+        // Build stats based on role (check isAdmin first since SUPER_ADMIN is also in EDITOR_ROLES)
+        if (isAdmin) {
+          // Admin (SUPER_ADMIN): full stats
+          const totalArticles = fetchedArticles.length;
+          const totalViews = fetchedArticles.reduce((sum, a) => sum + (a.viewCount || 0), 0);
+          const pendingReview = fetchedArticles.filter((a) => a.status === "IN_REVIEW").length;
+          const published = fetchedArticles.filter((a) => a.status === "PUBLISHED").length;
+          const scheduled = fetchedArticles.filter((a) => a.scheduledAt && a.status === "APPROVED").length;
+          const today = new Date().toDateString();
+          const todayViews = fetchedArticles
+            .filter((a) => a.publishedAt && new Date(a.publishedAt).toDateString() === today)
+            .reduce((sum, a) => sum + (a.viewCount || 0), 0);
+
+          setStats([
+            { label: "Total Artikel", value: formatNumber(totalArticles), icon: FileText, color: "text-blue-500 bg-blue-50" },
+            { label: "Total Tayangan", value: formatNumber(totalViews), icon: Eye, color: "text-goto-green bg-goto-light" },
+            { label: "Menunggu Review", value: pendingReview.toString(), icon: Clock, color: "text-yellow-500 bg-yellow-50" },
+            { label: "Dipublikasi", value: formatNumber(published), icon: CheckCircle, color: "text-goto-green bg-goto-light" },
+            { label: "Dijadwalkan", value: scheduled.toString(), icon: CalendarClock, color: "text-blue-500 bg-blue-50" },
+            { label: "Laporan Masuk", value: reportsPending.toString(), icon: AlertTriangle, color: "text-red-500 bg-red-50" },
+            { label: "Tayangan Hari Ini", value: formatNumber(todayViews), icon: TrendingUp, color: "text-purple-500 bg-purple-50" },
+          ]);
+
+          const sorted = [...fetchedArticles].sort(
+            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+          setRecentArticles(sorted.slice(0, 5));
+        } else if (isCreator) {
           // Creator stats: my articles, my drafts, pending review, published
           const myTotal = fetchedArticles.length;
           const myDrafts = fetchedArticles.filter((a) => a.status === "DRAFT").length;
@@ -797,32 +820,6 @@ export default function DashboardPage() {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
           });
           setRecentArticles(sorted.slice(0, 5));
-        } else {
-          // Admin (SUPER_ADMIN): full stats
-          const totalArticles = fetchedArticles.length;
-          const totalViews = fetchedArticles.reduce((sum, a) => sum + (a.viewCount || 0), 0);
-          const pendingReview = fetchedArticles.filter((a) => a.status === "IN_REVIEW").length;
-          const published = fetchedArticles.filter((a) => a.status === "PUBLISHED").length;
-          const scheduled = fetchedArticles.filter((a) => a.scheduledAt && a.status === "APPROVED").length;
-          const today = new Date().toDateString();
-          const todayViews = fetchedArticles
-            .filter((a) => a.publishedAt && new Date(a.publishedAt).toDateString() === today)
-            .reduce((sum, a) => sum + (a.viewCount || 0), 0);
-
-          setStats([
-            { label: "Total Artikel", value: formatNumber(totalArticles), icon: FileText, color: "text-blue-500 bg-blue-50" },
-            { label: "Total Tayangan", value: formatNumber(totalViews), icon: Eye, color: "text-goto-green bg-goto-light" },
-            { label: "Menunggu Review", value: pendingReview.toString(), icon: Clock, color: "text-yellow-500 bg-yellow-50" },
-            { label: "Dipublikasi", value: formatNumber(published), icon: CheckCircle, color: "text-goto-green bg-goto-light" },
-            { label: "Dijadwalkan", value: scheduled.toString(), icon: CalendarClock, color: "text-blue-500 bg-blue-50" },
-            { label: "Laporan Masuk", value: reportsPending.toString(), icon: AlertTriangle, color: "text-red-500 bg-red-50" },
-            { label: "Tayangan Hari Ini", value: formatNumber(todayViews), icon: TrendingUp, color: "text-purple-500 bg-purple-50" },
-          ]);
-
-          const sorted = [...fetchedArticles].sort(
-            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          );
-          setRecentArticles(sorted.slice(0, 5));
         }
       } catch (err) {
         setError("Gagal memuat data dashboard. Silakan coba lagi.");
@@ -830,7 +827,7 @@ export default function DashboardPage() {
       } finally {
         setLoading(false);
       }
-  }, [session?.user, isCreator, isEditorRole, userId]);
+  }, [session?.user, isCreator, isEditorRole, isAdmin, userId]);
 
   useEffect(() => {
     fetchData();
