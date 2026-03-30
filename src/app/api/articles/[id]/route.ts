@@ -570,8 +570,60 @@ export async function PUT(
         return successResponse(updated);
       }
 
-      // Admin CANNOT edit article content
-      throw new ApiError("Admin tidak dapat mengedit konten artikel. Gunakan tombol aksi status.", 403);
+      // Admin content edit — save changes without status change
+      if (data.content && data.content !== article.content) {
+        await prisma.revision.create({
+          data: {
+            articleId: article.id,
+            title: article.title,
+            content: article.content,
+            changedBy: session.user.name || session.user.email,
+          },
+        });
+      }
+
+      const readTime = data.content ? calculateReadTime(data.content) : undefined;
+      const { reviewNote: _rn, status: _st, ...adminEditData } = data;
+
+      const updateData: Record<string, unknown> = {};
+      if (adminEditData.title) updateData.title = adminEditData.title;
+      if (adminEditData.content) updateData.content = adminEditData.content;
+      if (adminEditData.excerpt !== undefined) updateData.excerpt = adminEditData.excerpt;
+      if (adminEditData.categoryId) updateData.categoryId = adminEditData.categoryId;
+      if (adminEditData.featuredImage !== undefined) updateData.featuredImage = adminEditData.featuredImage;
+      if (adminEditData.seoTitle !== undefined) updateData.seoTitle = adminEditData.seoTitle;
+      if (adminEditData.seoDescription !== undefined) updateData.seoDescription = adminEditData.seoDescription;
+      if (adminEditData.authorId) updateData.authorId = adminEditData.authorId;
+      if (readTime) updateData.readTime = readTime;
+      if (tagNames && Array.isArray(tagNames)) {
+        updateData.tags = {
+          set: [],
+          connectOrCreate: tagNames.map((name: string) => ({
+            where: { name },
+            create: { name, slug: name.toLowerCase().replace(/\s+/g, "-") },
+          })),
+        };
+      }
+      if (sourcesData && Array.isArray(sourcesData)) {
+        await prisma.source.deleteMany({ where: { articleId: article.id } });
+        updateData.sources = {
+          create: sourcesData.filter((s: { name: string }) => s.name?.trim()),
+        };
+      }
+
+      const updated = await prisma.article.update({
+        where: { id: params.id },
+        data: updateData,
+        include: {
+          author: { select: { id: true, name: true } },
+          category: { select: { id: true, name: true, slug: true } },
+          tags: true,
+          sources: true,
+        },
+      });
+
+      await logAudit(session.user.id, "UPDATE", "article", article.id, `Admin mengedit artikel: ${article.title}`);
+      return successResponse(updated);
     }
 
     // Fallback - shouldn't reach here
