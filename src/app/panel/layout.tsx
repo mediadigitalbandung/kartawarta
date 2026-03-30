@@ -308,7 +308,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 lg:ml-60 min-w-0" style={{ overflowX: "clip" }}>
+        <main className="flex-1 lg:ml-60 min-w-0 overflow-x-auto">
           {/* Top bar */}
           <div className="sticky top-0 z-30 flex items-center justify-between bg-surface border-b border-border h-16 px-5">
             <div className="flex items-center">
