@@ -145,58 +145,47 @@ function StatusDonutChart({ articles }: { articles: Article[] }) {
 
   return (
     <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
-      <div className="border-b border-border px-6 py-5">
-        <h2 className="flex items-center gap-2.5 text-base font-bold text-txt-primary">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-50">
-            <Layers size={16} className="text-purple-500" />
+      <div className="border-b border-border px-5 py-3.5">
+        <h2 className="flex items-center gap-2 text-sm font-bold text-txt-primary">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-50">
+            <Layers size={14} className="text-purple-500" />
           </div>
           Distribusi Status
         </h2>
       </div>
-      <div className="p-6">
-        <div className="flex items-center gap-8">
+      <div className="p-5">
+        <div className="flex items-center gap-5">
           <div className="relative shrink-0">
-            <svg width="130" height="130" viewBox="0 0 130 130">
-              <circle cx="65" cy="65" r={radius} fill="none" stroke="#F0F1F3" strokeWidth="14" />
+            <svg width="90" height="90" viewBox="0 0 90 90">
+              <circle cx="45" cy="45" r="35" fill="none" stroke="#F0F1F3" strokeWidth="10" />
               {data.map((d) => {
                 const pct = d.count / total;
-                const dash = pct * circumference;
-                const off = -offset * circumference;
+                const r = 35;
+                const c = 2 * Math.PI * r;
+                const dash = pct * c;
+                const off = -offset * c;
                 offset += pct;
                 return (
-                  <circle
-                    key={d.status}
-                    cx="65" cy="65" r={radius}
-                    fill="none"
-                    stroke={d.stroke}
-                    strokeWidth="14"
-                    strokeLinecap="round"
-                    strokeDasharray={`${dash} ${circumference - dash}`}
-                    strokeDashoffset={off}
-                    className="transition-all duration-700"
-                  />
+                  <circle key={d.status} cx="45" cy="45" r={r} fill="none" stroke={d.stroke} strokeWidth="10" strokeLinecap="round" strokeDasharray={`${dash} ${c - dash}`} strokeDashoffset={off} className="transition-all duration-700" />
                 );
               })}
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-2xl font-extrabold text-txt-primary">{total}</span>
-              <span className="text-xs text-txt-muted">Artikel</span>
+              <span className="text-lg font-extrabold text-txt-primary">{total}</span>
             </div>
           </div>
-          <div className="flex-1 space-y-3">
+          <div className="flex-1 space-y-2">
             {data.map((d) => {
               const pct = ((d.count / total) * 100).toFixed(0);
               return (
-                <div key={d.status} className="group">
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2.5">
-                      <span className={`inline-flex h-7 items-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold ${d.bg} ${d.text}`}>
-                        {statusLabels[d.status] || d.status}
-                      </span>
-                    </div>
-                    <span className="text-sm font-bold text-txt-primary">{d.count} <span className="text-xs font-normal text-txt-muted">({pct}%)</span></span>
+                <div key={d.status}>
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-semibold ${d.bg} ${d.text}`}>
+                      {statusLabels[d.status] || d.status}
+                    </span>
+                    <span className="text-xs font-bold text-txt-primary">{d.count} ({pct}%)</span>
                   </div>
-                  <div className="h-1.5 w-full rounded-full bg-surface-tertiary overflow-hidden">
+                  <div className="h-1 w-full rounded-full bg-surface-tertiary overflow-hidden">
                     <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, backgroundColor: d.stroke }} />
                   </div>
                 </div>
@@ -320,51 +309,37 @@ function PublicationRate({ articles }: { articles: Article[] }) {
 
   return (
     <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
-      <div className="border-b border-border px-6 py-5">
-        <h2 className="flex items-center gap-2.5 text-base font-bold text-txt-primary">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-goto-light">
-            <CheckCircle size={16} className="text-goto-green" />
+      <div className="border-b border-border px-5 py-3.5">
+        <h2 className="flex items-center gap-2 text-sm font-bold text-txt-primary">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-goto-light">
+            <CheckCircle size={14} className="text-goto-green" />
           </div>
           Tingkat Publikasi
         </h2>
       </div>
-      <div className="p-6">
-        {/* Big rate display */}
-        <div className="flex items-center gap-6 mb-6">
+      <div className="p-5">
+        <div className="flex items-center gap-5 mb-4">
           <div className="relative shrink-0">
-            <svg width="100" height="100" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r={radius} fill="none" stroke="#F0F1F3" strokeWidth="8" />
-              <circle
-                cx="50" cy="50" r={radius}
-                fill="none" stroke="#00AA13" strokeWidth="8"
-                strokeDasharray={`${dashArray} ${circumference - dashArray}`}
-                strokeDashoffset={circumference * 0.25}
-                strokeLinecap="round"
-                className="transition-all duration-700"
-              />
+            <svg width="70" height="70" viewBox="0 0 70 70">
+              <circle cx="35" cy="35" r="28" fill="none" stroke="#F0F1F3" strokeWidth="7" />
+              <circle cx="35" cy="35" r="28" fill="none" stroke="#00AA13" strokeWidth="7" strokeDasharray={`${(rate / 100) * 2 * Math.PI * 28} ${(1 - rate / 100) * 2 * Math.PI * 28}`} strokeDashoffset={2 * Math.PI * 28 * 0.25} strokeLinecap="round" className="transition-all duration-700" />
             </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-2xl font-extrabold text-goto-green">{rate.toFixed(0)}%</span>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-base font-extrabold text-goto-green">{rate.toFixed(0)}%</span>
             </div>
           </div>
           <div>
-            <p className="text-sm text-txt-muted">Dari total {total} artikel</p>
-            <p className="text-lg font-bold text-txt-primary">{published} berhasil dipublikasi</p>
+            <p className="text-xs text-txt-muted">Dari {total} artikel</p>
+            <p className="text-sm font-bold text-txt-primary">{published} dipublikasi</p>
           </div>
         </div>
-        {/* Breakdown bars */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           {breakdownData.map((item) => (
-            <div key={item.label}>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-sm text-txt-secondary">{item.label}</span>
-                <span className={`text-sm font-bold ${item.textColor}`}>{item.value}</span>
-              </div>
-              <div className="h-2 w-full rounded-full bg-surface-tertiary overflow-hidden">
-                <div
-                  className={`h-full rounded-full ${item.color} transition-all duration-500`}
-                  style={{ width: total > 0 ? `${(item.value / total) * 100}%` : "0%" }}
-                />
+            <div key={item.label} className="flex items-center gap-3">
+              <span className="text-xs text-txt-secondary flex-1">{item.label}</span>
+              <span className={`text-xs font-bold ${item.textColor} w-8 text-right`}>{item.value}</span>
+              <div className="h-1 w-20 rounded-full bg-surface-tertiary overflow-hidden">
+                <div className={`h-full rounded-full ${item.color} transition-all duration-500`} style={{ width: total > 0 ? `${(item.value / total) * 100}%` : "0%" }} />
               </div>
             </div>
           ))}
@@ -401,33 +376,33 @@ function WeeklyArticleTrend({ articles }: { articles: Article[] }) {
 
   return (
     <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
-      <div className="border-b border-border px-6 py-5 flex items-center justify-between">
-        <h2 className="flex items-center gap-2.5 text-base font-bold text-txt-primary">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
-            <BarChart3 size={16} className="text-blue-500" />
+      <div className="border-b border-border px-5 py-3.5 flex items-center justify-between">
+        <h2 className="flex items-center gap-2 text-sm font-bold text-txt-primary">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50">
+            <BarChart3 size={14} className="text-blue-500" />
           </div>
           Aktivitas Mingguan
         </h2>
-        <span className="text-sm text-txt-muted">{totalWeek} artikel</span>
+        <span className="text-xs text-txt-muted">{totalWeek} artikel</span>
       </div>
-      <div className="p-6 space-y-3">
+      <div className="p-5 space-y-2">
         {weekData.map((day, i) => (
-          <div key={i} className="flex items-center gap-4">
-            <span className="w-20 text-sm text-txt-secondary text-right shrink-0 font-medium">
+          <div key={i} className="flex items-center gap-3">
+            <span className="w-16 text-xs text-txt-secondary text-right shrink-0 font-medium">
               {day.label}
             </span>
-            <div className="flex-1 h-7 bg-surface-secondary rounded-lg overflow-hidden">
+            <div className="flex-1 h-5 bg-surface-secondary rounded-md overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-goto-green to-goto-dark rounded-lg transition-all duration-500 flex items-center justify-end pr-2"
-                style={{ width: `${(day.count / maxCount) * 100}%`, minWidth: day.count > 0 ? "32px" : "0px" }}
+                className="h-full bg-gradient-to-r from-goto-green to-goto-dark rounded-md transition-all duration-500 flex items-center justify-end pr-1.5"
+                style={{ width: `${(day.count / maxCount) * 100}%`, minWidth: day.count > 0 ? "24px" : "0px" }}
               >
                 {day.count > 0 && (
-                  <span className="text-xs font-bold text-white">{day.count}</span>
+                  <span className="text-[10px] font-bold text-white">{day.count}</span>
                 )}
               </div>
             </div>
             {day.count === 0 && (
-              <span className="w-6 text-sm text-txt-muted text-right">0</span>
+              <span className="w-4 text-xs text-txt-muted text-right">0</span>
             )}
           </div>
         ))}
@@ -545,23 +520,23 @@ function AverageReviewTime({ articles }: { articles: Article[] }) {
   }, [articles]);
 
   return (
-    <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
-      <div className="border-b border-border bg-surface-secondary px-5 py-4">
-        <h2 className="flex items-center gap-2 font-semibold text-txt-primary">
-          <Timer size={18} className="text-purple-500" />
+    <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
+      <div className="border-b border-border px-5 py-3.5">
+        <h2 className="flex items-center gap-2 text-sm font-bold text-txt-primary">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-50">
+            <Timer size={14} className="text-purple-500" />
+          </div>
           Rata-rata Waktu Review
         </h2>
       </div>
-      <div className="flex items-center justify-center p-8">
+      <div className="flex items-center justify-center p-5">
         {avgTime ? (
           <div className="text-center">
-            <p className="text-3xl font-extrabold text-txt-primary">{avgTime}</p>
-            <p className="mt-1 text-xs text-txt-secondary">
-              dari artikel dikirim hingga direview
-            </p>
+            <p className="text-2xl font-extrabold text-txt-primary">{avgTime}</p>
+            <p className="mt-1 text-xs text-txt-secondary">dikirim hingga direview</p>
           </div>
         ) : (
-          <p className="text-sm text-txt-secondary">Belum ada data review.</p>
+          <p className="text-sm text-txt-secondary">Belum ada data.</p>
         )}
       </div>
     </div>
