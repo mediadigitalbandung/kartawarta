@@ -497,7 +497,7 @@ export default function EditArticlePage() {
 
   // --- EDITOR HANDLERS ---
   const handleEditorApprove = async () => {
-    const ok = await confirm({ message: "Setujui artikel ini? Artikel akan diteruskan ke admin untuk publikasi.", variant: "warning", title: "Konfirmasi" });
+    const ok = await confirm({ message: "Setujui artikel ini? Artikel dapat dipublikasi oleh editor atau admin.", variant: "warning", title: "Konfirmasi" });
     if (!ok) return;
     setSaving(true);
     try {
@@ -573,6 +573,32 @@ export default function EditArticlePage() {
         return;
       }
       success("Persetujuan dibatalkan. Artikel kembali ke review.");
+      router.push("/panel/artikel");
+      router.refresh();
+    } catch {
+      setError("Terjadi kesalahan.");
+      setSaving(false);
+    }
+  };
+
+  // --- EDITOR PUBLISH ---
+  const handleEditorPublish = async () => {
+    const ok = await confirm({ message: "Publikasi artikel ini sekarang? Artikel akan tampil di halaman publik.", variant: "warning", title: "Konfirmasi" });
+    if (!ok) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/articles/${articleId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "PUBLISHED" }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        setError(data.error || "Gagal mempublikasi artikel");
+        setSaving(false);
+        return;
+      }
+      success("Artikel berhasil dipublikasi!");
       router.push("/panel/artikel");
       router.refresh();
     } catch {
@@ -1071,7 +1097,7 @@ export default function EditArticlePage() {
                   <CheckCircle size={20} />
                   Setujui
                 </div>
-                <p className="mt-1 text-xs text-txt-secondary">Artikel memenuhi standar. Teruskan ke admin untuk publikasi.</p>
+                <p className="mt-1 text-xs text-txt-secondary">Artikel memenuhi standar. Teruskan untuk publikasi.</p>
                 {reviewChoice === "approve" && (
                   <div className="mt-3">
                     <label className="mb-1 block text-xs font-medium text-txt-secondary">
@@ -1161,24 +1187,34 @@ export default function EditArticlePage() {
           </div>
         )}
 
-        {/* Editor Cancel Approval - APPROVED */}
+        {/* Editor APPROVED — Publish or Cancel */}
         {currentStatus === "APPROVED" && isAssignedEditor && (
-          <div className="mb-6 rounded-[12px] border border-blue-200 bg-blue-50 p-5">
-            <h3 className="flex items-center gap-2 text-base font-bold text-blue-700">
+          <div className="mb-6 rounded-[12px] border-2 border-goto-green/30 bg-goto-50 p-5">
+            <h3 className="flex items-center gap-2 text-base font-bold text-goto-dark">
               <CheckCircle size={18} />
-              Artikel Telah Disetujui
+              Artikel Telah Disetujui — Siap Dipublikasi
             </h3>
-            <p className="mt-1 text-sm text-blue-600">
-              Menunggu publikasi oleh admin.
+            <p className="mt-1 text-sm text-goto-green">
+              Artikel siap dipublikasi. Anda dapat mempublikasi atau membatalkan persetujuan.
             </p>
-            <button
-              onClick={handleEditorCancelApproval}
-              disabled={saving}
-              className="mt-3 flex items-center gap-1.5 rounded-[12px] border border-yellow-300 bg-yellow-50 px-4 py-2 text-sm font-semibold text-yellow-700 hover:bg-yellow-100 disabled:opacity-50"
-            >
-              <Undo2 size={16} />
-              Batalkan Persetujuan
-            </button>
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <button
+                onClick={handleEditorPublish}
+                disabled={saving}
+                className="flex items-center gap-1.5 rounded-[12px] bg-goto-green px-5 py-2.5 text-sm font-semibold text-white hover:bg-goto-dark disabled:opacity-50"
+              >
+                <Upload size={16} />
+                Publikasi Sekarang
+              </button>
+              <button
+                onClick={handleEditorCancelApproval}
+                disabled={saving}
+                className="flex items-center gap-1.5 rounded-[12px] border border-yellow-300 bg-yellow-50 px-4 py-2.5 text-sm font-semibold text-yellow-700 hover:bg-yellow-100 disabled:opacity-50"
+              >
+                <Undo2 size={16} />
+                Batalkan Persetujuan
+              </button>
+            </div>
           </div>
         )}
 
@@ -1481,7 +1517,7 @@ export default function EditArticlePage() {
             Artikel Telah Disetujui
           </h3>
           <p className="mt-1 text-sm text-blue-600">
-            Artikel telah disetujui oleh editor. Menunggu publikasi oleh admin.
+            Artikel telah disetujui oleh editor. Artikel siap dipublikasi.
           </p>
           {existingReviewNote && (
             <p className="mt-2 text-sm text-blue-500">Catatan editor: {existingReviewNote}</p>
