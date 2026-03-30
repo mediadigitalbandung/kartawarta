@@ -16,6 +16,8 @@ import {
   CheckCircle,
   Loader2,
   Sparkles,
+  TrendingUp,
+  Lightbulb,
 } from "lucide-react";
 import ImageUploader from "@/components/editor/ImageUploader";
 
@@ -140,6 +142,24 @@ export default function NewArticlePage() {
   });
 
   const allChecked = Object.values(checklist).every(Boolean);
+
+  const [trendingSuggestions, setTrendingSuggestions] = useState<{ label: string; hot: boolean }[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(true);
+
+  // Fetch trending suggestions on mount
+  useEffect(() => {
+    async function fetchTrending() {
+      try {
+        const res = await fetch("/api/trending");
+        if (res.ok) {
+          const json = await res.json();
+          const data = json.data || [];
+          setTrendingSuggestions(data);
+        }
+      } catch { /* ignore */ }
+    }
+    fetchTrending();
+  }, []);
 
   const [aiLoading, setAiLoading] = useState<Record<string, boolean>>({});
 
@@ -353,6 +373,48 @@ export default function NewArticlePage() {
         <div className="mb-4 flex items-center gap-2 rounded-[12px] bg-red-50 px-4 py-3 text-sm text-red-700">
           <AlertCircle size={16} />
           {error}
+        </div>
+      )}
+
+      {/* Trending Suggestions */}
+      {trendingSuggestions.length > 0 && showSuggestions && !title.trim() && (
+        <div className="mb-4 rounded-[12px] border border-border bg-surface p-4 shadow-card">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-goto-light">
+                <Lightbulb size={14} className="text-goto-green" />
+              </div>
+              <h3 className="text-sm font-bold text-txt-primary">Ide Berita dari Trending</h3>
+              <span className="text-xs text-txt-muted">— klik untuk pakai sebagai judul</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowSuggestions(false)}
+              className="text-xs text-txt-muted hover:text-txt-secondary"
+            >
+              Tutup
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {trendingSuggestions.map((item, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => {
+                  setTitle(item.label);
+                  setShowSuggestions(false);
+                }}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors hover:border-goto-green hover:text-goto-green ${
+                  item.hot
+                    ? "border-red-200 bg-red-50 text-red-600 hover:bg-red-50"
+                    : "border-border bg-surface-secondary text-txt-secondary"
+                }`}
+              >
+                {item.hot && <TrendingUp size={11} />}
+                {item.label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
