@@ -152,15 +152,21 @@ function RecentActivity({ articles }: { articles: Article[] }) {
           <div className="p-5 text-center text-sm text-txt-muted">Belum ada aktivitas.</div>
         ) : (
           activities.map((a, i) => (
-            <Link key={`${a.id}-${i}`} href={`/panel/artikel/${a.id}/edit`} className="flex items-center gap-3 px-5 py-3 hover:bg-surface-secondary/50 transition-colors">
-              <div className={`h-2 w-2 rounded-full shrink-0 ${a.action.icon}`} />
-              <div className="flex-1 min-w-0">
+            <Link key={`${a.id}-${i}`} href={`/panel/artikel/${a.id}/edit`} className="grid grid-cols-[auto_1fr_auto] items-center gap-3 px-5 py-3 hover:bg-surface-secondary/50 transition-colors">
+              <div className={`h-2 w-2 rounded-full ${a.action.icon}`} />
+              <div className="min-w-0">
                 <p className="text-xs font-semibold text-txt-primary truncate">{a.title}</p>
                 <p className="text-[11px] text-txt-muted mt-0.5">
                   {a.author?.name || "—"} &middot; {a.timeAgo}
                 </p>
               </div>
-              <span className={`shrink-0 text-xs font-semibold ${a.action.color}`}>{a.action.label}</span>
+              <span className={`rounded px-2 py-0.5 text-xs font-semibold whitespace-nowrap ${
+                a.action.color === "text-goto-green" ? "bg-goto-light text-goto-green" :
+                a.action.color === "text-yellow-600" ? "bg-yellow-50 text-yellow-600" :
+                a.action.color === "text-blue-600" ? "bg-blue-50 text-blue-600" :
+                a.action.color === "text-red-600" ? "bg-red-50 text-red-600" :
+                "bg-surface-tertiary text-txt-secondary"
+              }`}>{a.action.label}</span>
             </Link>
           ))
         )}
