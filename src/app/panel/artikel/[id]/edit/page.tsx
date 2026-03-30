@@ -669,6 +669,50 @@ export default function EditArticlePage() {
     }
   };
 
+  // --- ADMIN SAVE CONTENT ---
+  const handleAdminSave = async () => {
+    setError("");
+    if (!title.trim()) return setError("Judul wajib diisi");
+    if (!content.trim()) return setError("Konten tidak boleh kosong");
+    if (!categoryId) return setError("Kategori harus dipilih");
+
+    setSaving(true);
+    try {
+      const validSources = sources.filter((s) => s.name.trim());
+      const tagList = tags.split(",").map((t) => t.trim()).filter(Boolean);
+
+      const res = await fetch(`/api/articles/${articleId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          content,
+          excerpt: excerpt || undefined,
+          categoryId,
+          tags: tagList,
+          featuredImage: featuredImage || undefined,
+          seoTitle: seoTitle || undefined,
+          seoDescription: seoDescription || undefined,
+          sources: validSources.length > 0 ? validSources : undefined,
+        }),
+      });
+
+      const data = await res.json();
+      if (!data.success) {
+        setError(data.error || "Gagal menyimpan artikel");
+        setSaving(false);
+        return;
+      }
+
+      success("Artikel berhasil disimpan");
+      router.refresh();
+    } catch {
+      setError("Terjadi kesalahan. Silakan coba lagi.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) {
     return <LoadingSkeleton />;
   }
@@ -897,32 +941,56 @@ export default function EditArticlePage() {
           </Link>
         </div>
 
-        {/* Read-only article content */}
-        <div className="space-y-4">
-          <div className="rounded-[12px] border border-border bg-surface p-5">
-            <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Judul</label>
-            <p className="text-lg font-bold text-txt-primary">{title}</p>
-          </div>
-          <div className="rounded-[12px] border border-border bg-surface p-5">
-            <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Kategori</label>
-            <p className="text-sm text-txt-primary">{categories.find(c => c.id === categoryId)?.name || categoryId}</p>
-          </div>
-          {excerpt && (
-            <div className="rounded-[12px] border border-border bg-surface p-5">
-              <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Ringkasan</label>
-              <p className="text-sm text-txt-primary">{excerpt}</p>
+        {/* Editable article content */}
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-sm font-bold text-txt-primary uppercase tracking-wider">Edit Konten Artikel</h3>
+          <button
+            onClick={handleAdminSave}
+            disabled={saving}
+            className="btn-primary flex items-center gap-1.5 px-5 py-2.5 text-sm font-semibold disabled:opacity-50"
+          >
+            {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+            Simpan Perubahan
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="space-y-4 lg:col-span-2">
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Judul Artikel"
+              className="input w-full px-4 py-3 text-xl font-bold"
+            />
+            <div className="rounded-[12px] border border-border overflow-hidden">
+              <RichTextEditor content={content} onChange={setContent} />
             </div>
-          )}
-          {featuredImage && (
-            <div className="rounded-[12px] border border-border bg-surface p-5">
-              <label className="mb-1 block text-xs font-medium text-txt-muted uppercase tracking-wider">Gambar Utama</label>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={featuredImage} alt="Featured" className="mt-2 max-h-64 rounded-[8px] object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+          </div>
+
+          <div className="space-y-4">
+            <div className="rounded-[12px] border border-border bg-surface p-4">
+              <label className="mb-2 block text-xs font-medium text-txt-muted uppercase tracking-wider">Kategori</label>
+              <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="input w-full">
+                <option value="">Pilih kategori</option>
+                {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
             </div>
-          )}
-          <div className="rounded-[12px] border border-border bg-surface p-5">
-            <label className="mb-2 block text-xs font-medium text-txt-muted uppercase tracking-wider">Konten</label>
-            <div className="prose prose-sm max-w-none text-txt-primary text-justify" dangerouslySetInnerHTML={{ __html: content }} />
+            <div className="rounded-[12px] border border-border bg-surface p-4">
+              <label className="mb-2 block text-xs font-medium text-txt-muted uppercase tracking-wider">Tags</label>
+              <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} className="input w-full" placeholder="Tag1, Tag2, Tag3" />
+            </div>
+            <div className="rounded-[12px] border border-border bg-surface p-4">
+              <label className="mb-2 block text-xs font-medium text-txt-muted uppercase tracking-wider">Ringkasan</label>
+              <textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} className="input w-full" rows={3} placeholder="Ringkasan artikel..." />
+            </div>
+            {featuredImage && (
+              <div className="rounded-[12px] border border-border bg-surface p-4">
+                <label className="mb-2 block text-xs font-medium text-txt-muted uppercase tracking-wider">Gambar Utama</label>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={featuredImage} alt="Featured" className="mt-1 max-h-48 rounded-[8px] object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+              </div>
+            )}
           </div>
         </div>
       </div>
