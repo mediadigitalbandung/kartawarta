@@ -30,6 +30,7 @@ const updateArticleSchema = z.object({
   scheduledAt: z.string().datetime().optional().nullable(),
   reviewNote: z.string().max(1000).optional().nullable(),
   assignedEditorId: z.string().optional().nullable(),
+  authorId: z.string().optional(),
 });
 
 // GET /api/articles/:id
@@ -150,9 +151,9 @@ export async function PUT(
         throw new ApiError("Anda hanya dapat menyimpan draf atau mengirim untuk review", 403);
       }
 
-      // If sending for review, randomly assign an editor
-      let assignedReviewerId: string | null = article.reviewedBy;
-      if (data.status === "IN_REVIEW") {
+      // If sending for review, assign an editor (use provided or random)
+      let assignedReviewerId: string | null = data.assignedEditorId || article.reviewedBy;
+      if (data.status === "IN_REVIEW" && !data.assignedEditorId) {
         const editors = await prisma.user.findMany({
           where: {
             role: { in: ["EDITOR", "CHIEF_EDITOR"] },

@@ -55,7 +55,7 @@ interface Source {
   url: string;
 }
 
-import { EDITOR_ROLES, ADMIN_ROLES, CAN_SUBMIT_REVIEW } from "@/lib/roles";
+import { EDITOR_ROLES, ADMIN_ROLES, CAN_SUBMIT_REVIEW, roleLabelsMap } from "@/lib/roles";
 
 function LoadingSkeleton() {
   return (
@@ -123,6 +123,11 @@ export default function EditArticlePage() {
   const [articleAuthorId, setArticleAuthorId] = useState("");
   const [articleAuthorName, setArticleAuthorName] = useState("");
   const [articleCreatedAt, setArticleCreatedAt] = useState("");
+
+  // Author/Editor selection state
+  const [allUsers, setAllUsers] = useState<{id: string; name: string; role: string}[]>([]);
+  const [selectedAuthorId, setSelectedAuthorId] = useState("");
+  const [selectedEditorId, setSelectedEditorId] = useState("");
 
   // Editor review state
   const [reviewChoice, setReviewChoice] = useState<"approve" | "reject" | null>(null);
@@ -350,6 +355,8 @@ export default function EditArticlePage() {
       setArticleAuthorId(article.authorId || article.author?.id || "");
       setArticleAuthorName(article.author?.name || "");
       setArticleCreatedAt(article.createdAt || "");
+      setSelectedAuthorId(article.authorId || article.author?.id || "");
+      setSelectedEditorId(article.reviewedBy || article.assignedEditorId || "");
 
       if (article.sources && article.sources.length > 0) {
         setSources(
@@ -372,6 +379,22 @@ export default function EditArticlePage() {
     fetchCategories();
     fetchArticle();
   }, [fetchCategories, fetchArticle]);
+
+  // Fetch users for author/editor dropdowns
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const res = await fetch("/api/users");
+        if (res.ok) {
+          const json = await res.json();
+          setAllUsers(json.data || []);
+        }
+      } catch { /* ignore */ }
+    }
+    if (session?.user) {
+      fetchUsers();
+    }
+  }, [session?.user]);
 
   const addSource = () => {
     if (sources.length > 0 && !sources[sources.length - 1].name.trim()) {
@@ -446,6 +469,7 @@ export default function EditArticlePage() {
           seoDescription: seoDescription || undefined,
           status,
           sources: validSources.length > 0 ? validSources : undefined,
+          assignedEditorId: selectedEditorId || undefined,
         }),
       });
 
@@ -1525,6 +1549,46 @@ export default function EditArticlePage() {
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
+              </select>
+            </div>
+            {/* Pilih Penulis — only for admin/editor */}
+            {EDITOR_ROLES.includes(userRole) && (
+              <div className="rounded-[12px] border border-border bg-surface p-6">
+                <label className="mb-2 block text-sm font-medium text-txt-primary">
+                  Penulis
+                </label>
+                <select
+                  value={selectedAuthorId}
+                  onChange={(e) => setSelectedAuthorId(e.target.value)}
+                  className="input w-full"
+                >
+                  <option value="">Saya sendiri</option>
+                  {allUsers
+                    .filter(u => ["JOURNALIST", "SENIOR_JOURNALIST", "CONTRIBUTOR", "EDITOR", "CHIEF_EDITOR", "SUPER_ADMIN"].includes(u.role))
+                    .map(u => (
+                      <option key={u.id} value={u.id}>{u.name} ({roleLabelsMap[u.role] || u.role})</option>
+                    ))
+                  }
+                </select>
+              </div>
+            )}
+            {/* Pilih Editor — for all roles */}
+            <div className="rounded-[12px] border border-border bg-surface p-6">
+              <label className="mb-2 block text-sm font-medium text-txt-primary">
+                Editor
+              </label>
+              <select
+                value={selectedEditorId}
+                onChange={(e) => setSelectedEditorId(e.target.value)}
+                className="input w-full"
+              >
+                <option value="">Otomatis (random)</option>
+                {allUsers
+                  .filter(u => ["EDITOR", "CHIEF_EDITOR", "SUPER_ADMIN"].includes(u.role))
+                  .map(u => (
+                    <option key={u.id} value={u.id}>{u.name} ({roleLabelsMap[u.role] || u.role})</option>
+                  ))
+                }
               </select>
             </div>
             <div className="rounded-[12px] border border-border bg-surface p-6">

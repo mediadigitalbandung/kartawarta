@@ -2,29 +2,46 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import { successResponse, errorResponse, requireRole, logAudit, ApiError } from "@/lib/api-utils";
+import { successResponse, errorResponse, requireRole, requireAuth, logAudit, ApiError } from "@/lib/api-utils";
 
 // GET /api/users
 export async function GET() {
   try {
-    await requireRole(["SUPER_ADMIN", "CHIEF_EDITOR"]);
+    const session = await requireAuth();
+    const isAdmin = ["SUPER_ADMIN", "CHIEF_EDITOR"].includes(session.user.role);
 
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        avatar: true,
-        role: true,
-        specialization: true,
-        isActive: true,
-        createdAt: true,
-        _count: { select: { articles: true } },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    if (isAdmin) {
+      // Admin: return full data
+      const users = await prisma.user.findMany({
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          avatar: true,
+          role: true,
+          specialization: true,
+          isActive: true,
+          createdAt: true,
+          _count: { select: { articles: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      });
 
-    return successResponse(users);
+      return successResponse(users);
+    } else {
+      // Non-admin: return only id, name, role for active users
+      const users = await prisma.user.findMany({
+        where: { isActive: true },
+        select: {
+          id: true,
+          name: true,
+          role: true,
+        },
+        orderBy: { name: "asc" },
+      });
+
+      return successResponse(users);
+    }
   } catch (error) {
     return errorResponse(error);
   }

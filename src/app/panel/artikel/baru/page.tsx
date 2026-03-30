@@ -37,7 +37,7 @@ interface Source {
   url: string;
 }
 
-import { CAN_SUBMIT_REVIEW } from "@/lib/roles";
+import { CAN_SUBMIT_REVIEW, EDITOR_ROLES, roleLabelsMap } from "@/lib/roles";
 
 export default function NewArticlePage() {
   const router = useRouter();
@@ -61,6 +61,9 @@ export default function NewArticlePage() {
   const [showSeo, setShowSeo] = useState(false);
   const [showChecklist, setShowChecklist] = useState(false);
   const [showAutosaveBanner, setShowAutosaveBanner] = useState(false);
+  const [users, setUsers] = useState<{id: string; name: string; role: string}[]>([]);
+  const [selectedAuthorId, setSelectedAuthorId] = useState("");
+  const [selectedEditorId, setSelectedEditorId] = useState("");
   // Word counter calculations
   const plainText = content.replace(/<[^>]*>/g, "").trim();
   const wordCount = plainText ? plainText.split(/\s+/).length : 0;
@@ -190,6 +193,22 @@ export default function NewArticlePage() {
     fetchCategories();
   }, [fetchCategories]);
 
+  // Fetch users for author/editor dropdowns
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const res = await fetch("/api/users");
+        if (res.ok) {
+          const json = await res.json();
+          setUsers(json.data || []);
+        }
+      } catch { /* ignore */ }
+    }
+    if (session?.user) {
+      fetchUsers();
+    }
+  }, [session?.user]);
+
   const addSource = () => {
     if (sources.length > 0 && !sources[sources.length - 1].name.trim()) {
       return;
@@ -251,6 +270,8 @@ export default function NewArticlePage() {
           seoDescription: seoDescription || undefined,
           status,
           sources: validSources.length > 0 ? validSources : undefined,
+          authorId: selectedAuthorId || undefined,
+          assignedEditorId: selectedEditorId || undefined,
         }),
       });
 
@@ -483,6 +504,48 @@ export default function NewArticlePage() {
                   {cat.name}
                 </option>
               ))}
+            </select>
+          </div>
+
+          {/* Pilih Penulis — only for admin/editor */}
+          {EDITOR_ROLES.includes(userRole) && (
+            <div className="rounded-[12px] border border-border bg-surface p-6">
+              <label className="mb-2 block text-sm font-medium text-txt-primary">
+                Penulis
+              </label>
+              <select
+                value={selectedAuthorId}
+                onChange={(e) => setSelectedAuthorId(e.target.value)}
+                className="input w-full"
+              >
+                <option value="">Saya sendiri</option>
+                {users
+                  .filter(u => ["JOURNALIST", "SENIOR_JOURNALIST", "CONTRIBUTOR", "EDITOR", "CHIEF_EDITOR", "SUPER_ADMIN"].includes(u.role))
+                  .map(u => (
+                    <option key={u.id} value={u.id}>{u.name} ({roleLabelsMap[u.role] || u.role})</option>
+                  ))
+                }
+              </select>
+            </div>
+          )}
+
+          {/* Pilih Editor — for all roles */}
+          <div className="rounded-[12px] border border-border bg-surface p-6">
+            <label className="mb-2 block text-sm font-medium text-txt-primary">
+              Editor
+            </label>
+            <select
+              value={selectedEditorId}
+              onChange={(e) => setSelectedEditorId(e.target.value)}
+              className="input w-full"
+            >
+              <option value="">Otomatis (random)</option>
+              {users
+                .filter(u => ["EDITOR", "CHIEF_EDITOR", "SUPER_ADMIN"].includes(u.role))
+                .map(u => (
+                  <option key={u.id} value={u.id}>{u.name} ({roleLabelsMap[u.role] || u.role})</option>
+                ))
+              }
             </select>
           </div>
 

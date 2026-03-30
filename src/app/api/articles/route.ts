@@ -22,6 +22,8 @@ const createArticleSchema = z.object({
   seoTitle: z.string().max(70).optional(),
   seoDescription: z.string().max(160).optional(),
   status: z.enum(["DRAFT", "IN_REVIEW"]).optional(),
+  authorId: z.string().optional(),
+  assignedEditorId: z.string().optional(),
   sources: z
     .array(
       z.object({
@@ -176,9 +178,12 @@ export async function POST(request: NextRequest) {
       tagConnections.push(...tags.map((t) => ({ id: t.id })));
     }
 
-    // If submitting for review, randomly assign an editor
-    let assignedReviewerId: string | null = null;
-    if (finalStatus === "IN_REVIEW") {
+    // Determine the actual author
+    const effectiveAuthorId = (canApproveArticles(session.user.role) && data.authorId) ? data.authorId : session.user.id;
+
+    // If submitting for review, assign an editor (use provided or random)
+    let assignedReviewerId: string | null = data.assignedEditorId || null;
+    if (finalStatus === "IN_REVIEW" && !assignedReviewerId) {
       const editors = await prisma.user.findMany({
         where: {
           role: { in: ["EDITOR", "CHIEF_EDITOR"] },
@@ -202,7 +207,7 @@ export async function POST(request: NextRequest) {
         status: finalStatus as "DRAFT" | "IN_REVIEW",
         verificationLabel: "UNVERIFIED",
         readTime,
-        authorId: session.user.id,
+        authorId: effectiveAuthorId,
         categoryId: data.categoryId,
         seoTitle: data.seoTitle || data.title,
         seoDescription: data.seoDescription || data.content.replace(/<[^>]*>/g, "").slice(0, 160),
@@ -213,6 +218,7 @@ export async function POST(request: NextRequest) {
           ? { create: data.sources }
           : undefined,
         reviewedBy: assignedReviewerId,
+        assignedEditorId: data.assignedEditorId || null,
       },
       include: {
         author: { select: { id: true, name: true } },
