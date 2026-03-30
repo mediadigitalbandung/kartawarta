@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { successResponse, errorResponse, requireRole } from "@/lib/api-utils";
+import { successResponse, errorResponse, requireRole, requireAuth } from "@/lib/api-utils";
 
 const updateReportSchema = z.object({
   id: z.string().min(1),
@@ -15,19 +15,25 @@ const createReportSchema = z.object({
   email: z.string().email().optional(),
 });
 
-// GET /api/reports — admin only (supports pagination)
+// GET /api/reports — editors see all, creators see only their articles' reports
 export async function GET(request: NextRequest) {
   try {
-    await requireRole(["SUPER_ADMIN", "CHIEF_EDITOR", "EDITOR"]);
+    const session = await requireAuth();
+    const role = session.user.role;
+    const isEditor = ["SUPER_ADMIN", "CHIEF_EDITOR", "EDITOR"].includes(role);
 
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "20", 10)));
-    const status = searchParams.get("status"); // "PENDING" | "REVIEWED" | "RESOLVED" | "DISMISSED" | null
+    const status = searchParams.get("status");
 
     const where: Record<string, unknown> = {};
     if (status && ["PENDING", "REVIEWED", "RESOLVED", "DISMISSED"].includes(status)) {
       where.status = status;
+    }
+    // Non-editors can only see reports on their own articles
+    if (!isEditor) {
+      where.article = { authorId: session.user.id };
     }
 
     const [reports, total, pendingCount] = await Promise.all([
