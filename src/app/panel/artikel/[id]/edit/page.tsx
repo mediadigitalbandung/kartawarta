@@ -747,19 +747,29 @@ export default function EditArticlePage() {
   if (viewMode === "admin") {
     return (
       <div className="mx-auto max-w-5xl">
-        <div className="mb-6">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <button
+              onClick={() => router.push("/panel/artikel")}
+              className="mb-1 flex items-center gap-1 text-xs text-txt-secondary hover:text-txt-primary"
+            >
+              <ArrowLeft size={14} /> Kembali ke Daftar Artikel
+            </button>
+            <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">
+              Review Artikel (Admin)
+            </h1>
+            <p className="text-sm text-txt-secondary">
+              Status: <span className="font-medium text-gold">{statusLabel[currentStatus] || currentStatus}</span> | Penulis: {articleAuthorName || "—"}
+            </p>
+          </div>
           <button
-            onClick={() => router.push("/panel/artikel")}
-            className="mb-1 flex items-center gap-1 text-xs text-txt-secondary hover:text-txt-primary"
+            onClick={handleAdminSave}
+            disabled={saving}
+            className="btn-primary flex items-center gap-1.5 px-5 py-2.5 text-sm font-semibold disabled:opacity-50"
           >
-            <ArrowLeft size={14} /> Kembali ke Daftar Artikel
+            {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+            Simpan Perubahan
           </button>
-          <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">
-            Review Artikel (Admin)
-          </h1>
-          <p className="text-sm text-txt-secondary">
-            Status: <span className="font-medium text-gold">{statusLabel[currentStatus] || currentStatus}</span>
-          </p>
         </div>
 
         {error && (
@@ -942,17 +952,6 @@ export default function EditArticlePage() {
         </div>
 
         {/* Editable article content */}
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-txt-primary uppercase tracking-wider">Edit Konten Artikel</h3>
-          <button
-            onClick={handleAdminSave}
-            disabled={saving}
-            className="btn-primary flex items-center gap-1.5 px-5 py-2.5 text-sm font-semibold disabled:opacity-50"
-          >
-            {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-            Simpan Perubahan
-          </button>
-        </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="space-y-4 lg:col-span-2">
