@@ -117,31 +117,27 @@ function formatDate(dateStr: string): string {
 // --- Analytics Components ---
 
 // Donut chart for article status distribution
-function StatusDonutChart({ articles }: { articles: Article[] }) {
-  const data = useMemo(() => {
-    const counts: Record<string, number> = {};
-    articles.forEach((a) => {
-      counts[a.status] = (counts[a.status] || 0) + 1;
-    });
-    const colors: Record<string, { stroke: string; bg: string; text: string }> = {
-      PUBLISHED: { stroke: "#00AA13", bg: "bg-goto-light", text: "text-goto-green" },
-      IN_REVIEW: { stroke: "#EAB308", bg: "bg-yellow-50", text: "text-yellow-600" },
-      DRAFT: { stroke: "#9CA3AF", bg: "bg-surface-tertiary", text: "text-txt-secondary" },
-      APPROVED: { stroke: "#3B82F6", bg: "bg-blue-50", text: "text-blue-600" },
-      REJECTED: { stroke: "#EF4444", bg: "bg-red-50", text: "text-red-600" },
-      ARCHIVED: { stroke: "#6B7280", bg: "bg-surface-tertiary", text: "text-txt-muted" },
+// Combined compact summary — replaces StatusDonutChart + PublicationRate
+function ArticleSummary({ articles }: { articles: Article[] }) {
+  const statusData = useMemo(() => {
+    const allStatuses = ["PUBLISHED", "IN_REVIEW", "DRAFT", "APPROVED", "REJECTED", "ARCHIVED"] as const;
+    const colors: Record<string, { bg: string; text: string; dot: string }> = {
+      PUBLISHED: { bg: "bg-goto-light", text: "text-goto-green", dot: "bg-goto-green" },
+      IN_REVIEW: { bg: "bg-yellow-50", text: "text-yellow-600", dot: "bg-yellow-500" },
+      DRAFT: { bg: "bg-surface-tertiary", text: "text-txt-secondary", dot: "bg-gray-400" },
+      APPROVED: { bg: "bg-blue-50", text: "text-blue-600", dot: "bg-blue-500" },
+      REJECTED: { bg: "bg-red-50", text: "text-red-600", dot: "bg-red-500" },
+      ARCHIVED: { bg: "bg-surface-tertiary", text: "text-txt-muted", dot: "bg-gray-500" },
     };
-    return Object.entries(counts)
-      .map(([status, count]) => ({ status, count, ...(colors[status] || colors.DRAFT) }))
-      .sort((a, b) => b.count - a.count);
+    return allStatuses
+      .map((s) => ({ status: s, count: articles.filter((a) => a.status === s).length, ...(colors[s] || colors.DRAFT) }))
+      .filter((s) => s.count > 0);
   }, [articles]);
 
   const total = articles.length;
-  if (total === 0) return null;
-
-  const radius = 52;
-  const circumference = 2 * Math.PI * radius;
-  let offset = 0;
+  const totalViews = articles.reduce((s, a) => s + (a.viewCount || 0), 0);
+  const published = articles.filter((a) => a.status === "PUBLISHED").length;
+  const rate = total > 0 ? ((published / total) * 100).toFixed(0) : "0";
 
   return (
     <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
@@ -150,48 +146,34 @@ function StatusDonutChart({ articles }: { articles: Article[] }) {
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-50">
             <Layers size={14} className="text-purple-500" />
           </div>
-          Distribusi Status
+          Ringkasan Artikel
         </h2>
       </div>
-      <div className="p-5">
-        <div className="flex items-center gap-5">
-          <div className="relative shrink-0">
-            <svg width="90" height="90" viewBox="0 0 90 90">
-              <circle cx="45" cy="45" r="35" fill="none" stroke="#F0F1F3" strokeWidth="10" />
-              {data.map((d) => {
-                const pct = d.count / total;
-                const r = 35;
-                const c = 2 * Math.PI * r;
-                const dash = pct * c;
-                const off = -offset * c;
-                offset += pct;
-                return (
-                  <circle key={d.status} cx="45" cy="45" r={r} fill="none" stroke={d.stroke} strokeWidth="10" strokeLinecap="round" strokeDasharray={`${dash} ${c - dash}`} strokeDashoffset={off} className="transition-all duration-700" />
-                );
-              })}
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-lg font-extrabold text-txt-primary">{total}</span>
+      <div className="p-4">
+        {/* Compact stat grid */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="rounded-lg bg-surface-secondary px-3 py-2.5 text-center">
+            <p className="text-lg font-extrabold text-txt-primary">{total}</p>
+            <p className="text-[11px] text-txt-muted">Total</p>
+          </div>
+          <div className="rounded-lg bg-surface-secondary px-3 py-2.5 text-center">
+            <p className="text-lg font-extrabold text-goto-green">{rate}%</p>
+            <p className="text-[11px] text-txt-muted">Publikasi</p>
+          </div>
+          <div className="rounded-lg bg-surface-secondary px-3 py-2.5 text-center">
+            <p className="text-lg font-extrabold text-txt-primary">{formatNumber(totalViews)}</p>
+            <p className="text-[11px] text-txt-muted">Tayangan</p>
+          </div>
+        </div>
+        {/* Status breakdown — compact rows */}
+        <div className="space-y-1.5">
+          {statusData.map((s) => (
+            <div key={s.status} className="flex items-center gap-2">
+              <span className={`h-2 w-2 rounded-full shrink-0 ${s.dot}`} />
+              <span className="text-xs text-txt-secondary flex-1">{statusLabels[s.status]}</span>
+              <span className="text-xs font-bold text-txt-primary">{s.count}</span>
             </div>
-          </div>
-          <div className="flex-1 space-y-2">
-            {data.map((d) => {
-              const pct = ((d.count / total) * 100).toFixed(0);
-              return (
-                <div key={d.status}>
-                  <div className="flex items-center justify-between mb-0.5">
-                    <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-semibold ${d.bg} ${d.text}`}>
-                      {statusLabels[d.status] || d.status}
-                    </span>
-                    <span className="text-xs font-bold text-txt-primary">{d.count} ({pct}%)</span>
-                  </div>
-                  <div className="h-1 w-full rounded-full bg-surface-tertiary overflow-hidden">
-                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, backgroundColor: d.stroke }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          ))}
         </div>
       </div>
     </div>
@@ -285,70 +267,6 @@ function ViewsRanking({ articles }: { articles: Article[] }) {
 }
 
 // Publication rate ring
-function PublicationRate({ articles }: { articles: Article[] }) {
-  const { published, total, rate } = useMemo(() => {
-    const pub = articles.filter((a) => a.status === "PUBLISHED").length;
-    const all = articles.length;
-    return { published: pub, total: all, rate: all > 0 ? (pub / all) * 100 : 0 };
-  }, [articles]);
-
-  const radius = 45;
-  const circumference = 2 * Math.PI * radius;
-  const dashArray = (rate / 100) * circumference;
-
-  const rejected = articles.filter((a) => a.status === "REJECTED").length;
-  const inReview = articles.filter((a) => a.status === "IN_REVIEW").length;
-  const draft = articles.filter((a) => a.status === "DRAFT").length;
-
-  const breakdownData = [
-    { label: "Dipublikasi", value: published, color: "bg-goto-green", textColor: "text-goto-green" },
-    { label: "Menunggu Review", value: inReview, color: "bg-yellow-500", textColor: "text-yellow-600" },
-    { label: "Draf", value: draft, color: "bg-gray-400", textColor: "text-txt-secondary" },
-    { label: "Ditolak", value: rejected, color: "bg-red-500", textColor: "text-red-500" },
-  ];
-
-  return (
-    <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
-      <div className="border-b border-border px-5 py-3.5">
-        <h2 className="flex items-center gap-2 text-sm font-bold text-txt-primary">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-goto-light">
-            <CheckCircle size={14} className="text-goto-green" />
-          </div>
-          Tingkat Publikasi
-        </h2>
-      </div>
-      <div className="p-5">
-        <div className="flex items-center gap-5 mb-4">
-          <div className="relative shrink-0">
-            <svg width="70" height="70" viewBox="0 0 70 70">
-              <circle cx="35" cy="35" r="28" fill="none" stroke="#F0F1F3" strokeWidth="7" />
-              <circle cx="35" cy="35" r="28" fill="none" stroke="#00AA13" strokeWidth="7" strokeDasharray={`${(rate / 100) * 2 * Math.PI * 28} ${(1 - rate / 100) * 2 * Math.PI * 28}`} strokeDashoffset={2 * Math.PI * 28 * 0.25} strokeLinecap="round" className="transition-all duration-700" />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-base font-extrabold text-goto-green">{rate.toFixed(0)}%</span>
-            </div>
-          </div>
-          <div>
-            <p className="text-xs text-txt-muted">Dari {total} artikel</p>
-            <p className="text-sm font-bold text-txt-primary">{published} dipublikasi</p>
-          </div>
-        </div>
-        <div className="space-y-2">
-          {breakdownData.map((item) => (
-            <div key={item.label} className="flex items-center gap-3">
-              <span className="text-xs text-txt-secondary flex-1">{item.label}</span>
-              <span className={`text-xs font-bold ${item.textColor} w-8 text-right`}>{item.value}</span>
-              <div className="h-1 w-20 rounded-full bg-surface-tertiary overflow-hidden">
-                <div className={`h-full rounded-full ${item.color} transition-all duration-500`} style={{ width: total > 0 ? `${(item.value / total) * 100}%` : "0%" }} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function WeeklyArticleTrend({ articles }: { articles: Article[] }) {
   const weekData = useMemo(() => {
     const now = new Date();
@@ -1068,9 +986,8 @@ export default function DashboardPage() {
       {/* Analytics Section */}
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <ViewsRanking articles={allArticles} />
-        <StatusDonutChart articles={allArticles} />
+        <ArticleSummary articles={allArticles} />
         <WeeklyArticleTrend articles={allArticles} />
-        <PublicationRate articles={allArticles} />
         <CategoryPerformance articles={allArticles} />
         <AverageReviewTime articles={allArticles} />
         <ArticleCalendar articles={allArticles} />
