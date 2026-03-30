@@ -54,3 +54,8 @@ export function commentRateLimit(ip: string): { success: boolean; remaining: num
 export function aiRateLimit(userId: string): { success: boolean; remaining: number } {
   return rateLimit(`ai:${userId}`, 20, 60 * 60 * 1000); // 20 AI calls per hour
 }
+
+// Report submission rate limit
+export function reportRateLimit(ip: string): { success: boolean; remaining: number } {
+  return rateLimit(`report:${ip}`, 5, 15 * 60 * 1000); // 5 reports per 15 min
+}

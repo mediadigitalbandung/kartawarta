@@ -1,6 +1,24 @@
 import { NextRequest } from "next/server";
-import { requireRole, successResponse, errorResponse, ApiError } from "@/lib/api-utils";
+import { z } from "zod";
+import { requireRole, successResponse, errorResponse } from "@/lib/api-utils";
 import { prisma } from "@/lib/prisma";
+
+const ALLOWED_KEYS = [
+  "site_name",
+  "site_description",
+  "contact_email",
+  "deepseek_api_key",
+  "resend_api_key",
+  "notification_email_from",
+  "enable_comments",
+  "enable_ai",
+  "maintenance_mode",
+] as const;
+
+const settingSchema = z.object({
+  key: z.string().min(1, "Key wajib diisi").max(100),
+  value: z.string().max(5000),
+});
 
 export async function GET() {
   try {
@@ -23,19 +41,15 @@ export async function PUT(req: NextRequest) {
     await requireRole(["SUPER_ADMIN"]);
 
     const body = await req.json();
-    const { key, value } = body as { key: string; value: string };
-
-    if (!key || value === undefined) {
-      throw new ApiError("Field key dan value diperlukan", 400);
-    }
+    const data = settingSchema.parse(body);
 
     await prisma.systemSetting.upsert({
-      where: { key },
-      update: { value },
-      create: { key, value },
+      where: { key: data.key },
+      update: { value: data.value },
+      create: { key: data.key, value: data.value },
     });
 
-    return successResponse({ key, value });
+    return successResponse({ key: data.key, value: data.value });
   } catch (error) {
     return errorResponse(error);
   }

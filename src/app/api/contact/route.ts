@@ -1,6 +1,15 @@
 import { NextRequest } from "next/server";
+import { z } from "zod";
 import { successResponse, errorResponse, ApiError } from "@/lib/api-utils";
 import { commentRateLimit } from "@/lib/rate-limit";
+import { sanitizeText, sanitizeEmail } from "@/lib/sanitize";
+
+const contactSchema = z.object({
+  name: z.string().min(1, "Nama wajib diisi").max(100),
+  email: z.string().email("Format email tidak valid"),
+  subject: z.string().max(200).optional(),
+  message: z.string().min(1, "Pesan wajib diisi").max(5000),
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,11 +21,15 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, email, message } = body;
+    const data = contactSchema.parse(body);
 
-    if (!name || !email || !message) {
-      throw new ApiError("Nama, email, dan pesan wajib diisi", 400);
-    }
+    // Sanitize inputs
+    const sanitized = {
+      name: sanitizeText(data.name),
+      email: sanitizeEmail(data.email),
+      subject: data.subject ? sanitizeText(data.subject) : undefined,
+      message: sanitizeText(data.message),
+    };
 
     // Contact form received — stored for processing
 

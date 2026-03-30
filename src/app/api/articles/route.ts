@@ -156,18 +156,24 @@ export async function POST(request: NextRequest) {
     // Calculate read time
     const readTime = calculateReadTime(data.content);
 
-    // Handle tags
+    // Handle tags (batch to avoid N+1)
     const tagConnections = [];
     if (data.tags && data.tags.length > 0) {
-      for (const tagName of data.tags) {
-        const tagSlug = slugify(tagName);
-        const tag = await prisma.tag.upsert({
-          where: { slug: tagSlug },
-          update: {},
-          create: { name: tagName, slug: tagSlug },
-        });
-        tagConnections.push({ id: tag.id });
-      }
+      const tagEntries = data.tags.map((name) => ({ name, slug: slugify(name) }));
+      await Promise.all(
+        tagEntries.map((t) =>
+          prisma.tag.upsert({
+            where: { slug: t.slug },
+            update: {},
+            create: { name: t.name, slug: t.slug },
+          })
+        )
+      );
+      const tags = await prisma.tag.findMany({
+        where: { slug: { in: tagEntries.map((t) => t.slug) } },
+        select: { id: true },
+      });
+      tagConnections.push(...tags.map((t) => ({ id: t.id })));
     }
 
     // If submitting for review, randomly assign an editor
