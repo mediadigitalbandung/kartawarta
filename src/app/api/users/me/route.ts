@@ -9,6 +9,7 @@ import {
 
 const updateProfileSchema = z.object({
   name: z.string().min(2, "Nama minimal 2 karakter").max(100).optional(),
+  avatar: z.string().optional().nullable(),
   bio: z.string().max(500).optional().nullable(),
   specialization: z.string().max(200).optional().nullable(),
   phone: z.string().max(20).optional().nullable(),

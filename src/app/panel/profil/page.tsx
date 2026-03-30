@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { UserCircle, Save, Loader2 } from "lucide-react";
+import Image from "next/image";
+import { UserCircle, Save, Loader2, Camera } from "lucide-react";
 
 import { roleLabelsMap } from "@/lib/roles";
 
@@ -32,7 +33,9 @@ export default function ProfilPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form state
   const [name, setName] = useState("");
@@ -114,6 +117,51 @@ export default function ProfilPage() {
     }
   }
 
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setMessage({ type: "error", text: "Format file harus JPEG, PNG, atau WebP" });
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setMessage({ type: "error", text: "Ukuran file maksimal 2MB" });
+      return;
+    }
+
+    setUploadingAvatar(true);
+    setMessage(null);
+
+    try {
+      // Upload file
+      const formData = new FormData();
+      formData.append("file", file);
+      const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
+      if (!uploadRes.ok) throw new Error("Gagal mengupload foto");
+      const uploadJson = await uploadRes.json();
+      const avatarUrl = uploadJson.url || uploadJson.data?.url;
+
+      // Update profile with avatar URL
+      const res = await fetch("/api/users/me", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ avatar: avatarUrl }),
+      });
+      if (!res.ok) throw new Error("Gagal menyimpan foto profil");
+
+      const json = await res.json();
+      setProfile((prev) => (prev ? { ...prev, avatar: json.data?.avatar || avatarUrl } : prev));
+      setMessage({ type: "success", text: "Foto profil berhasil diperbarui" });
+    } catch (err) {
+      setMessage({ type: "error", text: err instanceof Error ? err.message : "Gagal mengupload foto" });
+    } finally {
+      setUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
@@ -145,8 +193,37 @@ export default function ProfilPage() {
         {/* Profile Card */}
         <div className="rounded-[12px] border border-border bg-surface p-6 shadow-card">
           <div className="flex flex-col items-center text-center">
-            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-goto-green text-xl sm:text-3xl font-bold text-white">
-              {profile?.name?.charAt(0) || <UserCircle size={40} />}
+            {/* Avatar with upload */}
+            <div className="relative mb-4 group">
+              {profile?.avatar ? (
+                <Image
+                  src={profile.avatar}
+                  alt={profile.name || "Avatar"}
+                  width={80}
+                  height={80}
+                  className="h-20 w-20 rounded-full object-cover border-2 border-border"
+                />
+              ) : (
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-goto-green text-xl sm:text-3xl font-bold text-white">
+                  {profile?.name?.charAt(0) || <UserCircle size={40} />}
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingAvatar}
+                className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-goto-green text-white shadow-lg border-2 border-surface hover:bg-goto-dark transition-colors disabled:opacity-50"
+                aria-label="Ganti foto profil"
+              >
+                {uploadingAvatar ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleAvatarUpload}
+                className="hidden"
+              />
             </div>
             <h2 className="text-lg font-semibold text-txt-primary">{profile?.name}</h2>
             <p className="text-sm text-txt-secondary">{profile?.email}</p>
