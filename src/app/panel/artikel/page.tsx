@@ -38,8 +38,7 @@ interface Article {
   category?: { id: string; name: string; slug: string };
 }
 
-const CREATOR_ROLES = ["JOURNALIST", "SENIOR_JOURNALIST", "CONTRIBUTOR"];
-const EDITOR_ROLES = ["EDITOR", "CHIEF_EDITOR", "SUPER_ADMIN"];
+import { CREATOR_ROLES, EDITOR_ROLES } from "@/lib/roles";
 
 const statusConfig: Record<string, { label: string; icon: React.ElementType; color: string }> = {
   PUBLISHED: { label: "Dipublikasi", icon: CheckCircle, color: "bg-goto-light text-goto-green" },

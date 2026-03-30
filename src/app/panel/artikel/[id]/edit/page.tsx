@@ -54,9 +54,7 @@ interface Source {
   url: string;
 }
 
-const EDITOR_ROLES = ["EDITOR", "CHIEF_EDITOR", "SUPER_ADMIN"];
-const ADMIN_ROLES = ["SUPER_ADMIN"];
-const CAN_SUBMIT_REVIEW = ["SUPER_ADMIN", "CHIEF_EDITOR", "EDITOR", "SENIOR_JOURNALIST", "JOURNALIST"];
+import { EDITOR_ROLES, ADMIN_ROLES, CAN_SUBMIT_REVIEW } from "@/lib/roles";
 
 function LoadingSkeleton() {
   return (

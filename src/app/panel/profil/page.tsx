@@ -4,14 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { UserCircle, Save, Loader2 } from "lucide-react";
 
-const roleLabelsMap: Record<string, string> = {
-  SUPER_ADMIN: "Super Admin",
-  CHIEF_EDITOR: "Editor Kepala",
-  EDITOR: "Editor",
-  SENIOR_JOURNALIST: "Jurnalis Senior",
-  JOURNALIST: "Jurnalis",
-  CONTRIBUTOR: "Kontributor",
-};
+import { roleLabelsMap } from "@/lib/roles";
 
 interface UserProfile {
   id: string;

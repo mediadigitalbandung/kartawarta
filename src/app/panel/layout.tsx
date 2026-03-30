@@ -31,18 +31,7 @@ import {
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
-
-const roleLabelsMap: Record<string, string> = {
-  SUPER_ADMIN: "Super Admin",
-  CHIEF_EDITOR: "Editor Kepala",
-  EDITOR: "Editor",
-  SENIOR_JOURNALIST: "Jurnalis Senior",
-  JOURNALIST: "Jurnalis",
-  CONTRIBUTOR: "Kontributor",
-};
-
-const EDITOR_ROLES = ["EDITOR", "CHIEF_EDITOR", "SUPER_ADMIN"];
-const CREATOR_ROLES = ["JOURNALIST", "SENIOR_JOURNALIST", "CONTRIBUTOR"];
+import { roleLabelsMap, EDITOR_ROLES, CREATOR_ROLES } from "@/lib/roles";
 
 interface MenuItem {
   name: string;

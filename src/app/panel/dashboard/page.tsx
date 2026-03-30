@@ -45,8 +45,7 @@ interface StatsItem {
   color: string;
 }
 
-const CREATOR_ROLES = ["JOURNALIST", "SENIOR_JOURNALIST", "CONTRIBUTOR"];
-const EDITOR_ROLES = ["EDITOR", "CHIEF_EDITOR"];
+import { CREATOR_ROLES, EDITOR_ROLES } from "@/lib/roles";
 
 const statusColors: Record<string, string> = {
   PUBLISHED: "bg-goto-light text-goto-green",

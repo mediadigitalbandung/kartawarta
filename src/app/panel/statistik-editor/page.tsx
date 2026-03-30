@@ -11,7 +11,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-const EDITOR_ROLES = ["EDITOR", "CHIEF_EDITOR", "SUPER_ADMIN"];
+import { EDITOR_ROLES } from "@/lib/roles";
 
 interface ReviewedArticle {
   id: string;

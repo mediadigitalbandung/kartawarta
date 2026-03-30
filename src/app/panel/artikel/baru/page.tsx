@@ -37,7 +37,7 @@ interface Source {
   url: string;
 }
 
-const CAN_SUBMIT_REVIEW = ["SUPER_ADMIN", "CHIEF_EDITOR", "EDITOR", "SENIOR_JOURNALIST", "JOURNALIST"];
+import { CAN_SUBMIT_REVIEW } from "@/lib/roles";
 
 export default function NewArticlePage() {
   const router = useRouter();
