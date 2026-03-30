@@ -16,7 +16,7 @@ const createArticleSchema = z.object({
   title: z.string().min(5, "Judul minimal 5 karakter").max(255),
   content: z.string().min(50, "Konten minimal 50 karakter"),
   excerpt: z.string().max(500).optional(),
-  featuredImage: z.string().url().optional().nullable(),
+  featuredImage: z.string().optional().nullable(),
   categoryId: z.string().min(1, "Kategori wajib dipilih"),
   tags: z.array(z.string()).optional(),
   seoTitle: z.string().max(70).optional(),
@@ -28,7 +28,7 @@ const createArticleSchema = z.object({
         name: z.string().min(1),
         title: z.string().optional(),
         institution: z.string().optional(),
-        url: z.string().url().optional(),
+        url: z.string().optional(),
       })
     )
     .optional(),

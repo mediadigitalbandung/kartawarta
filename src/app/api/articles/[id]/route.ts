@@ -22,7 +22,7 @@ const updateArticleSchema = z.object({
   title: z.string().min(5).max(255).optional(),
   content: z.string().min(50).optional(),
   excerpt: z.string().max(500).optional(),
-  featuredImage: z.string().url().optional().nullable(),
+  featuredImage: z.string().optional().nullable(),
   categoryId: z.string().optional(),
   seoTitle: z.string().max(70).optional(),
   seoDescription: z.string().max(160).optional(),
