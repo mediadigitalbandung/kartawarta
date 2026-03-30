@@ -1,14 +1,14 @@
 import { successResponse } from "@/lib/api-utils";
 import { prisma } from "@/lib/prisma";
 
-export const revalidate = 86400; // Cache for 24 hours
+export const revalidate = 3600; // Cache for 1 hour
 
 export async function GET() {
   try {
     // 1. Fetch Google Trends Daily Search Trends for Indonesia
     const googleRes = await fetch(
       "https://trends.google.com/trends/trendingsearches/daily/rss?geo=ID",
-      { next: { revalidate: 86400 } }
+      { next: { revalidate: 3600 } }
     );
 
     if (!googleRes.ok) {
