@@ -5,9 +5,9 @@ export const revalidate = 3600; // Cache for 1 hour
 
 export async function GET() {
   try {
-    // 1. Fetch Google Trends Daily Search Trends for Indonesia
+    // 1. Fetch Google Trends Daily Search Trends for Indonesia (new URL)
     const googleRes = await fetch(
-      "https://trends.google.com/trends/trendingsearches/daily/rss?geo=ID",
+      "https://trends.google.com/trending/rss?geo=ID",
       { next: { revalidate: 3600 } }
     );
 
@@ -16,15 +16,22 @@ export async function GET() {
     }
 
     const xml = await googleRes.text();
-    const titles = xml.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/g);
 
-    if (!titles || titles.length <= 1) {
+    // Parse <item><title>...</title></item> from RSS
+    const itemTitles = xml.match(/<item>\s*<title>(.*?)<\/title>/g);
+
+    if (!itemTitles || itemTitles.length === 0) {
       return successResponse(getFallbackTags());
     }
 
-    const rawTrends = titles
-      .slice(1, 20) // take more candidates for AI to filter
-      .map((t) => t.replace(/<title><!\[CDATA\[/, "").replace(/\]\]><\/title>/, ""));
+    const rawTrends = itemTitles
+      .slice(0, 20) // take up to 20 candidates for AI to filter
+      .map((t) => t.replace(/<item>\s*<title>/, "").replace(/<\/title>/, "").trim())
+      .filter((t) => t.length > 0);
+
+    if (rawTrends.length === 0) {
+      return successResponse(getFallbackTags());
+    }
 
     // 2. Use DeepSeek AI to filter & curate relevant tags
     const aiTags = await filterWithAI(rawTrends);
@@ -99,7 +106,7 @@ Aturan:
     // Parse: each line is a tag
     const tags = result
       .split("\n")
-      .map((line: string) => line.replace(/^\d+[\.\)]\s*/, "").trim())
+      .map((line: string) => line.replace(/^\d+[\.\)]\s*/, "").replace(/^[-•]\s*/, "").trim())
       .filter((line: string) => line.length > 0 && line.length <= 40);
 
     return tags.length > 0 ? tags : null;
