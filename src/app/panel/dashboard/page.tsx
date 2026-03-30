@@ -16,7 +16,6 @@ import {
   Send,
   BarChart3,
   Layers,
-  Timer,
   CalendarClock,
   Calendar,
   ChevronLeft,
@@ -117,67 +116,72 @@ function formatDate(dateStr: string): string {
 // --- Analytics Components ---
 
 // Donut chart for article status distribution
-// Combined compact summary — replaces StatusDonutChart + PublicationRate
-function ArticleSummary({ articles }: { articles: Article[] }) {
-  const statusData = useMemo(() => {
-    const allStatuses = ["PUBLISHED", "IN_REVIEW", "DRAFT", "APPROVED", "REJECTED", "ARCHIVED"] as const;
-    const colors: Record<string, { bg: string; text: string; dot: string }> = {
-      PUBLISHED: { bg: "bg-goto-light", text: "text-goto-green", dot: "bg-goto-green" },
-      IN_REVIEW: { bg: "bg-yellow-50", text: "text-yellow-600", dot: "bg-yellow-500" },
-      DRAFT: { bg: "bg-surface-tertiary", text: "text-txt-secondary", dot: "bg-gray-400" },
-      APPROVED: { bg: "bg-blue-50", text: "text-blue-600", dot: "bg-blue-500" },
-      REJECTED: { bg: "bg-red-50", text: "text-red-600", dot: "bg-red-500" },
-      ARCHIVED: { bg: "bg-surface-tertiary", text: "text-txt-muted", dot: "bg-gray-500" },
-    };
-    return allStatuses
-      .map((s) => ({ status: s, count: articles.filter((a) => a.status === s).length, ...(colors[s] || colors.DRAFT) }))
-      .filter((s) => s.count > 0);
+// Recent activity feed
+function RecentActivity({ articles }: { articles: Article[] }) {
+  const activities = useMemo(() => {
+    return [...articles]
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      .slice(0, 8)
+      .map((a) => {
+        const actionMap: Record<string, { label: string; color: string; icon: string }> = {
+          PUBLISHED: { label: "dipublikasikan", color: "text-goto-green", icon: "bg-goto-green" },
+          IN_REVIEW: { label: "diajukan review", color: "text-yellow-600", icon: "bg-yellow-500" },
+          APPROVED: { label: "disetujui", color: "text-blue-600", icon: "bg-blue-500" },
+          REJECTED: { label: "ditolak", color: "text-red-600", icon: "bg-red-500" },
+          DRAFT: { label: "disimpan sebagai draf", color: "text-txt-secondary", icon: "bg-gray-400" },
+          ARCHIVED: { label: "diarsipkan", color: "text-txt-muted", icon: "bg-gray-500" },
+        };
+        const action = actionMap[a.status] || actionMap.DRAFT;
+        const timeAgo = getTimeAgo(a.updatedAt);
+        return { ...a, action, timeAgo };
+      });
   }, [articles]);
-
-  const total = articles.length;
-  const totalViews = articles.reduce((s, a) => s + (a.viewCount || 0), 0);
-  const published = articles.filter((a) => a.status === "PUBLISHED").length;
-  const rate = total > 0 ? ((published / total) * 100).toFixed(0) : "0";
 
   return (
     <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
       <div className="border-b border-border px-5 py-3.5">
         <h2 className="flex items-center gap-2 text-sm font-bold text-txt-primary">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-50">
-            <Layers size={14} className="text-purple-500" />
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50">
+            <Clock size={14} className="text-blue-500" />
           </div>
-          Ringkasan Artikel
+          Aktivitas Terbaru
         </h2>
       </div>
-      <div className="p-4">
-        {/* Compact stat grid */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="rounded-lg bg-surface-secondary px-3 py-2.5 text-center">
-            <p className="text-lg font-extrabold text-txt-primary">{total}</p>
-            <p className="text-[11px] text-txt-muted">Total</p>
-          </div>
-          <div className="rounded-lg bg-surface-secondary px-3 py-2.5 text-center">
-            <p className="text-lg font-extrabold text-goto-green">{rate}%</p>
-            <p className="text-[11px] text-txt-muted">Publikasi</p>
-          </div>
-          <div className="rounded-lg bg-surface-secondary px-3 py-2.5 text-center">
-            <p className="text-lg font-extrabold text-txt-primary">{formatNumber(totalViews)}</p>
-            <p className="text-[11px] text-txt-muted">Tayangan</p>
-          </div>
-        </div>
-        {/* Status breakdown — compact rows */}
-        <div className="space-y-1.5">
-          {statusData.map((s) => (
-            <div key={s.status} className="flex items-center gap-2">
-              <span className={`h-2 w-2 rounded-full shrink-0 ${s.dot}`} />
-              <span className="text-xs text-txt-secondary flex-1">{statusLabels[s.status]}</span>
-              <span className="text-xs font-bold text-txt-primary">{s.count}</span>
-            </div>
-          ))}
-        </div>
+      <div className="divide-y divide-border">
+        {activities.length === 0 ? (
+          <div className="p-5 text-center text-sm text-txt-muted">Belum ada aktivitas.</div>
+        ) : (
+          activities.map((a, i) => (
+            <Link key={`${a.id}-${i}`} href={`/panel/artikel/${a.id}/edit`} className="flex items-start gap-3 px-5 py-3 hover:bg-surface-secondary/50 transition-colors">
+              <div className={`mt-1 h-2 w-2 rounded-full shrink-0 ${a.action.icon}`} />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-txt-primary">
+                  <span className="font-semibold">{a.title.length > 40 ? a.title.slice(0, 40) + "..." : a.title}</span>
+                  {" "}<span className={a.action.color}>{a.action.label}</span>
+                </p>
+                <p className="text-[11px] text-txt-muted mt-0.5">
+                  {a.author?.name || "—"} &middot; {a.timeAgo}
+                </p>
+              </div>
+            </Link>
+          ))
+        )}
       </div>
     </div>
   );
+}
+
+function getTimeAgo(dateStr: string): string {
+  const now = new Date().getTime();
+  const then = new Date(dateStr).getTime();
+  const diffMin = Math.floor((now - then) / 60000);
+  if (diffMin < 1) return "Baru saja";
+  if (diffMin < 60) return `${diffMin} menit lalu`;
+  const diffHour = Math.floor(diffMin / 60);
+  if (diffHour < 24) return `${diffHour} jam lalu`;
+  const diffDay = Math.floor(diffHour / 24);
+  if (diffDay < 30) return `${diffDay} hari lalu`;
+  return new Date(dateStr).toLocaleDateString("id-ID", { day: "numeric", month: "short" });
 }
 
 // Top articles ranked by views with horizontal bar
@@ -392,74 +396,6 @@ function CategoryPerformance({ articles }: { articles: Article[] }) {
   );
 }
 
-function AverageReviewTime({ articles }: { articles: Article[] }) {
-  const avgTime = useMemo(() => {
-    // Calculate average time between articles entering IN_REVIEW (using createdAt or updatedAt)
-    // and being APPROVED/REJECTED (reviewedAt is in updatedAt)
-    // We look at articles that have been reviewed (status APPROVED, REJECTED, PUBLISHED)
-    const reviewed = articles.filter(
-      (a) =>
-        ["APPROVED", "REJECTED", "PUBLISHED"].includes(a.status) &&
-        a.reviewedAt &&
-        a.createdAt
-    );
-
-    if (reviewed.length === 0) return null;
-
-    let totalMs = 0;
-    let count = 0;
-
-    reviewed.forEach((a) => {
-      if (a.reviewedAt) {
-        const created = new Date(a.createdAt).getTime();
-        const reviewedAt = new Date(a.reviewedAt).getTime();
-        const diff = reviewedAt - created;
-        if (diff > 0) {
-          totalMs += diff;
-          count += 1;
-        }
-      }
-    });
-
-    if (count === 0) return null;
-
-    const avgMs = totalMs / count;
-    const hours = avgMs / (1000 * 60 * 60);
-
-    if (hours < 1) {
-      const mins = Math.round(avgMs / (1000 * 60));
-      return `${mins} menit`;
-    } else if (hours < 24) {
-      return `${hours.toFixed(1)} jam`;
-    } else {
-      const days = hours / 24;
-      return `${days.toFixed(1)} hari`;
-    }
-  }, [articles]);
-
-  return (
-    <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
-      <div className="border-b border-border px-5 py-3.5">
-        <h2 className="flex items-center gap-2 text-sm font-bold text-txt-primary">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-50">
-            <Timer size={14} className="text-purple-500" />
-          </div>
-          Rata-rata Waktu Review
-        </h2>
-      </div>
-      <div className="flex items-center justify-center p-5">
-        {avgTime ? (
-          <div className="text-center">
-            <p className="text-2xl font-extrabold text-txt-primary">{avgTime}</p>
-            <p className="mt-1 text-xs text-txt-secondary">dikirim hingga direview</p>
-          </div>
-        ) : (
-          <p className="text-sm text-txt-secondary">Belum ada data.</p>
-        )}
-      </div>
-    </div>
-  );
-}
 
 function ArticleCalendar({ articles }: { articles: Article[] }) {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -986,10 +922,9 @@ export default function DashboardPage() {
       {/* Analytics Section */}
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <ViewsRanking articles={allArticles} />
-        <ArticleSummary articles={allArticles} />
+        <RecentActivity articles={allArticles} />
         <WeeklyArticleTrend articles={allArticles} />
         <CategoryPerformance articles={allArticles} />
-        <AverageReviewTime articles={allArticles} />
         <ArticleCalendar articles={allArticles} />
       </div>
 
