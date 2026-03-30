@@ -101,6 +101,16 @@ export default async function ArticlePage({ params }: { params: { slug: string }
     ARCHIVED: { label: "Diarsipkan", color: "bg-gray-600" },
   };
 
+  // Resolve editor/reviewer name
+  let editorName: string | null = null;
+  if (article.reviewedBy) {
+    const reviewer = await prisma.user.findUnique({
+      where: { id: article.reviewedBy },
+      select: { name: true },
+    });
+    editorName = reviewer?.name || null;
+  }
+
   // Fetch related articles (same category, exclude current)
   const relatedArticles = await prisma.article.findMany({
     where: {
@@ -239,7 +249,13 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
               {/* Meta bar */}
               <div className="mt-4 text-sm text-txt-muted">
-                <span>{article.author.name}</span>
+                <span>Penulis: <span className="text-txt-primary font-medium">{article.author.name}</span></span>
+                {editorName && (
+                  <>
+                    <span className="mx-2">&middot;</span>
+                    <span>Editor: <span className="text-txt-primary font-medium">{editorName}</span></span>
+                  </>
+                )}
                 <span className="mx-2">&middot;</span>
                 <span>
                   {article.publishedAt
