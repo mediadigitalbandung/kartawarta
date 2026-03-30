@@ -3,12 +3,11 @@
 import Link from "next/link";
 
 const footerLinks = {
-  kategori: [
-    { name: "Hukum Pidana", href: "/kategori/hukum-pidana" },
-    { name: "Hukum Perdata", href: "/kategori/hukum-perdata" },
-    { name: "Hukum Tata Negara", href: "/kategori/hukum-tata-negara" },
-    { name: "HAM", href: "/kategori/ham" },
-    { name: "Opini", href: "/kategori/opini" },
+  tentang: [
+    { name: "Tentang Kami", href: "/tentang" },
+    { name: "Redaksi", href: "/redaksi" },
+    { name: "Kode Etik", href: "/kode-etik" },
+    { name: "Pedoman Media", href: "/pedoman-media" },
   ],
   kontak: [
     { name: "Kontak Redaksi", href: "/kontak" },
@@ -37,13 +36,13 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Kategori */}
+          {/* Tentang */}
           <div>
             <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/40">
-              Kategori
+              Tentang
             </h4>
             <ul className="space-y-2">
-              {footerLinks.kategori.map((link) => (
+              {footerLinks.tentang.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
