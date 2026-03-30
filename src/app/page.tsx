@@ -314,9 +314,9 @@ export default async function HomePage() {
           </div>
 
           {/* 3 Info Cards */}
-          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {liveSidangData.map((sidang) => (
-              <div key={sidang.id} className="shrink-0 w-[280px] sm:w-[300px] rounded-lg border border-border bg-surface p-4 transition-shadow hover:shadow-card">
+              <div key={sidang.id} className="rounded-lg border border-border bg-surface p-4 transition-shadow hover:shadow-card">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-medium text-txt-secondary">{sidang.court}</span>
                   <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${
