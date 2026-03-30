@@ -1,4 +1,5 @@
 // Input sanitization utilities
+import sanitize from "sanitize-html";
 
 const ALLOWED_TAGS = [
   "h1", "h2", "h3", "h4", "h5", "h6",
@@ -13,21 +14,23 @@ const ALLOWED_TAGS = [
   "iframe", // for YouTube embeds
 ];
 
-const ALLOWED_ATTR = [
-  "href", "src", "alt", "title", "class", "id",
-  "target", "rel",
-  "width", "height", "style",
-  "data-youtube-video", "allowfullscreen", "frameborder",
-  "start", "type",
-];
+const ALLOWED_ATTR: Record<string, sanitize.AllowedAttribute[]> = {
+  a: ["href", "target", "rel", "title"],
+  img: ["src", "alt", "title", "width", "height", "class"],
+  iframe: ["src", "width", "height", "allowfullscreen", "frameborder", "data-youtube-video"],
+  div: ["class", "id", "style"],
+  span: ["class", "id", "style"],
+  td: ["style", "class"],
+  th: ["style", "class"],
+  table: ["class", "style"],
+  "*": ["class", "id"],
+};
 
-export async function sanitizeHtml(html: string): Promise<string> {
-  const DOMPurify = (await import("isomorphic-dompurify")).default;
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS,
-    ALLOWED_ATTR,
-    ALLOW_DATA_ATTR: false,
-    ADD_ATTR: ["target"],
+export function sanitizeHtml(html: string): string {
+  return sanitize(html, {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: ALLOWED_ATTR,
+    allowedIframeHostnames: ["www.youtube.com", "youtube.com", "www.youtube-nocookie.com"],
   });
 }
 

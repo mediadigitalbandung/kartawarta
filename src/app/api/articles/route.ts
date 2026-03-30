@@ -196,7 +196,7 @@ export async function POST(request: NextRequest) {
       data: {
         title: data.title,
         slug,
-        content: await sanitizeHtml(data.content),
+        content: sanitizeHtml(data.content),
         excerpt: data.excerpt || data.content.replace(/<[^>]*>/g, "").slice(0, 200),
         featuredImage: data.featuredImage,
         status: finalStatus as "DRAFT" | "IN_REVIEW",
