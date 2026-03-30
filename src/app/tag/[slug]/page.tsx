@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Metadata } from "next";
 import { ChevronLeft, ChevronRight, Hash } from "lucide-react";
 import ArticleCard from "@/components/artikel/ArticleCard";
+import BannerAd from "@/components/ads/BannerAd";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 
@@ -18,8 +19,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const tag = await prisma.tag.findUnique({ where: { slug: params.slug } });
   if (!tag) return { title: "Tag Tidak Ditemukan" };
   return {
-    title: `Tag: #${tag.name}`,
-    description: `Kumpulan berita dengan tag #${tag.name} di Jurnalis Hukum Bandung.`,
+    title: `Berita ${tag.name} Terbaru - Jurnalis Hukum Bandung`,
+    description: `Baca berita terbaru tentang ${tag.name}. Kumpulan artikel dan analisis hukum terkait ${tag.name} di Bandung dan Indonesia.`,
     alternates: {
       canonical: `/tag/${params.slug}`,
     },
@@ -84,6 +85,9 @@ export default async function TagPage({ params, searchParams }: PageProps) {
           </p>
         </div>
 
+        {/* Ad slot above articles */}
+        <BannerAd size="slim" />
+
         {/* Article grid */}
         {articles.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -100,6 +104,9 @@ export default async function TagPage({ params, searchParams }: PageProps) {
             </Link>
           </div>
         )}
+
+        {/* Ad slot below articles */}
+        <BannerAd size="slim" />
 
         {/* Pagination */}
         {totalPages > 1 && (

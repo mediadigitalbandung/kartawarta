@@ -248,6 +248,7 @@ export default function EditArticlePage() {
     downloadTextFile(`${safeFilename}.txt`, plainText);
   };
 
+  const [generatingTags, setGeneratingTags] = useState(false);
   const [aiLoading, setAiLoading] = useState<Record<string, boolean>>({});
 
   const generateAI = async (feature: string, setter: (val: string) => void) => {
@@ -283,6 +284,28 @@ export default function EditArticlePage() {
       Generate AI
     </button>
   );
+
+  const generateTagsAI = async () => {
+    if (!title.trim() || !content.trim()) return;
+    try {
+      setGeneratingTags(true);
+      const res = await fetch("/api/ai/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ feature: "tags", title, content }),
+      });
+      if (!res.ok) throw new Error("Gagal generate tags");
+      const json = await res.json();
+      const newTags = json.data?.result?.split(",").map((t: string) => t.trim()).filter(Boolean) || [];
+      setTags((prev) => {
+        const existing = prev.split(",").map((t) => t.trim()).filter(Boolean);
+        const merged = Array.from(new Set([...existing, ...newTags]));
+        return merged.join(", ");
+      });
+    } catch { /* ignore */ } finally {
+      setGeneratingTags(false);
+    }
+  };
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -1145,7 +1168,15 @@ export default function EditArticlePage() {
               <div className="rounded-[12px] border border-border bg-surface p-5">
                 <div className="mb-2 flex items-center justify-between">
                   <label className="text-sm font-medium text-txt-primary">Tags</label>
-                  <AiButton feature="tags" setter={setTags} />
+                  <button
+                    type="button"
+                    onClick={generateTagsAI}
+                    disabled={generatingTags || !title.trim() || !content.trim()}
+                    className="btn-secondary text-sm flex items-center gap-1.5"
+                  >
+                    {generatingTags ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                    Generate Tags AI
+                  </button>
                 </div>
                 <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} className="input w-full" placeholder="Tag1, Tag2, Tag3" />
                 <p className="mt-1 text-xs text-txt-muted">Pisahkan dengan koma</p>
