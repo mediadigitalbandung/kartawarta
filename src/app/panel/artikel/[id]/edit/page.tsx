@@ -209,18 +209,19 @@ export default function EditArticlePage() {
   const allChecked = Object.values(checklist).every(Boolean);
 
   // Export functions
-  const handleExportPdf = () => {
+  const handleExportPdf = async () => {
     const categoryName = categories.find(c => c.id === categoryId)?.name || "-";
     const authorName = articleAuthorName || "-";
     const dateStr = new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
 
-    exportArticlePdf({
+    await exportArticlePdf({
       title,
       excerpt: excerpt || undefined,
       content,
       author: authorName,
       category: categoryName,
       date: dateStr,
+      featuredImage: featuredImage || undefined,
       tags: tags.split(",").map((t: string) => t.trim()).filter(Boolean),
       sources: sources.filter((s: { name: string }) => s.name?.trim()),
     });
