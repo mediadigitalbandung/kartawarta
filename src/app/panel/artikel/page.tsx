@@ -415,9 +415,9 @@ export default function ArtikelPage() {
       ) : (
         <>
           {/* Table */}
-          <div className="overflow-hidden rounded-[12px] border border-border bg-surface shadow-card">
+          <div className="rounded-[12px] border border-border bg-surface shadow-card">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[900px] text-sm">
                 <thead className="border-b border-border bg-surface-secondary">
                   <tr>
                     <th className="w-10 px-3 py-3.5 text-center">
