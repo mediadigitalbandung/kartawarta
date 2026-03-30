@@ -61,41 +61,6 @@ export default function NewArticlePage() {
   const [showSeo, setShowSeo] = useState(false);
   const [showChecklist, setShowChecklist] = useState(false);
   const [showAutosaveBanner, setShowAutosaveBanner] = useState(false);
-  const [showTemplates, setShowTemplates] = useState(true);
-
-  const templates = [
-    {
-      name: "Berita Sidang",
-      icon: "\u2696\uFE0F",
-      desc: "Liputan persidangan hukum",
-      content: `<h2>Kronologi Perkara</h2><p>[Jelaskan latar belakang kasus dan kronologi peristiwa]</p><h2>Dakwaan & Tuntutan</h2><p>[Uraikan dakwaan jaksa penuntut umum]</p><h2>Pembelaan Terdakwa</h2><p>[Sampaikan argumen dari pihak terdakwa/kuasa hukum]</p><h2>Putusan Hakim</h2><p>[Tuliskan putusan majelis hakim]</p><h2>Tanggapan</h2><p>[Respons dari pihak-pihak terkait]</p>`,
-    },
-    {
-      name: "Investigasi",
-      icon: "\uD83D\uDD0D",
-      desc: "Liputan investigasi mendalam",
-      content: `<h2>Latar Belakang</h2><p>[Konteks dan alasan investigasi dilakukan]</p><h2>Temuan Utama</h2><p>[Hasil investigasi dan bukti-bukti yang ditemukan]</p><h2>Bukti Pendukung</h2><p>[Data, dokumen, dan saksi yang mendukung temuan]</p><h2>Dampak</h2><p>[Dampak terhadap masyarakat dan pihak terkait]</p><h2>Respons Pihak Terkait</h2><p>[Tanggapan dari pihak yang menjadi subjek investigasi]</p>`,
-    },
-    {
-      name: "Opini Hukum",
-      icon: "\uD83D\uDCDD",
-      desc: "Analisis dan pendapat hukum",
-      content: `<h2>Pendahuluan</h2><p>[Latar belakang isu hukum yang dibahas]</p><h2>Dasar Hukum</h2><p>[Rujukan undang-undang, pasal, dan regulasi terkait]</p><h2>Analisis</h2><p>[Pembahasan mendalam dari perspektif hukum]</p><h2>Perbandingan</h2><p>[Perbandingan dengan kasus atau regulasi lain jika relevan]</p><h2>Kesimpulan</h2><p>[Rangkuman dan rekomendasi]</p>`,
-    },
-    {
-      name: "Breaking News",
-      icon: "\uD83D\uDEA8",
-      desc: "Berita terkini singkat",
-      content: `<p><strong>[KOTA, TANGGAL]</strong> — [Paragraf pembuka: Apa yang terjadi, siapa yang terlibat, di mana, kapan]</p><p>[Paragraf 2: Detail tambahan dan konteks]</p><p>[Paragraf 3: Kutipan dari narasumber terkait]</p><p>[Paragraf 4: Latar belakang atau informasi tambahan]</p><p><em>Berita ini akan terus diperbarui seiring perkembangan terbaru.</em></p>`,
-    },
-    {
-      name: "Profil Hukum",
-      icon: "\uD83D\uDC64",
-      desc: "Profil tokoh atau lembaga hukum",
-      content: `<h2>Latar Belakang</h2><p>[Riwayat hidup dan pendidikan]</p><h2>Karir & Jabatan</h2><p>[Perjalanan karir di bidang hukum]</p><h2>Kontribusi</h2><p>[Kontribusi penting dalam dunia hukum]</p><h2>Pandangan</h2><p>[Pandangan dan pemikiran terkait isu hukum]</p><h2>Penutup</h2><p>[Kesimpulan dan relevansi saat ini]</p>`,
-    },
-  ];
-
   // Word counter calculations
   const plainText = content.replace(/<[^>]*>/g, "").trim();
   const wordCount = plainText ? plainText.split(/\s+/).length : 0;
@@ -367,29 +332,6 @@ export default function NewArticlePage() {
         <div className="mb-4 flex items-center gap-2 rounded-[12px] bg-red-50 px-4 py-3 text-sm text-red-700">
           <AlertCircle size={16} />
           {error}
-        </div>
-      )}
-
-      {/* Template Selector */}
-      {showTemplates && !content && (
-        <div className="mb-6 rounded-2xl border border-border bg-surface p-5 shadow-card">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-bold text-txt-primary">Pilih Template Artikel</h3>
-            <button onClick={() => setShowTemplates(false)} className="text-sm text-txt-muted hover:text-txt-primary">Lewati</button>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-            {templates.map((t) => (
-              <button
-                key={t.name}
-                onClick={() => { setContent(t.content); setShowTemplates(false); }}
-                className="flex flex-col items-center gap-2 rounded-xl border-2 border-border p-4 text-center transition-all hover:border-goto-green hover:bg-goto-50"
-              >
-                <span className="text-2xl">{t.icon}</span>
-                <span className="text-sm font-semibold text-txt-primary">{t.name}</span>
-                <span className="text-xs text-txt-muted">{t.desc}</span>
-              </button>
-            ))}
-          </div>
         </div>
       )}
 
