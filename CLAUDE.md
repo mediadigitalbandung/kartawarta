@@ -27,29 +27,31 @@ Jangan tunggu user minta commit/push — **langsung lakukan** setelah perubahan 
 
 ## Design System
 
-### Warna
-- **Brand (Hijau Emerald):** `#0d7c4a` — logo, tombol, badge, ticker bg, avatar
-- **Gold Elegan:** `#c9a84c` — aksen premium: link, angka trending, ikon kategori, label
-- **Background:** `#0a0a0a` (hitam), `#141414` (secondary), `#1e1e1e` (card)
-- **Text:** `#ffffff` (primary), `#a1a1aa` (secondary), `#71717a` (muted)
-- **Border:** `#27272a`
-- **DARK MODE ONLY** — tidak ada light mode, jangan pakai prefix `dark:`
+### Warna (Light Mode — GoTo-inspired)
+- **Brand (GoTo Green):** `#00AA13` — tombol, badge, link, aksen utama
+- **Brand Dark:** `#008C10` — hover state
+- **Brand Light:** `#E6F9E8` — badge background, highlight
+- **Surface:** `#FFFFFF` (primary), `#F7F7F8` (secondary), `#F0F1F3` (tertiary), `#1C1C1E` (dark)
+- **Text:** `#1C1C1E` (primary), `#6B7280` (secondary), `#9CA3AF` (muted), `#FFFFFF` (inverse)
+- **Border:** `#E5E7EB` (default), `#F3F4F6` (light)
+- **LIGHT MODE** — warna terang, clean, profesional
 
-### Layout Style (Vidio.com-inspired)
-- Horizontal scroll carousels (`scroll-row`) untuk konten
-- Full-width hero banner untuk featured article
-- Section headers: judul kiri + "Lihat Semua" kanan (gold)
-- Compact dark cards tanpa border, hover bg change
-- Minimal chrome, content-centric
+### Layout Style
+- Horizontal scroll carousels untuk konten di homepage
+- Full-width hero banner + headline slider
+- Section headers: judul kiri + "Lihat Semua" kanan (green)
+- Clean white cards dengan rounded-[12px], subtle shadow-card
+- GoTo-style rounded buttons (rounded-full)
+- Content-centric, minimal chrome
 
 ### Komponen CSS Utility
-- `.container-main` — max-w-[1400px] centered
-- `.scroll-row` — horizontal scroll dengan snap
+- `.container-main` — max-w-6xl centered (px-5 sm:px-8)
 - `.section-header` / `.section-title` / `.section-link`
-- `.card` / `.card-flat`
-- `.btn-primary` / `.btn-secondary` / `.btn-ghost`
+- `.card` — rounded-[12px], bg-surface, border, shadow-card, hover elevation
+- `.btn-primary` — rounded-full, bg-goto-green
+- `.btn-secondary` / `.btn-ghost`
+- `.badge` / `.badge-green` / `.badge-live` / `.badge-verified`
 - `.input`
-- `.badge` / `.badge-live` / `.badge-verified` / `.badge-category`
 
 ## Database
 

@@ -176,6 +176,30 @@ export default async function HomePage() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "NewsMediaOrganization",
+            name: "Jurnalis Hukum Bandung",
+            url: "https://jurnalis-hukum-bandung.vercel.app",
+            logo: {
+              "@type": "ImageObject",
+              url: "https://jurnalis-hukum-bandung.vercel.app/logo.png",
+            },
+            description: "Portal berita hukum terpercaya di Bandung. Menyajikan berita hukum pidana, perdata, tata negara, HAM, dan analisis hukum yang akurat dan terverifikasi.",
+            sameAs: [],
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: "Bandung",
+              addressRegion: "Jawa Barat",
+              addressCountry: "ID",
+            },
+          }),
+        }}
+      />
+
       <NewsTicker items={tickerItems} />
 
       {/* Banner Ad — Leaderboard (above headline) */}

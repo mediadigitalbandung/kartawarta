@@ -78,9 +78,17 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const category = await getCategory(params.slug);
   if (!category) return { title: "Kategori Tidak Ditemukan" };
 
+  const title = `${category.name} - Berita Hukum Terkini`;
+  const description = `Kumpulan berita ${category.name.toLowerCase()} terbaru dari Jurnalis Hukum Bandung.`;
+
   return {
-    title: `${category.name} - Berita Hukum Terkini`,
-    description: `Kumpulan berita ${category.name.toLowerCase()} terbaru dari Jurnalis Hukum Bandung.`,
+    title,
+    description,
+    openGraph: {
+      title: `${title} | Jurnalis Hukum Bandung`,
+      description,
+      type: "website",
+    },
     alternates: {
       canonical: `/kategori/${params.slug}`,
     },
