@@ -34,7 +34,6 @@ const categoryIconMap: Record<string, LucideIcon> = {
 
 const defaultIcon = Scale;
 
-// --- SIMULATION DATA ---
 const liveSidangData = [
   { id: 1, title: "Sidang Praperadilan Kasus Korupsi Bandung Barat", court: "PN Bandung", time: "10:00 WIB", status: "Sedang Berlangsung", judge: "Majelis Hakim: Dr. H. Ahmad S., S.H., M.H." },
   { id: 2, title: "Sidang Lanjutan Sengketa Tanah Ciwidey", court: "PN Bale Bandung", time: "13:30 WIB", status: "Menunggu", judge: "Majelis Hakim: Hj. Siti R., S.H." },
@@ -125,7 +124,6 @@ const jadwalSidangData = [
   { date: "03 Apr", day: "Kamis", time: "09:00 WIB", cases: 11, highlight: "Putusan Kasus Korupsi Dana Hibah" },
   { date: "04 Apr", day: "Jumat", time: "14:00 WIB", cases: 6, highlight: "Praperadilan Tersangka TPPU" },
 ];
-// --- END SIMULATION DATA ---
 
 export default async function HomePage() {
   const [articles, categories, trendingArticles, tickerArticles] = await Promise.all([
