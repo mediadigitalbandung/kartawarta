@@ -15,7 +15,6 @@ import {
   XCircle,
   Send,
   BarChart3,
-  Award,
   Layers,
   Timer,
   CalendarClock,
@@ -432,57 +431,6 @@ function WeeklyArticleTrend({ articles }: { articles: Article[] }) {
             )}
           </div>
         ))}
-      </div>
-    </div>
-  );
-}
-
-function TopArticlesByViews({ articles }: { articles: Article[] }) {
-  const topArticles = useMemo(() => {
-    return [...articles]
-      .filter((a) => a.status === "PUBLISHED")
-      .sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
-      .slice(0, 5);
-  }, [articles]);
-
-  return (
-    <div className="rounded-[12px] border border-border bg-surface shadow-card overflow-hidden">
-      <div className="border-b border-border bg-surface-secondary px-5 py-4">
-        <h2 className="flex items-center gap-2 font-semibold text-txt-primary">
-          <Award size={18} className="text-gold" />
-          Top 5 Artikel by Views
-        </h2>
-      </div>
-      <div className="divide-y divide-border">
-        {topArticles.length === 0 ? (
-          <div className="px-5 py-8 text-center text-sm text-txt-secondary">
-            Belum ada artikel yang dipublikasi.
-          </div>
-        ) : (
-          topArticles.map((article, i) => (
-            <Link
-              key={article.id}
-              href={`/panel/artikel/${article.id}/edit`}
-              className="flex items-center gap-3 px-5 py-3 hover:bg-surface-secondary transition-colors"
-            >
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-goto-light text-xs font-bold text-goto-green">
-                {i + 1}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-txt-primary">
-                  {article.title}
-                </p>
-                <p className="text-xs text-txt-muted">
-                  {article.category?.name || "—"}
-                </p>
-              </div>
-              <div className="flex items-center gap-1 text-xs font-semibold text-gold shrink-0">
-                <Eye size={12} />
-                {formatNumber(article.viewCount)}
-              </div>
-            </Link>
-          ))
-        )}
       </div>
     </div>
   );
