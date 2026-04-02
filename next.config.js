@@ -14,6 +14,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
+      {
+        protocol: "http",
+        hostname: "145.79.15.99",
+      },
     ],
   },
   async headers() {
@@ -29,11 +33,6 @@ const nextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           // XSS protection
           { key: "X-XSS-Protection", value: "1; mode=block" },
-          // HSTS — force HTTPS for 2 years
-          {
-            key: "Strict-Transport-Security",
-            value: "max-age=63072000; includeSubDomains; preload",
-          },
           // Disable dangerous browser features
           {
             key: "Permissions-Policy",
@@ -52,7 +51,6 @@ const nextConfig = {
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",
-              "upgrade-insecure-requests",
             ].join("; "),
           },
           // Prevent DNS prefetch abuse
