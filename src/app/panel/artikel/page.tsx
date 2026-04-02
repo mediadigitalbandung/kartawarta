@@ -166,7 +166,7 @@ export default function ArtikelPage() {
       setError(null);
 
       // Creators only see their own articles
-      let url = `/api/articles?page=${page}&limit=20&status=ALL`;
+      let url = `/api/articles?page=${page}&limit=20&status=${filterStatus}`;
       if (isCreator) {
         url += `&authorId=${userId}`;
       }
@@ -186,7 +186,7 @@ export default function ArtikelPage() {
     } finally {
       setLoading(false);
     }
-  }, [session?.user, isCreator, userId, page]);
+  }, [session?.user, isCreator, userId, page, filterStatus]);
 
   useEffect(() => {
     fetchArticles();
@@ -299,9 +299,7 @@ export default function ArtikelPage() {
   }
 
   const filtered = articles.filter((a) => {
-    const matchStatus = filterStatus === "ALL" || a.status === filterStatus;
-    const matchSearch = a.title.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchStatus && matchSearch;
+    return a.title.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
   const filteredIds = filtered.map((a) => a.id);
