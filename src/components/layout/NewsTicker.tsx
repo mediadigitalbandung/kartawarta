@@ -13,15 +13,16 @@ interface NewsTickerProps {
 }
 
 export default function NewsTicker({ items }: NewsTickerProps) {
-  if (!items.length) return null;
-
-  const looped = [...items, ...items];
   const trackRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
   const [paused, setPaused] = useState(false);
   const didDrag = useRef(false);
+
+  if (!items.length) return null;
+
+  const looped = [...items, ...items];
 
   // Mouse drag
   function onMouseDown(e: React.MouseEvent) {
