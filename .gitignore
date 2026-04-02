@@ -58,3 +58,7 @@ etc/
 www/
 
 .vercel
+
+# Uploaded files
+public/uploads/*
+!public/uploads/.gitkeep
