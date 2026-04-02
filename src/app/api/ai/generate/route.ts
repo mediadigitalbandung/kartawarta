@@ -50,30 +50,36 @@ export async function POST(req: NextRequest) {
 
     const prompt = PROMPTS[feature](title, content);
 
-    // Call DeepSeek API
-    const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${setting.value}`,
-      },
-      body: JSON.stringify({
-        model: "deepseek-chat",
-        messages: [
-          {
-            role: "system",
-            content: "Kamu adalah asisten AI untuk media berita hukum Indonesia. Jawab dalam Bahasa Indonesia.",
-          },
-          { role: "user", content: prompt },
-        ],
-        max_tokens: 500,
-        temperature: 0.7,
-      }),
-    });
+    // Call DeepSeek API with 30s timeout
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+    let response: Response;
+    try {
+      response = await fetch("https://api.deepseek.com/v1/chat/completions", {
+        method: "POST",
+        signal: controller.signal,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${setting.value}`,
+        },
+        body: JSON.stringify({
+          model: "deepseek-chat",
+          messages: [
+            {
+              role: "system",
+              content: "Kamu adalah asisten AI untuk media berita hukum Indonesia. Jawab dalam Bahasa Indonesia.",
+            },
+            { role: "user", content: prompt },
+          ],
+          max_tokens: 500,
+          temperature: 0.7,
+        }),
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
 
     if (!response.ok) {
-      const errBody = await response.text();
-      console.error("DeepSeek API error:", response.status, errBody);
       throw new ApiError("Gagal menghubungi AI service. Coba lagi nanti.", 502);
     }
 

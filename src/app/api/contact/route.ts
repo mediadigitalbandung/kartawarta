@@ -3,6 +3,8 @@ import { z } from "zod";
 import { successResponse, errorResponse, ApiError } from "@/lib/api-utils";
 import { commentRateLimit } from "@/lib/rate-limit";
 import { sanitizeText, sanitizeEmail } from "@/lib/sanitize";
+import { prisma } from "@/lib/prisma";
+import { randomBytes } from "crypto";
 
 const contactSchema = z.object({
   name: z.string().min(1, "Nama wajib diisi").max(100),
@@ -13,7 +15,6 @@ const contactSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    // Rate limit
     const ip = request.headers.get("x-forwarded-for") || "unknown";
     const { success: allowed } = commentRateLimit(ip);
     if (!allowed) {
@@ -23,7 +24,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const data = contactSchema.parse(body);
 
-    // Sanitize inputs
     const sanitized = {
       name: sanitizeText(data.name),
       email: sanitizeEmail(data.email),
@@ -31,7 +31,15 @@ export async function POST(request: NextRequest) {
       message: sanitizeText(data.message),
     };
 
-    // Contact form received — stored for processing
+    await prisma.contact_messages.create({
+      data: {
+        id: randomBytes(12).toString("hex"),
+        name: sanitized.name,
+        email: sanitized.email,
+        subject: sanitized.subject ?? null,
+        message: sanitized.message,
+      },
+    });
 
     return successResponse({ message: "Pesan berhasil dikirim" });
   } catch (error) {

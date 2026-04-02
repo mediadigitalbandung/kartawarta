@@ -8,13 +8,247 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-enum Role {
-  SUPER_ADMIN
-  CHIEF_EDITOR
-  EDITOR
-  SENIOR_JOURNALIST
-  JOURNALIST
-  CONTRIBUTOR
+model ads {
+  id          String   @id
+  name        String
+  type        AdType
+  imageUrl    String?
+  htmlCode    String?
+  targetUrl   String?
+  slot        AdSlot
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(true)
+  priority    Int      @default(0)
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  targetPages String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+}
+
+model ai_usage_logs {
+  id           String   @id
+  userId       String
+  userName     String
+  feature      String
+  inputTokens  Int      @default(0)
+  outputTokens Int      @default(0)
+  totalTokens  Int      @default(0)
+  articleTitle String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+}
+
+model articles {
+  id                String            @id
+  title             String
+  slug              String            @unique
+  content           String
+  excerpt           String?
+  featuredImage     String?
+  status            ArticleStatus     @default(DRAFT)
+  verificationLabel VerificationLabel @default(UNVERIFIED)
+  readTime          Int?
+  viewCount         Int               @default(0)
+  publishedAt       DateTime?
+  scheduledAt       DateTime?
+  seoTitle          String?
+  seoDescription    String?
+  authorId          String
+  categoryId        String
+  reviewNote        String?
+  reviewedBy        String?
+  reviewedAt        DateTime?
+  assignedEditorId  String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime
+  users             users             @relation(fields: [authorId], references: [id])
+  categories        categories        @relation(fields: [categoryId], references: [id])
+  comments          comments[]
+  corrections       corrections[]
+  reports           reports[]
+  revisions         revisions[]
+  sources           sources[]
+  tags              tags[]            @relation("ArticleToTag")
+
+  @@index([assignedEditorId])
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([publishedAt])
+  @@index([status])
+}
+
+model audit_logs {
+  id        String   @id
+  action    String
+  entity    String
+  entityId  String
+  detail    String?
+  userId    String
+  ip        String?
+  createdAt DateTime @default(now())
+  users     users    @relation(fields: [userId], references: [id])
+
+  @@index([entity, entityId])
+  @@index([userId])
+}
+
+model categories {
+  id          String     @id
+  name        String     @unique
+  slug        String     @unique
+  description String?
+  icon        String?
+  order       Int        @default(0)
+  articles    articles[]
+}
+
+model comments {
+  id          String   @id
+  content     String
+  authorName  String
+  authorEmail String
+  isApproved  Boolean  @default(false)
+  articleId   String
+  parentId    String?
+  createdAt   DateTime @default(now())
+  articles    articles @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@index([articleId])
+}
+
+model corrections {
+  id          String   @id
+  description String
+  articleId   String
+  createdAt   DateTime @default(now())
+  articles    articles @relation(fields: [articleId], references: [id], onDelete: Cascade)
+}
+
+model media {
+  id           String   @id
+  filename     String
+  url          String
+  type         String
+  size         Int
+  uploadedBy   String
+  uploaderName String
+  createdAt    DateTime @default(now())
+
+  @@index([uploadedBy])
+}
+
+model notifications {
+  id        String   @id
+  userId    String
+  type      String
+  title     String
+  message   String
+  link      String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, isRead])
+}
+
+model reports {
+  id        String       @id
+  reason    ReportReason
+  detail    String?
+  email     String?
+  status    ReportStatus @default(PENDING)
+  articleId String
+  createdAt DateTime     @default(now())
+  articles  articles     @relation(fields: [articleId], references: [id], onDelete: Cascade)
+}
+
+model revisions {
+  id        String   @id
+  content   String
+  title     String
+  changedBy String
+  articleId String
+  createdAt DateTime @default(now())
+  articles  articles @relation(fields: [articleId], references: [id], onDelete: Cascade)
+}
+
+model sources {
+  id          String   @id
+  name        String
+  title       String?
+  institution String?
+  url         String?
+  articleId   String
+  articles    articles @relation(fields: [articleId], references: [id], onDelete: Cascade)
+}
+
+model system_settings {
+  id    String @id
+  key   String @unique
+  value String
+}
+
+model contact_messages {
+  id        String   @id
+  name      String
+  email     String
+  subject   String?
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model tags {
+  id       String     @id
+  name     String     @unique
+  slug     String     @unique
+  articles articles[] @relation("ArticleToTag")
+}
+
+model users {
+  id               String       @id
+  email            String       @unique
+  password         String
+  name             String
+  avatar           String?
+  bio              String?
+  role             Role         @default(JOURNALIST)
+  specialization   String?
+  phone            String?
+  nomorKartuPers   String?
+  organisasiPers   String?
+  pendidikan       String?
+  pengalaman       String?
+  keahlian         String?
+  portofolio       String?
+  mediaSosial      String?
+  alamat           String?
+  isActive         Boolean      @default(true)
+  twoFactorEnabled Boolean      @default(false)
+  activeSessionId  String?
+  lastLoginAt      DateTime?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime
+  articles         articles[]
+  audit_logs       audit_logs[]
+}
+
+enum AdSlot {
+  HEADER
+  SIDEBAR
+  IN_ARTICLE
+  FOOTER
+  POPUP
+  FLOATING_BOTTOM
+}
+
+enum AdType {
+  IMAGE
+  GIF
+  HTML
 }
 
 enum ArticleStatus {
@@ -24,13 +258,6 @@ enum ArticleStatus {
   PUBLISHED
   REJECTED
   ARCHIVED
-}
-
-enum VerificationLabel {
-  VERIFIED
-  UNVERIFIED
-  CORRECTION
-  OPINION
 }
 
 enum ReportReason {
@@ -48,259 +275,18 @@ enum ReportStatus {
   DISMISSED
 }
 
-enum AdType {
-  IMAGE
-  GIF
-  HTML
+enum Role {
+  SUPER_ADMIN
+  CHIEF_EDITOR
+  EDITOR
+  SENIOR_JOURNALIST
+  JOURNALIST
+  CONTRIBUTOR
 }
 
-enum AdSlot {
-  HEADER
-  SIDEBAR
-  IN_ARTICLE
-  FOOTER
-  POPUP
-  FLOATING_BOTTOM
-}
-
-model User {
-  id               String     @id @default(cuid())
-  email            String     @unique
-  password         String
-  name             String
-  avatar           String?
-  bio              String?
-  role             Role       @default(JOURNALIST)
-  specialization   String?
-  phone            String?
-  nomorKartuPers   String?
-  organisasiPers   String?
-  pendidikan       String?
-  pengalaman       String?    @db.Text
-  keahlian         String?
-  portofolio       String?
-  mediaSosial      String?
-  alamat           String?
-  isActive         Boolean    @default(true)
-  twoFactorEnabled Boolean    @default(false)
-  activeSessionId  String?
-  lastLoginAt      DateTime?
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
-  articles         Article[]
-  auditLogs        AuditLog[]
-
-  @@map("users")
-}
-
-model Article {
-  id                String            @id @default(cuid())
-  title             String
-  slug              String            @unique
-  content           String            @db.Text
-  excerpt           String?
-  featuredImage     String?
-  status            ArticleStatus     @default(DRAFT)
-  verificationLabel VerificationLabel @default(UNVERIFIED)
-  readTime          Int?
-  viewCount         Int               @default(0)
-  publishedAt       DateTime?
-  scheduledAt       DateTime?
-  seoTitle          String?
-  seoDescription    String?
-  author            User              @relation(fields: [authorId], references: [id])
-  authorId          String
-  category          Category          @relation(fields: [categoryId], references: [id])
-  categoryId        String
-  tags              Tag[]
-  sources           Source[]
-  corrections       Correction[]
-  reports           Report[]
-  revisions         Revision[]
-  comments          Comment[]
-  reviewNote        String?
-  reviewedBy        String?
-  reviewedAt        DateTime?
-  assignedEditorId  String?
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-
-  @@index([status])
-  @@index([authorId])
-  @@index([categoryId])
-  @@index([publishedAt])
-  @@index([assignedEditorId])
-  @@map("articles")
-}
-
-model Category {
-  id          String    @id @default(cuid())
-  name        String    @unique
-  slug        String    @unique
-  description String?
-  icon        String?
-  order       Int       @default(0)
-  articles    Article[]
-
-  @@map("categories")
-}
-
-model Tag {
-  id       String    @id @default(cuid())
-  name     String    @unique
-  slug     String    @unique
-  articles Article[]
-
-  @@map("tags")
-}
-
-model Source {
-  id          String  @id @default(cuid())
-  name        String
-  title       String?
-  institution String?
-  url         String?
-  article     Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  articleId   String
-
-  @@map("sources")
-}
-
-model Correction {
-  id          String   @id @default(cuid())
-  description String
-  article     Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  articleId   String
-  createdAt   DateTime @default(now())
-
-  @@map("corrections")
-}
-
-model Revision {
-  id        String   @id @default(cuid())
-  content   String   @db.Text
-  title     String
-  changedBy String
-  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  articleId String
-  createdAt DateTime @default(now())
-
-  @@map("revisions")
-}
-
-model Report {
-  id        String       @id @default(cuid())
-  reason    ReportReason
-  detail    String?
-  email     String?
-  status    ReportStatus @default(PENDING)
-  article   Article      @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  articleId String
-  createdAt DateTime     @default(now())
-
-  @@map("reports")
-}
-
-model Ad {
-  id          String   @id @default(cuid())
-  name        String
-  type        AdType
-  imageUrl    String?
-  htmlCode    String?  @db.Text
-  targetUrl   String?
-  slot        AdSlot
-  startDate   DateTime
-  endDate     DateTime
-  isActive    Boolean  @default(true)
-  priority    Int      @default(0)
-  impressions Int      @default(0)
-  clicks      Int      @default(0)
-  targetPages String[] @default([])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@map("ads")
-}
-
-model AuditLog {
-  id        String   @id @default(cuid())
-  action    String
-  entity    String
-  entityId  String
-  detail    String?
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  ip        String?
-  createdAt DateTime @default(now())
-
-  @@index([userId])
-  @@index([entity, entityId])
-  @@map("audit_logs")
-}
-
-model AIUsageLog {
-  id           String   @id @default(cuid())
-  userId       String
-  userName     String
-  feature      String
-  inputTokens  Int      @default(0)
-  outputTokens Int      @default(0)
-  totalTokens  Int      @default(0)
-  articleTitle  String?
-  createdAt    DateTime @default(now())
-
-  @@index([userId])
-  @@map("ai_usage_logs")
-}
-
-model Comment {
-  id          String   @id @default(cuid())
-  content     String   @db.Text
-  authorName  String
-  authorEmail String
-  isApproved  Boolean  @default(false)
-  article     Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  articleId   String
-  parentId    String?
-  createdAt   DateTime @default(now())
-
-  @@index([articleId])
-  @@map("comments")
-}
-
-model Media {
-  id           String   @id @default(cuid())
-  filename     String
-  url          String   @db.Text
-  type         String
-  size         Int
-  uploadedBy   String
-  uploaderName String
-  createdAt    DateTime @default(now())
-
-  @@index([uploadedBy])
-  @@map("media")
-}
-
-model SystemSetting {
-  id    String @id @default(cuid())
-  key   String @unique
-  value String @db.Text
-
-  @@map("system_settings")
-}
-
-model Notification {
-  id        String   @id @default(cuid())
-  userId    String
-  type      String   // "article_approved", "article_rejected", "article_published", "article_submitted", "new_review"
-  title     String
-  message   String
-  link      String?  // URL to navigate to
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  @@index([userId, isRead])
-  @@index([userId, createdAt])
-  @@map("notifications")
+enum VerificationLabel {
+  VERIFIED
+  UNVERIFIED
+  CORRECTION
+  OPINION
 }

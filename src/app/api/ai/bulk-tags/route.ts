@@ -43,22 +43,30 @@ Konten: ${plainContent}
 
 Format jawaban HANYA tag dipisah koma, tanpa penjelasan.`;
 
-        const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${setting.value}`,
-          },
-          body: JSON.stringify({
-            model: "deepseek-chat",
-            messages: [
-              { role: "system", content: "Kamu adalah SEO specialist untuk media berita hukum Indonesia. Jawab HANYA dengan daftar tag dipisah koma." },
-              { role: "user", content: prompt },
-            ],
-            max_tokens: 200,
-            temperature: 0.8,
-          }),
-        });
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 30000);
+        let response: Response;
+        try {
+          response = await fetch("https://api.deepseek.com/v1/chat/completions", {
+            method: "POST",
+            signal: controller.signal,
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${setting.value}`,
+            },
+            body: JSON.stringify({
+              model: "deepseek-chat",
+              messages: [
+                { role: "system", content: "Kamu adalah SEO specialist untuk media berita hukum Indonesia. Jawab HANYA dengan daftar tag dipisah koma." },
+                { role: "user", content: prompt },
+              ],
+              max_tokens: 200,
+              temperature: 0.8,
+            }),
+          });
+        } finally {
+          clearTimeout(timeout);
+        }
 
         if (!response.ok) continue;
 

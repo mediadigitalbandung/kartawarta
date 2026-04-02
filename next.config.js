@@ -4,10 +4,6 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**.supabase.co",
-      },
-      {
-        protocol: "https",
         hostname: "jurnalishukumbandung.com",
       },
       {
@@ -51,7 +47,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https: http:",
-              "connect-src 'self' https://api.deepseek.com https://*.supabase.co https://trends.google.com",
+              "connect-src 'self' https://api.deepseek.com https://trends.google.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",

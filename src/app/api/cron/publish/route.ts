@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get("authorization");
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (!authHeader || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
       throw new ApiError("Unauthorized", 401);
     }
 
@@ -22,6 +22,18 @@ export async function GET(request: NextRequest) {
       select: { id: true, title: true, slug: true, authorId: true, scheduledAt: true },
     });
 
+    if (articles.length === 0) {
+      return successResponse({ published: 0, titles: [] });
+    }
+
+    // Batch fetch all authors in one query (avoid N+1)
+    const authorIds = [...new Set(articles.map(a => a.authorId))];
+    const authors = await prisma.user.findMany({
+      where: { id: { in: authorIds } },
+      select: { id: true, email: true },
+    });
+    const authorMap = new Map(authors.map(u => [u.id, u]));
+
     const published = [];
     for (const article of articles) {
       await prisma.article.update({
@@ -32,9 +44,8 @@ export async function GET(request: NextRequest) {
           scheduledAt: null,
         },
       });
-      // Notify & email author about auto-publication
       await notifyArticleStatusChange(article.id, article.title, "PUBLISHED", article.authorId);
-      const author = await prisma.user.findUnique({ where: { id: article.authorId }, select: { email: true } });
+      const author = authorMap.get(article.authorId);
       if (author) await sendArticlePublishedEmail(author.email, article.title, article.slug);
       published.push(article.title);
     }
