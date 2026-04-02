@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -77,10 +78,15 @@ export default function Header() {
           {/* Row 1: Logo + date + actions */}
           <div className="flex items-center justify-between py-3">
             {/* Logo */}
-            <Link href="/" className="group flex shrink-0 items-center gap-2">
-              <span className="flex h-8 w-8 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-goto-green text-xs sm:text-base font-bold text-white">
-                JH
-              </span>
+            <Link href="/" className="group flex shrink-0 items-center gap-2.5">
+              <Image
+                src="/logo-jhb.png"
+                alt="Jurnalis Hukum Bandung"
+                width={48}
+                height={48}
+                className="h-9 w-9 sm:h-12 sm:w-12 rounded-full object-cover"
+                priority
+              />
               <span className="flex items-baseline gap-1 sm:gap-2">
                 <span className="text-sm font-bold text-white sm:text-2xl lg:text-3xl">
                   Jurnalis Hukum
