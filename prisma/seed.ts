@@ -1,7 +1,12 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { randomBytes } from "crypto";
 
 const prisma = new PrismaClient();
+
+function genId() {
+  return randomBytes(12).toString("hex");
+}
 
 async function main() {
   // Create categories
@@ -19,37 +24,39 @@ async function main() {
   ];
 
   for (const cat of categories) {
-    await prisma.category.upsert({
+    await prisma.categories.upsert({
       where: { slug: cat.slug },
       update: {},
-      create: cat,
+      create: { id: genId(), ...cat },
     });
   }
 
   // Create super admin
   const hashedPassword = await bcrypt.hash("Admin@2026!", 12);
-  await prisma.user.upsert({
+  await prisma.users.upsert({
     where: { email: "admin@jurnalishukumbandung.com" },
     update: {},
     create: {
+      id: genId(),
       email: "admin@jurnalishukumbandung.com",
       password: hashedPassword,
       name: "Super Admin",
-      role: "SUPER_ADMIN",
+      role: Role.SUPER_ADMIN,
       bio: "Administrator Jurnalis Hukum Bandung",
     },
   });
 
   // Create demo editor
   const editorPassword = await bcrypt.hash("Editor@2026!", 12);
-  await prisma.user.upsert({
+  await prisma.users.upsert({
     where: { email: "editor@jurnalishukumbandung.com" },
     update: {},
     create: {
+      id: genId(),
       email: "editor@jurnalishukumbandung.com",
       password: editorPassword,
       name: "Editor Kepala",
-      role: "CHIEF_EDITOR",
+      role: Role.CHIEF_EDITOR,
       bio: "Editor Kepala Jurnalis Hukum Bandung",
     },
   });

@@ -319,7 +319,7 @@ export default async function HomePage() {
           </div>
           <HorizontalScroll>
             {jadwalSidangData.map((j) => (
-              <div key={j.date} className="shrink-0 w-[260px] sm:w-[300px] rounded-lg border border-border bg-surface-secondary p-4 hover:border-goto-green/40 transition-colors">
+              <div key={j.date} className="shrink-0 w-[calc(100vw-48px)] sm:w-[260px] md:w-[300px] rounded-lg border border-border bg-surface-secondary p-4 hover:border-goto-green/40 transition-colors">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="flex h-12 w-12 flex-col items-center justify-center rounded-lg bg-goto-green text-white">
                     <span className="text-lg font-extrabold leading-none">{j.date.split(" ")[0]}</span>

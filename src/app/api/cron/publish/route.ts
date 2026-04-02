@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Batch fetch all authors in one query (avoid N+1)
-    const authorIds = [...new Set(articles.map(a => a.authorId))];
+    const authorIds = Array.from(new Set(articles.map(a => a.authorId)));
     const authors = await prisma.user.findMany({
       where: { id: { in: authorIds } },
       select: { id: true, email: true },

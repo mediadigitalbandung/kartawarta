@@ -356,8 +356,9 @@ export default function ArtikelPage() {
       )}
 
       {/* Filters */}
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2 flex-1 sm:max-w-xs">
+      <div className="mb-4 flex flex-col gap-3">
+        <div className="flex items-center gap-2 flex-col sm:flex-row sm:justify-between">
+        <div className="flex items-center gap-2 w-full sm:max-w-xs">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted" />
             <input
@@ -379,13 +380,14 @@ export default function ArtikelPage() {
             Export CSV
           </button>
         </div>
+        </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <Filter size={14} className="text-txt-muted" />
+          <Filter size={14} className="text-txt-muted shrink-0" />
           {["ALL", "DRAFT", "IN_REVIEW", "APPROVED", "PUBLISHED", "REJECTED"].map((status) => (
             <button
               key={status}
               onClick={() => { setFilterStatus(status); setPage(1); }}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+              className={`rounded-full px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors ${
                 filterStatus === status
                   ? "bg-goto-green text-white"
                   : "bg-surface-tertiary text-txt-secondary hover:bg-border"
@@ -417,7 +419,7 @@ export default function ArtikelPage() {
           {/* Table */}
           <div className="rounded-[12px] border border-border bg-surface shadow-card">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px] text-sm">
+              <table className="w-full min-w-[320px] text-sm">
                 <thead className="border-b border-border bg-surface-secondary">
                   <tr>
                     <th className="w-10 px-3 py-3.5 text-center">

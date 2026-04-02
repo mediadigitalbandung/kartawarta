@@ -30,7 +30,7 @@ export default function PollingCarousel({ items }: { items: Poll[] }) {
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollRef.current) return;
-    const cardWidth = 340;
+    const cardWidth = scrollRef.current.querySelector("div")?.offsetWidth || 300;
     const gap = 16;
     const amount = (cardWidth + gap) * (direction === "left" ? -1 : 1);
     scrollRef.current.scrollBy({ left: amount, behavior: "smooth" });
@@ -68,7 +68,7 @@ export default function PollingCarousel({ items }: { items: Poll[] }) {
         {items.map((poll, idx) => (
           <div
             key={idx}
-            className="shrink-0 w-[300px] sm:w-[340px] rounded-xl border border-border bg-surface-secondary overflow-hidden hover:shadow-card-hover transition-shadow"
+            className="shrink-0 w-[calc(100vw-48px)] sm:w-[300px] md:w-[340px] rounded-xl border border-border bg-surface-secondary overflow-hidden hover:shadow-card-hover transition-shadow"
           >
             {poll.image && (
               <div className="relative w-full aspect-[2/1]">
@@ -121,7 +121,8 @@ export default function PollingCarousel({ items }: { items: Poll[] }) {
             key={idx}
             onClick={() => {
               if (!scrollRef.current) return;
-              const cardWidth = 340 + 16;
+              const card = scrollRef.current.querySelector("div");
+              const cardWidth = (card?.offsetWidth || 300) + 16;
               scrollRef.current.scrollTo({ left: idx * cardWidth, behavior: "smooth" });
               setTimeout(checkScroll, 400);
             }}

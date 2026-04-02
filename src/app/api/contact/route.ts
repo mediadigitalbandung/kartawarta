@@ -4,7 +4,7 @@ import { successResponse, errorResponse, ApiError } from "@/lib/api-utils";
 import { commentRateLimit } from "@/lib/rate-limit";
 import { sanitizeText, sanitizeEmail } from "@/lib/sanitize";
 import { prisma } from "@/lib/prisma";
-import { randomBytes } from "crypto";
+
 
 const contactSchema = z.object({
   name: z.string().min(1, "Nama wajib diisi").max(100),
@@ -31,9 +31,8 @@ export async function POST(request: NextRequest) {
       message: sanitizeText(data.message),
     };
 
-    await prisma.contact_messages.create({
+    await prisma.contactMessage.create({
       data: {
-        id: randomBytes(12).toString("hex"),
         name: sanitized.name,
         email: sanitized.email,
         subject: sanitized.subject ?? null,
