@@ -18,6 +18,10 @@ const nextConfig = {
         protocol: "http",
         hostname: "145.79.15.99",
       },
+      {
+        protocol: "https",
+        hostname: "145.79.15.99.nip.io",
+      },
     ],
   },
   async headers() {
