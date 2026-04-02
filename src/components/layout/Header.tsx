@@ -82,9 +82,10 @@ export default function Header() {
               <Image
                 src="/logo-jhb.png"
                 alt="Jurnalis Hukum Bandung"
-                width={48}
-                height={48}
-                className="h-9 w-9 sm:h-12 sm:w-12 rounded-full object-cover"
+                width={96}
+                height={96}
+                className="h-9 w-9 sm:h-12 sm:w-12 object-contain"
+                quality={100}
                 priority
               />
               <span className="flex items-baseline gap-1 sm:gap-2">
