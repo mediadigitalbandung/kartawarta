@@ -6,7 +6,7 @@ import NewsTicker from "@/components/layout/NewsTicker";
 import HeroCarousel from "@/components/slider/HeroCarousel";
 import PollingCarousel from "@/components/slider/PollingCarousel";
 import BannerAd, { SidebarAd, InlineAd, NativeAd } from "@/components/ads/BannerAd";
-import { Scale, Briefcase, Trophy, Film, Heart, Wheat, Cpu, Vote as VoteIcon, GraduationCap, Leaf, Compass, BookOpen, TrendingUp, LucideIcon, ArrowRight } from "lucide-react";
+import { Scale, Briefcase, Trophy, Film, Heart, Wheat, Cpu, Vote as VoteIcon, GraduationCap, Leaf, Compass, BookOpen, TrendingUp, LucideIcon, ArrowRight, Clock, Eye, Flame, Sparkles, ChevronRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 const categoryIconMap: Record<string, LucideIcon> = {
@@ -96,13 +96,18 @@ export default async function HomePage() {
         <section className="bg-surface py-14">
           <div className="container-main">
             <div className="flex items-center justify-between mb-8">
-              <div>
-                <span className="text-label-md uppercase tracking-widest text-secondary font-bold">Pilihan Editor</span>
-                <h2 className="font-serif text-headline-md text-on-surface mt-1">
-                  Wajib Dibaca Hari Ini
-                </h2>
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-secondary/20 to-secondary/5 text-secondary ring-1 ring-secondary/10">
+                  <Sparkles size={18} strokeWidth={2.5} />
+                </div>
+                <div>
+                  <span className="text-label-md uppercase tracking-widest text-secondary font-bold">Pilihan Editor</span>
+                  <h2 className="font-serif text-headline-md text-on-surface mt-0.5">
+                    Wajib Dibaca Hari Ini
+                  </h2>
+                </div>
               </div>
-              <Link href="/berita" className="hidden sm:flex items-center gap-1.5 text-label-md uppercase tracking-wider font-semibold text-primary hover:text-primary-dark transition-colors">
+              <Link href="/berita" className="hidden sm:flex items-center gap-1.5 rounded-full bg-primary/5 px-4 py-2 text-label-md uppercase tracking-wider font-semibold text-primary hover:bg-primary/10 transition-colors">
                 Semua Berita <ArrowRight size={14} />
               </Link>
             </div>
@@ -125,8 +130,8 @@ export default async function HomePage() {
                         {a.title}
                       </h3>
                     </Link>
-                    <p className="mt-2 text-label-sm uppercase tracking-wider text-on-surface-variant">
-                      {a.author.name} <span className="text-on-surface-variant/30 mx-1">/</span> {timeAgo(a.publishedAt)}
+                    <p className="mt-2 flex items-center gap-1.5 text-label-sm uppercase tracking-wider text-on-surface-variant">
+                      {a.author.name} <span className="text-on-surface-variant/30 mx-0.5">/</span> <Clock size={10} className="text-on-surface-variant/50" /> {timeAgo(a.publishedAt)}
                     </p>
                   </div>
                 </article>
@@ -145,9 +150,14 @@ export default async function HomePage() {
             {/* Berita Terkini â€” 7 cols */}
             <div className="lg:col-span-7">
               <div className="flex items-center justify-between mb-8">
-                <h2 className="font-serif text-headline-md text-on-surface">Berita Terkini</h2>
-                <Link href="/berita" className="text-label-md uppercase tracking-wider font-semibold text-primary hover:text-primary-dark transition-colors">
-                  Lihat Semua
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 text-primary ring-1 ring-primary/10">
+                    <Flame size={18} strokeWidth={2.5} />
+                  </div>
+                  <h2 className="font-serif text-headline-md text-on-surface">Berita Terkini</h2>
+                </div>
+                <Link href="/berita" className="flex items-center gap-1.5 rounded-full bg-primary/5 px-4 py-2 text-label-md uppercase tracking-wider font-semibold text-primary hover:bg-primary/10 transition-colors">
+                  Lihat Semua <ChevronRight size={14} />
                 </Link>
               </div>
               {/* First article large */}
@@ -205,8 +215,10 @@ export default async function HomePage() {
             <aside className="lg:col-span-5">
               {/* Terpopuler */}
               <div className="mb-8">
-                <div className="flex items-center gap-2 mb-6">
-                  <TrendingUp size={18} className="text-secondary" />
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-secondary/20 to-secondary/5 text-secondary ring-1 ring-secondary/10">
+                    <TrendingUp size={16} strokeWidth={2.5} />
+                  </div>
                   <h2 className="font-serif text-headline-sm text-on-surface">Terpopuler</h2>
                 </div>
                 <div className="flex flex-col">
@@ -221,9 +233,10 @@ export default async function HomePage() {
                             {a.title}
                           </h3>
                         </Link>
-                        <p className="mt-1.5 text-label-sm uppercase tracking-wider text-on-surface-variant">
+                        <p className="mt-1.5 flex items-center gap-1.5 text-label-sm uppercase tracking-wider text-on-surface-variant">
                           <span className="text-primary font-semibold">{a.category.name}</span>
-                          <span className="mx-1.5 text-on-surface-variant/20">/</span>
+                          <span className="mx-0.5 text-on-surface-variant/20">/</span>
+                          <Eye size={10} className="text-on-surface-variant/50" />
                           {a.viewCount?.toLocaleString("id-ID")} views
                         </p>
                       </div>
@@ -252,9 +265,14 @@ export default async function HomePage() {
           â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       <section className="bg-surface py-14">
         <div className="container-main">
-          <div className="mb-8">
-            <span className="text-label-md uppercase tracking-widest text-secondary font-bold">Suara Pembaca</span>
-            <h2 className="font-serif text-headline-md text-on-surface mt-1">Polling</h2>
+          <div className="flex items-center gap-3 mb-8">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-secondary/20 to-secondary/5 text-secondary ring-1 ring-secondary/10">
+              <VoteIcon size={18} strokeWidth={2.5} />
+            </div>
+            <div>
+              <span className="text-label-md uppercase tracking-widest text-secondary font-bold">Suara Pembaca</span>
+              <h2 className="font-serif text-headline-md text-on-surface mt-0.5">Polling</h2>
+            </div>
           </div>
           <PollingCarousel />
         </div>
@@ -278,13 +296,17 @@ export default async function HomePage() {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
                   <Link href={`/kategori/${catSlug}`} className="group flex items-center gap-3">
-                    <div className="h-8 w-1 bg-primary rounded-full" />
+                    {(() => { const CatIcon = categoryIconMap[catSlug] || Scale; return (
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 text-primary ring-1 ring-primary/10 group-hover:from-primary/25 group-hover:to-primary/10 transition-all">
+                        <CatIcon size={18} strokeWidth={2.5} />
+                      </div>
+                    ); })()}
                     <h2 className="font-serif text-headline-sm text-on-surface group-hover:text-primary transition-colors">
                       {catName}
                     </h2>
                   </Link>
-                  <Link href={`/kategori/${catSlug}`} className="flex items-center gap-1.5 text-label-md uppercase tracking-wider font-semibold text-primary hover:text-primary-dark transition-colors">
-                    Lihat Semua <ArrowRight size={14} />
+                  <Link href={`/kategori/${catSlug}`} className="flex items-center gap-1.5 rounded-full bg-primary/5 px-4 py-2 text-label-md uppercase tracking-wider font-semibold text-primary hover:bg-primary/10 transition-colors">
+                    Lihat Semua <ChevronRight size={14} />
                   </Link>
                 </div>
 
@@ -309,8 +331,8 @@ export default async function HomePage() {
                             </h3>
                           </Link>
                           {main.excerpt && <p className="mt-3 text-body-md text-on-surface-variant line-clamp-2">{main.excerpt}</p>}
-                          <p className="mt-3 text-label-sm uppercase tracking-wider text-on-surface-variant">
-                            {main.author.name} <span className="mx-1.5 text-on-surface-variant/20">/</span> {timeAgo(main.publishedAt)}
+                          <p className="mt-3 flex items-center gap-1.5 text-label-sm uppercase tracking-wider text-on-surface-variant">
+                            {main.author.name} <span className="mx-0.5 text-on-surface-variant/20">/</span> <Clock size={10} className="text-on-surface-variant/50" /> {timeAgo(main.publishedAt)}
                           </p>
                         </div>
                       </div>
@@ -355,8 +377,8 @@ export default async function HomePage() {
                           <Link href={`/berita/${a.slug}`}>
                             <h3 className="font-serif text-title-lg leading-snug text-on-surface line-clamp-2 group-hover:text-primary transition-colors">{a.title}</h3>
                           </Link>
-                          <p className="mt-2 text-label-sm uppercase tracking-wider text-on-surface-variant">
-                            {a.author.name} <span className="mx-1.5 text-on-surface-variant/20">/</span> {timeAgo(a.publishedAt)}
+                          <p className="mt-2 flex items-center gap-1.5 text-label-sm uppercase tracking-wider text-on-surface-variant">
+                            {a.author.name} <span className="mx-0.5 text-on-surface-variant/20">/</span> <Clock size={10} className="text-on-surface-variant/50" /> {timeAgo(a.publishedAt)}
                           </p>
                         </div>
                       </article>
@@ -383,9 +405,14 @@ export default async function HomePage() {
           â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       <section className="bg-primary py-14">
         <div className="container-main">
-          <div className="mb-8">
-            <h2 className="font-serif text-headline-md text-white">Jelajahi Kategori</h2>
-            <p className="mt-1 text-body-sm text-white/40">Temukan berita berdasarkan topik yang Anda minati</p>
+          <div className="flex items-center gap-3 mb-8">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-white ring-1 ring-white/10">
+              <Compass size={20} strokeWidth={2.2} />
+            </div>
+            <div>
+              <h2 className="font-serif text-headline-md text-white">Jelajahi Kategori</h2>
+              <p className="mt-0.5 text-body-sm text-white/40">Temukan berita berdasarkan topik yang Anda minati</p>
+            </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {categories.map((cat) => {
@@ -394,15 +421,16 @@ export default async function HomePage() {
                 <Link
                   key={cat.slug}
                   href={`/kategori/${cat.slug}`}
-                  className="group flex items-center gap-3 rounded-sm bg-white/5 p-4 transition-all duration-200 hover:bg-white/10"
+                  className="group flex items-center gap-3 rounded-xl bg-white/[0.04] p-4 transition-all duration-300 hover:bg-white/[0.1] ring-1 ring-white/[0.06] hover:ring-white/[0.12]"
                 >
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm bg-white/10 text-white/60 group-hover:bg-white/20 group-hover:text-white transition-colors">
-                    <Icon size={16} />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-white/15 to-white/5 text-white/70 group-hover:from-white/25 group-hover:to-white/10 group-hover:text-white transition-all duration-300 shadow-lg shadow-black/10">
+                    <Icon size={18} strokeWidth={2.2} />
                   </div>
                   <div className="min-w-0">
-                    <span className="block text-title-sm text-white truncate">{cat.name}</span>
+                    <span className="block text-title-sm text-white font-semibold truncate">{cat.name}</span>
                     <span className="block text-label-sm text-white/30 uppercase tracking-wider">{cat._count.articles} artikel</span>
                   </div>
+                  <ChevronRight size={14} className="ml-auto text-white/15 group-hover:text-white/40 transition-colors shrink-0" />
                 </Link>
               );
             })}
