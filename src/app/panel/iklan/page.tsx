@@ -324,6 +324,7 @@ export default function IklanPage() {
   const [formTargetUrl, setFormTargetUrl] = useState("");
   const [formStartDate, setFormStartDate] = useState("");
   const [formEndDate, setFormEndDate] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   const fetchAds = useCallback(async () => {
     try {
@@ -546,31 +547,133 @@ export default function IklanPage() {
                 </div>
               </div>
 
-              {/* Slot spec info */}
+              {/* ── Visual Slot Guide ── */}
               {currentSpec && (
-                <div className="flex items-start gap-2.5 rounded-xl bg-blue-50 border border-blue-200 px-4 py-3">
-                  <Info size={16} className="text-blue-500 mt-0.5 shrink-0" />
-                  <div className="text-sm">
-                    <p className="font-semibold text-blue-800">Ukuran rekomendasi: {currentSpec.ratio}</p>
-                    <p className="text-blue-600 text-xs mt-0.5">{currentSpec.desc} — Rasio {currentSpec.width}:{currentSpec.height}</p>
+                <div className="rounded-xl border border-border bg-surface-secondary p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Info size={14} className="text-goto-green" />
+                    <span className="text-sm font-bold text-txt-primary">Posisi & Ukuran: {slotLabels[formSlot]}</span>
+                  </div>
+                  {/* Mini wireframe */}
+                  <div className="relative rounded-lg border-2 border-border bg-surface p-2 text-[9px] text-txt-muted font-medium overflow-hidden" style={{ minHeight: 180 }}>
+                    {/* Header */}
+                    <div className={`rounded h-5 mb-1 flex items-center justify-center ${formSlot === "HEADER" ? "bg-goto-green/20 border-2 border-dashed border-goto-green text-goto-green font-bold text-[10px]" : "bg-surface-tertiary"}`}>
+                      {formSlot === "HEADER" ? `IKLAN (${currentSpec.ratio})` : "Header"}
+                    </div>
+                    {/* Nav */}
+                    <div className="rounded h-3 bg-surface-tertiary mb-1.5" />
+                    {/* Body */}
+                    <div className="flex gap-1.5 mb-1.5">
+                      {/* Content area */}
+                      <div className="flex-1 space-y-1">
+                        <div className={`rounded h-4 ${formSlot === "BETWEEN_SECTIONS" ? "bg-goto-green/20 border-2 border-dashed border-goto-green flex items-center justify-center text-goto-green font-bold text-[10px]" : "bg-surface-tertiary"}`}>
+                          {formSlot === "BETWEEN_SECTIONS" && `IKLAN (${currentSpec.ratio})`}
+                        </div>
+                        <div className="rounded h-8 bg-surface-tertiary" />
+                        <div className={`rounded h-4 ${formSlot === "IN_ARTICLE" ? "bg-goto-green/20 border-2 border-dashed border-goto-green flex items-center justify-center text-goto-green font-bold text-[10px]" : "bg-surface-tertiary"}`}>
+                          {formSlot === "IN_ARTICLE" && `IKLAN (${currentSpec.ratio})`}
+                        </div>
+                        <div className="rounded h-8 bg-surface-tertiary" />
+                      </div>
+                      {/* Sidebar */}
+                      <div className={`shrink-0 w-16 rounded ${formSlot === "SIDEBAR" ? "bg-goto-green/20 border-2 border-dashed border-goto-green flex items-center justify-center text-goto-green font-bold text-[10px] p-1 text-center leading-tight" : "bg-surface-tertiary"}`}>
+                        {formSlot === "SIDEBAR" && `IKLAN\n${currentSpec.ratio}`}
+                      </div>
+                    </div>
+                    {/* Footer */}
+                    <div className={`rounded h-5 mb-1 flex items-center justify-center ${formSlot === "FOOTER" ? "bg-goto-green/20 border-2 border-dashed border-goto-green text-goto-green font-bold text-[10px]" : "bg-surface-tertiary"}`}>
+                      {formSlot === "FOOTER" ? `IKLAN (${currentSpec.ratio})` : "Footer"}
+                    </div>
+                    {/* Floating / Popup overlay */}
+                    {formSlot === "FLOATING_BOTTOM" && (
+                      <div className="absolute bottom-2 left-2 right-2 rounded bg-goto-green/20 border-2 border-dashed border-goto-green h-5 flex items-center justify-center text-goto-green font-bold text-[10px]">
+                        IKLAN FLOATING ({currentSpec.ratio})
+                      </div>
+                    )}
+                    {formSlot === "POPUP" && (
+                      <div className="absolute inset-0 bg-black/20 flex items-center justify-center rounded-lg">
+                        <div className="rounded-lg bg-goto-green/20 border-2 border-dashed border-goto-green px-4 py-6 text-goto-green font-bold text-[10px] text-center">
+                          POP-UP IKLAN<br />{currentSpec.ratio}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-2 flex items-center justify-between">
+                    <p className="text-xs text-txt-muted">{currentSpec.desc}</p>
+                    <span className="rounded-full bg-goto-light px-2.5 py-0.5 text-xs font-bold text-goto-green">{currentSpec.ratio}</span>
                   </div>
                 </div>
               )}
 
+              {/* ── Image Upload / URL ── */}
               {formType !== "HTML" ? (
-                <div>
-                  <input type="url" placeholder="URL Gambar" value={formImageUrl} onChange={(e) => setFormImageUrl(e.target.value)} className="input w-full" />
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-txt-secondary">Gambar Iklan</label>
+                  {/* Upload button */}
+                  <div className="flex gap-2">
+                    <label className="flex-1 cursor-pointer">
+                      <div className={`flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border py-4 hover:border-goto-green hover:bg-goto-light/30 transition-colors ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
+                        <ImageIcon size={18} className="text-txt-muted" />
+                        <span className="text-sm font-medium text-txt-secondary">
+                          {uploading ? "Mengupload..." : "Upload Gambar"}
+                        </span>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        className="hidden"
+                        disabled={uploading}
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          if (file.size > 5 * 1024 * 1024) { showError("Ukuran file maksimal 5MB"); return; }
+                          try {
+                            setUploading(true);
+                            const fd = new FormData();
+                            fd.append("file", file);
+                            const res = await fetch("/api/upload", { method: "POST", body: fd });
+                            if (!res.ok) { const j = await res.json(); throw new Error(j.error || "Upload gagal"); }
+                            const json = await res.json();
+                            setFormImageUrl(json.data?.url || "");
+                            success("Gambar berhasil diupload");
+                          } catch (err) {
+                            showError(err instanceof Error ? err.message : "Upload gagal");
+                          } finally {
+                            setUploading(false);
+                            e.target.value = "";
+                          }
+                        }}
+                      />
+                    </label>
+                  </div>
+                  {/* Or paste URL */}
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-px bg-border" />
+                    <span className="text-[10px] text-txt-muted font-medium">atau paste URL</span>
+                    <div className="flex-1 h-px bg-border" />
+                  </div>
+                  <input type="url" placeholder="https://contoh.com/banner.jpg" value={formImageUrl} onChange={(e) => setFormImageUrl(e.target.value)} className="input w-full text-sm" />
                   {/* Inline preview */}
                   {formImageUrl && (
-                    <div className="mt-2 rounded-lg border border-border bg-surface-secondary p-2 overflow-hidden">
-                      <p className="text-[10px] font-medium text-txt-muted mb-1">Preview gambar:</p>
-                      <img
-                        src={formImageUrl}
-                        alt="Preview"
-                        className="max-w-full h-auto rounded object-contain"
-                        style={{ maxHeight: currentSpec?.height || 200 }}
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                      />
+                    <div className="rounded-xl border border-border bg-surface-secondary p-3 overflow-hidden">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs font-semibold text-txt-secondary">Preview Gambar</p>
+                        <button type="button" onClick={() => setFormImageUrl("")} className="text-xs text-red-400 hover:text-red-600">Hapus</button>
+                      </div>
+                      <div className="rounded-lg overflow-hidden bg-[repeating-conic-gradient(#f0f1f3_0%_25%,#fff_0%_50%)] bg-[length:16px_16px] flex items-center justify-center p-2">
+                        <img
+                          src={formImageUrl}
+                          alt="Preview"
+                          className="max-w-full h-auto rounded object-contain"
+                          style={{ maxHeight: Math.min(currentSpec?.height || 200, 300) }}
+                          onError={(e) => { (e.target as HTMLImageElement).src = ""; (e.target as HTMLImageElement).alt = "Gagal memuat gambar"; }}
+                        />
+                      </div>
+                      {currentSpec && (
+                        <p className="mt-1.5 text-[10px] text-txt-muted text-center">
+                          Rekomendasi: {currentSpec.width} x {currentSpec.height} piksel
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>
