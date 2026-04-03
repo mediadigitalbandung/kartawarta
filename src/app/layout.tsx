@@ -56,7 +56,9 @@ export const metadata: Metadata = {
     description: "Portal berita digital terpercaya. Menyajikan berita terkini, analisis mendalam, dan informasi akurat.",
     images: ["/kartawarta-icon.png"],
   },
-  verification: {},
+  verification: {
+    google: "aOYlnEshfJKwCD4v8OePC3vgPACRIRt2bO5s9dziFj0",
+  },
   category: "news",
   icons: {
     icon: "/kartawarta-icon.png",
