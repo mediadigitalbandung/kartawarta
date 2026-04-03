@@ -11,16 +11,18 @@ function genId() {
 async function main() {
   // Create categories
   const categories = [
-    { name: "Hukum Pidana", slug: "hukum-pidana", description: "Berita seputar hukum pidana", order: 1 },
-    { name: "Hukum Perdata", slug: "hukum-perdata", description: "Berita seputar hukum perdata", order: 2 },
-    { name: "Hukum Tata Negara", slug: "hukum-tata-negara", description: "Berita seputar hukum tata negara dan konstitusi", order: 3 },
-    { name: "Hukum Bisnis", slug: "hukum-bisnis", description: "Berita seputar hukum bisnis dan korporasi", order: 4 },
-    { name: "HAM", slug: "ham", description: "Berita seputar hak asasi manusia", order: 5 },
-    { name: "Hukum Lingkungan", slug: "hukum-lingkungan", description: "Berita seputar hukum lingkungan", order: 6 },
-    { name: "Ketenagakerjaan", slug: "ketenagakerjaan", description: "Berita seputar hukum ketenagakerjaan", order: 7 },
-    { name: "Opini", slug: "opini", description: "Opini dan analisis hukum", order: 8 },
-    { name: "Infografis", slug: "infografis", description: "Infografis hukum", order: 9 },
-    { name: "Berita Bandung", slug: "berita-bandung", description: "Berita hukum daerah Bandung", order: 10 },
+    { name: "Hukum", slug: "hukum", description: "Berita hukum, peradilan, dan regulasi", order: 1 },
+    { name: "Bisnis & Ekonomi", slug: "bisnis-ekonomi", description: "Berita bisnis, ekonomi, dan keuangan", order: 2 },
+    { name: "Olahraga", slug: "olahraga", description: "Berita olahraga nasional dan internasional", order: 3 },
+    { name: "Hiburan", slug: "hiburan", description: "Entertainment, selebriti, dan budaya pop", order: 4 },
+    { name: "Kesehatan", slug: "kesehatan", description: "Berita kesehatan, medis, dan gaya hidup sehat", order: 5 },
+    { name: "Pertanian & Peternakan", slug: "pertanian-peternakan", description: "Agrikultur, peternakan, dan ketahanan pangan", order: 6 },
+    { name: "Teknologi", slug: "teknologi", description: "Teknologi, digital, startup, dan inovasi", order: 7 },
+    { name: "Politik", slug: "politik", description: "Politik, pemerintahan, dan kebijakan publik", order: 8 },
+    { name: "Pendidikan", slug: "pendidikan", description: "Pendidikan, akademik, dan riset", order: 9 },
+    { name: "Lingkungan", slug: "lingkungan", description: "Isu lingkungan, iklim, dan konservasi", order: 10 },
+    { name: "Gaya Hidup", slug: "gaya-hidup", description: "Lifestyle, travel, kuliner, dan tren", order: 11 },
+    { name: "Opini", slug: "opini", description: "Opini, analisis, dan kolom", order: 12 },
   ];
 
   for (const cat of categories) {

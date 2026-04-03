@@ -17,21 +17,21 @@ import {
 
 const categoryNavMain = [
   { name: "Terkini", href: "/" },
-  { name: "Hukum Pidana", href: "/kategori/hukum-pidana" },
-  { name: "Hukum Perdata", href: "/kategori/hukum-perdata" },
-  { name: "Tata Negara", href: "/kategori/hukum-tata-negara" },
-  { name: "HAM", href: "/kategori/ham" },
-  { name: "Hukum Bisnis", href: "/kategori/hukum-bisnis" },
-  { name: "Opini", href: "/kategori/opini" },
-  { name: "Daerah", href: "/kategori/berita-bandung" },
+  { name: "Hukum", href: "/kategori/hukum" },
+  { name: "Bisnis", href: "/kategori/bisnis-ekonomi" },
+  { name: "Olahraga", href: "/kategori/olahraga" },
+  { name: "Hiburan", href: "/kategori/hiburan" },
+  { name: "Kesehatan", href: "/kategori/kesehatan" },
+  { name: "Teknologi", href: "/kategori/teknologi" },
+  { name: "Politik", href: "/kategori/politik" },
 ];
 
 const categoryNavMore = [
-  { name: "Lingkungan", href: "/kategori/hukum-lingkungan" },
-  { name: "Ketenagakerjaan", href: "/kategori/ketenagakerjaan" },
-  { name: "Infografis", href: "/kategori/infografis" },
-  { name: "Hukum Administrasi", href: "/kategori/hukum-administrasi" },
-  { name: "Koreksi & Klarifikasi", href: "/kode-etik" },
+  { name: "Pertanian & Peternakan", href: "/kategori/pertanian-peternakan" },
+  { name: "Pendidikan", href: "/kategori/pendidikan" },
+  { name: "Lingkungan", href: "/kategori/lingkungan" },
+  { name: "Gaya Hidup", href: "/kategori/gaya-hidup" },
+  { name: "Opini", href: "/kategori/opini" },
 ];
 
 export default function Header() {

@@ -1,14 +1,16 @@
 INSERT INTO categories (id, name, slug, description, "order") VALUES
-('cat01', 'Hukum Pidana', 'hukum-pidana', 'Berita seputar hukum pidana', 1),
-('cat02', 'Hukum Perdata', 'hukum-perdata', 'Berita seputar hukum perdata', 2),
-('cat03', 'Hukum Tata Negara', 'hukum-tata-negara', 'Berita seputar hukum tata negara dan konstitusi', 3),
-('cat04', 'Hukum Bisnis', 'hukum-bisnis', 'Berita seputar hukum bisnis dan korporasi', 4),
-('cat05', 'HAM', 'ham', 'Berita seputar hak asasi manusia', 5),
-('cat06', 'Hukum Lingkungan', 'hukum-lingkungan', 'Berita seputar hukum lingkungan', 6),
-('cat07', 'Ketenagakerjaan', 'ketenagakerjaan', 'Berita seputar hukum ketenagakerjaan', 7),
-('cat08', 'Opini', 'opini', 'Opini dan analisis hukum', 8),
-('cat09', 'Infografis', 'infografis', 'Infografis hukum', 9),
-('cat10', 'Berita Bandung', 'berita-bandung', 'Berita hukum daerah Bandung', 10)
+('cat01', 'Hukum', 'hukum', 'Berita hukum, peradilan, dan regulasi', 1),
+('cat02', 'Bisnis & Ekonomi', 'bisnis-ekonomi', 'Berita bisnis, ekonomi, dan keuangan', 2),
+('cat03', 'Olahraga', 'olahraga', 'Berita olahraga nasional dan internasional', 3),
+('cat04', 'Hiburan', 'hiburan', 'Entertainment, selebriti, dan budaya pop', 4),
+('cat05', 'Kesehatan', 'kesehatan', 'Berita kesehatan, medis, dan gaya hidup sehat', 5),
+('cat06', 'Pertanian & Peternakan', 'pertanian-peternakan', 'Agrikultur, peternakan, dan ketahanan pangan', 6),
+('cat07', 'Teknologi', 'teknologi', 'Teknologi, digital, startup, dan inovasi', 7),
+('cat08', 'Politik', 'politik', 'Politik, pemerintahan, dan kebijakan publik', 8),
+('cat09', 'Pendidikan', 'pendidikan', 'Pendidikan, akademik, dan riset', 9),
+('cat10', 'Lingkungan', 'lingkungan', 'Isu lingkungan, iklim, dan konservasi', 10),
+('cat11', 'Gaya Hidup', 'gaya-hidup', 'Lifestyle, travel, kuliner, dan tren', 11),
+('cat12', 'Opini', 'opini', 'Opini, analisis, dan kolom', 12)
 ON CONFLICT (slug) DO NOTHING;
 
 INSERT INTO users (id, email, password, name, role, bio, "updatedAt") VALUES
