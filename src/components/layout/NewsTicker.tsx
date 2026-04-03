@@ -46,37 +46,20 @@ function useStocks() {
 
   const fetchStocks = useCallback(async () => {
     try {
-      const ids = SYMBOLS.map((s) => s.id).join(",");
-      const res = await fetch(
-        `https://query2.finance.yahoo.com/v8/finance/spark?symbols=${ids}&range=1d&interval=1d`,
-        { cache: "no-store", headers: { "User-Agent": "Mozilla/5.0" } }
-      );
-      if (!res.ok) throw new Error("Yahoo error");
-      const data = await res.json();
+      const res = await fetch("/api/stocks", { cache: "no-store" });
+      if (!res.ok) throw new Error("API error");
+      const json = await res.json();
+      const data = json.data || [];
 
-      const mapped: StockItem[] = SYMBOLS.map((s) => {
-        const q = data[s.id];
-        if (!q) return null;
-        const close = q.close?.[q.close.length - 1] || 0;
-        const prev = q.chartPreviousClose || close;
-        const change = close - prev;
-        const pct = prev > 0 ? (change / prev) * 100 : 0;
-        return {
-          symbol: s.label,
-          price: close,
-          prevClose: prev,
-          change,
-          changePercent: pct,
-          direction: change > 0.001 ? "up" as const : change < -0.001 ? "down" as const : "flat" as const,
-        };
-      }).filter(Boolean) as StockItem[];
-
-      if (mapped.length > 0) {
-        setStocks(mapped);
+      if (data.length > 0) {
+        setStocks(data.map((s: StockItem) => ({
+          ...s,
+          direction: s.change > 0.001 ? "up" as const : s.change < -0.001 ? "down" as const : "flat" as const,
+        })));
         setLastUpdate(new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
       }
     } catch {
-      // Keep existing data or show nothing
+      // Keep existing data
     }
   }, []);
 
