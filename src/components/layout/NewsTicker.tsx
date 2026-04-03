@@ -72,22 +72,22 @@ function useTrending() {
 /* ── Stock Card ── */
 function StockCard({ s }: { s: StockItem }) {
   return (
-    <div className={`shrink-0 rounded-sm px-4 py-3 min-w-[150px] sm:min-w-[165px] ${
-      s.direction === "up" ? "bg-emerald-500/10" : s.direction === "down" ? "bg-red-500/10" : "bg-white/5"
+    <div className={`shrink-0 rounded-[12px] px-4 py-3 min-w-[150px] sm:min-w-[165px] border ${
+      s.direction === "up" ? "bg-emerald-50/50 border-emerald-100/50" : s.direction === "down" ? "bg-red-50/50 border-red-100/50" : "bg-gray-50/50 border-gray-100"
     }`}>
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-label-md font-bold text-white/70">{s.symbol}</span>
-        {s.direction === "up" ? <ArrowUpRight size={16} className="text-emerald-400" /> :
-         s.direction === "down" ? <ArrowDownRight size={16} className="text-red-400" /> :
-         <Minus size={14} className="text-white/30" />}
+        <span className="text-label-md font-bold text-gray-600">{s.symbol}</span>
+        {s.direction === "up" ? <ArrowUpRight size={16} className="text-emerald-500" /> :
+         s.direction === "down" ? <ArrowDownRight size={16} className="text-red-500" /> :
+         <Minus size={14} className="text-gray-400" />}
       </div>
-      <div className="text-title-lg font-mono font-bold text-white leading-none">{fmtPrice(s.price, s.symbol)}</div>
+      <div className="text-title-lg font-mono font-bold text-gray-900 leading-none">{fmtPrice(s.price, s.symbol)}</div>
       <div className="mt-1.5 flex items-center gap-2">
         <span className={`text-label-md font-mono font-semibold ${
-          s.direction === "up" ? "text-emerald-400" : s.direction === "down" ? "text-red-400" : "text-white/40"
+          s.direction === "up" ? "text-emerald-600" : s.direction === "down" ? "text-red-600" : "text-gray-500"
         }`}>{s.change >= 0 ? "+" : ""}{s.change.toFixed(2)}</span>
         <span className={`text-label-sm font-mono ${
-          s.direction === "up" ? "text-emerald-400/60" : s.direction === "down" ? "text-red-400/60" : "text-white/20"
+          s.direction === "up" ? "text-emerald-500" : s.direction === "down" ? "text-red-500" : "text-gray-400"
         }`}>({s.changePercent >= 0 ? "+" : ""}{s.changePercent.toFixed(2)}%)</span>
       </div>
     </div>
@@ -105,18 +105,18 @@ function StockCarousel({ stocks, lastUpdate }: { stocks: StockItem[]; lastUpdate
 
   return (
     <div
-      className="bg-on-surface overflow-hidden"
+      className="bg-white border-b border-gray-100 overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
       <div className="container-main py-3">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2.5">
-            <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-label-md font-bold uppercase tracking-widest text-white/50">Market</span>
-            <span className="hidden sm:inline text-label-sm text-white/20">Live</span>
+            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-label-md font-bold uppercase tracking-widest text-gray-500">Market</span>
+            <span className="hidden sm:inline text-label-sm text-gray-400">Live</span>
           </div>
-          {lastUpdate && <span className="text-label-sm text-white/20 font-mono">Update {lastUpdate} WIB</span>}
+          {lastUpdate && <span className="text-label-sm text-gray-400 font-mono">Update {lastUpdate} WIB</span>}
         </div>
       </div>
 
