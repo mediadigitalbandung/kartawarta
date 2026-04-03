@@ -236,9 +236,9 @@ export default async function HomePage() {
             {/* Left: Berita Terkini — 2/3 width, grid layout */}
             <div className="lg:col-span-3">
               <div className="flex items-center justify-between mb-5">
-                <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
+                <Link href="/berita" className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary hover:text-goto-green transition-colors">
                   Berita Terkini
-                </h2>
+                </Link>
                 <Link href="/berita" className="text-sm font-medium text-goto-green hover:underline">
                   Lihat Semua
                 </Link>
@@ -254,10 +254,10 @@ export default async function HomePage() {
             {trendingArticles.length > 0 && (
               <div className="lg:col-span-2 flex flex-col">
                 <div className="flex items-center justify-between mb-5">
-                  <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
+                  <Link href="/berita?sort=popular" className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center hover:text-goto-green transition-colors">
                     <TrendingUp size={18} className="mr-2 text-goto-green" />
                     Terpopuler
-                  </h2>
+                  </Link>
                   <Link href="/berita?sort=popular" className="text-sm font-medium text-goto-green hover:underline">
                     Lihat Semua
                   </Link>
@@ -313,10 +313,10 @@ export default async function HomePage() {
       <section className="bg-surface py-6">
         <div className="container-main">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
+            <Link href="/jadwal-sidang" className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center hover:text-goto-green transition-colors">
               <Calendar size={18} className="mr-2 text-goto-green" />
               Jadwal Sidang Mendatang
-            </h2>
+            </Link>
             <Link href="/jadwal-sidang" className="text-sm font-medium text-goto-green hover:underline">
               Lihat Semua
             </Link>
@@ -348,10 +348,10 @@ export default async function HomePage() {
       <section className="bg-surface-secondary py-6">
         <div className="container-main">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="border-l-[3px] border-red-500 pl-3 text-lg font-bold text-txt-primary flex items-center">
+            <Link href="/live-sidang" className="border-l-[3px] border-red-500 pl-3 text-lg font-bold text-txt-primary flex items-center hover:text-red-500 transition-colors">
               <Radio size={18} className="mr-2 text-red-500 animate-pulse" />
               Live Sidang Hari Ini
-            </h2>
+            </Link>
             <Link href="/live-sidang" className="text-sm font-medium text-goto-green hover:underline">
               Lihat Semua
             </Link>
@@ -406,7 +406,7 @@ export default async function HomePage() {
       <section className="bg-surface py-8">
         <div className="container-main">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
+            <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center cursor-default">
               <Vote size={18} className="mr-2 text-goto-green" />
               Polling Hukum
             </h2>
@@ -422,10 +422,10 @@ export default async function HomePage() {
       <section className="bg-surface-secondary py-8">
         <div className="container-main">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
+            <Link href="/video" className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center hover:text-goto-green transition-colors">
               <Play size={18} className="mr-2 text-goto-green" />
               Video Story
-            </h2>
+            </Link>
             <Link href="/video" className="text-sm font-medium text-goto-green hover:underline flex items-center gap-1">
               Lihat Semua &rarr;
             </Link>
@@ -453,9 +453,9 @@ export default async function HomePage() {
             <div className="container-main">
               {/* Section header */}
               <div className="flex items-center justify-between mb-5">
-                <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
+                <Link href={`/kategori/${categorySlug}`} className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary hover:text-goto-green transition-colors">
                   {categoryName}
-                </h2>
+                </Link>
                 <Link
                   href={`/kategori/${categorySlug}`}
                   className="text-sm font-medium text-goto-green hover:underline"
@@ -498,9 +498,9 @@ export default async function HomePage() {
                 {/* Center: Trending — scrollable list */}
                 {trending.length > 0 && (
                   <div className="lg:col-span-1">
-                    <h3 className="border-l-[3px] border-goto-green pl-3 text-sm font-bold text-txt-primary mb-3">
+                    <Link href={`/kategori/${categorySlug}`} className="border-l-[3px] border-goto-green pl-3 text-sm font-bold text-txt-primary mb-3 block hover:text-goto-green transition-colors">
                       Trending di {categoryName}
-                    </h3>
+                    </Link>
                     <div className="space-y-0 divide-y divide-border max-h-[280px] overflow-y-auto scrollbar-hide">
                       {trending.map((a) => (
                         <div key={a.slug} className="group flex gap-3 py-2.5 first:pt-0">
@@ -531,9 +531,9 @@ export default async function HomePage() {
                 {/* Right: Terbaru */}
                 {terbaru.length > 0 && (
                   <div className="lg:col-span-1">
-                    <h3 className="border-l-[3px] border-goto-green pl-3 text-sm font-bold text-txt-primary mb-3">
+                    <Link href={`/kategori/${categorySlug}`} className="border-l-[3px] border-goto-green pl-3 text-sm font-bold text-txt-primary mb-3 block hover:text-goto-green transition-colors">
                       Terbaru di {categoryName}
-                    </h3>
+                    </Link>
                     <div className="space-y-0 divide-y divide-border max-h-[280px] overflow-y-auto scrollbar-hide">
                       {terbaru.map((a) => (
                         <div key={a.slug} className="group flex gap-3 py-2.5 first:pt-0">
