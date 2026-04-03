@@ -458,9 +458,14 @@ export default function ArtikelPage() {
                           />
                         </td>
                         <td className="max-w-[200px] sm:max-w-[300px] px-3 sm:px-5 py-4">
-                          <p className="truncate font-medium text-txt-primary text-sm">
+                          <a
+                            href={`/berita/${article.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="truncate block font-medium text-txt-primary text-sm hover:text-goto-green transition-colors cursor-pointer"
+                          >
                             {article.title}
-                          </p>
+                          </a>
                         </td>
                         <td className="hidden md:table-cell px-5 py-4 text-sm text-txt-secondary">
                           {article.category?.name || "\u2014"}
