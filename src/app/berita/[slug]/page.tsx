@@ -63,8 +63,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-const WORDS_PER_PAGE = 500;
-const TOLERANCE = 100; // if total ≤ WORDS_PER_PAGE + TOLERANCE, keep single page
+const WORDS_PER_PAGE = 300;
+const TOLERANCE = 50; // if total ≤ WORDS_PER_PAGE + TOLERANCE, keep single page
 
 function splitContentIntoPages(html: string): string[] {
   if (!html) return [html];
