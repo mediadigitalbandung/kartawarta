@@ -206,13 +206,13 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
     <div className="flex h-full flex-col px-3 py-4 overflow-y-auto overscroll-contain">
       <a
         href="/"
-        className="mb-5 flex items-center gap-2.5 rounded-xl px-4 py-3 text-base text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+        className="mb-6 flex items-center gap-2.5 rounded-lg px-4 py-2.5 text-[13px] font-medium text-white/40 hover:text-white/80 hover:bg-white/5 transition-all duration-150"
       >
-        <ChevronLeft size={18} />
+        <ChevronLeft size={16} />
         Kembali ke Situs
       </a>
 
-      <nav className="flex-1 space-y-1">
+      <nav className="flex-1 space-y-0.5">
         {filteredMenu.map((item) => {
           const Icon = item.icon;
           const isActive = pathname.startsWith(item.href);
@@ -222,13 +222,13 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
               href={item.href}
               onClick={() => setSidebarOpen(false)}
               className={cn(
-                "flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium transition-colors",
+                "flex items-center gap-3 rounded-lg px-4 py-2.5 text-[14px] font-medium transition-all duration-150",
                 isActive
-                  ? "bg-primary/15 text-primary"
-                  : "text-white/60 hover:text-white hover:bg-white/5"
+                  ? "bg-white/10 text-white shadow-sm border border-white/10"
+                  : "text-white/50 hover:text-white/90 hover:bg-white/5 border border-transparent"
               )}
             >
-              <Icon size={20} />
+              <Icon size={18} className={isActive ? "text-blue-400" : ""} />
               {item.name}
             </Link>
           );
@@ -236,16 +236,16 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
       </nav>
 
       {/* User info */}
-      <div className="border-t border-white/10 pt-4">
-        <div className="flex items-center gap-3 rounded-xl px-4 py-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-base font-bold text-white/70">
+      <div className="border-t border-white/[0.08] pt-4 mt-2">
+        <div className="flex items-center gap-3 rounded-lg px-4 py-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-500/20 text-sm font-bold text-blue-300">
             {session.user.name?.charAt(0)}
           </div>
           <div className="truncate">
-            <p className="truncate text-[15px] font-semibold text-white">
+            <p className="truncate text-[13px] font-semibold text-white/90">
               {session.user.name}
             </p>
-            <p className="text-sm text-white/50">
+            <p className="text-[11px] text-white/40">
               {roleLabelsMap[session.user.role] || session.user.role.replace(/_/g, " ")}
             </p>
           </div>
@@ -255,10 +255,10 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             await fetch("/api/auth/logout", { method: "POST" });
             signOut({ callbackUrl: "/login" });
           }}
-          className="mt-2 flex w-full items-center gap-2.5 rounded-xl px-4 py-3 text-[15px] text-white/50 transition-colors hover:bg-white/5 hover:text-white"
+          className="mt-1 flex w-full items-center gap-2.5 rounded-lg px-4 py-2.5 text-[13px] text-white/40 transition-all duration-150 hover:bg-white/5 hover:text-red-400"
           aria-label="Keluar"
         >
-          <LogOut size={18} />
+          <LogOut size={16} />
           Keluar
         </button>
       </div>
