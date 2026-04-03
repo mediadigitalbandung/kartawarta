@@ -14,6 +14,8 @@ import {
   UserX,
   Mail,
   ShieldAlert,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 interface User {
@@ -83,6 +85,7 @@ export default function PenggunaPage() {
   const [formName, setFormName] = useState("");
   const [formEmail, setFormEmail] = useState("");
   const [formPassword, setFormPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [formRole, setFormRole] = useState("");
   const [formSpec, setFormSpec] = useState("");
 
@@ -429,16 +432,25 @@ export default function PenggunaPage() {
                 className="input w-full"
               />
               <div>
-                <input
-                  type="password"
-                  placeholder={editingUser ? "Password baru" : "Password (min. 8 karakter)"}
-                  value={formPassword}
-                  onChange={(e) => setFormPassword(e.target.value)}
-                  required={!editingUser}
-                  minLength={8}
-                  className="input w-full"
-                  aria-label="Password"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder={editingUser ? "Password baru" : "Password (min. 8 karakter)"}
+                    value={formPassword}
+                    onChange={(e) => setFormPassword(e.target.value)}
+                    required={!editingUser}
+                    minLength={8}
+                    className="input w-full pr-10"
+                    aria-label="Password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-txt-muted hover:text-txt-primary transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
                 {editingUser && (
                   <p className="mt-1 text-sm text-txt-muted">Kosongkan jika tidak ingin mengubah password</p>
                 )}
