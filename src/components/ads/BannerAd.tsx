@@ -107,5 +107,33 @@ export function SidebarAd({ slot = "SIDEBAR" }: { slot?: string }) {
 
   if (!ad) return null;
 
-  return <AdContent ad={ad} />;
+  const content =
+    ad.type === "HTML" && ad.htmlCode ? (
+      <div dangerouslySetInnerHTML={{ __html: ad.htmlCode }} className="w-full h-full" />
+    ) : ad.imageUrl ? (
+      <img
+        src={ad.imageUrl}
+        alt="Iklan"
+        className="w-full h-full object-cover block rounded-lg"
+        loading="lazy"
+      />
+    ) : null;
+
+  if (!content) return null;
+
+  if (ad.targetUrl) {
+    return (
+      <a
+        href={ad.targetUrl}
+        target="_blank"
+        rel="noopener noreferrer sponsored"
+        onClick={() => handleClick(ad)}
+        className="block w-full h-full"
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return content;
 }
