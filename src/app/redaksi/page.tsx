@@ -1,21 +1,19 @@
+export const dynamic = "force-dynamic";
+
 import { Metadata } from "next";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "Susunan Redaksi",
   description: "Susunan redaksi Jurnalis Hukum Bandung.",
 };
 
-const redaksi = [
-  { position: "Pemimpin Redaksi", name: "\u2014", desc: "Bertanggung jawab atas keseluruhan isi pemberitaan" },
-  { position: "Wakil Pemimpin Redaksi", name: "\u2014", desc: "Membantu pemimpin redaksi dalam operasional harian" },
-  { position: "Editor Kepala", name: "\u2014", desc: "Mengelola proses editorial dan approval artikel" },
-  { position: "Editor", name: "\u2014", desc: "Menyunting dan memeriksa kelayakan artikel sebelum terbit" },
-  { position: "Jurnalis Senior", name: "\u2014", desc: "Jurnalis berpengalaman dengan hak publish langsung" },
-  { position: "Tim Jurnalis", name: "\u2014", desc: "Meliput dan menulis berita hukum di lapangan" },
-  { position: "Tim IT & Pengembangan", name: "Aureon", desc: "Pengembangan dan pemeliharaan platform digital" },
-];
+export default async function RedaksiPage() {
+  const members = await prisma.redaksiMember.findMany({
+    where: { isActive: true },
+    orderBy: { order: "asc" },
+  });
 
-export default function RedaksiPage() {
   return (
     <div className="bg-surface min-h-screen">
       <div className="container-main py-12">
@@ -30,25 +28,35 @@ export default function RedaksiPage() {
             seluruh proses produksi dan distribusi konten.
           </p>
 
-          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {redaksi.map((item, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-4 rounded-[12px] border border-border bg-surface p-5"
-              >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-goto-green text-lg font-bold text-white">
-                  {item.name === "\u2014" ? (i + 1) : item.name.charAt(0)}
+          {members.length === 0 ? (
+            <div className="mt-8 rounded-[12px] border-2 border-dashed border-border py-12 text-center">
+              <p className="text-txt-muted">Susunan redaksi akan segera diperbarui.</p>
+            </div>
+          ) : (
+            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {members.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-4 rounded-[12px] border border-border bg-surface p-5"
+                >
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-goto-green text-lg font-bold text-white overflow-hidden">
+                    {item.photo ? (
+                      <img src={item.photo} alt={item.name} className="h-12 w-12 object-cover" />
+                    ) : (
+                      item.name.charAt(0).toUpperCase()
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-goto-green">
+                      {item.position}
+                    </p>
+                    <p className="font-bold text-txt-primary">{item.name}</p>
+                    {item.desc && <p className="text-sm text-txt-muted">{item.desc}</p>}
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-goto-green">
-                    {item.position}
-                  </p>
-                  <p className="font-bold text-txt-primary">{item.name}</p>
-                  <p className="text-sm text-txt-muted">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           <div className="mt-8 rounded-[12px] border border-border bg-surface-secondary p-5">
             <p className="text-sm text-txt-muted">
