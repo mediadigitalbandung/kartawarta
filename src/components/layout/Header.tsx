@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 
 const categoryNav = [
-  { name: "Terkini", href: "/" },
   { name: "Hukum", href: "/kategori/hukum" },
   { name: "Bisnis", href: "/kategori/bisnis-ekonomi" },
   { name: "Olahraga", href: "/kategori/olahraga" },

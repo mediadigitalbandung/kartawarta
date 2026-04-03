@@ -109,41 +109,13 @@ function StockCard({ s }: { s: StockItem }) {
   );
 }
 
-/* ── Stock Carousel — JS animation infinite loop with native scroll ── */
+/* ── Stock Carousel — CSS animation + touch pause ── */
 function StockCarousel({ stocks, lastUpdate }: { stocks: StockItem[]; lastUpdate: string }) {
   const [paused, setPaused] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const set1Ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    let animationFrameId: number;
-    let lastTime = performance.now();
-    const speed = 30; // px per second
-
-    const animate = (time: number) => {
-      const dt = (time - lastTime) / 1000;
-      lastTime = time;
-
-      if (!paused && scrollRef.current && set1Ref.current && stocks.length > 0) {
-        const node = scrollRef.current;
-        // The gap between Set 1 and Set 2 is 10px (gap-2.5)
-        const resetPoint = set1Ref.current.offsetWidth + 10;
-        
-        node.scrollLeft += speed * dt;
-        
-        // Loop back seamlessly
-        if (node.scrollLeft >= resetPoint) {
-          node.scrollLeft -= resetPoint;
-        }
-      }
-      animationFrameId = requestAnimationFrame(animate);
-    };
-
-    animationFrameId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [paused, stocks.length]);
 
   if (stocks.length === 0) return null;
+
+  const duration = stocks.length * 12; // ~12s per card
 
   return (
     <div
@@ -152,7 +124,6 @@ function StockCarousel({ stocks, lastUpdate }: { stocks: StockItem[]; lastUpdate
       onMouseLeave={() => setPaused(false)}
       onTouchStart={() => setPaused(true)}
       onTouchEnd={() => setPaused(false)}
-      onTouchCancel={() => setPaused(false)}
     >
       <div className="container-main py-3">
         <div className="flex items-center justify-between mb-3">
@@ -165,37 +136,31 @@ function StockCarousel({ stocks, lastUpdate }: { stocks: StockItem[]; lastUpdate
         </div>
       </div>
 
-      {/* Infinte scrolling via JS, while supporting native drag / touchpan */}
-      <div className="relative overflow-visible">
+      <div className="relative">
         <div
-          ref={scrollRef}
-          className="overflow-x-auto hide-scrollbar touch-pan-x w-full"
-          style={{ scrollBehavior: 'auto' }}
+          className="flex gap-2.5 w-max"
+          style={{
+            animation: `stockScroll ${duration}s linear infinite`,
+            animationPlayState: paused ? "paused" : "running",
+          }}
         >
-          {/* We ensure a constant padding on the left and right inside the scroll container.
-              The reset point measures just the items, so keeping padding outside or symmetrical is key. */}
-          <div className="flex gap-2.5 w-max px-5 sm:px-8">
-            {/* Set 1 */}
-            <div ref={set1Ref} className="flex gap-2.5">
-              {stocks.map((s) => <StockCard key={`a-${s.symbol}`} s={s} />)}
-            </div>
-            {/* Set 2 (duplicate for seamless loop, always rendered to allow the JS loop trick) */}
-            <div className="flex gap-2.5">
-              {stocks.map((s) => <StockCard key={`b-${s.symbol}`} s={s} />)}
-            </div>
+          {/* Set 1 */}
+          <div className="flex gap-2.5 pl-5 sm:pl-8">
+            {stocks.map((s) => <StockCard key={`a-${s.symbol}`} s={s} />)}
+          </div>
+          {/* Set 2 (duplicate for seamless loop) */}
+          <div className="flex gap-2.5">
+            {stocks.map((s) => <StockCard key={`b-${s.symbol}`} s={s} />)}
           </div>
         </div>
       </div>
 
-      <div className="h-3 md:h-3" />
+      <div className="h-3" />
 
       <style jsx>{`
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .hide-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
+        @keyframes stockScroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
         }
       `}</style>
     </div>
@@ -213,9 +178,6 @@ export default function NewsTicker() {
 
   return (
     <>
-      {/* ═══ MARKET CAROUSEL ═══ */}
-      <StockCarousel stocks={stocks} lastUpdate={lastUpdate} />
-
       {/* ═══ TRENDING INDONESIA ═══ */}
       {looped.length > 0 && (
         <div className="bg-primary border-b border-[#001530] overflow-hidden">
@@ -277,6 +239,9 @@ export default function NewsTicker() {
           `}</style>
         </div>
       )}
+
+      {/* ═══ MARKET CAROUSEL ═══ */}
+      <StockCarousel stocks={stocks} lastUpdate={lastUpdate} />
     </>
   );
 }
