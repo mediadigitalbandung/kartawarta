@@ -135,29 +135,44 @@ function StockCarousel({ stocks, lastUpdate }: { stocks: StockItem[]; lastUpdate
         </div>
       </div>
 
-      {/* Infinite CSS scroll — two identical sets side by side */}
-      <div className="relative">
-        <div
-          className="flex gap-2.5 w-max"
-          style={{
-            animation: `stockScroll ${duration}s linear infinite`,
-            animationPlayState: paused ? "paused" : "running",
-          }}
-        >
-          {/* Set 1 */}
-          <div className="flex gap-2.5 pl-5 sm:pl-8">
-            {stocks.map((s) => <StockCard key={`a-${s.symbol}`} s={s} />)}
-          </div>
-          {/* Set 2 (duplicate for seamless loop) */}
-          <div className="flex gap-2.5">
-            {stocks.map((s) => <StockCard key={`b-${s.symbol}`} s={s} />)}
+      {/* Infinite CSS scroll on Desktop / Native scroll on Mobile */}
+      <div className="relative overflow-hidden md:overflow-visible">
+        <div className="overflow-x-auto hide-scrollbar touch-pan-x w-full">
+          <div
+            className="flex gap-2.5 w-max md:stock-scroll-animated"
+            style={{
+              "--scroll-duration": `${duration}s`,
+              animationPlayState: paused ? "paused" : "running",
+            } as React.CSSProperties}
+          >
+            {/* Set 1 */}
+            <div className="flex gap-2.5 pl-5 sm:pl-8">
+              {stocks.map((s) => <StockCard key={`a-${s.symbol}`} s={s} />)}
+            </div>
+            {/* Set 2 (duplicate for seamless loop, hidden on mobile) */}
+            <div className="hidden md:flex gap-2.5 pr-8">
+              {stocks.map((s) => <StockCard key={`b-${s.symbol}`} s={s} />)}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="h-3" />
+      <div className="h-3 md:h-3" />
 
       <style jsx>{`
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+
+        @media (min-width: 768px) {
+          .md\\:stock-scroll-animated {
+            animation: stockScroll var(--scroll-duration) linear infinite !important;
+          }
+        }
         @keyframes stockScroll {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
