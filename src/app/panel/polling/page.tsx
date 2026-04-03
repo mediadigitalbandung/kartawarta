@@ -12,6 +12,9 @@ import {
   Vote,
   BarChart3,
   Power,
+  Upload,
+  ImageIcon,
+  Loader2,
 } from "lucide-react";
 
 interface PollOption {
@@ -54,6 +57,27 @@ export default function PollingPanelPage() {
   const [formIsActive, setFormIsActive] = useState(true);
   const [formOrder, setFormOrder] = useState(0);
   const [formOptions, setFormOptions] = useState(["", ""]);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { showError("Ukuran gambar maksimal 5MB"); return; }
+    try {
+      setUploadingImage(true);
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      if (!res.ok) throw new Error();
+      const json = await res.json();
+      setFormImage(json.data?.url || "");
+      success("Gambar berhasil diupload");
+    } catch {
+      showError("Gagal upload gambar");
+    } finally {
+      setUploadingImage(false);
+    }
+  }
 
   const fetchData = useCallback(async () => {
     try {
@@ -238,8 +262,26 @@ export default function PollingPanelPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-txt-secondary">URL Gambar (opsional)</label>
-                  <input type="url" placeholder="https://..." value={formImage} onChange={(e) => setFormImage(e.target.value)} className="input w-full" />
+                  <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Gambar (opsional)</label>
+                  {formImage ? (
+                    <div className="relative group">
+                      <img src={formImage} alt="" className="w-full h-24 object-cover rounded-lg border border-border" />
+                      <button type="button" onClick={() => setFormImage("")} className="absolute top-1.5 right-1.5 p-1 rounded-md bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity"><X size={14} /></button>
+                    </div>
+                  ) : (
+                    <label className={`flex flex-col items-center justify-center w-full h-24 rounded-lg border-2 border-dashed border-border hover:border-primary/30 transition-colors cursor-pointer ${uploadingImage ? "pointer-events-none opacity-60" : ""}`}>
+                      {uploadingImage ? (
+                        <Loader2 size={20} className="text-primary animate-spin" />
+                      ) : (
+                        <>
+                          <Upload size={18} className="text-txt-muted mb-1" />
+                          <span className="text-xs text-txt-muted">Upload gambar</span>
+                          <span className="text-[10px] text-txt-muted/60">JPG, PNG, WebP · Maks 5MB</span>
+                        </>
+                      )}
+                      <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageUpload} className="hidden" />
+                    </label>
+                  )}
                 </div>
               </div>
 
@@ -348,6 +390,16 @@ export default function PollingPanelPage() {
           {polls.map((poll) => (
             <div key={poll.id} className={`rounded-[12px] border bg-surface p-5 shadow-card transition-all ${editingId === poll.id ? "border-primary bg-primary-light/10" : "border-border"}`}>
               <div className="flex items-start gap-4">
+                {poll.image && (
+                  <div className="shrink-0 w-20 h-14 rounded-lg overflow-hidden bg-surface-tertiary">
+                    <img src={poll.image} alt="" className="w-full h-full object-cover" />
+                  </div>
+                )}
+                {!poll.image && (
+                  <div className="shrink-0 w-20 h-14 rounded-lg bg-surface-tertiary flex items-center justify-center">
+                    <ImageIcon size={18} className="text-txt-muted/40" />
+                  </div>
+                )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${poll.isActive ? "bg-primary-light text-primary" : "bg-red-50 text-red-600"}`}>
