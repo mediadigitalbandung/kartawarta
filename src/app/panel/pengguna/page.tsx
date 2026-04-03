@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, FormEvent } from "react";
 import { useSession } from "next-auth/react";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
+import Link from "next/link";
 import {
   Plus,
   Search,
@@ -16,6 +17,7 @@ import {
   ShieldAlert,
   Eye,
   EyeOff,
+  AtSign,
 } from "lucide-react";
 
 interface User {
@@ -191,7 +193,9 @@ export default function PenggunaPage() {
           throw new Error(json.error || "Gagal menambah pengguna");
         }
 
-        success("Pengguna berhasil ditambahkan");
+        const json = await res.json();
+        const emailInfo = json.data?.emailCreated ? ` — Email ${formName.split(" ")[0].toLowerCase()}@kartawarta.com dibuat` : "";
+        success(`Pengguna berhasil ditambahkan${emailInfo}`);
       }
 
       setShowModal(false);
@@ -257,13 +261,22 @@ export default function PenggunaPage() {
           <h1 className="text-xl sm:text-3xl font-bold text-txt-primary">Kelola Pengguna</h1>
           <p className="text-base text-txt-secondary">{users.length} pengguna terdaftar</p>
         </div>
-        <button
-          onClick={() => setShowModal(true)}
-          className="btn-primary flex items-center gap-2 px-4 py-2.5 text-sm font-semibold"
-        >
-          <Plus size={16} />
-          Tambah Pengguna
-        </button>
+        <div className="flex gap-2">
+          <Link
+            href="/panel/email"
+            className="btn-secondary flex items-center gap-2 px-4 py-2.5 text-sm font-semibold"
+          >
+            <AtSign size={16} />
+            Kelola Email
+          </Link>
+          <button
+            onClick={() => setShowModal(true)}
+            className="btn-primary flex items-center gap-2 px-4 py-2.5 text-sm font-semibold"
+          >
+            <Plus size={16} />
+            Tambah Pengguna
+          </button>
+        </div>
       </div>
 
       <div className="mb-4 relative sm:max-w-xs">
@@ -473,6 +486,12 @@ export default function PenggunaPage() {
                 onChange={(e) => setFormSpec(e.target.value)}
                 className="input w-full"
               />
+              {!editingUser && formName && (
+                <div className="flex items-center gap-2 text-xs text-txt-muted bg-surface-secondary rounded-lg px-3 py-2.5">
+                  <AtSign size={12} className="text-primary shrink-0" />
+                  <span>Email <strong className="text-primary">{formName.split(" ")[0].toLowerCase()}@kartawarta.com</strong> akan otomatis dibuat dan forward ke <strong>{formEmail || "..."}</strong></span>
+                </div>
+              )}
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"

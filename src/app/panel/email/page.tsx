@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
-import { Plus, Trash2, Mail, Power, AtSign, ArrowRight, Loader2, RefreshCw } from "lucide-react";
+import Link from "next/link";
+import { Plus, Trash2, Mail, Power, AtSign, ArrowRight, Loader2, RefreshCw, Users } from "lucide-react";
 
 interface EmailRoute {
   id: string;
@@ -104,6 +105,9 @@ export default function EmailRoutingPage() {
           <p className="text-base text-txt-secondary">Kelola email @kartawarta.com — forward ke Gmail/email pribadi</p>
         </div>
         <div className="flex gap-2">
+          <Link href="/panel/pengguna" className="btn-ghost flex items-center gap-2 px-3 py-2.5 text-sm">
+            <Users size={14} /> Pengguna
+          </Link>
           <button onClick={fetchEmails} className="btn-ghost flex items-center gap-2 px-3 py-2.5 text-sm">
             <RefreshCw size={14} /> Refresh
           </button>

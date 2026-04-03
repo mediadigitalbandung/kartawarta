@@ -9,6 +9,7 @@ import {
   logAudit,
   ApiError,
 } from "@/lib/api-utils";
+import { listEmailRules, deleteEmailRule } from "@/lib/cloudflare-email";
 
 const updateUserSchema = z.object({
   name: z.string().min(2).max(100).optional(),
@@ -101,6 +102,20 @@ export async function DELETE(
     }
 
     await prisma.user.delete({ where: { id: params.id } });
+
+    // Auto-delete associated email routing rules
+    try {
+      const rules = await listEmailRules();
+      const userRules = rules.filter((r) => {
+        const forwardTo = r.actions.find((a) => a.type === "forward")?.value?.[0];
+        return forwardTo === user.email;
+      });
+      for (const rule of userRules) {
+        await deleteEmailRule(rule.id);
+      }
+    } catch {
+      // Non-critical
+    }
 
     await logAudit(
       session.user.id,

@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { successResponse, errorResponse, requireRole, requireAuth, logAudit, ApiError } from "@/lib/api-utils";
+import { createEmailForward, addDestinationAddress } from "@/lib/cloudflare-email";
+import { slugify } from "@/lib/utils";
 
 // GET /api/users
 export async function GET() {
@@ -88,7 +90,20 @@ export async function POST(request: NextRequest) {
 
     await logAudit(session.user.id, "CREATE", "user", user.id, `Membuat user: ${user.name} (${user.role})`);
 
-    return successResponse(user, 201);
+    // Auto-create email: firstname@kartawarta.com → user's email
+    let emailCreated = false;
+    try {
+      const localPart = slugify(data.name.split(" ")[0].toLowerCase());
+      if (localPart.length >= 2) {
+        await addDestinationAddress(data.email);
+        await createEmailForward(localPart, data.email);
+        emailCreated = true;
+      }
+    } catch {
+      // Non-critical — email routing might not be active yet
+    }
+
+    return successResponse({ ...user, emailCreated }, 201);
   } catch (error) {
     return errorResponse(error);
   }
