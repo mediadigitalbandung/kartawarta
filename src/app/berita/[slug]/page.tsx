@@ -372,7 +372,7 @@ export default async function ArticlePage({ params, searchParams }: { params: { 
                       />
                       {i < arr.length - 1 && (
                         <div className="my-6">
-                          <BannerAd slot="IN_ARTICLE" />
+                          <BannerAd slot="IN_ARTICLE" noWrapper />
                         </div>
                       )}
                     </div>

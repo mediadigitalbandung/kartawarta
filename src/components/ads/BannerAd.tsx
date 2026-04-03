@@ -22,6 +22,7 @@ interface BannerAdProps {
   size?: "leaderboard" | "billboard" | "sidebar" | "inline" | "slim";
   slot?: string;
   className?: string;
+  noWrapper?: boolean;
 }
 
 function useAd(adSlot: string) {
@@ -87,11 +88,15 @@ function AdContent({ ad }: { ad: Ad }) {
   return content;
 }
 
-export default function BannerAd({ size, slot, className = "" }: BannerAdProps) {
+export default function BannerAd({ size, slot, className = "", noWrapper }: BannerAdProps) {
   const adSlot = slot || (size ? sizeToSlot[size] : "HEADER");
   const ad = useAd(adSlot);
 
   if (!ad) return null;
+
+  if (noWrapper) {
+    return <AdContent ad={ad} />;
+  }
 
   return (
     <div className={className}>
