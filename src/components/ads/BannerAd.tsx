@@ -18,16 +18,26 @@ const sizeToSlot: Record<string, string> = {
   inline: "IN_ARTICLE",
 };
 
+/* Max dimensions per slot so ads don't stretch beyond their intended size */
+const slotConstraints: Record<string, { maxWidth: number; maxHeight: number }> = {
+  HEADER: { maxWidth: 728, maxHeight: 90 },
+  SIDEBAR: { maxWidth: 300, maxHeight: 250 },
+  IN_ARTICLE: { maxWidth: 728, maxHeight: 90 },
+  FOOTER: { maxWidth: 728, maxHeight: 90 },
+  BETWEEN_SECTIONS: { maxWidth: 970, maxHeight: 250 },
+  POPUP: { maxWidth: 600, maxHeight: 400 },
+  FLOATING_BOTTOM: { maxWidth: 728, maxHeight: 90 },
+};
+
 interface BannerAdProps {
   size?: "leaderboard" | "billboard" | "sidebar" | "inline" | "slim";
   slot?: string;
   className?: string;
 }
 
-export default function BannerAd({ size, slot, className = "" }: BannerAdProps) {
+function useAd(adSlot: string) {
   const [ad, setAd] = useState<Ad | null>(null);
   const tracked = useRef(false);
-  const adSlot = slot || (size ? sizeToSlot[size] : "HEADER");
 
   useEffect(() => {
     tracked.current = false;
@@ -36,15 +46,12 @@ export default function BannerAd({ size, slot, className = "" }: BannerAdProps) 
       .then((json) => {
         const ads: Ad[] = json.data || [];
         if (ads.length > 0) {
-          // Pick random ad from active ones for variety
-          const picked = ads[Math.floor(Math.random() * ads.length)];
-          setAd(picked);
+          setAd(ads[Math.floor(Math.random() * ads.length)]);
         }
       })
       .catch(() => {});
   }, [adSlot]);
 
-  // Track impression when ad becomes visible
   useEffect(() => {
     if (ad && !tracked.current) {
       tracked.current = true;
@@ -52,106 +59,80 @@ export default function BannerAd({ size, slot, className = "" }: BannerAdProps) 
     }
   }, [ad]);
 
-  if (!ad) return null;
+  return ad;
+}
 
-  function handleClick() {
-    if (ad) {
-      fetch(`/api/ads/${ad.id}/track?type=click`, { method: "POST" }).catch(() => {});
-    }
-  }
+function handleClick(ad: Ad) {
+  fetch(`/api/ads/${ad.id}/track?type=click`, { method: "POST" }).catch(() => {});
+}
 
-  const adContent =
+function AdImage({ ad, adSlot }: { ad: Ad; adSlot: string }) {
+  const constraints = slotConstraints[adSlot];
+
+  const content =
     ad.type === "HTML" && ad.htmlCode ? (
-      <div dangerouslySetInnerHTML={{ __html: ad.htmlCode }} />
+      <div
+        dangerouslySetInnerHTML={{ __html: ad.htmlCode }}
+        style={constraints ? { maxWidth: constraints.maxWidth } : undefined}
+        className="mx-auto"
+      />
     ) : ad.imageUrl ? (
       <img
         src={ad.imageUrl}
         alt="Iklan"
-        className="w-full h-auto rounded-lg"
+        className="h-auto rounded-lg"
         loading="lazy"
+        style={{
+          maxWidth: constraints ? constraints.maxWidth : "100%",
+          maxHeight: constraints ? constraints.maxHeight : undefined,
+          width: "100%",
+          objectFit: "contain",
+        }}
       />
     ) : null;
 
-  if (!adContent) return null;
+  if (!content) return null;
+
+  if (ad.targetUrl) {
+    return (
+      <a
+        href={ad.targetUrl}
+        target="_blank"
+        rel="noopener noreferrer sponsored"
+        onClick={() => handleClick(ad)}
+        className="block"
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return content;
+}
+
+export default function BannerAd({ size, slot, className = "" }: BannerAdProps) {
+  const adSlot = slot || (size ? sizeToSlot[size] : "HEADER");
+  const ad = useAd(adSlot);
+
+  if (!ad) return null;
 
   return (
     <div className={`py-2 ${className}`}>
-      <div className="container-main">
-        {ad.targetUrl ? (
-          <a
-            href={ad.targetUrl}
-            target="_blank"
-            rel="noopener noreferrer sponsored"
-            onClick={handleClick}
-            className="block"
-          >
-            {adContent}
-          </a>
-        ) : (
-          adContent
-        )}
+      <div className="container-main flex justify-center">
+        <AdImage ad={ad} adSlot={adSlot} />
       </div>
     </div>
   );
 }
 
 export function SidebarAd({ slot = "SIDEBAR" }: { slot?: string }) {
-  const [ad, setAd] = useState<Ad | null>(null);
-  const tracked = useRef(false);
-
-  useEffect(() => {
-    tracked.current = false;
-    fetch(`/api/ads?slot=${slot}`)
-      .then((r) => r.json())
-      .then((json) => {
-        const ads: Ad[] = json.data || [];
-        if (ads.length > 0) {
-          setAd(ads[Math.floor(Math.random() * ads.length)]);
-        }
-      })
-      .catch(() => {});
-  }, [slot]);
-
-  useEffect(() => {
-    if (ad && !tracked.current) {
-      tracked.current = true;
-      fetch(`/api/ads/${ad.id}/track?type=impression`, { method: "POST" }).catch(() => {});
-    }
-  }, [ad]);
+  const ad = useAd(slot);
 
   if (!ad) return null;
 
-  function handleClick() {
-    if (ad) {
-      fetch(`/api/ads/${ad.id}/track?type=click`, { method: "POST" }).catch(() => {});
-    }
-  }
-
-  const adContent =
-    ad.type === "HTML" && ad.htmlCode ? (
-      <div dangerouslySetInnerHTML={{ __html: ad.htmlCode }} />
-    ) : ad.imageUrl ? (
-      <img
-        src={ad.imageUrl}
-        alt="Iklan"
-        className="w-full h-auto rounded-lg"
-        loading="lazy"
-      />
-    ) : null;
-
-  if (!adContent) return null;
-
-  return ad.targetUrl ? (
-    <a
-      href={ad.targetUrl}
-      target="_blank"
-      rel="noopener noreferrer sponsored"
-      onClick={handleClick}
-      className="block"
-    >
-      {adContent}
-    </a>
-  ) : (
-    adContent
+  return (
+    <div className="flex justify-center">
+      <AdImage ad={ad} adSlot={slot} />
+    </div>
   );
 }
