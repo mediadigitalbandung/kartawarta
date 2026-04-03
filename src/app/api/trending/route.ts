@@ -1,6 +1,6 @@
 import { successResponse } from "@/lib/api-utils";
 
-export const revalidate = 1800;
+export const revalidate = 7200; // 2 hours
 
 // Indonesian keywords to detect local trends
 const ID_KEYWORDS = /indonesia|jakarta|bandung|surabaya|jawa|timnas|pssi|persib|persija|liga\s?1|piala|bola|rupiah|ihsg|saham|dpr|mpr|presiden|menteri|jokowi|prabowo|kpk|polri|tni|pilkada|pemilu|gubernur|bupati|walikota|bpjs|pertamina|pln|garuda|telkom|bca|bri|mandiri|kominfo|kemenko|kemenkes|kemendikbud|mui|nu|muhammadiyah|lebaran|ramadan|idul|haji|umkm|ojk|bi\s|bank indonesia|mahkamah|sidang|hukum|korupsi|narkoba|tsunami|gempa|banjir|bmkg|gunung|merapi|cuaca|kebakaran|hutan/i;
@@ -42,7 +42,7 @@ export async function GET() {
   try {
     const googleRes = await fetch(
       "https://trends.google.com/trending/rss?geo=ID",
-      { next: { revalidate: 1800 } }
+      { next: { revalidate: 7200 } }
     );
 
     if (!googleRes.ok) return successResponse(getFallbackTags());

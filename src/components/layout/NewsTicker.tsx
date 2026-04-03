@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
 
 /* ── Types ── */
@@ -10,16 +10,6 @@ interface StockItem {
   symbol: string; price: number; prevClose: number;
   change: number; changePercent: number; direction: "up" | "down" | "flat";
 }
-
-/* ── Stock symbols ── */
-const SYMBOLS = [
-  { id: "^JKSE", label: "IHSG" }, { id: "BBCA.JK", label: "BBCA" },
-  { id: "BBRI.JK", label: "BBRI" }, { id: "BMRI.JK", label: "BMRI" },
-  { id: "TLKM.JK", label: "TLKM" }, { id: "ASII.JK", label: "ASII" },
-  { id: "UNVR.JK", label: "UNVR" }, { id: "GOTO.JK", label: "GOTO" },
-  { id: "USDIDR=X", label: "USD/IDR" }, { id: "GC=F", label: "EMAS" },
-  { id: "CL=F", label: "MINYAK" }, { id: "BTC-USD", label: "BTC" },
-];
 
 function fmtPrice(p: number, sym: string): string {
   if (sym === "BTC") return "$" + p.toLocaleString("en-US", { maximumFractionDigits: 0 });
@@ -56,7 +46,7 @@ function useStocks() {
 
 function useTrending() {
   const [items, setItems] = useState<TickerItem[]>([]);
-  useEffect(() => {
+  const fetchTrending = useCallback(() => {
     fetch("/api/trending").then((r) => r.json()).then((json) => {
       const data = json.data || json || [];
       if (Array.isArray(data) && data.length > 0) {
@@ -66,6 +56,11 @@ function useTrending() {
       }
     }).catch(() => {});
   }, []);
+  useEffect(() => {
+    fetchTrending();
+    const i = setInterval(fetchTrending, 7200000); // refresh every 2 hours
+    return () => clearInterval(i);
+  }, [fetchTrending]);
   return items;
 }
 
