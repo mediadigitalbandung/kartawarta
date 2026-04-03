@@ -64,18 +64,47 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 const WORDS_PER_PAGE = 300;
-const TOLERANCE = 50; // if total ≤ WORDS_PER_PAGE + TOLERANCE, keep single page
+const TOLERANCE = 50;
+const AD_INSERT_WORDS = 150; // inject ad every ~150 words
+const AD_PLACEHOLDER = '<!--AD_SLOT-->';
+
+function injectInlineAds(html: string): string {
+  if (!html) return html;
+
+  const blocks = html.split(/(<br\s*\/?>(?:<br\s*\/?>)*|<\/p>\s*<p[^>]*>|<\/h[2-6]>\s*<h[2-6][^>]*>)/gi);
+  let result = "";
+  let wordCount = 0;
+  let adInserted = false;
+
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i];
+    const blockText = block.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    const blockWords = blockText.split(" ").filter(Boolean).length;
+
+    result += block;
+    wordCount += blockWords;
+
+    if (wordCount >= AD_INSERT_WORDS && !adInserted && i < blocks.length - 2) {
+      result += AD_PLACEHOLDER;
+      adInserted = true;
+      wordCount = 0;
+    } else if (wordCount >= AD_INSERT_WORDS && adInserted && i < blocks.length - 2) {
+      result += AD_PLACEHOLDER;
+      wordCount = 0;
+    }
+  }
+
+  return result;
+}
 
 function splitContentIntoPages(html: string): string[] {
   if (!html) return [html];
 
-  // Count words (strip HTML tags for counting)
   const textOnly = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
   const totalWords = textOnly.split(" ").filter(Boolean).length;
 
   if (totalWords <= WORDS_PER_PAGE + TOLERANCE) return [html];
 
-  // Split by paragraphs/breaks
   const blocks = html.split(/(<br\s*\/?>(?:<br\s*\/?>)*|<\/p>\s*<p[^>]*>|<\/h[2-6]>\s*<h[2-6][^>]*>)/gi);
 
   const pages: string[] = [];
@@ -91,7 +120,6 @@ function splitContentIntoPages(html: string): string[] {
     currentWordCount += blockWords;
 
     if (currentWordCount >= WORDS_PER_PAGE && i < blocks.length - 1) {
-      // Check if remaining is within tolerance
       const remaining = blocks.slice(i + 1).join("");
       const remainingText = remaining.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
       const remainingWords = remainingText.split(" ").filter(Boolean).length;
@@ -191,10 +219,11 @@ export default async function ArticlePage({ params, searchParams }: { params: { 
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://jurnalishukumbandung.com";
   const articleUrl = `${appUrl}/berita/${params.slug}`;
-  const contentPages = splitContentIntoPages(article.content);
+  const contentWithAds = injectInlineAds(article.content);
+  const contentPages = splitContentIntoPages(contentWithAds);
   const totalPages = contentPages.length;
   const currentPage = Math.min(Math.max(1, parseInt(searchParams.page || "1") || 1), totalPages);
-  const sanitizedContent = contentPages[currentPage - 1] || article.content;
+  const sanitizedContent = contentPages[currentPage - 1] || contentWithAds;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -332,12 +361,28 @@ export default async function ArticlePage({ params, searchParams }: { params: { 
                 </div>
               )}
 
-              {/* Article content */}
+              {/* Article content with inline ads */}
               <div className="mt-8 max-w-full overflow-hidden">
-                <div
-                  className="article-content text-base sm:text-[17px] leading-[1.8] break-words text-justify"
-                  dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-                />
+                {sanitizedContent.includes(AD_PLACEHOLDER) ? (
+                  sanitizedContent.split(AD_PLACEHOLDER).map((chunk, i, arr) => (
+                    <div key={i}>
+                      <div
+                        className="article-content text-base sm:text-[17px] leading-[1.8] break-words text-justify"
+                        dangerouslySetInnerHTML={{ __html: chunk }}
+                      />
+                      {i < arr.length - 1 && (
+                        <div className="my-6">
+                          <BannerAd slot="IN_ARTICLE" />
+                        </div>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div
+                    className="article-content text-base sm:text-[17px] leading-[1.8] break-words text-justify"
+                    dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+                  />
+                )}
               </div>
 
               {/* Page navigation */}
