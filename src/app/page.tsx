@@ -2,30 +2,28 @@ export const revalidate = 60;
 
 import Link from "next/link";
 import Image from "next/image";
-import ArticleCard from "@/components/artikel/ArticleCard";
 import NewsTicker from "@/components/layout/NewsTicker";
-import HeadlineSlider from "@/components/slider/HeadlineSlider";
-import BreakingSlider from "@/components/slider/BreakingSlider";
-import SubHeadlineSlider from "@/components/slider/SubHeadlineSlider";
 import PollingCarousel from "@/components/slider/PollingCarousel";
 import BannerAd, { SidebarAd, InlineAd, NativeAd } from "@/components/ads/BannerAd";
-import { Scale, Briefcase, Trophy, Film, Heart, Wheat, Cpu, Vote as VoteIcon, GraduationCap, Leaf, Compass, BookOpen, TrendingUp, LucideIcon } from "lucide-react";
+import { Scale, Briefcase, Trophy, Film, Heart, Wheat, Cpu, Vote as VoteIcon, GraduationCap, Leaf, Compass, BookOpen, TrendingUp, LucideIcon, ArrowRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 const categoryIconMap: Record<string, LucideIcon> = {
-  "hukum": Scale,
-  "bisnis-ekonomi": Briefcase,
-  "olahraga": Trophy,
-  "hiburan": Film,
-  "kesehatan": Heart,
-  "pertanian-peternakan": Wheat,
-  "teknologi": Cpu,
-  "politik": VoteIcon,
-  "pendidikan": GraduationCap,
-  "lingkungan": Leaf,
-  "gaya-hidup": Compass,
-  "opini": BookOpen,
+  "hukum": Scale, "bisnis-ekonomi": Briefcase, "olahraga": Trophy, "hiburan": Film,
+  "kesehatan": Heart, "pertanian-peternakan": Wheat, "teknologi": Cpu, "politik": VoteIcon,
+  "pendidikan": GraduationCap, "lingkungan": Leaf, "gaya-hidup": Compass, "opini": BookOpen,
 };
+
+function timeAgo(date: Date | string | null): string {
+  if (!date) return "";
+  const d = new Date(date);
+  const now = new Date();
+  const mins = Math.floor((now.getTime() - d.getTime()) / 60000);
+  if (mins < 60) return `${mins}m lalu`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}j lalu`;
+  return d.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
+}
 
 export default async function HomePage() {
   const [articles, categories, trendingArticles] = await Promise.all([
@@ -33,7 +31,7 @@ export default async function HomePage() {
       where: { status: "PUBLISHED" },
       include: { author: true, category: true },
       orderBy: { publishedAt: "desc" },
-      take: 50,
+      take: 60,
     }),
     prisma.category.findMany({
       include: { _count: { select: { articles: true } } },
@@ -47,24 +45,20 @@ export default async function HomePage() {
     }),
   ]);
 
-  const headlineArticles = articles.slice(0, 5);
-  const subHeadlines = articles.slice(5, 11);
-  const breakingArticles = articles.slice(11, 16);
-  const terkiniArticles = articles.slice(16, 24);
-  const restArticles = articles.slice(24);
+  const hero = articles[0];
+  const heroSide = articles.slice(1, 4);
+  const editorsPickArticles = articles.slice(4, 8);
+  const terkiniArticles = articles.slice(8, 20);
+  const restArticles = articles.slice(20);
 
-  // Group remaining articles by category
-  const articlesByCategory: Record<string, { categorySlug: string; articles: typeof restArticles }> = {};
-  for (const article of restArticles) {
-    const catName = article.category.name;
-    if (!articlesByCategory[catName]) {
-      articlesByCategory[catName] = { categorySlug: article.category.slug, articles: [] };
-    }
-    if (articlesByCategory[catName].articles.length < 6) {
-      articlesByCategory[catName].articles.push(article);
-    }
+  // Group by category
+  const articlesByCategory: Record<string, { slug: string; articles: typeof restArticles }> = {};
+  for (const a of restArticles) {
+    const name = a.category.name;
+    if (!articlesByCategory[name]) articlesByCategory[name] = { slug: a.category.slug, articles: [] };
+    if (articlesByCategory[name].articles.length < 5) articlesByCategory[name].articles.push(a);
   }
-  const categoryEntries = Object.entries(articlesByCategory);
+  const catEntries = Object.entries(articlesByCategory);
 
   return (
     <>
@@ -77,274 +71,400 @@ export default async function HomePage() {
             name: "Kartawarta",
             url: "https://kartawarta.com",
             logo: { "@type": "ImageObject", url: "https://kartawarta.com/logo-kartawarta.png" },
-            description: "Portal berita digital terpercaya. Menyajikan berita terkini, analisis mendalam, dan informasi akurat.",
           }),
         }}
       />
 
       <NewsTicker />
 
-      {/* AD: Leaderboard — top of page */}
-      <BannerAd size="leaderboard" slot="HEADER" className="bg-surface-container-lowest" />
-
-      {/* ═══════════════════════════════════════════
-          SECTION 1: Hero — Headline + Breaking
-          ═══════════════════════════════════════════ */}
-      <section className="bg-surface-container-lowest py-8">
-        <div className="container-main">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left: Headline + Sub-headline */}
-            <div className="lg:col-span-2 flex flex-col gap-5">
-              <HeadlineSlider items={JSON.parse(JSON.stringify(headlineArticles))} />
-              {subHeadlines.length > 0 && (
-                <SubHeadlineSlider items={JSON.parse(JSON.stringify(subHeadlines))} />
-              )}
-            </div>
-            {/* Right: Breaking + Sidebar Ad */}
-            <div className="lg:col-span-1 grid grid-cols-7 lg:grid-cols-1 gap-4">
-              <div className="col-span-4 lg:col-span-1">
-                <BreakingSlider items={JSON.parse(JSON.stringify(breakingArticles))} />
+      {/* ════════════════════════════════════════════
+          HERO — Full-bleed main story + side stories
+          ════════════════════════════════════════════ */}
+      {hero && (
+        <section className="bg-on-surface">
+          <div className="container-main py-0">
+            <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[28rem] lg:min-h-[32rem]">
+              {/* Main story — spans 8 cols */}
+              <div className="lg:col-span-8 relative">
+                <Link href={`/berita/${hero.slug}`} className="block relative h-full min-h-[24rem] lg:min-h-full overflow-hidden group">
+                  {hero.featuredImage ? (
+                    <Image src={hero.featuredImage} alt={hero.title} fill className="object-cover transition-transform duration-700 group-hover:scale-[1.03]" priority />
+                  ) : (
+                    <div className="absolute inset-0 bg-primary" />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 lg:p-10">
+                    <span className="inline-block text-label-sm font-bold uppercase tracking-widest text-secondary mb-3">
+                      {hero.category.name}
+                    </span>
+                    <h1 className="font-serif text-display-sm sm:text-display-md lg:text-display-lg text-white leading-[1.1] max-w-2xl">
+                      {hero.title}
+                    </h1>
+                    {hero.excerpt && (
+                      <p className="mt-4 text-body-md text-white/60 max-w-xl line-clamp-2 hidden sm:block">
+                        {hero.excerpt}
+                      </p>
+                    )}
+                    <div className="mt-4 flex items-center gap-3 text-label-sm uppercase tracking-wider text-white/40">
+                      <span className="text-white/60 font-semibold">{hero.author.name}</span>
+                      <span>/</span>
+                      <span>{timeAgo(hero.publishedAt)}</span>
+                    </div>
+                  </div>
+                </Link>
               </div>
-              <div className="col-span-3 lg:col-span-1 flex items-stretch">
-                <SidebarAd />
+
+              {/* Side stories — 4 cols, stacked */}
+              <div className="lg:col-span-4 flex flex-col">
+                {heroSide.map((a, i) => (
+                  <Link
+                    key={a.slug}
+                    href={`/berita/${a.slug}`}
+                    className={`group flex-1 relative overflow-hidden ${i < heroSide.length - 1 ? "border-b border-white/10" : ""}`}
+                  >
+                    <div className="absolute inset-0">
+                      {a.featuredImage ? (
+                        <Image src={a.featuredImage} alt={a.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                      ) : (
+                        <div className="absolute inset-0 bg-primary-container" />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
+                    </div>
+                    <div className="relative p-5 flex flex-col justify-end h-full min-h-[8rem]">
+                      <span className="text-label-sm font-bold uppercase tracking-widest text-secondary/80 mb-1">
+                        {a.category.name}
+                      </span>
+                      <h2 className="font-serif text-title-lg text-white leading-snug line-clamp-2 group-hover:text-white/90 transition-colors">
+                        {a.title}
+                      </h2>
+                      <span className="mt-2 text-label-sm text-white/40 uppercase tracking-wider">
+                        {timeAgo(a.publishedAt)}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* ═══════════════════════════════════════════
-          SECTION 2: Berita Terkini + Terpopuler
-          ═══════════════════════════════════════════ */}
-      <section className="bg-surface py-12">
-        <div className="container-main">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-            {/* Left 2/3: Berita Terkini */}
-            <div className="lg:col-span-2">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="font-serif text-headline-sm text-on-surface">
-                  Berita Terkini
+      {/* AD: Header */}
+      <BannerAd size="leaderboard" slot="HEADER" className="bg-surface" />
+
+      {/* ════════════════════════════════════════════
+          EDITOR'S PICK — 4 cards horizontal
+          ════════════════════════════════════════════ */}
+      {editorsPickArticles.length > 0 && (
+        <section className="bg-surface py-14">
+          <div className="container-main">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <span className="text-label-md uppercase tracking-widest text-secondary font-bold">Pilihan Editor</span>
+                <h2 className="font-serif text-headline-md text-on-surface mt-1">
+                  Wajib Dibaca Hari Ini
                 </h2>
+              </div>
+              <Link href="/berita" className="hidden sm:flex items-center gap-1.5 text-label-md uppercase tracking-wider font-semibold text-primary hover:text-primary-dark transition-colors">
+                Semua Berita <ArrowRight size={14} />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {editorsPickArticles.map((a) => (
+                <article key={a.slug} className="group">
+                  <Link href={`/berita/${a.slug}`} className="block">
+                    <div className="relative aspect-[3/2] overflow-hidden rounded-sm">
+                      {a.featuredImage ? (
+                        <Image src={a.featuredImage} alt={a.title} fill className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+                      ) : (
+                        <div className="h-full w-full bg-surface-container-low" />
+                      )}
+                    </div>
+                  </Link>
+                  <div className="mt-3">
+                    <span className="text-label-sm font-bold uppercase tracking-widest text-primary">{a.category.name}</span>
+                    <Link href={`/berita/${a.slug}`}>
+                      <h3 className="mt-1 font-serif text-title-lg leading-snug text-on-surface line-clamp-2 group-hover:text-primary transition-colors">
+                        {a.title}
+                      </h3>
+                    </Link>
+                    <p className="mt-2 text-label-sm uppercase tracking-wider text-on-surface-variant">
+                      {a.author.name} <span className="text-on-surface-variant/30 mx-1">/</span> {timeAgo(a.publishedAt)}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ════════════════════════════════════════════
+          TERKINI + TERPOPULER + SIDEBAR AD
+          ════════════════════════════════════════════ */}
+      <section className="bg-surface-container-low py-14">
+        <div className="container-main">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            {/* Berita Terkini — 7 cols */}
+            <div className="lg:col-span-7">
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="font-serif text-headline-md text-on-surface">Berita Terkini</h2>
                 <Link href="/berita" className="text-label-md uppercase tracking-wider font-semibold text-primary hover:text-primary-dark transition-colors">
                   Lihat Semua
                 </Link>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                {terkiniArticles.map((a) => (
-                  <ArticleCard key={a.slug} {...a} variant="standard" />
+              {/* First article large */}
+              {terkiniArticles[0] && (
+                <article className="group mb-8">
+                  <Link href={`/berita/${terkiniArticles[0].slug}`} className="block">
+                    <div className="relative aspect-[2/1] overflow-hidden rounded-sm">
+                      {terkiniArticles[0].featuredImage ? (
+                        <Image src={terkiniArticles[0].featuredImage} alt={terkiniArticles[0].title} fill className="object-cover transition-transform duration-500 group-hover:scale-[1.02]" />
+                      ) : (
+                        <div className="h-full w-full bg-surface-container" />
+                      )}
+                    </div>
+                  </Link>
+                  <div className="mt-4">
+                    <span className="text-label-sm font-bold uppercase tracking-widest text-primary">{terkiniArticles[0].category.name}</span>
+                    <Link href={`/berita/${terkiniArticles[0].slug}`}>
+                      <h3 className="mt-1 font-serif text-headline-md leading-tight text-on-surface group-hover:text-primary transition-colors">
+                        {terkiniArticles[0].title}
+                      </h3>
+                    </Link>
+                    {terkiniArticles[0].excerpt && (
+                      <p className="mt-2 text-body-md text-on-surface-variant line-clamp-2">{terkiniArticles[0].excerpt}</p>
+                    )}
+                  </div>
+                </article>
+              )}
+              {/* Rest as compact list */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                {terkiniArticles.slice(1).map((a) => (
+                  <article key={a.slug} className="group flex gap-4">
+                    {a.featuredImage && (
+                      <Link href={`/berita/${a.slug}`} className="shrink-0">
+                        <div className="relative h-20 w-28 overflow-hidden rounded-sm">
+                          <Image src={a.featuredImage} alt={a.title} fill className="object-cover transition-transform duration-300 group-hover:scale-105" />
+                        </div>
+                      </Link>
+                    )}
+                    <div className="flex-1 min-w-0 flex flex-col justify-center">
+                      <Link href={`/berita/${a.slug}`}>
+                        <h4 className="text-title-sm leading-snug text-on-surface line-clamp-2 group-hover:text-primary transition-colors">
+                          {a.title}
+                        </h4>
+                      </Link>
+                      <p className="mt-1 text-label-sm uppercase tracking-wider text-on-surface-variant">
+                        {timeAgo(a.publishedAt)}
+                      </p>
+                    </div>
+                  </article>
                 ))}
               </div>
             </div>
 
-            {/* Right 1/3: Terpopuler */}
-            {trendingArticles.length > 0 && (
-              <div className="lg:col-span-1">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="font-serif text-headline-sm text-on-surface flex items-center gap-2">
-                    <TrendingUp size={20} className="text-secondary" />
-                    Terpopuler
-                  </h2>
+            {/* Sidebar — 5 cols: Terpopuler + Ads */}
+            <aside className="lg:col-span-5">
+              {/* Terpopuler */}
+              <div className="mb-8">
+                <div className="flex items-center gap-2 mb-6">
+                  <TrendingUp size={18} className="text-secondary" />
+                  <h2 className="font-serif text-headline-sm text-on-surface">Terpopuler</h2>
                 </div>
-                <div className="flex flex-col gap-5">
-                  {trendingArticles.slice(0, 8).map((article, i) => (
-                    <div key={article.slug} className="group flex items-start gap-4">
-                      {/* Rank */}
-                      <span className="shrink-0 font-serif text-display-sm text-primary/20 leading-none select-none w-8 text-right">
+                <div className="flex flex-col">
+                  {trendingArticles.slice(0, 6).map((a, i) => (
+                    <div key={a.slug} className={`group flex items-start gap-4 py-4 ${i > 0 ? "border-t border-on-surface/5" : ""}`}>
+                      <span className="shrink-0 font-serif text-3xl font-bold text-primary/15 leading-none select-none w-7 text-right mt-0.5">
                         {i + 1}
                       </span>
-                      {/* Content */}
                       <div className="flex-1 min-w-0">
-                        <Link href={`/berita/${article.slug}`}>
+                        <Link href={`/berita/${a.slug}`}>
                           <h3 className="text-title-sm leading-snug text-on-surface line-clamp-2 group-hover:text-primary transition-colors">
-                            {article.title}
+                            {a.title}
                           </h3>
                         </Link>
-                        <div className="mt-1.5 flex items-center gap-2 text-label-sm uppercase tracking-wider text-on-surface-variant">
-                          <span className="text-primary font-semibold">{article.category.name}</span>
-                          <span className="text-on-surface-variant/30">/</span>
-                          <span>{article.viewCount?.toLocaleString("id-ID")} views</span>
-                        </div>
+                        <p className="mt-1.5 text-label-sm uppercase tracking-wider text-on-surface-variant">
+                          <span className="text-primary font-semibold">{a.category.name}</span>
+                          <span className="mx-1.5 text-on-surface-variant/20">/</span>
+                          {a.viewCount?.toLocaleString("id-ID")} views
+                        </p>
                       </div>
                     </div>
                   ))}
                 </div>
-                {/* AD: Sidebar rectangle under Terpopuler */}
-                <div className="mt-6">
-                  <SidebarAd />
-                </div>
               </div>
-            )}
+
+              {/* AD: Sidebar */}
+              <SidebarAd />
+
+              {/* AD: 2nd sidebar */}
+              <div className="mt-6">
+                <SidebarAd />
+              </div>
+            </aside>
           </div>
         </div>
       </section>
 
-      {/* AD: Full-width banner between sections */}
-      <BannerAd size="banner" slot="BETWEEN_SECTIONS" className="bg-surface-container-low" />
+      {/* AD: Between sections */}
+      <BannerAd size="banner" slot="BETWEEN_SECTIONS" className="bg-surface" />
 
-      {/* ═══════════════════════════════════════════
-          SECTION 3: Polling
-          ═══════════════════════════════════════════ */}
-      <section className="bg-surface-container-lowest py-12">
+      {/* ════════════════════════════════════════════
+          POLLING
+          ════════════════════════════════════════════ */}
+      <section className="bg-surface py-14">
         <div className="container-main">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="font-serif text-headline-sm text-on-surface">
-              Polling
-            </h2>
+          <div className="mb-8">
+            <span className="text-label-md uppercase tracking-widest text-secondary font-bold">Suara Pembaca</span>
+            <h2 className="font-serif text-headline-md text-on-surface mt-1">Polling</h2>
           </div>
           <PollingCarousel />
         </div>
       </section>
 
-      {/* AD: Inline ad before category sections */}
-      <InlineAd className="bg-surface" />
+      {/* AD: Inline */}
+      <InlineAd className="bg-surface-container-low" />
 
-      {/* ═══════════════════════════════════════════
-          SECTION 4: Category Sections
-          ═══════════════════════════════════════════ */}
-      {categoryEntries.map(([categoryName, { categorySlug, articles: catArticles }], idx) => {
-        const featured = catArticles[0];
-        const rest = catArticles.slice(1, 5);
+      {/* ════════════════════════════════════════════
+          CATEGORY SECTIONS — alternating layouts
+          ════════════════════════════════════════════ */}
+      {catEntries.map(([catName, { slug: catSlug, articles: catArticles }], idx) => {
+        const main = catArticles[0];
+        const side = catArticles.slice(1);
+        const isEven = idx % 2 === 0;
 
         return (
-          <div key={categorySlug}>
-          <section
-            className={`py-12 ${idx % 2 === 0 ? "bg-surface" : "bg-surface-container-low"}`}
-          >
-            <div className="container-main">
-              {/* Section header */}
-              <div className="flex items-center justify-between mb-8">
-                <Link href={`/kategori/${categorySlug}`} className="font-serif text-headline-sm text-on-surface hover:text-primary transition-colors">
-                  {categoryName}
-                </Link>
-                <Link
-                  href={`/kategori/${categorySlug}`}
-                  className="text-label-md uppercase tracking-wider font-semibold text-primary hover:text-primary-dark transition-colors"
-                >
-                  Lihat Semua
-                </Link>
-              </div>
+          <div key={catSlug}>
+            <section className={`py-14 ${isEven ? "bg-surface" : "bg-surface-container-low"}`}>
+              <div className="container-main">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-8">
+                  <Link href={`/kategori/${catSlug}`} className="group flex items-center gap-3">
+                    <div className="h-8 w-1 bg-primary rounded-full" />
+                    <h2 className="font-serif text-headline-sm text-on-surface group-hover:text-primary transition-colors">
+                      {catName}
+                    </h2>
+                  </Link>
+                  <Link href={`/kategori/${catSlug}`} className="flex items-center gap-1.5 text-label-md uppercase tracking-wider font-semibold text-primary hover:text-primary-dark transition-colors">
+                    Lihat Semua <ArrowRight size={14} />
+                  </Link>
+                </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Left: Featured article */}
-                {featured && (
-                  <div>
-                    <Link href={`/berita/${featured.slug}`} className="group block">
-                      <div className="relative aspect-[16/10] w-full overflow-hidden rounded-sm">
-                        {featured.featuredImage ? (
-                          <Image
-                            src={featured.featuredImage}
-                            alt={featured.title}
-                            fill
-                            className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                          />
-                        ) : (
-                          <div className="h-full w-full bg-surface-container-low" />
-                        )}
-                      </div>
-                    </Link>
-                    <div className="mt-4">
-                      <Link href={`/berita/${featured.slug}`}>
-                        <h3 className="font-serif text-headline-md leading-tight text-on-surface group-hover:text-primary transition-colors">
-                          {featured.title}
-                        </h3>
-                      </Link>
-                      {featured.excerpt && (
-                        <p className="mt-3 text-body-md text-on-surface-variant line-clamp-2">
-                          {featured.excerpt}
-                        </p>
-                      )}
-                      <p className="mt-3 text-label-md uppercase tracking-wider text-on-surface-variant">
-                        {featured.author.name}
-                        <span className="mx-2 text-on-surface-variant/30">/</span>
-                        {featured.publishedAt
-                          ? new Date(featured.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long" })
-                          : ""}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Right: Article list */}
-                {rest.length > 0 && (
-                  <div className="flex flex-col gap-6">
-                    {rest.map((a) => (
-                      <div key={a.slug} className="group flex gap-4">
-                        {a.featuredImage && (
-                          <Link href={`/berita/${a.slug}`} className="shrink-0">
-                            <div className="relative h-20 w-28 sm:h-24 sm:w-36 overflow-hidden rounded-sm">
-                              <Image src={a.featuredImage} alt={a.title} fill className="object-cover transition-transform duration-300 group-hover:scale-105" />
-                            </div>
+                {/* Layout A (even): Large left + list right */}
+                {isEven ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    {main && (
+                      <div className="lg:col-span-7">
+                        <Link href={`/berita/${main.slug}`} className="group block">
+                          <div className="relative aspect-[16/9] overflow-hidden rounded-sm">
+                            {main.featuredImage ? (
+                              <Image src={main.featuredImage} alt={main.title} fill className="object-cover transition-transform duration-500 group-hover:scale-[1.02]" />
+                            ) : (
+                              <div className="h-full w-full bg-surface-container" />
+                            )}
+                          </div>
+                        </Link>
+                        <div className="mt-5">
+                          <Link href={`/berita/${main.slug}`}>
+                            <h3 className="font-serif text-headline-md leading-tight text-on-surface group-hover:text-primary transition-colors">
+                              {main.title}
+                            </h3>
                           </Link>
-                        )}
-                        <div className="flex-1 min-w-0 flex flex-col justify-center">
-                          <Link href={`/berita/${a.slug}`}>
-                            <h4 className="text-title-sm leading-snug text-on-surface line-clamp-2 group-hover:text-primary transition-colors">
-                              {a.title}
-                            </h4>
-                          </Link>
-                          <p className="mt-1.5 text-label-sm uppercase tracking-wider text-on-surface-variant">
-                            {a.author.name}
-                            <span className="mx-2 text-on-surface-variant/30">/</span>
-                            {a.publishedAt
-                              ? new Date(a.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" })
-                              : ""}
+                          {main.excerpt && <p className="mt-3 text-body-md text-on-surface-variant line-clamp-2">{main.excerpt}</p>}
+                          <p className="mt-3 text-label-sm uppercase tracking-wider text-on-surface-variant">
+                            {main.author.name} <span className="mx-1.5 text-on-surface-variant/20">/</span> {timeAgo(main.publishedAt)}
                           </p>
                         </div>
                       </div>
+                    )}
+                    {side.length > 0 && (
+                      <div className="lg:col-span-5 flex flex-col gap-5">
+                        {side.map((a) => (
+                          <article key={a.slug} className="group flex gap-4">
+                            {a.featuredImage && (
+                              <Link href={`/berita/${a.slug}`} className="shrink-0">
+                                <div className="relative h-20 w-28 overflow-hidden rounded-sm">
+                                  <Image src={a.featuredImage} alt={a.title} fill className="object-cover" />
+                                </div>
+                              </Link>
+                            )}
+                            <div className="flex-1 min-w-0 flex flex-col justify-center">
+                              <Link href={`/berita/${a.slug}`}>
+                                <h4 className="text-title-sm leading-snug text-on-surface line-clamp-2 group-hover:text-primary transition-colors">{a.title}</h4>
+                              </Link>
+                              <p className="mt-1 text-label-sm uppercase tracking-wider text-on-surface-variant">{timeAgo(a.publishedAt)}</p>
+                            </div>
+                          </article>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  /* Layout B (odd): Grid of cards */
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {catArticles.slice(0, 3).map((a) => (
+                      <article key={a.slug} className="group">
+                        <Link href={`/berita/${a.slug}`} className="block">
+                          <div className="relative aspect-[3/2] overflow-hidden rounded-sm">
+                            {a.featuredImage ? (
+                              <Image src={a.featuredImage} alt={a.title} fill className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+                            ) : (
+                              <div className="h-full w-full bg-surface-container" />
+                            )}
+                          </div>
+                        </Link>
+                        <div className="mt-3">
+                          <Link href={`/berita/${a.slug}`}>
+                            <h3 className="font-serif text-title-lg leading-snug text-on-surface line-clamp-2 group-hover:text-primary transition-colors">{a.title}</h3>
+                          </Link>
+                          <p className="mt-2 text-label-sm uppercase tracking-wider text-on-surface-variant">
+                            {a.author.name} <span className="mx-1.5 text-on-surface-variant/20">/</span> {timeAgo(a.publishedAt)}
+                          </p>
+                        </div>
+                      </article>
                     ))}
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* AD: Native ad inside some category sections */}
-            {idx === 1 && (
-              <div className="mt-8">
-                <NativeAd />
-              </div>
+              {idx === 1 && <div className="container-main mt-8"><NativeAd /></div>}
+            </section>
+
+            {idx > 0 && idx % 3 === 2 && (
+              <BannerAd size="banner" slot="BETWEEN_SECTIONS" className={isEven ? "bg-surface-container-low" : "bg-surface"} />
             )}
-          </section>
-
-          {/* AD: Banner between every 3 category sections */}
-          {idx > 0 && idx % 3 === 2 && (
-            <BannerAd size="banner" slot="BETWEEN_SECTIONS" className={idx % 2 === 0 ? "bg-surface-container-low" : "bg-surface"} />
-          )}
-        </div>
+          </div>
         );
       })}
 
-      {/* AD: Footer leaderboard */}
+      {/* AD: Footer */}
       <BannerAd size="leaderboard" slot="FOOTER" className="bg-surface" />
 
-      {/* ═══════════════════════════════════════════
-          SECTION 5: Category Grid
-          ═══════════════════════════════════════════ */}
-      <section className="bg-surface-container-low py-12">
+      {/* ════════════════════════════════════════════
+          CATEGORY GRID
+          ════════════════════════════════════════════ */}
+      <section className="bg-primary py-14">
         <div className="container-main">
           <div className="mb-8">
-            <h2 className="font-serif text-headline-sm text-on-surface">
-              Jelajahi Kategori
-            </h2>
+            <h2 className="font-serif text-headline-md text-white">Jelajahi Kategori</h2>
+            <p className="mt-1 text-body-sm text-white/40">Temukan berita berdasarkan topik yang Anda minati</p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {categories.map((cat) => {
               const Icon = categoryIconMap[cat.slug] || Scale;
               return (
                 <Link
                   key={cat.slug}
                   href={`/kategori/${cat.slug}`}
-                  className="group flex items-center gap-4 rounded-sm bg-surface-container-lowest p-4 transition-all duration-200 hover:shadow-ambient"
+                  className="group flex items-center gap-3 rounded-sm bg-white/5 p-4 transition-all duration-200 hover:bg-white/10"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-primary-light text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
-                    <Icon size={18} />
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm bg-white/10 text-white/60 group-hover:bg-white/20 group-hover:text-white transition-colors">
+                    <Icon size={16} />
                   </div>
                   <div className="min-w-0">
-                    <span className="block text-title-sm text-on-surface truncate group-hover:text-primary transition-colors">
-                      {cat.name}
-                    </span>
-                    <span className="block text-label-sm text-on-surface-variant uppercase tracking-wider">
-                      {cat._count.articles} artikel
-                    </span>
+                    <span className="block text-title-sm text-white truncate">{cat.name}</span>
+                    <span className="block text-label-sm text-white/30 uppercase tracking-wider">{cat._count.articles} artikel</span>
                   </div>
                 </Link>
               );
