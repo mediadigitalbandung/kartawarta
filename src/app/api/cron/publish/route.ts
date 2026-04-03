@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { notifyArticleStatusChange } from "@/lib/notifications";
 import { sendArticlePublishedEmail } from "@/lib/email";
 import { ApiError, successResponse, errorResponse } from "@/lib/api-utils";
+import { onArticlePublished, generateSeoTitle, generateSeoDescription } from "@/lib/seo-auto";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
         status: "APPROVED",
         scheduledAt: { lte: now },
       },
-      select: { id: true, title: true, slug: true, authorId: true, scheduledAt: true },
+      select: { id: true, title: true, slug: true, authorId: true, scheduledAt: true, excerpt: true, content: true, seoTitle: true, seoDescription: true },
     });
 
     if (articles.length === 0) {
@@ -44,9 +45,20 @@ export async function GET(request: NextRequest) {
           scheduledAt: null,
         },
       });
+      // Auto-fill SEO fields if empty
+      if (!article.seoTitle || !article.seoDescription) {
+        await prisma.article.update({
+          where: { id: article.id },
+          data: {
+            ...(!article.seoTitle && { seoTitle: generateSeoTitle(article.title) }),
+            ...(!article.seoDescription && { seoDescription: generateSeoDescription(article.excerpt, article.content) }),
+          },
+        });
+      }
       await notifyArticleStatusChange(article.id, article.title, "PUBLISHED", article.authorId);
       const author = authorMap.get(article.authorId);
       if (author) await sendArticlePublishedEmail(author.email, article.title, article.slug);
+      onArticlePublished(article.slug);
       published.push(article.title);
     }
 

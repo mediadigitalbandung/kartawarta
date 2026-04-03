@@ -17,6 +17,7 @@ import {
   sendArticlePublishedEmail,
   sendNewReviewEmail,
 } from "@/lib/email";
+import { onArticlePublished, generateSeoTitle, generateSeoDescription } from "@/lib/seo-auto";
 
 const updateArticleSchema = z.object({
   title: z.string().min(5).max(255).optional(),
@@ -389,6 +390,18 @@ export async function PUT(
       const authorPub = await prisma.user.findUnique({ where: { id: article.authorId }, select: { email: true } });
       if (authorPub) await sendArticlePublishedEmail(authorPub.email, article.title, updated.slug);
 
+      // SEO: auto-fill seoTitle/seoDescription if empty, ping search engines
+      if (!article.seoTitle || !article.seoDescription) {
+        await prisma.article.update({
+          where: { id: article.id },
+          data: {
+            ...(!article.seoTitle && { seoTitle: generateSeoTitle(article.title) }),
+            ...(!article.seoDescription && { seoDescription: generateSeoDescription(article.excerpt, article.content) }),
+          },
+        });
+      }
+      onArticlePublished(updated.slug);
+
       return successResponse(updated);
     }
 
@@ -537,6 +550,18 @@ export async function PUT(
         await notifyArticleStatusChange(article.id, article.title, "PUBLISHED", article.authorId);
         const authorPub = await prisma.user.findUnique({ where: { id: article.authorId }, select: { email: true } });
         if (authorPub) await sendArticlePublishedEmail(authorPub.email, article.title, updated.slug);
+
+        // SEO: auto-fill seoTitle/seoDescription if empty, ping search engines
+        if (!article.seoTitle || !article.seoDescription) {
+          await prisma.article.update({
+            where: { id: article.id },
+            data: {
+              ...(!article.seoTitle && { seoTitle: generateSeoTitle(article.title) }),
+              ...(!article.seoDescription && { seoDescription: generateSeoDescription(article.excerpt, article.content) }),
+            },
+          });
+        }
+        onArticlePublished(updated.slug);
 
         return successResponse(updated);
       }
