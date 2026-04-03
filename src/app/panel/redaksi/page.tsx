@@ -210,7 +210,7 @@ export default function RedaksiPanelPage() {
                 <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Pilih dari Pengguna Terdaftar</label>
                 <select
                   className="input w-full"
-                  value=""
+                  value={form.userId}
                   onChange={(e) => {
                     const user = users.find((u) => u.id === e.target.value);
                     if (user) selectUser(user);
