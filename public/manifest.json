@@ -1,6 +1,6 @@
 {
-  "name": "Jurnalis Hukum Bandung",
-  "short_name": "JHB News",
+  "name": "Kartawarta",
+  "short_name": "Kartawarta News",
   "description": "Portal berita hukum terpercaya di Bandung",
   "start_url": "/",
   "display": "standalone",

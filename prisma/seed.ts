@@ -34,30 +34,30 @@ async function main() {
   // Create super admin
   const hashedPassword = await bcrypt.hash("Admin@2026!", 12);
   await prisma.users.upsert({
-    where: { email: "admin@jurnalishukumbandung.com" },
+    where: { email: "admin@kartawarta.com" },
     update: {},
     create: {
       id: genId(),
-      email: "admin@jurnalishukumbandung.com",
+      email: "admin@kartawarta.com",
       password: hashedPassword,
       name: "Super Admin",
       role: Role.SUPER_ADMIN,
-      bio: "Administrator Jurnalis Hukum Bandung",
+      bio: "Administrator Kartawarta",
     },
   });
 
   // Create demo editor
   const editorPassword = await bcrypt.hash("Editor@2026!", 12);
   await prisma.users.upsert({
-    where: { email: "editor@jurnalishukumbandung.com" },
+    where: { email: "editor@kartawarta.com" },
     update: {},
     create: {
       id: genId(),
-      email: "editor@jurnalishukumbandung.com",
+      email: "editor@kartawarta.com",
       password: editorPassword,
       name: "Editor Kepala",
       role: Role.CHIEF_EDITOR,
-      bio: "Editor Kepala Jurnalis Hukum Bandung",
+      bio: "Editor Kepala Kartawarta",
     },
   });
 

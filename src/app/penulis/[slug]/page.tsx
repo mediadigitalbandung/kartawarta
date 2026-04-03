@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
   return {
     title: `${author.name} - Penulis`,
-    description: author.bio || `Profil penulis ${author.name} di Jurnalis Hukum Bandung.`,
+    description: author.bio || `Profil penulis ${author.name} di Kartawarta.`,
     alternates: {
       canonical: `/penulis/${params.slug}`,
     },

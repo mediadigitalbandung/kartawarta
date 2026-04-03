@@ -79,13 +79,13 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   if (!category) return { title: "Kategori Tidak Ditemukan" };
 
   const title = `${category.name} - Berita Hukum Terkini`;
-  const description = `Kumpulan berita ${category.name.toLowerCase()} terbaru dari Jurnalis Hukum Bandung.`;
+  const description = `Kumpulan berita ${category.name.toLowerCase()} terbaru dari Kartawarta.`;
 
   return {
     title,
     description,
     openGraph: {
-      title: `${title} | Jurnalis Hukum Bandung`,
+      title: `${title} | Kartawarta`,
       description,
       type: "website",
     },
