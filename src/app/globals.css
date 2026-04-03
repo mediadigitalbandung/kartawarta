@@ -127,7 +127,7 @@
   .news-ticker-content {
     display: flex;
     white-space: nowrap;
-    animation: scrollX 35s linear infinite;
+    animation: scrollX 20s linear infinite;
   }
   .news-ticker:hover .news-ticker-content {
     animation-play-state: paused;
