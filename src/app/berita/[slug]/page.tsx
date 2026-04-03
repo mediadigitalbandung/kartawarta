@@ -66,31 +66,39 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 const WORDS_PER_PAGE = 300;
 const TOLERANCE = 50;
 const AD_INSERT_WORDS = 150; // inject ad every ~150 words
+const AD_MIN_REMAINING = 100; // don't inject if less than 100 words remain
 const AD_PLACEHOLDER = '<!--AD_SLOT-->';
+
+function countWords(html: string): number {
+  return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().split(" ").filter(Boolean).length;
+}
 
 function injectInlineAds(html: string): string {
   if (!html) return html;
 
+  const totalWords = countWords(html);
+  if (totalWords < AD_INSERT_WORDS + AD_MIN_REMAINING) return html;
+
   const blocks = html.split(/(<br\s*\/?>(?:<br\s*\/?>)*|<\/p>\s*<p[^>]*>|<\/h[2-6]>\s*<h[2-6][^>]*>)/gi);
   let result = "";
   let wordCount = 0;
-  let adInserted = false;
 
   for (let i = 0; i < blocks.length; i++) {
     const block = blocks[i];
-    const blockText = block.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-    const blockWords = blockText.split(" ").filter(Boolean).length;
+    const blockWords = countWords(block);
 
     result += block;
     wordCount += blockWords;
 
-    if (wordCount >= AD_INSERT_WORDS && !adInserted && i < blocks.length - 2) {
-      result += AD_PLACEHOLDER;
-      adInserted = true;
-      wordCount = 0;
-    } else if (wordCount >= AD_INSERT_WORDS && adInserted && i < blocks.length - 2) {
-      result += AD_PLACEHOLDER;
-      wordCount = 0;
+    if (wordCount >= AD_INSERT_WORDS) {
+      // Check remaining words after this point
+      const remaining = blocks.slice(i + 1).join("");
+      const remainingWords = countWords(remaining);
+
+      if (remainingWords >= AD_MIN_REMAINING) {
+        result += AD_PLACEHOLDER;
+        wordCount = 0;
+      }
     }
   }
 
