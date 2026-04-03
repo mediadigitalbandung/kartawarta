@@ -177,7 +177,7 @@ export default async function HomePage() {
                 </div>
                 {/* AD: Sidebar rectangle under Terpopuler */}
                 <div className="mt-6">
-                  <SidebarAd size="rectangle" />
+                  <SidebarAd />
                 </div>
               </div>
             )}
