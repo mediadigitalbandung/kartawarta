@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -64,8 +64,8 @@ export default function Header() {
 
   return (
     <>
-      {/* Row 1: Top bar â€” Deep Blue gradient header */}
-      <header className="sticky top-0 z-50 bg-gradient-primary" role="banner" aria-label="Header utama">
+      {/* Row 1: Top bar — White header */}
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-100" role="banner" aria-label="Header utama">
         <div className="container-main">
           <div className="flex items-center justify-between py-3">
             {/* Logo */}
@@ -80,7 +80,7 @@ export default function Header() {
                 priority
               />
               <span className="flex items-baseline gap-1.5 sm:gap-2">
-                <span className="font-serif text-sm font-bold text-white sm:text-2xl lg:text-3xl tracking-tight">
+                <span className="font-serif text-sm font-bold text-primary sm:text-2xl lg:text-3xl tracking-tight">
                   Kartawarta
                 </span>
               </span>
@@ -89,15 +89,15 @@ export default function Header() {
             {/* Right: Date + Search + actions */}
             <div className="flex items-center gap-3">
             {/* Live date */}
-            <span className="hidden text-label-sm text-white/40 md:block uppercase tracking-wider">
+            <span className="hidden text-label-sm text-gray-500 md:block uppercase tracking-wider">
               {new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
             </span>
-            <div className="hidden h-5 w-px bg-white/15 md:block" />
+            <div className="hidden h-4 w-px bg-gray-200 md:block" />
             {/* Search */}
             <form action="/search" className="relative hidden md:block md:w-64 lg:w-80" role="search" aria-label="Pencarian artikel">
               <Search
                 size={16}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
                 aria-hidden="true"
               />
               <input
@@ -105,14 +105,14 @@ export default function Header() {
                 name="q"
                 placeholder="Cari berita..."
                 aria-label="Cari artikel"
-                className="w-full rounded-md bg-white/10 py-2 pl-10 pr-4 text-body-sm text-white placeholder:text-white/40 backdrop-blur-glass transition-all focus:bg-white/20 focus:outline-none focus:ring-1 focus:ring-white/30"
+                className="w-full rounded-md bg-white border border-gray-200 py-2 pl-10 pr-4 text-body-sm text-gray-900 placeholder:text-gray-400 transition-all focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
               />
             </form>
 
               {/* Bookmark link */}
               <Link
                 href="/bookmark"
-                className="hidden md:flex items-center gap-1.5 rounded-md px-3 py-1.5 text-label-sm font-medium text-white/50 transition-colors hover:text-white hover:bg-white/10"
+                className="hidden md:flex items-center gap-1.5 rounded-md px-3 py-1.5 text-label-sm font-medium text-gray-500 transition-colors hover:text-primary hover:bg-gray-50"
                 title="Bookmark Saya"
               >
                 <Bookmark size={14} />
@@ -124,7 +124,7 @@ export default function Header() {
                 <div className="relative">
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex h-10 w-10 items-center justify-center rounded-md bg-white/15 text-label-lg font-bold text-white transition-all hover:bg-white/25"
+                    className="flex h-10 w-10 items-center justify-center rounded-md bg-gray-100 text-label-lg font-bold text-primary transition-all hover:bg-gray-200"
                     aria-label="Menu pengguna"
                     aria-expanded={userMenuOpen}
                   >
@@ -170,7 +170,7 @@ export default function Header() {
               {/* Mobile menu toggle */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="flex h-10 w-10 items-center justify-center rounded-md text-white/60 transition-colors hover:text-white hover:bg-white/10 lg:hidden"
+                className="flex h-10 w-10 items-center justify-center rounded-md text-gray-500 transition-colors hover:text-primary hover:bg-gray-50 lg:hidden"
                 aria-label="Menu"
               >
                 {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -182,7 +182,7 @@ export default function Header() {
             <form action="/search" className="relative" role="search" aria-label="Pencarian artikel (mobile)">
               <Search
                 size={16}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
                 aria-hidden="true"
               />
               <input
@@ -190,7 +190,7 @@ export default function Header() {
                 name="q"
                 placeholder="Cari berita..."
                 aria-label="Cari artikel"
-                className="w-full rounded-md bg-white/10 py-2 pl-10 pr-4 text-body-sm text-white placeholder:text-white/40 backdrop-blur-glass transition-all focus:bg-white/20 focus:outline-none focus:ring-1 focus:ring-white/30"
+                className="w-full rounded-md bg-white border border-gray-200 py-2 pl-10 pr-4 text-body-sm text-gray-900 placeholder:text-gray-400 transition-all focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
               />
             </form>
           </div>
