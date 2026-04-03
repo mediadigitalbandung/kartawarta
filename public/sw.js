@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jhb-v1';
+const CACHE_NAME = 'kartawarta-v1';
 const OFFLINE_URL = '/offline';
 
 // Pre-cache essential assets

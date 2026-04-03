@@ -19,21 +19,21 @@ export const viewport = { width: "device-width", initialScale: 1 };
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || "https://kartawarta.vercel.app"
+    process.env.NEXT_PUBLIC_APP_URL || "https://kartawarta.com"
   ),
   title: {
-    default: "Kartawarta - Media Hukum Digital Terpercaya",
+    default: "Kartawarta - Media Digital Terpercaya",
     template: "%s | Kartawarta",
   },
   description:
-    "Portal berita hukum terpercaya di Bandung. Menyajikan berita hukum pidana, perdata, tata negara, HAM, dan analisis hukum yang akurat dan terverifikasi.",
+    "Portal berita digital terpercaya. Menyajikan berita terkini, analisis mendalam, dan informasi akurat dan terverifikasi.",
   keywords: [
-    "berita hukum",
-    "hukum bandung",
+    "berita terkini",
     "kartawarta",
-    "berita hukum bandung",
-    "hukum pidana",
-    "hukum perdata",
+    "berita indonesia",
+    "portal berita",
+    "media digital",
+    "berita terpercaya",
   ],
   authors: [{ name: "Kartawarta" }],
   openGraph: {
@@ -42,8 +42,8 @@ export const metadata: Metadata = {
     siteName: "Kartawarta",
   },
   icons: {
-    icon: "/logo-jhb.png",
-    apple: "/logo-jhb.png",
+    icon: "/logo-kartawarta.png",
+    apple: "/logo-kartawarta.png",
   },
   manifest: "/manifest.json",
   robots: {

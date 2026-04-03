@@ -80,7 +80,7 @@ export default function Header() {
             {/* Logo */}
             <Link href="/" className="group flex shrink-0 items-center gap-2.5">
               <Image
-                src="/logo-jhb.png"
+                src="/logo-kartawarta.png"
                 alt="Kartawarta"
                 width={96}
                 height={96}

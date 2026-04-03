@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
         password: journalistPassword,
         name: "Ahmad Fauzi",
         role: "SENIOR_JOURNALIST",
-        bio: "Jurnalis hukum senior dengan pengalaman 10 tahun meliput berita hukum di wilayah Bandung.",
+        bio: "Jurnalis senior dengan pengalaman 10 tahun meliput berita.",
         specialization: "Hukum Tata Negara",
       },
     });

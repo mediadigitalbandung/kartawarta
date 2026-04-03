@@ -1,7 +1,7 @@
 {
   "name": "Kartawarta",
   "short_name": "Kartawarta News",
-  "description": "Portal berita hukum terpercaya di Bandung",
+  "description": "Portal berita digital terpercaya",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FFFFFF",

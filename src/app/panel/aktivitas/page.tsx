@@ -137,7 +137,7 @@ export default function AktivitasPage() {
         log.detail || "",
       ]);
 
-      exportToCsv("audit-logs-jhb.csv", headers, rows);
+      exportToCsv("audit-logs-kartawarta.csv", headers, rows);
     } catch {
       console.error("Failed to export CSV");
     } finally {

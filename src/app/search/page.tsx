@@ -28,7 +28,7 @@ interface SuggestItem {
 type SortBy = "terbaru" | "terlama" | "terpopuler";
 type TimeRange = "semua" | "minggu" | "bulan" | "tahun";
 
-const HISTORY_KEY = "search_history_jhb";
+const HISTORY_KEY = "search_history_kartawarta";
 const MAX_HISTORY = 5;
 
 function getSearchHistory(): string[] {

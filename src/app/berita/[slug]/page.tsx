@@ -310,7 +310,7 @@ export default async function ArticlePage({ params, searchParams }: { params: { 
             <article className="lg:col-span-2">
               {/* Print-only header */}
               <div className="print-header hidden">
-                <img src="/logo-jhb.png" alt="Kartawarta" />
+                <img src="/logo-kartawarta.png" alt="Kartawarta" />
                 <div>
                   <div className="print-title">Kartawarta</div>
                   <div className="print-subtitle">Media Hukum Digital Terpercaya — kartawarta.com</div>

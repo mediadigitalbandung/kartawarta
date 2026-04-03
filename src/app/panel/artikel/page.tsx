@@ -295,7 +295,7 @@ export default function ArtikelPage() {
       String(a.viewCount),
       formatDate(a.publishedAt || a.createdAt),
     ]);
-    exportToCsv("artikel-jhb.csv", headers, rows);
+    exportToCsv("artikel-kartawarta.csv", headers, rows);
   }
 
   const filtered = articles.filter((a) => {

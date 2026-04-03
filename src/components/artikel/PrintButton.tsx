@@ -93,7 +93,7 @@ function PrintPreviewContent() {
     <div style={{ fontFamily: "Georgia, serif", color: "#1C1C1E" }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, borderBottom: "2px solid #00AA13", paddingBottom: 12, marginBottom: 20 }}>
-        <img src="/logo-jhb.png" alt="Kartawarta" style={{ width: 40, height: 40 }} />
+        <img src="/logo-kartawarta.png" alt="Kartawarta" style={{ width: 40, height: 40 }} />
         <div>
           <div style={{ fontSize: 16, fontWeight: 800 }}>Kartawarta</div>
           <div style={{ fontSize: 9, color: "#6B7280" }}>Media Hukum Digital Terpercaya — kartawarta.com</div>

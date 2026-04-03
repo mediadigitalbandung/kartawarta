@@ -21,20 +21,20 @@ interface SiteSettings {
 const defaultSettings: SiteSettings = {
   siteName: "Kartawarta",
   siteDescription:
-    "Portal berita hukum terpercaya di Bandung. Menyajikan berita hukum pidana, perdata, tata negara, HAM, dan analisis hukum yang akurat dan terverifikasi.",
-  emailRedaksi: "redaksi@kartawarta.id",
-  alamatRedaksi: "Jl. Bandung, Jawa Barat, Indonesia",
-  metaTitle: "Kartawarta - Media Hukum Digital Terpercaya",
+    "Portal berita digital terpercaya. Menyajikan berita terkini, analisis mendalam, dan informasi akurat dan terverifikasi.",
+  emailRedaksi: "redaksi@kartawarta.com",
+  alamatRedaksi: "Indonesia",
+  metaTitle: "Kartawarta - Media Digital Terpercaya",
   metaDescription:
-    "Portal berita hukum terpercaya di Bandung. Menyajikan berita hukum pidana, perdata, tata negara, HAM, dan analisis hukum yang akurat dan terverifikasi.",
+    "Portal berita digital terpercaya. Menyajikan berita terkini, analisis mendalam, dan informasi akurat dan terverifikasi.",
   keywords:
-    "berita hukum, hukum bandung, kartawarta, berita hukum bandung, hukum pidana, hukum perdata",
+    "berita terkini, kartawarta, portal berita, media digital, berita indonesia, berita terpercaya",
   articlesPerPage: 12,
   enableComments: true,
   autoModerateComments: false,
 };
 
-const STORAGE_KEY = "jhb_site_settings";
+const STORAGE_KEY = "kartawarta_site_settings";
 
 export default function PengaturanPage() {
   const { data: session, status: sessionStatus } = useSession();
