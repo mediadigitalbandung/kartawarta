@@ -25,6 +25,7 @@ import {
   LogOut,
   MessageCircle,
   ImageIcon,
+  Mail,
   XCircle,
   CheckCircle,
   AlertCircle,
@@ -57,6 +58,7 @@ const menuItems: MenuItem[] = [
   { name: "AI Tools", href: "/panel/ai-log", icon: Sparkles, adminOnly: true },
   { name: "Pengguna", href: "/panel/pengguna", icon: Users, adminOnly: true },
   { name: "Statistik", href: "/panel/statistik-editor", icon: BarChart3, editorOnly: true },
+  { name: "Email", href: "/panel/email", icon: Mail, adminOnly: true },
   { name: "Pengaturan", href: "/panel/pengaturan", icon: Settings, adminOnly: true },
   { name: "Profil", href: "/panel/profil", icon: UserCircle },
 ];
