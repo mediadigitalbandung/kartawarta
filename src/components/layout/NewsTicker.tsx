@@ -5,30 +5,20 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import { ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
 
 /* ── Types ── */
-interface TickerItem { title: string; href: string; hot?: boolean }
+interface TickerItem { title: string; href: string; hot?: boolean; category?: string | null }
 interface StockItem {
-  symbol: string;
-  price: number;
-  prevClose: number;
-  change: number;
-  changePercent: number;
-  direction: "up" | "down" | "flat";
+  symbol: string; price: number; prevClose: number;
+  change: number; changePercent: number; direction: "up" | "down" | "flat";
 }
 
 /* ── Stock symbols ── */
 const SYMBOLS = [
-  { id: "^JKSE", label: "IHSG" },
-  { id: "BBCA.JK", label: "BBCA" },
-  { id: "BBRI.JK", label: "BBRI" },
-  { id: "BMRI.JK", label: "BMRI" },
-  { id: "TLKM.JK", label: "TLKM" },
-  { id: "ASII.JK", label: "ASII" },
-  { id: "UNVR.JK", label: "UNVR" },
-  { id: "GOTO.JK", label: "GOTO" },
-  { id: "USDIDR=X", label: "USD/IDR" },
-  { id: "GC=F", label: "EMAS" },
-  { id: "CL=F", label: "MINYAK" },
-  { id: "BTC-USD", label: "BTC" },
+  { id: "^JKSE", label: "IHSG" }, { id: "BBCA.JK", label: "BBCA" },
+  { id: "BBRI.JK", label: "BBRI" }, { id: "BMRI.JK", label: "BMRI" },
+  { id: "TLKM.JK", label: "TLKM" }, { id: "ASII.JK", label: "ASII" },
+  { id: "UNVR.JK", label: "UNVR" }, { id: "GOTO.JK", label: "GOTO" },
+  { id: "USDIDR=X", label: "USD/IDR" }, { id: "GC=F", label: "EMAS" },
+  { id: "CL=F", label: "MINYAK" }, { id: "BTC-USD", label: "BTC" },
 ];
 
 function fmtPrice(p: number, sym: string): string {
@@ -42,15 +32,14 @@ function fmtPrice(p: number, sym: string): string {
 /* ── Hooks ── */
 function useStocks() {
   const [stocks, setStocks] = useState<StockItem[]>([]);
-  const [lastUpdate, setLastUpdate] = useState<string>("");
+  const [lastUpdate, setLastUpdate] = useState("");
 
   const fetchStocks = useCallback(async () => {
     try {
       const res = await fetch("/api/stocks", { cache: "no-store" });
-      if (!res.ok) throw new Error("API error");
+      if (!res.ok) throw new Error("err");
       const json = await res.json();
       const data = json.data || [];
-
       if (data.length > 0) {
         setStocks(data.map((s: StockItem) => ({
           ...s,
@@ -58,36 +47,24 @@ function useStocks() {
         })));
         setLastUpdate(new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
       }
-    } catch {
-      // Keep existing data
-    }
+    } catch { /* keep existing */ }
   }, []);
 
-  useEffect(() => {
-    fetchStocks();
-    const interval = setInterval(fetchStocks, 15000); // 15s refresh
-    return () => clearInterval(interval);
-  }, [fetchStocks]);
-
+  useEffect(() => { fetchStocks(); const i = setInterval(fetchStocks, 15000); return () => clearInterval(i); }, [fetchStocks]);
   return { stocks, lastUpdate };
 }
 
 function useTrending() {
   const [items, setItems] = useState<TickerItem[]>([]);
   useEffect(() => {
-    fetch("/api/trending")
-      .then((r) => r.json())
-      .then((json) => {
-        const data = json.data || json || [];
-        if (Array.isArray(data) && data.length > 0) {
-          setItems(data.map((t: { label?: string; title?: string; href?: string; slug?: string; hot?: boolean }) => ({
-            title: t.label || t.title || "",
-            href: t.href || (t.slug ? `/berita/${t.slug}` : "/search"),
-            hot: t.hot || false,
-          })));
-        }
-      })
-      .catch(() => {});
+    fetch("/api/trending").then((r) => r.json()).then((json) => {
+      const data = json.data || json || [];
+      if (Array.isArray(data) && data.length > 0) {
+        setItems(data.map((t: { label?: string; href?: string; hot?: boolean; category?: string }) => ({
+          title: t.label || "", href: t.href || "/search", hot: t.hot || false, category: t.category || null,
+        })));
+      }
+    }).catch(() => {});
   }, []);
   return items;
 }
@@ -95,140 +72,94 @@ function useTrending() {
 /* ── Stock Card ── */
 function StockCard({ s }: { s: StockItem }) {
   return (
-    <div
-      className={`shrink-0 rounded-sm px-4 py-3 min-w-[150px] sm:min-w-[165px] transition-colors ${
-        s.direction === "up"
-          ? "bg-emerald-500/10 hover:bg-emerald-500/15"
-          : s.direction === "down"
-          ? "bg-red-500/10 hover:bg-red-500/15"
-          : "bg-white/5 hover:bg-white/8"
-      }`}
-    >
+    <div className={`shrink-0 rounded-sm px-4 py-3 min-w-[150px] sm:min-w-[165px] ${
+      s.direction === "up" ? "bg-emerald-500/10" : s.direction === "down" ? "bg-red-500/10" : "bg-white/5"
+    }`}>
       <div className="flex items-center justify-between mb-1.5">
         <span className="text-label-md font-bold text-white/70">{s.symbol}</span>
-        {s.direction === "up" ? (
-          <ArrowUpRight size={16} className="text-emerald-400" />
-        ) : s.direction === "down" ? (
-          <ArrowDownRight size={16} className="text-red-400" />
-        ) : (
-          <Minus size={14} className="text-white/30" />
-        )}
+        {s.direction === "up" ? <ArrowUpRight size={16} className="text-emerald-400" /> :
+         s.direction === "down" ? <ArrowDownRight size={16} className="text-red-400" /> :
+         <Minus size={14} className="text-white/30" />}
       </div>
-      <div className="text-title-lg font-mono font-bold text-white leading-none">
-        {fmtPrice(s.price, s.symbol)}
-      </div>
+      <div className="text-title-lg font-mono font-bold text-white leading-none">{fmtPrice(s.price, s.symbol)}</div>
       <div className="mt-1.5 flex items-center gap-2">
         <span className={`text-label-md font-mono font-semibold ${
           s.direction === "up" ? "text-emerald-400" : s.direction === "down" ? "text-red-400" : "text-white/40"
-        }`}>
-          {s.change >= 0 ? "+" : ""}{s.change.toFixed(2)}
-        </span>
+        }`}>{s.change >= 0 ? "+" : ""}{s.change.toFixed(2)}</span>
         <span className={`text-label-sm font-mono ${
           s.direction === "up" ? "text-emerald-400/60" : s.direction === "down" ? "text-red-400/60" : "text-white/20"
-        }`}>
-          ({s.changePercent >= 0 ? "+" : ""}{s.changePercent.toFixed(2)}%)
-        </span>
+        }`}>({s.changePercent >= 0 ? "+" : ""}{s.changePercent.toFixed(2)}%)</span>
       </div>
     </div>
   );
 }
 
-/* ── Stock Carousel — Infinite Loop ── */
+/* ── Stock Carousel — CSS animation infinite loop ── */
 function StockCarousel({ stocks, lastUpdate }: { stocks: StockItem[]; lastUpdate: string }) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [hovered, setHovered] = useState(false);
-
-  // Duplicate stocks for seamless looping
-  const loopedStocks = [...stocks, ...stocks, ...stocks];
-
-  // Infinite auto-scroll: when reaching end of first set, jump back to start
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el || stocks.length === 0) return;
-
-    // Calculate width of one set of cards
-    const getSetWidth = () => {
-      const cards = el.children;
-      if (cards.length === 0) return 0;
-      const cardCount = stocks.length;
-      let width = 0;
-      for (let i = 0; i < cardCount && i < cards.length; i++) {
-        width += (cards[i] as HTMLElement).offsetWidth + 10; // 10 = gap
-      }
-      return width;
-    };
-
-    // Start in the middle set
-    const setWidth = getSetWidth();
-    if (setWidth > 0) el.scrollLeft = setWidth;
-
-    const interval = setInterval(() => {
-      if (hovered) return;
-      el.scrollLeft += 0.8;
-
-      // If scrolled past 2 sets, jump back to 1 set (seamless)
-      const sw = getSetWidth();
-      if (sw > 0 && el.scrollLeft >= sw * 2) {
-        el.scrollLeft -= sw;
-      }
-    }, 20);
-
-    return () => clearInterval(interval);
-  }, [stocks, hovered]);
+  const [paused, setPaused] = useState(false);
 
   if (stocks.length === 0) return null;
 
+  // Total animation duration based on number of cards
+  const duration = stocks.length * 3; // ~3s per card
+
   return (
-    <div className="bg-on-surface" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+    <div
+      className="bg-on-surface overflow-hidden"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
       <div className="container-main py-3">
-        {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2.5">
             <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-label-md font-bold uppercase tracking-widest text-white/50">Market</span>
             <span className="hidden sm:inline text-label-sm text-white/20">Live</span>
           </div>
-          {lastUpdate && (
-            <span className="text-label-sm text-white/20 font-mono">
-              Update {lastUpdate} WIB
-            </span>
-          )}
-        </div>
-
-        {/* Infinite carousel */}
-        <div
-          ref={scrollRef}
-          className="flex gap-2.5 overflow-x-auto scrollbar-hide"
-        >
-          {loopedStocks.map((s, i) => (
-            <StockCard key={`${s.symbol}-${i}`} s={s} />
-          ))}
+          {lastUpdate && <span className="text-label-sm text-white/20 font-mono">Update {lastUpdate} WIB</span>}
         </div>
       </div>
+
+      {/* Infinite CSS scroll — two identical sets side by side */}
+      <div className="relative">
+        <div
+          className="flex gap-2.5 w-max"
+          style={{
+            animation: `stockScroll ${duration}s linear infinite`,
+            animationPlayState: paused ? "paused" : "running",
+          }}
+        >
+          {/* Set 1 */}
+          <div className="flex gap-2.5 pl-5 sm:pl-8">
+            {stocks.map((s) => <StockCard key={`a-${s.symbol}`} s={s} />)}
+          </div>
+          {/* Set 2 (duplicate for seamless loop) */}
+          <div className="flex gap-2.5">
+            {stocks.map((s) => <StockCard key={`b-${s.symbol}`} s={s} />)}
+          </div>
+        </div>
+      </div>
+
+      <div className="h-3" />
+
+      <style jsx>{`
+        @keyframes stockScroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+      `}</style>
     </div>
   );
 }
 
 /* ── Main Component ── */
 export default function NewsTicker() {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const isDragging = useRef(false);
-  const startX = useRef(0);
-  const scrollLeftVal = useRef(0);
-  const [paused, setPaused] = useState(false);
-  const didDrag = useRef(false);
-
   const trendingItems = useTrending();
   const { stocks, lastUpdate } = useStocks();
-  const looped = trendingItems.length > 0 ? [...trendingItems, ...trendingItems] : [];
 
-  function onMouseDown(e: React.MouseEvent) { isDragging.current = true; didDrag.current = false; startX.current = e.pageX; if (trackRef.current) scrollLeftVal.current = trackRef.current.scrollLeft; setPaused(true); }
-  function onMouseMove(e: React.MouseEvent) { if (!isDragging.current) return; if (Math.abs(e.pageX - startX.current) > 3) didDrag.current = true; if (trackRef.current) trackRef.current.scrollLeft = scrollLeftVal.current - (e.pageX - startX.current); }
-  function onMouseUp() { isDragging.current = false; setPaused(false); }
-  function onTouchStart(e: React.TouchEvent) { isDragging.current = true; didDrag.current = false; startX.current = e.touches[0].pageX; if (trackRef.current) scrollLeftVal.current = trackRef.current.scrollLeft; setPaused(true); }
-  function onTouchMove(e: React.TouchEvent) { if (!isDragging.current) return; if (Math.abs(e.touches[0].pageX - startX.current) > 3) didDrag.current = true; if (trackRef.current) trackRef.current.scrollLeft = scrollLeftVal.current - (e.touches[0].pageX - startX.current); }
-  function onTouchEnd() { isDragging.current = false; setPaused(false); }
-  function onLinkClick(e: React.MouseEvent) { if (didDrag.current) e.preventDefault(); }
+  // Trending: duplicate for CSS infinite scroll
+  const looped = trendingItems.length > 0 ? [...trendingItems, ...trendingItems] : [];
+  const trendDuration = Math.max(trendingItems.length * 2, 15); // ~2s per tag
 
   return (
     <>
@@ -237,34 +168,63 @@ export default function NewsTicker() {
 
       {/* ═══ TRENDING INDONESIA ═══ */}
       {looped.length > 0 && (
-        <div className="bg-surface-container-lowest">
+        <div className="bg-surface-container-lowest overflow-hidden">
           <div className="flex items-center py-2.5">
-            <div className="shrink-0 flex items-center gap-2 px-4 sm:px-6">
+            <div className="shrink-0 flex items-center gap-2 px-4 sm:px-6 z-10 bg-surface-container-lowest">
               <span className="h-2 w-2 rounded-full bg-secondary animate-pulse shrink-0" />
               <span className="text-label-md font-bold tracking-widest text-secondary uppercase whitespace-nowrap">
-                Trending Indonesia
+                Trending
               </span>
             </div>
-            <div
-              ref={trackRef}
-              className="news-ticker flex-1 overflow-hidden cursor-grab active:cursor-grabbing select-none"
-              onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp}
-              onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
-            >
-              <div className="news-ticker-content" style={{ animationPlayState: paused ? "paused" : "running" }}>
-                {looped.map((item, i) => (
-                  <Link key={i} href={item.href} onClick={onLinkClick}
-                    className="mx-4 sm:mx-6 inline-flex items-center gap-2 text-body-md font-medium text-on-surface/60 transition-colors duration-200 hover:text-primary whitespace-nowrap">
-                    {item.hot && (
-                      <span className="inline-flex items-center rounded-sm bg-secondary px-1.5 py-0.5 text-[9px] font-bold text-white tracking-wider">HOT</span>
-                    )}
-                    <span className="h-1 w-1 rounded-full bg-on-surface-variant/30 shrink-0" />
-                    {item.title}
-                  </Link>
-                ))}
+
+            {/* CSS infinite scroll */}
+            <div className="flex-1 overflow-hidden">
+              <div
+                className="flex w-max hover:[animation-play-state:paused]"
+                style={{ animation: `trendScroll ${trendDuration}s linear infinite` }}
+              >
+                {/* Set 1 */}
+                <div className="flex items-center">
+                  {trendingItems.map((item, i) => (
+                    <Link key={`a-${i}`} href={item.href}
+                      className="mx-3 sm:mx-5 inline-flex items-center gap-2 text-body-md font-medium text-on-surface/60 hover:text-primary whitespace-nowrap transition-colors">
+                      {item.hot && (
+                        <span className="inline-flex items-center rounded-sm bg-secondary px-1.5 py-0.5 text-[9px] font-bold text-white tracking-wider">HOT</span>
+                      )}
+                      {item.category && (
+                        <span className="text-label-sm font-bold text-primary/60 uppercase tracking-wider">{item.category}</span>
+                      )}
+                      <span className="h-1 w-1 rounded-full bg-on-surface-variant/20 shrink-0" />
+                      {item.title}
+                    </Link>
+                  ))}
+                </div>
+                {/* Set 2 */}
+                <div className="flex items-center">
+                  {trendingItems.map((item, i) => (
+                    <Link key={`b-${i}`} href={item.href}
+                      className="mx-3 sm:mx-5 inline-flex items-center gap-2 text-body-md font-medium text-on-surface/60 hover:text-primary whitespace-nowrap transition-colors">
+                      {item.hot && (
+                        <span className="inline-flex items-center rounded-sm bg-secondary px-1.5 py-0.5 text-[9px] font-bold text-white tracking-wider">HOT</span>
+                      )}
+                      {item.category && (
+                        <span className="text-label-sm font-bold text-primary/60 uppercase tracking-wider">{item.category}</span>
+                      )}
+                      <span className="h-1 w-1 rounded-full bg-on-surface-variant/20 shrink-0" />
+                      {item.title}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
+
+          <style jsx>{`
+            @keyframes trendScroll {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
+            }
+          `}</style>
         </div>
       )}
     </>
