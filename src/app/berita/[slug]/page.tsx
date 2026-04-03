@@ -63,7 +63,55 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function ArticlePage({ params }: { params: { slug: string } }) {
+const WORDS_PER_PAGE = 500;
+const TOLERANCE = 100; // if total ≤ WORDS_PER_PAGE + TOLERANCE, keep single page
+
+function splitContentIntoPages(html: string): string[] {
+  if (!html) return [html];
+
+  // Count words (strip HTML tags for counting)
+  const textOnly = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  const totalWords = textOnly.split(" ").filter(Boolean).length;
+
+  if (totalWords <= WORDS_PER_PAGE + TOLERANCE) return [html];
+
+  // Split by paragraphs/breaks
+  const blocks = html.split(/(<br\s*\/?>(?:<br\s*\/?>)*|<\/p>\s*<p[^>]*>|<\/h[2-6]>\s*<h[2-6][^>]*>)/gi);
+
+  const pages: string[] = [];
+  let currentPage = "";
+  let currentWordCount = 0;
+
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i];
+    const blockText = block.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    const blockWords = blockText.split(" ").filter(Boolean).length;
+
+    currentPage += block;
+    currentWordCount += blockWords;
+
+    if (currentWordCount >= WORDS_PER_PAGE && i < blocks.length - 1) {
+      // Check if remaining is within tolerance
+      const remaining = blocks.slice(i + 1).join("");
+      const remainingText = remaining.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+      const remainingWords = remainingText.split(" ").filter(Boolean).length;
+
+      if (remainingWords > TOLERANCE) {
+        pages.push(currentPage.trim());
+        currentPage = "";
+        currentWordCount = 0;
+      }
+    }
+  }
+
+  if (currentPage.trim()) {
+    pages.push(currentPage.trim());
+  }
+
+  return pages.length > 0 ? pages : [html];
+}
+
+export default async function ArticlePage({ params, searchParams }: { params: { slug: string }; searchParams: { page?: string } }) {
   const article = await getArticle(params.slug);
   if (!article) notFound();
 
@@ -143,7 +191,10 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://jurnalishukumbandung.com";
   const articleUrl = `${appUrl}/berita/${params.slug}`;
-  const sanitizedContent = article.content;
+  const contentPages = splitContentIntoPages(article.content);
+  const totalPages = contentPages.length;
+  const currentPage = Math.min(Math.max(1, parseInt(searchParams.page || "1") || 1), totalPages);
+  const sanitizedContent = contentPages[currentPage - 1] || article.content;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -288,6 +339,46 @@ export default async function ArticlePage({ params }: { params: { slug: string }
                   dangerouslySetInnerHTML={{ __html: sanitizedContent }}
                 />
               </div>
+
+              {/* Page navigation */}
+              {totalPages > 1 && (
+                <div className="mt-8 flex items-center justify-between rounded-[12px] border border-border bg-surface-secondary p-4">
+                  <div className="text-sm text-txt-secondary">
+                    Halaman <span className="font-bold text-txt-primary">{currentPage}</span> dari <span className="font-bold text-txt-primary">{totalPages}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {currentPage > 1 && (
+                      <Link
+                        href={`/berita/${params.slug}?page=${currentPage - 1}`}
+                        className="btn-secondary px-4 py-2 text-sm"
+                      >
+                        ← Sebelumnya
+                      </Link>
+                    )}
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <Link
+                        key={i + 1}
+                        href={`/berita/${params.slug}${i === 0 ? "" : `?page=${i + 1}`}`}
+                        className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold transition-colors ${
+                          currentPage === i + 1
+                            ? "bg-goto-green text-white"
+                            : "hover:bg-surface-tertiary text-txt-secondary"
+                        }`}
+                      >
+                        {i + 1}
+                      </Link>
+                    ))}
+                    {currentPage < totalPages && (
+                      <Link
+                        href={`/berita/${params.slug}?page=${currentPage + 1}`}
+                        className="btn-primary px-4 py-2 text-sm"
+                      >
+                        Selanjutnya →
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Ad — after content */}
               <div className="mt-8">
