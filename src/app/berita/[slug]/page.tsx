@@ -13,7 +13,7 @@ import PrintButton from "@/components/artikel/PrintButton";
 import ShareBar from "@/components/artikel/ShareBar";
 import Sidebar from "@/components/layout/Sidebar";
 import ArticleCard from "@/components/artikel/ArticleCard";
-import BannerAd from "@/components/ads/BannerAd";
+import BannerAd, { SidebarAd } from "@/components/ads/BannerAd";
 import CommentSection from "@/components/artikel/CommentSection";
 import BookmarkButton from "@/components/artikel/BookmarkButton";
 import { prisma } from "@/lib/prisma";
@@ -270,9 +270,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               <div className="mt-6 h-px bg-border" />
 
               {/* Ad — below meta */}
-              <div className="mt-6 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "6 / 1" }}>
-                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
-                <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
+              <div className="mt-6">
+                <BannerAd slot="HEADER" />
               </div>
 
               {/* Featured Image */}
@@ -291,9 +290,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               </div>
 
               {/* Ad — after content */}
-              <div className="mt-8 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "4 / 1" }}>
-                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
-                <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
+              <div className="mt-8">
+                <BannerAd slot="IN_ARTICLE" />
               </div>
 
               {/* Share bar + bookmark */}
@@ -338,9 +336,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               </div>
 
               {/* Ad — after tags */}
-              <div className="mt-6 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "6 / 1" }}>
-                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
-                <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
+              <div className="mt-6">
+                <BannerAd slot="BETWEEN_SECTIONS" />
               </div>
 
               {/* Report button */}
@@ -374,9 +371,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
               </div>
 
               {/* Ad — before related */}
-              <div className="mt-8 rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "3 / 1" }}>
-                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
-                <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
+              <div className="mt-8">
+                <BannerAd slot="FOOTER" />
               </div>
 
               {/* Related articles */}
@@ -405,15 +401,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
             {/* Sidebar */}
             <div className="hidden lg:block lg:col-span-1">
               <Sidebar trending={sidebarTrending} />
-              {/* Sidebar Ad 1 */}
-              <div className="mt-5 rounded-lg bg-gradient-to-b from-surface-tertiary to-surface-secondary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "4 / 3" }}>
-                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
-                <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
-              </div>
-              {/* Sidebar Ad 2 */}
-              <div className="mt-5 rounded-lg bg-gradient-to-b from-surface-tertiary to-surface-secondary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "4 / 3" }}>
-                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
-                <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
+              <div className="mt-5">
+                <SidebarAd />
               </div>
             </div>
           </div>
