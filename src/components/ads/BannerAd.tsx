@@ -95,7 +95,7 @@ export default function BannerAd({ size, slot, className = "" }: BannerAdProps) 
 
   return (
     <div className={className}>
-      <div className="container-main">
+      <div className="mx-auto max-w-6xl sm:px-8 lg:px-8">
         <AdContent ad={ad} />
       </div>
     </div>
