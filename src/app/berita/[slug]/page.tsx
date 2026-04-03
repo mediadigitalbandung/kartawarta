@@ -65,8 +65,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
 const WORDS_PER_PAGE = 300;
 const TOLERANCE = 50;
-const AD_INSERT_WORDS = 150; // inject ad every ~150 words
-const AD_MIN_REMAINING = 100; // don't inject if less than 100 words remain
+const AD_INSERT_WORDS = 100; // inject ad after ~100 words
+const AD_MIN_REMAINING = 80; // don't inject if less than 80 words remain
 const AD_PLACEHOLDER = '<!--AD_SLOT-->';
 
 function countWords(html: string): number {
@@ -227,11 +227,11 @@ export default async function ArticlePage({ params, searchParams }: { params: { 
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://jurnalishukumbandung.com";
   const articleUrl = `${appUrl}/berita/${params.slug}`;
-  const contentWithAds = injectInlineAds(article.content);
-  const contentPages = splitContentIntoPages(contentWithAds);
+  const contentPages = splitContentIntoPages(article.content);
   const totalPages = contentPages.length;
   const currentPage = Math.min(Math.max(1, parseInt(searchParams.page || "1") || 1), totalPages);
-  const sanitizedContent = contentPages[currentPage - 1] || contentWithAds;
+  // Inject ads per page (after pagination) so every page gets an ad in the middle
+  const sanitizedContent = injectInlineAds(contentPages[currentPage - 1] || article.content);
 
   const jsonLd = {
     "@context": "https://schema.org",
