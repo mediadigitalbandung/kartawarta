@@ -12,7 +12,7 @@ import {
 const updateAdSchema = z.object({
   name: z.string().min(1).optional(),
   type: z.enum(["IMAGE", "GIF", "HTML"]).optional(),
-  slot: z.enum(["HEADER", "SIDEBAR", "IN_ARTICLE", "FOOTER", "POPUP", "FLOATING_BOTTOM"]).optional(),
+  slot: z.enum(["HEADER", "SIDEBAR", "IN_ARTICLE", "FOOTER", "BETWEEN_SECTIONS", "POPUP", "FLOATING_BOTTOM"]).optional(),
   imageUrl: z.string().url().nullable().optional(),
   htmlCode: z.string().nullable().optional(),
   targetUrl: z.string().url().nullable().optional(),

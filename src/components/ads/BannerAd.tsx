@@ -1,67 +1,157 @@
+"use client";
+
+import { useEffect, useState, useRef } from "react";
+
+interface Ad {
+  id: string;
+  type: string;
+  imageUrl?: string | null;
+  htmlCode?: string | null;
+  targetUrl?: string | null;
+}
+
+const sizeToSlot: Record<string, string> = {
+  slim: "HEADER",
+  leaderboard: "BETWEEN_SECTIONS",
+  billboard: "BETWEEN_SECTIONS",
+  sidebar: "SIDEBAR",
+  inline: "IN_ARTICLE",
+};
+
 interface BannerAdProps {
-  size: "leaderboard" | "billboard" | "sidebar" | "inline" | "slim";
+  size?: "leaderboard" | "billboard" | "sidebar" | "inline" | "slim";
+  slot?: string;
   className?: string;
 }
 
-const sizeConfig = {
-  slim: {
-    ratio: "3 / 1",       // compact but visible
-    containerClass: "py-2",
-  },
-  leaderboard: {
-    ratio: "4 / 1",       // standard banner
-    containerClass: "py-3",
-  },
-  billboard: {
-    ratio: "3 / 1",       // wider billboard
-    containerClass: "py-4",
-  },
-  sidebar: {
-    ratio: "4 / 3",       // vertical sidebar
-    containerClass: "py-3",
-  },
-  inline: {
-    ratio: "6 / 1",       // thin inline
-    containerClass: "py-4",
-  },
-};
+export default function BannerAd({ size, slot, className = "" }: BannerAdProps) {
+  const [ad, setAd] = useState<Ad | null>(null);
+  const tracked = useRef(false);
+  const adSlot = slot || (size ? sizeToSlot[size] : "HEADER");
 
-export default function BannerAd({ size, className = "" }: BannerAdProps) {
-  const config = sizeConfig[size];
+  useEffect(() => {
+    tracked.current = false;
+    fetch(`/api/ads?slot=${adSlot}`)
+      .then((r) => r.json())
+      .then((json) => {
+        const ads: Ad[] = json.data || [];
+        if (ads.length > 0) {
+          // Pick random ad from active ones for variety
+          const picked = ads[Math.floor(Math.random() * ads.length)];
+          setAd(picked);
+        }
+      })
+      .catch(() => {});
+  }, [adSlot]);
+
+  // Track impression when ad becomes visible
+  useEffect(() => {
+    if (ad && !tracked.current) {
+      tracked.current = true;
+      fetch(`/api/ads/${ad.id}/track?type=impression`, { method: "POST" }).catch(() => {});
+    }
+  }, [ad]);
+
+  if (!ad) return null;
+
+  function handleClick() {
+    if (ad) {
+      fetch(`/api/ads/${ad.id}/track?type=click`, { method: "POST" }).catch(() => {});
+    }
+  }
+
+  const adContent =
+    ad.type === "HTML" && ad.htmlCode ? (
+      <div dangerouslySetInnerHTML={{ __html: ad.htmlCode }} />
+    ) : ad.imageUrl ? (
+      <img
+        src={ad.imageUrl}
+        alt="Iklan"
+        className="w-full h-auto rounded-lg"
+        loading="lazy"
+      />
+    ) : null;
+
+  if (!adContent) return null;
 
   return (
-    <div className={`${config.containerClass} ${className}`}>
+    <div className={`py-2 ${className}`}>
       <div className="container-main">
-        <div
-          className="relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-surface-tertiary via-surface-secondary to-surface-tertiary flex items-center justify-center"
-          style={{ aspectRatio: config.ratio }}
-        >
-          <div className="absolute inset-0 opacity-[0.03]" style={{
-            backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)",
-          }} />
-          <div className="relative text-center">
-            <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">
-              Iklan
-            </p>
-          </div>
-        </div>
+        {ad.targetUrl ? (
+          <a
+            href={ad.targetUrl}
+            target="_blank"
+            rel="noopener noreferrer sponsored"
+            onClick={handleClick}
+            className="block"
+          >
+            {adContent}
+          </a>
+        ) : (
+          adContent
+        )}
       </div>
     </div>
   );
 }
 
-export function SidebarAd() {
-  return (
-    <div
-      className="rounded-lg bg-gradient-to-b from-surface-tertiary to-surface-secondary flex items-center justify-center overflow-hidden relative w-full"
-      style={{ aspectRatio: "4 / 3" }}
+export function SidebarAd({ slot = "SIDEBAR" }: { slot?: string }) {
+  const [ad, setAd] = useState<Ad | null>(null);
+  const tracked = useRef(false);
+
+  useEffect(() => {
+    tracked.current = false;
+    fetch(`/api/ads?slot=${slot}`)
+      .then((r) => r.json())
+      .then((json) => {
+        const ads: Ad[] = json.data || [];
+        if (ads.length > 0) {
+          setAd(ads[Math.floor(Math.random() * ads.length)]);
+        }
+      })
+      .catch(() => {});
+  }, [slot]);
+
+  useEffect(() => {
+    if (ad && !tracked.current) {
+      tracked.current = true;
+      fetch(`/api/ads/${ad.id}/track?type=impression`, { method: "POST" }).catch(() => {});
+    }
+  }, [ad]);
+
+  if (!ad) return null;
+
+  function handleClick() {
+    if (ad) {
+      fetch(`/api/ads/${ad.id}/track?type=click`, { method: "POST" }).catch(() => {});
+    }
+  }
+
+  const adContent =
+    ad.type === "HTML" && ad.htmlCode ? (
+      <div dangerouslySetInnerHTML={{ __html: ad.htmlCode }} />
+    ) : ad.imageUrl ? (
+      <img
+        src={ad.imageUrl}
+        alt="Iklan"
+        className="w-full h-auto rounded-lg"
+        loading="lazy"
+      />
+    ) : null;
+
+  if (!adContent) return null;
+
+  return ad.targetUrl ? (
+    <a
+      href={ad.targetUrl}
+      target="_blank"
+      rel="noopener noreferrer sponsored"
+      onClick={handleClick}
+      className="block"
     >
-      <div className="absolute inset-0 opacity-[0.03]" style={{
-        backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)",
-      }} />
-      <div className="relative text-center">
-        <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan</p>
-      </div>
-    </div>
+      {adContent}
+    </a>
+  ) : (
+    adContent
   );
 }

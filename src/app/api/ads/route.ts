@@ -45,7 +45,7 @@ const createAdSchema = z.object({
   imageUrl: z.string().url().optional().nullable(),
   htmlCode: z.string().optional().nullable(),
   targetUrl: z.string().url().optional().nullable(),
-  slot: z.enum(["HEADER", "SIDEBAR", "IN_ARTICLE", "FOOTER", "POPUP", "FLOATING_BOTTOM"]),
+  slot: z.enum(["HEADER", "SIDEBAR", "IN_ARTICLE", "FOOTER", "BETWEEN_SECTIONS", "POPUP", "FLOATING_BOTTOM"]),
   startDate: z.string().datetime(),
   endDate: z.string().datetime(),
   priority: z.number().int().min(0).max(100).optional(),

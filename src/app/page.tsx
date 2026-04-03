@@ -430,19 +430,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 3 Banner Ads */}
-      <div className="bg-surface py-4">
-        <div className="container-main">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {[1, 2, 3].map((n) => (
-              <div key={n} className="rounded-lg bg-gradient-to-br from-surface-tertiary to-surface-secondary flex items-center justify-center overflow-hidden relative" style={{ aspectRatio: "3 / 1" }}>
-                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)" }} />
-                <p className="text-xs font-semibold text-txt-muted/60 uppercase tracking-wider">Iklan {n}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* Banner Ad — In-Article */}
+      <BannerAd slot="IN_ARTICLE" className="bg-surface" />
 
       <div className="border-b border-border" />
 
@@ -573,8 +562,8 @@ export default async function HomePage() {
         );
       })}
 
-      {/* Banner Ad — Leaderboard */}
-      <BannerAd size="leaderboard" className="bg-surface" />
+      {/* Banner Ad — Footer */}
+      <BannerAd slot="FOOTER" className="bg-surface" />
 
       {/* Kategori Links — DATA REAL */}
       <section className="bg-surface-secondary py-8">
