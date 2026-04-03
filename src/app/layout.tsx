@@ -41,6 +41,10 @@ export const metadata: Metadata = {
     locale: "id_ID",
     siteName: "Jurnalis Hukum Bandung",
   },
+  icons: {
+    icon: "/logo-jhb.png",
+    apple: "/logo-jhb.png",
+  },
   manifest: "/manifest.json",
   robots: {
     index: true,
