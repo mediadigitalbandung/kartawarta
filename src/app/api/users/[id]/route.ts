@@ -16,6 +16,7 @@ const updateUserSchema = z.object({
   password: z.string().min(8).optional(),
   role: z.enum(["SUPER_ADMIN", "CHIEF_EDITOR", "EDITOR", "SENIOR_JOURNALIST", "JOURNALIST", "CONTRIBUTOR"]).optional(),
   specialization: z.string().max(100).optional(),
+  avatar: z.string().url().nullable().optional(),
   isActive: z.boolean().optional(),
 });
 

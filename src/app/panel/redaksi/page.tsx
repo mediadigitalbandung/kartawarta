@@ -41,7 +41,7 @@ const roleLabels: Record<string, string> = {
   CONTRIBUTOR: "Kontributor",
 };
 
-const emptyForm = { position: "", name: "", desc: "", photo: "", order: 0, isActive: true };
+const emptyForm = { position: "", name: "", desc: "", photo: "", order: 0, isActive: true, userId: "" };
 
 export default function RedaksiPanelPage() {
   const { success, error: showError } = useToast();
@@ -105,7 +105,7 @@ export default function RedaksiPanelPage() {
 
   function openEdit(m: RedaksiMember) {
     setEditingId(m.id);
-    setForm({ position: m.position, name: m.name, desc: m.desc || "", photo: m.photo || "", order: m.order, isActive: m.isActive });
+    setForm({ position: m.position, name: m.name, desc: m.desc || "", photo: m.photo || "", order: m.order, isActive: m.isActive, userId: "" });
     setShowForm(true);
   }
 
@@ -115,6 +115,7 @@ export default function RedaksiPanelPage() {
       name: user.name,
       photo: user.avatar || f.photo,
       position: f.position || (roleLabels[user.role] || user.role),
+      userId: user.id,
     }));
   }
 
@@ -145,6 +146,19 @@ export default function RedaksiPanelPage() {
         }),
       });
       if (!res.ok) { const j = await res.json(); throw new Error(j.error || "Gagal menyimpan"); }
+
+      // Update avatar di profil user jika foto diupload dan user dipilih
+      if (form.userId && form.photo) {
+        const selectedUser = users.find((u) => u.id === form.userId);
+        if (selectedUser && selectedUser.avatar !== form.photo) {
+          await fetch(`/api/users/${form.userId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ avatar: form.photo }),
+          }).catch(() => {});
+        }
+      }
+
       success(editingId ? "Berhasil diperbarui" : "Berhasil ditambahkan");
       closeForm();
       fetchData();
@@ -236,16 +250,26 @@ export default function RedaksiPanelPage() {
                     <img src={form.photo} alt="Foto" className="h-16 w-16 rounded-full object-cover border border-border" />
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-txt-muted truncate">{form.photo}</p>
-                      <button type="button" onClick={() => setForm({ ...form, photo: "" })} className="text-xs text-red-500 hover:text-red-700 mt-1 flex items-center gap-1">
-                        <X size={12} /> Hapus foto
-                      </button>
+                      <div className="flex items-center gap-3 mt-1">
+                        <label className="text-xs text-goto-green hover:text-goto-dark cursor-pointer flex items-center gap-1">
+                          <Upload size={12} /> Ganti foto
+                          <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={uploading}
+                            onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f); e.target.value = ""; }}
+                          />
+                        </label>
+                        <button type="button" onClick={() => setForm({ ...form, photo: "" })} className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1">
+                          <X size={12} /> Hapus
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ) : (
                   <label className="block cursor-pointer">
-                    <div className={`flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border py-5 hover:border-goto-green hover:bg-goto-light/20 transition-colors ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
-                      <Upload size={18} className="text-txt-muted" />
-                      <span className="text-sm text-txt-secondary">{uploading ? "Mengupload..." : "Upload foto (maks 2MB)"}</span>
+                    <div className={`flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-border py-6 hover:border-goto-green hover:bg-goto-light/20 transition-colors ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
+                      <Upload size={20} className="text-txt-muted" />
+                      <span className="text-sm font-medium text-txt-primary">{uploading ? "Mengupload..." : "Upload foto anggota"}</span>
+                      <span className="text-xs text-txt-muted">JPEG, PNG, WebP — Maks 2MB</span>
+                      <span className="text-[11px] text-goto-green">Foto juga akan tersimpan di profil pengguna</span>
                     </div>
                     <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={uploading}
                       onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f); e.target.value = ""; }}
