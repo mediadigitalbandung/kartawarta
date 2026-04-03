@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Newsreader, Work_Sans } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
@@ -50,8 +50,8 @@ export const metadata: Metadata = {
     siteName: "Kartawarta",
   },
   icons: {
-    icon: "/logo-kartawarta.png",
-    apple: "/logo-kartawarta.png",
+    icon: "/kartawarta-icon.png",
+    apple: "/kartawarta-icon.png",
   },
   manifest: "/manifest.json",
   robots: {

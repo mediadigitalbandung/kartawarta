@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Printer, FileText, X } from "lucide-react";
@@ -61,7 +61,7 @@ export default function PrintButton() {
               </div>
             </div>
 
-            {/* Preview content — iframe of print view */}
+            {/* Preview content â€” iframe of print view */}
             <div className="flex-1 overflow-auto p-6 bg-surface-secondary">
               <div className="bg-white shadow-lg rounded-lg mx-auto" style={{ maxWidth: "210mm", minHeight: "297mm", padding: "15mm 20mm" }}>
                 {/* Replicate print layout */}
@@ -93,10 +93,10 @@ function PrintPreviewContent() {
     <div style={{ fontFamily: "Georgia, serif", color: "#1C1C1E" }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, borderBottom: "2px solid #00AA13", paddingBottom: 12, marginBottom: 20 }}>
-        <img src="/logo-kartawarta.png" alt="Kartawarta" style={{ width: 40, height: 40 }} />
+        <img src="/kartawarta-icon.png" alt="Kartawarta" style={{ width: 40, height: 40 }} />
         <div>
           <div style={{ fontSize: 16, fontWeight: 800 }}>Kartawarta</div>
-          <div style={{ fontSize: 9, color: "#6B7280" }}>Media Hukum Digital Terpercaya — kartawarta.com</div>
+          <div style={{ fontSize: 9, color: "#6B7280" }}>Media Hukum Digital Terpercaya â€” kartawarta.com</div>
         </div>
       </div>
 
@@ -140,7 +140,7 @@ function PrintPreviewContent() {
 
       {/* Footer */}
       <div style={{ marginTop: 24, paddingTop: 12, borderTop: "1px solid #E5E7EB", fontSize: 9, color: "#9CA3AF", textAlign: "center" }}>
-        &copy; {new Date().getFullYear()} Kartawarta — kartawarta.com
+        &copy; {new Date().getFullYear()} Kartawarta â€” kartawarta.com
         <br />Artikel ini dicetak pada {new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
         <br />Sumber: {typeof window !== "undefined" ? window.location.href : ""}
       </div>

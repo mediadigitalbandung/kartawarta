@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -64,14 +64,14 @@ export default function Header() {
 
   return (
     <>
-      {/* Row 1: Top bar — Deep Blue gradient header */}
+      {/* Row 1: Top bar â€” Deep Blue gradient header */}
       <header className="sticky top-0 z-50 bg-gradient-primary" role="banner" aria-label="Header utama">
         <div className="container-main">
           <div className="flex items-center justify-between py-3">
             {/* Logo */}
             <Link href="/" className="group flex shrink-0 items-center gap-3">
               <Image
-                src="/logo-kartawarta.png"
+                src="/kartawarta-icon.png"
                 alt="Kartawarta"
                 width={96}
                 height={96}

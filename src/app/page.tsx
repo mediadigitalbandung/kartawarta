@@ -1,4 +1,4 @@
-export const revalidate = 60;
+﻿export const revalidate = 60;
 
 import Link from "next/link";
 import Image from "next/image";
@@ -71,16 +71,16 @@ export default async function HomePage() {
             "@type": "NewsMediaOrganization",
             name: "Kartawarta",
             url: "https://kartawarta.com",
-            logo: { "@type": "ImageObject", url: "https://kartawarta.com/logo-kartawarta.png" },
+            logo: { "@type": "ImageObject", url: "https://kartawarta.com/kartawarta-icon.png" },
           }),
         }}
       />
 
       <NewsTicker />
 
-      {/* ════════════════════════════════════════════
-          HERO — Auto-rotating carousel + side stories
-          ════════════════════════════════════════════ */}
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+          HERO â€” Auto-rotating carousel + side stories
+          â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       <HeroCarousel
         main={JSON.parse(JSON.stringify(heroMain))}
         side={JSON.parse(JSON.stringify(heroSide))}
@@ -89,9 +89,9 @@ export default async function HomePage() {
       {/* AD: Header */}
       <BannerAd size="leaderboard" slot="HEADER" className="bg-surface" />
 
-      {/* ════════════════════════════════════════════
-          EDITOR'S PICK — 4 cards horizontal
-          ════════════════════════════════════════════ */}
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+          EDITOR'S PICK â€” 4 cards horizontal
+          â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       {editorsPickArticles.length > 0 && (
         <section className="bg-surface py-14">
           <div className="container-main">
@@ -136,13 +136,13 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ════════════════════════════════════════════
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
           TERKINI + TERPOPULER + SIDEBAR AD
-          ════════════════════════════════════════════ */}
+          â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       <section className="bg-surface-container-low py-14">
         <div className="container-main">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            {/* Berita Terkini — 7 cols */}
+            {/* Berita Terkini â€” 7 cols */}
             <div className="lg:col-span-7">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="font-serif text-headline-md text-on-surface">Berita Terkini</h2>
@@ -201,7 +201,7 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Sidebar — 5 cols: Terpopuler + Ads */}
+            {/* Sidebar â€” 5 cols: Terpopuler + Ads */}
             <aside className="lg:col-span-5">
               {/* Terpopuler */}
               <div className="mb-8">
@@ -247,9 +247,9 @@ export default async function HomePage() {
       {/* AD: Between sections */}
       <BannerAd size="banner" slot="BETWEEN_SECTIONS" className="bg-surface" />
 
-      {/* ════════════════════════════════════════════
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
           POLLING
-          ════════════════════════════════════════════ */}
+          â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       <section className="bg-surface py-14">
         <div className="container-main">
           <div className="mb-8">
@@ -263,9 +263,9 @@ export default async function HomePage() {
       {/* AD: Inline */}
       <InlineAd className="bg-surface-container-low" />
 
-      {/* ════════════════════════════════════════════
-          CATEGORY SECTIONS — alternating layouts
-          ════════════════════════════════════════════ */}
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+          CATEGORY SECTIONS â€” alternating layouts
+          â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       {catEntries.map(([catName, { slug: catSlug, articles: catArticles }], idx) => {
         const main = catArticles[0];
         const side = catArticles.slice(1);
@@ -378,9 +378,9 @@ export default async function HomePage() {
       {/* AD: Footer */}
       <BannerAd size="leaderboard" slot="FOOTER" className="bg-surface" />
 
-      {/* ════════════════════════════════════════════
+      {/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
           CATEGORY GRID
-          ════════════════════════════════════════════ */}
+          â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       <section className="bg-primary py-14">
         <div className="container-main">
           <div className="mb-8">
