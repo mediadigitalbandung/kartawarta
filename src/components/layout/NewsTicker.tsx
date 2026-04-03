@@ -72,23 +72,36 @@ function useTrending() {
 /* ── Stock Card ── */
 function StockCard({ s }: { s: StockItem }) {
   return (
-    <div className={`shrink-0 rounded-[12px] px-4 py-3 min-w-[150px] sm:min-w-[165px] border ${
-      s.direction === "up" ? "bg-emerald-50/50 border-emerald-100/50" : s.direction === "down" ? "bg-red-50/50 border-red-100/50" : "bg-gray-50/50 border-gray-100"
-    }`}>
-      <div className="flex items-center justify-between mb-1.5">
-        <span className="text-label-md font-bold text-gray-600">{s.symbol}</span>
-        {s.direction === "up" ? <ArrowUpRight size={16} className="text-emerald-500" /> :
-         s.direction === "down" ? <ArrowDownRight size={16} className="text-red-500" /> :
-         <Minus size={14} className="text-gray-400" />}
+    <div className="shrink-0 rounded-[12px] px-4 py-3 min-w-[150px] sm:min-w-[170px] bg-white border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_6px_14px_-4px_rgba(0,0,0,0.12)] transition-all hover:-translate-y-0.5 relative overflow-hidden group cursor-default">
+      {/* Decorative top accent line */}
+      <div className={`absolute top-0 left-0 w-full h-1 transition-colors ${
+        s.direction === "up" ? "bg-emerald-500" : s.direction === "down" ? "bg-red-500" : "bg-gray-300"
+      }`} />
+      
+      <div className="flex items-center justify-between mb-2 mt-0.5">
+        <span className="text-label-md font-bold text-gray-600 group-hover:text-gray-900 transition-colors">{s.symbol}</span>
+        <div className={`p-1 rounded-md transition-colors ${
+          s.direction === "up" ? "bg-emerald-50 text-emerald-600" : s.direction === "down" ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-500"
+        }`}>
+          {s.direction === "up" ? <ArrowUpRight size={14} strokeWidth={2.5} /> :
+           s.direction === "down" ? <ArrowDownRight size={14} strokeWidth={2.5} /> :
+           <Minus size={14} strokeWidth={2.5} />}
+        </div>
       </div>
-      <div className="text-title-lg font-mono font-bold text-gray-900 leading-none">{fmtPrice(s.price, s.symbol)}</div>
-      <div className="mt-1.5 flex items-center gap-2">
-        <span className={`text-label-md font-mono font-semibold ${
+      
+      <div className="text-title-lg font-mono font-bold text-gray-900 leading-none tracking-tight">{fmtPrice(s.price, s.symbol)}</div>
+      
+      <div className="mt-2.5 flex items-center gap-1.5">
+        <span className={`text-label-sm font-mono font-bold ${
           s.direction === "up" ? "text-emerald-600" : s.direction === "down" ? "text-red-600" : "text-gray-500"
-        }`}>{s.change >= 0 ? "+" : ""}{s.change.toFixed(2)}</span>
-        <span className={`text-label-sm font-mono ${
-          s.direction === "up" ? "text-emerald-500" : s.direction === "down" ? "text-red-500" : "text-gray-400"
-        }`}>({s.changePercent >= 0 ? "+" : ""}{s.changePercent.toFixed(2)}%)</span>
+        }`}>
+          {s.change >= 0 ? "+" : ""}{s.change.toFixed(2)}
+        </span>
+        <span className={`text-[11px] font-mono font-bold px-1.5 py-0.5 rounded-[4px] ${
+          s.direction === "up" ? "bg-emerald-50 text-emerald-600" : s.direction === "down" ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-500"
+        }`}>
+          {s.changePercent >= 0 ? "+" : ""}{s.changePercent.toFixed(2)}%
+        </span>
       </div>
     </div>
   );
@@ -105,7 +118,7 @@ function StockCarousel({ stocks, lastUpdate }: { stocks: StockItem[]; lastUpdate
 
   return (
     <div
-      className="bg-white border-b border-gray-100 overflow-hidden"
+      className="bg-gray-50/30 border-b border-gray-100 overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
