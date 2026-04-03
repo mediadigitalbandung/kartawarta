@@ -553,7 +553,9 @@ export default async function ArticlePage({ params, searchParams }: { params: { 
         </div>
 
         {/* Ad — Bottom full width */}
-        <BannerAd size="leaderboard" className="bg-surface-secondary" />
+        <div className="py-8">
+          <BannerAd size="leaderboard" className="bg-surface-secondary" />
+        </div>
       </div>
     </>
   );
