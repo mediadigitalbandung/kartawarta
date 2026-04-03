@@ -16,22 +16,10 @@ const sizeToSlot: Record<string, string> = {
   rectangle: "SIDEBAR",
   inline: "IN_ARTICLE",
   footer: "FOOTER",
-  floating: "FLOATING_BOTTOM",
-};
-
-const sizeStyles: Record<string, { width: string; height: string; label: string }> = {
-  leaderboard: { width: "728px", height: "90px", label: "728 × 90" },
-  banner: { width: "100%", height: "90px", label: "Responsive × 90" },
-  rectangle: { width: "300px", height: "250px", label: "300 × 250" },
-  "large-rectangle": { width: "336px", height: "280px", label: "336 × 280" },
-  inline: { width: "100%", height: "120px", label: "Responsive × 120" },
-  "native-card": { width: "100%", height: "auto", label: "Native" },
-  footer: { width: "100%", height: "90px", label: "Responsive × 90" },
-  billboard: { width: "100%", height: "250px", label: "Billboard" },
 };
 
 interface BannerAdProps {
-  size?: keyof typeof sizeStyles | "slim";
+  size?: string;
   slot?: string;
   className?: string;
   noWrapper?: boolean;
@@ -48,9 +36,7 @@ function useAd(adSlot: string) {
       .then((r) => r.json())
       .then((json) => {
         const ads: Ad[] = json.data || [];
-        if (ads.length > 0) {
-          setAd(ads[Math.floor(Math.random() * ads.length)]);
-        }
+        if (ads.length > 0) setAd(ads[Math.floor(Math.random() * ads.length)]);
       })
       .catch(() => {});
   }, [adSlot]);
@@ -74,7 +60,7 @@ function AdContent({ ad }: { ad: Ad }) {
     ad.type === "HTML" && ad.htmlCode ? (
       <div dangerouslySetInnerHTML={{ __html: ad.htmlCode }} />
     ) : ad.imageUrl ? (
-      <img src={ad.imageUrl} alt="Iklan" className="w-full h-auto block" loading="lazy" />
+      <img src={ad.imageUrl} alt="Iklan" className="w-full h-auto block rounded-sm" loading="lazy" />
     ) : null;
 
   if (!content) return null;
@@ -89,56 +75,53 @@ function AdContent({ ad }: { ad: Ad }) {
   return content;
 }
 
-function AdPlaceholder({ size = "banner", className = "" }: { size?: string; className?: string }) {
-  const s = sizeStyles[size] || sizeStyles.banner;
+function AdPlaceholder({ label = "Iklan" }: { label?: string }) {
   return (
-    <div
-      className={`flex items-center justify-center bg-surface-container-low rounded-sm ${className}`}
-      style={{ maxWidth: s.width, height: s.height, width: "100%", margin: "0 auto" }}
-    >
-      <div className="flex flex-col items-center gap-1 opacity-30">
-        <span className="text-label-sm uppercase tracking-wider text-on-surface-variant">Iklan</span>
-        <span className="text-label-sm text-on-surface-variant">{s.label}</span>
-      </div>
+    <div className="flex items-center justify-center rounded-sm bg-surface-container-low py-5">
+      <span className="text-label-sm uppercase tracking-wider text-on-surface-variant/30">{label}</span>
     </div>
   );
 }
 
+/* ── Main Banner Ad ──
+   Full-width within container-main, consistent with section spacing */
 export default function BannerAd({ size = "banner", slot, className = "", noWrapper, showPlaceholder = true }: BannerAdProps) {
   const resolvedSlot = slot || sizeToSlot[size] || "BETWEEN_SECTIONS";
   const ad = useAd(resolvedSlot);
 
-  const inner = ad ? <AdContent ad={ad} /> : showPlaceholder ? <AdPlaceholder size={size} /> : null;
-
+  const inner = ad ? <AdContent ad={ad} /> : showPlaceholder ? <AdPlaceholder /> : null;
   if (!inner) return null;
-
   if (noWrapper) return inner;
 
   return (
-    <div className={`py-4 ${className}`}>
-      <div className="container-main">
+    <div className={className}>
+      <div className="container-main py-6">
         {inner}
       </div>
     </div>
   );
 }
 
-export function SidebarAd({ slot = "SIDEBAR", size = "rectangle" }: { slot?: string; size?: string }) {
+/* ── Sidebar Ad ──
+   Fills the sidebar column width (100%) */
+export function SidebarAd({ slot = "SIDEBAR" }: { slot?: string }) {
   const ad = useAd(slot);
+
+  const wrapper = "w-full rounded-sm overflow-hidden";
 
   if (ad) {
     const content =
       ad.type === "HTML" && ad.htmlCode ? (
-        <div dangerouslySetInnerHTML={{ __html: ad.htmlCode }} className="w-full h-full" />
+        <div dangerouslySetInnerHTML={{ __html: ad.htmlCode }} className={wrapper} />
       ) : ad.imageUrl ? (
-        <img src={ad.imageUrl} alt="Iklan" className="w-full h-full object-cover block rounded-sm" loading="lazy" />
+        <img src={ad.imageUrl} alt="Iklan" className={`${wrapper} object-cover`} loading="lazy" />
       ) : null;
 
     if (!content) return null;
 
     if (ad.targetUrl) {
       return (
-        <a href={ad.targetUrl} target="_blank" rel="noopener noreferrer sponsored" onClick={() => handleClick(ad)} className="block w-full h-full">
+        <a href={ad.targetUrl} target="_blank" rel="noopener noreferrer sponsored" onClick={() => handleClick(ad)} className="block w-full">
           {content}
         </a>
       );
@@ -146,48 +129,31 @@ export function SidebarAd({ slot = "SIDEBAR", size = "rectangle" }: { slot?: str
     return content;
   }
 
-  // Placeholder
-  const s = sizeStyles[size] || sizeStyles.rectangle;
-  return (
-    <div
-      className="flex items-center justify-center bg-surface-container-low rounded-sm w-full"
-      style={{ height: s.height }}
-    >
-      <div className="flex flex-col items-center gap-1 opacity-30">
-        <span className="text-label-sm uppercase tracking-wider text-on-surface-variant">Iklan</span>
-        <span className="text-label-sm text-on-surface-variant">{s.label}</span>
-      </div>
-    </div>
-  );
+  return <AdPlaceholder label="Iklan Sidebar" />;
 }
 
+/* ── Inline Ad ──
+   Full container width, blends with content rhythm */
 export function InlineAd({ className = "" }: { className?: string }) {
   const ad = useAd("IN_ARTICLE");
 
   return (
-    <div className={`py-3 ${className}`}>
-      <div className="container-main">
-        {ad ? (
-          <AdContent ad={ad} />
-        ) : (
-          <div className="flex items-center justify-center bg-surface-container-low rounded-sm py-6">
-            <div className="flex flex-col items-center gap-1 opacity-30">
-              <span className="text-label-sm uppercase tracking-wider text-on-surface-variant">Iklan</span>
-              <span className="text-label-sm text-on-surface-variant">Sponsored Content</span>
-            </div>
-          </div>
-        )}
+    <div className={className}>
+      <div className="container-main py-6">
+        {ad ? <AdContent ad={ad} /> : <AdPlaceholder label="Sponsored Content" />}
       </div>
     </div>
   );
 }
 
+/* ── Native Ad ──
+   Card-style within content, matches article card proportions */
 export function NativeAd({ className = "" }: { className?: string }) {
   const ad = useAd("IN_ARTICLE");
 
   return (
-    <div className={`rounded-sm bg-surface-container-low p-4 ${className}`}>
-      <span className="text-label-sm uppercase tracking-wider text-on-surface-variant/50 mb-2 block">Sponsored</span>
+    <div className={`rounded-sm bg-surface-container-low p-5 ${className}`}>
+      <span className="text-label-sm uppercase tracking-wider text-on-surface-variant/40 mb-3 block">Sponsored</span>
       {ad ? (
         <AdContent ad={ad} />
       ) : (
