@@ -1,24 +1,42 @@
 import { successResponse } from "@/lib/api-utils";
 
-export const revalidate = 1800; // 30 min
+export const revalidate = 1800;
 
-// Map Google Trends to our categories
-const categoryKeywords: Record<string, string[]> = {
-  "Hukum": ["hukum", "kpk", "korupsi", "sidang", "pengadilan", "jaksa", "hakim", "polisi", "kriminal", "pidana", "perdata"],
-  "Bisnis": ["saham", "ihsg", "rupiah", "bank", "ekonomi", "bisnis", "investasi", "fintech", "startup", "emas", "bbm"],
-  "Olahraga": ["timnas", "liga", "bola", "sepak", "badminton", "moto", "gp", "olimpiade", "persib", "persija", "piala", "goal", "fc", "vs"],
-  "Hiburan": ["film", "konser", "musik", "artis", "drama", "netflix", "idol", "viral", "tiktok", "selebriti"],
-  "Kesehatan": ["covid", "vaksin", "rumah sakit", "kesehatan", "penyakit", "obat", "dokter", "bpjs"],
-  "Teknologi": ["ai", "tech", "google", "apple", "samsung", "android", "iphone", "digital", "cyber", "internet"],
-  "Politik": ["presiden", "dpr", "menteri", "pilkada", "pemilu", "partai", "pemerintah", "kebijakan"],
-  "Pendidikan": ["sekolah", "universitas", "mahasiswa", "ujian", "beasiswa", "kampus"],
-  "Lingkungan": ["banjir", "gempa", "cuaca", "iklim", "kebakaran", "tsunami", "gunung"],
+// Indonesian keywords to detect local trends
+const ID_KEYWORDS = /indonesia|jakarta|bandung|surabaya|jawa|timnas|pssi|persib|persija|liga\s?1|piala|bola|rupiah|ihsg|saham|dpr|mpr|presiden|menteri|jokowi|prabowo|kpk|polri|tni|pilkada|pemilu|gubernur|bupati|walikota|bpjs|pertamina|pln|garuda|telkom|bca|bri|mandiri|kominfo|kemenko|kemenkes|kemendikbud|mui|nu|muhammadiyah|lebaran|ramadan|idul|haji|umkm|ojk|bi\s|bank indonesia|mahkamah|sidang|hukum|korupsi|narkoba|tsunami|gempa|banjir|bmkg|gunung|merapi|cuaca|kebakaran|hutan/i;
+
+// Known international/irrelevant keywords to exclude
+const INTL_KEYWORDS = /nba|nfl|premier league|champions league|la liga|bundesliga|serie a|ligue 1|cricket|ipl|nhl|mlb|trump|biden|putin|ukraine|russia|china|israel|palestine|gaza|nato|eu\b|brexit|elon musk|tesla|spacex|nasa|oscar|grammy|emmy|super bowl|world cup|euro 2|copa america|wimbledon|us open|australian open|french open|bollywood|hollywood|kpop|blackpink|bts\b|taylor swift|drake|beyonce|kanye|kardashian|royal family|king charles|pope|vatican|olympics 20|fifa|uefa|afc asian|nba draft|f1 grand prix|formula 1|motogp (?!mandalika)|ufc\b|wwe\b|boxing|pga|lpga|masters|super league|eredivisie|antwerp|ried|lueders|macau|khaleej|kholood|al-|fc\b(?!.*indonesia)/i;
+
+function isIndonesianTrend(tag: string): boolean {
+  // If it matches Indonesian keywords, keep it
+  if (ID_KEYWORDS.test(tag)) return true;
+  // If it matches international keywords, reject it
+  if (INTL_KEYWORDS.test(tag)) return false;
+  // Short generic terms (1-2 words, all latin) are likely international
+  const words = tag.trim().split(/\s+/);
+  if (words.length <= 2 && /^[a-z\s]+$/i.test(tag)) return false;
+  // If contains Indonesian words, keep
+  if (/yang|dan|dari|untuk|dengan|dalam|ini|itu|baru|hari|kasus|soal|tentang/i.test(tag)) return true;
+  // Default: keep if 3+ words
+  return words.length >= 3;
+}
+
+// Category detection
+const CAT_KEYWORDS: Record<string, RegExp> = {
+  "Hukum": /hukum|kpk|korupsi|sidang|pengadilan|jaksa|hakim|polisi|kriminal|pidana|perdata|mahkamah/i,
+  "Bisnis": /saham|ihsg|rupiah|bank|ekonomi|bisnis|investasi|fintech|startup|emas|bbm|pertamina|ojk/i,
+  "Olahraga": /timnas|liga|bola|sepak|badminton|moto|gp|olimpiade|persib|persija|piala|pssi|atlet/i,
+  "Hiburan": /film|konser|musik|artis|drama|netflix|idol|viral|tiktok|selebriti|dangdut/i,
+  "Kesehatan": /covid|vaksin|rumah sakit|kesehatan|penyakit|obat|dokter|bpjs|stunting/i,
+  "Teknologi": /ai\b|tech|google|apple|samsung|android|iphone|digital|cyber|internet|satelit|5g/i,
+  "Politik": /presiden|dpr|menteri|pilkada|pemilu|partai|pemerintah|kebijakan|gubernur|jokowi|prabowo/i,
+  "Lingkungan": /banjir|gempa|cuaca|iklim|kebakaran|tsunami|gunung|bmkg|deforestasi/i,
 };
 
 function categorize(tag: string): string | null {
-  const lower = tag.toLowerCase();
-  for (const [cat, keywords] of Object.entries(categoryKeywords)) {
-    if (keywords.some((k) => lower.includes(k))) return cat;
+  for (const [cat, re] of Object.entries(CAT_KEYWORDS)) {
+    if (re.test(tag)) return cat;
   }
   return null;
 }
@@ -40,22 +58,23 @@ export async function GET() {
     }
 
     const rawTrends = itemTitles
-      .slice(0, 25)
-      .map((t) => t.replace(/<item>\s*<title>/, "").replace(/<\/title>/, "").replace(/&amp;/g, "&").replace(/&apos;/g, "'").trim())
+      .map((t) => t.replace(/<item>\s*<title>/, "").replace(/<\/title>/, "")
+        .replace(/&amp;/g, "&").replace(/&apos;/g, "'").replace(/&quot;/g, '"').trim())
       .filter((t) => t.length > 0 && t.length <= 40);
 
-    if (rawTrends.length === 0) return successResponse(getFallbackTags());
+    // Filter: only Indonesian trends
+    const filtered = rawTrends.filter(isIndonesianTrend);
 
-    // Tag with category if possible
-    const tags = rawTrends.slice(0, 15).map((label, i) => {
-      const cat = categorize(label);
-      return {
-        label,
-        category: cat,
-        href: `/search?q=${encodeURIComponent(label)}`,
-        hot: i < 3,
-      };
-    });
+    // If not enough Indonesian trends, pad with fallback
+    const final = filtered.length >= 5 ? filtered : [...filtered, ...getFallbackTags().map((t) => t.label)];
+    const unique = Array.from(new Set(final));
+
+    const tags = unique.slice(0, 15).map((label, i) => ({
+      label,
+      category: categorize(label),
+      href: `/search?q=${encodeURIComponent(label)}`,
+      hot: i < 3,
+    }));
 
     return successResponse(tags);
   } catch {
@@ -69,13 +88,13 @@ function getFallbackTags() {
     { label: "Timnas Indonesia", category: "Olahraga", href: "/search?q=timnas+indonesia", hot: true },
     { label: "IHSG Hari Ini", category: "Bisnis", href: "/search?q=IHSG", hot: true },
     { label: "Harga BBM", category: "Bisnis", href: "/search?q=harga+bbm", hot: false },
-    { label: "KPK Tangkap Tersangka", category: "Hukum", href: "/search?q=KPK", hot: false },
+    { label: "KPK", category: "Hukum", href: "/search?q=KPK", hot: false },
     { label: "Kurs Rupiah", category: "Bisnis", href: "/search?q=kurs+rupiah", hot: false },
-    { label: "ChatGPT", category: "Teknologi", href: "/search?q=chatgpt", hot: false },
     { label: "Liga 1 Indonesia", category: "Olahraga", href: "/search?q=liga+1", hot: false },
     { label: "Harga Emas", category: "Bisnis", href: "/search?q=harga+emas", hot: false },
     { label: "IKN Nusantara", category: "Politik", href: "/search?q=IKN", hot: false },
+    { label: "Cuaca Ekstrem", category: "Lingkungan", href: "/search?q=cuaca+ekstrem", hot: false },
     { label: "Film Indonesia", category: "Hiburan", href: "/search?q=film+indonesia", hot: false },
-    { label: "Cuaca Ekstrem BMKG", category: "Lingkungan", href: "/search?q=cuaca+ekstrem", hot: false },
+    { label: "BPJS Kesehatan", category: "Kesehatan", href: "/search?q=BPJS", hot: false },
   ];
 }

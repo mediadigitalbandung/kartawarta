@@ -101,7 +101,7 @@ function StockCarousel({ stocks, lastUpdate }: { stocks: StockItem[]; lastUpdate
   if (stocks.length === 0) return null;
 
   // Total animation duration based on number of cards
-  const duration = stocks.length * 3; // ~3s per card
+  const duration = stocks.length * 15; // slow: ~15s per card
 
   return (
     <div
@@ -159,7 +159,7 @@ export default function NewsTicker() {
 
   // Trending: duplicate for CSS infinite scroll
   const looped = trendingItems.length > 0 ? [...trendingItems, ...trendingItems] : [];
-  const trendDuration = Math.max(trendingItems.length * 2, 15); // ~2s per tag
+  const trendDuration = Math.max(trendingItems.length * 10, 60); // slow: ~10s per tag
 
   return (
     <>
