@@ -183,11 +183,11 @@ export default function NewsTicker() {
 
       {/* ═══ TRENDING INDONESIA ═══ */}
       {looped.length > 0 && (
-        <div className="bg-surface-container-lowest overflow-hidden">
-          <div className="flex items-center py-2.5">
-            <div className="shrink-0 flex items-center gap-2 px-4 sm:px-6 z-10 bg-surface-container-lowest">
+        <div className="bg-primary border-b border-[#001530] overflow-hidden">
+          <div className="flex items-center py-2.5 relative">
+            <div className="shrink-0 flex items-center gap-2 px-4 sm:px-6 z-10 bg-primary shadow-[8px_0_12px_-2px_#002045]">
               <span className="h-2 w-2 rounded-full bg-secondary animate-pulse shrink-0" />
-              <span className="text-label-md font-bold tracking-widest text-secondary uppercase whitespace-nowrap">
+              <span className="text-label-md font-bold tracking-widest text-white uppercase whitespace-nowrap">
                 Trending
               </span>
             </div>
@@ -202,14 +202,14 @@ export default function NewsTicker() {
                 <div className="flex items-center">
                   {trendingItems.map((item, i) => (
                     <Link key={`a-${i}`} href={item.href}
-                      className="mx-3 sm:mx-5 inline-flex items-center gap-2 text-body-md font-medium text-on-surface/60 hover:text-primary whitespace-nowrap transition-colors">
+                      className="mx-3 sm:mx-5 inline-flex items-center gap-2 text-body-md font-medium text-white/80 hover:text-white whitespace-nowrap transition-colors">
                       {item.hot && (
                         <span className="inline-flex items-center rounded-sm bg-secondary px-1.5 py-0.5 text-[9px] font-bold text-white tracking-wider">HOT</span>
                       )}
                       {item.category && (
-                        <span className="text-label-sm font-bold text-primary/60 uppercase tracking-wider">{item.category}</span>
+                        <span className="text-label-sm font-bold text-blue-200/80 uppercase tracking-wider">{item.category}</span>
                       )}
-                      <span className="h-1 w-1 rounded-full bg-on-surface-variant/20 shrink-0" />
+                      <span className="h-1 w-1 rounded-full bg-white/20 shrink-0" />
                       {item.title}
                     </Link>
                   ))}
@@ -218,14 +218,14 @@ export default function NewsTicker() {
                 <div className="flex items-center">
                   {trendingItems.map((item, i) => (
                     <Link key={`b-${i}`} href={item.href}
-                      className="mx-3 sm:mx-5 inline-flex items-center gap-2 text-body-md font-medium text-on-surface/60 hover:text-primary whitespace-nowrap transition-colors">
+                      className="mx-3 sm:mx-5 inline-flex items-center gap-2 text-body-md font-medium text-white/80 hover:text-white whitespace-nowrap transition-colors">
                       {item.hot && (
                         <span className="inline-flex items-center rounded-sm bg-secondary px-1.5 py-0.5 text-[9px] font-bold text-white tracking-wider">HOT</span>
                       )}
                       {item.category && (
-                        <span className="text-label-sm font-bold text-primary/60 uppercase tracking-wider">{item.category}</span>
+                        <span className="text-label-sm font-bold text-blue-200/80 uppercase tracking-wider">{item.category}</span>
                       )}
-                      <span className="h-1 w-1 rounded-full bg-on-surface-variant/20 shrink-0" />
+                      <span className="h-1 w-1 rounded-full bg-white/20 shrink-0" />
                       {item.title}
                     </Link>
                   ))}
