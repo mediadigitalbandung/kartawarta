@@ -79,7 +79,7 @@ export default function RiwayatReviewPage() {
   if (sessionStatus === "loading" || (session && !EDITOR_ROLES.includes(userRole))) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-goto-green border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     );
   }
@@ -88,7 +88,7 @@ export default function RiwayatReviewPage() {
     <div>
       <div className="mb-6">
         <div className="flex items-center gap-2">
-          <ClipboardCheck size={24} className="text-goto-green" />
+          <ClipboardCheck size={24} className="text-primary" />
           <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">Riwayat Review</h1>
         </div>
         <p className="text-sm text-txt-secondary mt-1">
@@ -120,7 +120,7 @@ export default function RiwayatReviewPage() {
               onClick={() => setFilterStatus(opt.value)}
               className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                 filterStatus === opt.value
-                  ? "bg-goto-green text-white"
+                  ? "bg-primary text-white"
                   : "bg-surface-tertiary text-txt-secondary hover:bg-border"
               }`}
             >
@@ -187,7 +187,7 @@ export default function RiwayatReviewPage() {
                         <span
                           className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
                             isApproved
-                              ? "bg-goto-light text-goto-green"
+                              ? "bg-primary-light text-primary"
                               : isRejected
                                 ? "bg-red-50 text-red-600"
                                 : "bg-surface-tertiary text-txt-secondary"

@@ -22,8 +22,8 @@ function AdSlotBox({ label, spec, type, imageUrl, htmlCode }: {
   label: string; spec: { height: number; ratio: string }; type: string; imageUrl: string; htmlCode: string;
 }) {
   return (
-    <div className="relative border-2 border-dashed border-goto-green/40 rounded-lg overflow-hidden bg-surface">
-      <div className="absolute top-1 left-2 z-10 rounded bg-goto-green/90 px-2 py-0.5 text-[10px] font-bold text-white">
+    <div className="relative border-2 border-dashed border-primary/40 rounded-lg overflow-hidden bg-surface">
+      <div className="absolute top-1 left-2 z-10 rounded bg-primary/90 px-2 py-0.5 text-[10px] font-bold text-white">
         IKLAN — {label}
       </div>
       <div className="flex items-center justify-center" style={{ minHeight: spec.height }}>
@@ -80,7 +80,7 @@ export default function AdPreviewOverlay({ slot, imageUrl, htmlCode, type, targe
           )}
           {targetUrl && (
             <p className="mt-3 text-center text-xs text-txt-muted">
-              Klik mengarah ke: <span className="text-goto-green font-medium">{targetUrl}</span>
+              Klik mengarah ke: <span className="text-primary font-medium">{targetUrl}</span>
             </p>
           )}
         </div>

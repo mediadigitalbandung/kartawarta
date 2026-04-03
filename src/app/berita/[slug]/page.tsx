@@ -296,9 +296,9 @@ export default async function ArticlePage({ params, searchParams }: { params: { 
         <div className="container-main py-8 overflow-hidden">
           {/* Breadcrumb */}
           <nav className="mb-6 flex items-center gap-2 text-sm text-txt-secondary" aria-label="Breadcrumb">
-            <Link href="/" className="transition-colors hover:text-goto-green">Beranda</Link>
+            <Link href="/" className="transition-colors hover:text-primary">Beranda</Link>
             <span>&gt;</span>
-            <Link href={`/kategori/${article.category.slug}`} className="transition-colors hover:text-goto-green">
+            <Link href={`/kategori/${article.category.slug}`} className="transition-colors hover:text-primary">
               {article.category.name}
             </Link>
             <span>&gt;</span>
@@ -321,12 +321,12 @@ export default async function ArticlePage({ params, searchParams }: { params: { 
               <div className="mb-4 flex items-center gap-3">
                 <Link
                   href={`/kategori/${article.category.slug}`}
-                  className="text-xs font-bold uppercase tracking-wide text-goto-green hover:underline"
+                  className="text-xs font-bold uppercase tracking-wide text-primary hover:underline"
                 >
                   {article.category.name}
                 </Link>
                 {article.verificationLabel === "VERIFIED" && (
-                  <span className="flex items-center gap-1 text-xs font-medium text-goto-green">
+                  <span className="flex items-center gap-1 text-xs font-medium text-primary">
                     <CheckCircle size={12} /> Terverifikasi
                   </span>
                 )}
@@ -423,7 +423,7 @@ export default async function ArticlePage({ params, searchParams }: { params: { 
                         href={`/berita/${params.slug}${i === 0 ? "" : `?page=${i + 1}`}`}
                         className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold transition-colors ${
                           currentPage === i + 1
-                            ? "bg-goto-green text-white"
+                            ? "bg-primary text-white"
                             : "hover:bg-surface-tertiary text-txt-secondary"
                         }`}
                       >
@@ -481,7 +481,7 @@ export default async function ArticlePage({ params, searchParams }: { params: { 
                   <Link
                     key={tag.slug}
                     href={`/tag/${tag.slug}`}
-                    className="text-xs font-medium text-goto-green border border-border rounded px-2 py-1 hover:bg-surface-secondary transition-colors"
+                    className="text-xs font-medium text-primary border border-border rounded px-2 py-1 hover:bg-surface-secondary transition-colors"
                   >
                     #{tag.name}
                   </Link>
@@ -504,18 +504,18 @@ export default async function ArticlePage({ params, searchParams }: { params: { 
               {/* Author box */}
               <div id="author" className="mt-8 rounded-[12px] border border-border bg-surface p-6 shadow-card">
                 <div className="flex gap-5">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-goto-green text-xl font-bold text-white">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-xl font-bold text-white">
                     {article.author.name.charAt(0)}
                   </div>
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-txt-primary">{article.author.name}</h3>
-                    <p className="text-sm text-goto-green font-medium">Jurnalis</p>
+                    <p className="text-sm text-primary font-medium">Jurnalis</p>
                     <p className="mt-2 text-sm leading-relaxed text-txt-secondary">
                       {article.author.bio}
                     </p>
                     <Link
                       href={`/penulis/${slugify(article.author.name)}`}
-                      className="mt-3 inline-block text-sm font-medium text-goto-green transition-colors hover:text-goto-dark"
+                      className="mt-3 inline-block text-sm font-medium text-primary transition-colors hover:text-primary-dark"
                     >
                       Lihat semua artikel &rarr;
                     </Link>
@@ -532,8 +532,8 @@ export default async function ArticlePage({ params, searchParams }: { params: { 
               {relatedArticles.length > 0 && (
                 <section className="mt-10">
                   <div className="flex items-center justify-between mb-5">
-                    <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">Artikel Terkait</h2>
-                    <Link href={`/kategori/${article.category.slug}`} className="text-sm font-medium text-goto-green hover:underline">
+                    <h2 className="border-l-[3px] border-primary pl-3 text-lg font-bold text-txt-primary">Artikel Terkait</h2>
+                    <Link href={`/kategori/${article.category.slug}`} className="text-sm font-medium text-primary hover:underline">
                       Lihat Lainnya &rarr;
                     </Link>
                   </div>

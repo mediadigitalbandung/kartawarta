@@ -83,7 +83,7 @@ export default function SearchableArticleList({ articles, categoryName }: Search
               onClick={() => setSortBy(s)}
               className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
                 sortBy === s
-                  ? "bg-goto-green text-white"
+                  ? "bg-primary text-white"
                   : "bg-surface-secondary text-txt-secondary hover:bg-surface-tertiary"
               }`}
             >
@@ -120,7 +120,7 @@ export default function SearchableArticleList({ articles, categoryName }: Search
             {/* Content */}
             <div className="flex-1 min-w-0">
               <Link href={`/berita/${article.slug}`}>
-                <h3 className="text-sm sm:text-base font-bold text-txt-primary leading-snug line-clamp-2 group-hover:text-goto-green transition-colors">
+                <h3 className="text-sm sm:text-base font-bold text-txt-primary leading-snug line-clamp-2 group-hover:text-primary transition-colors">
                   {article.title}
                 </h3>
               </Link>
@@ -130,7 +130,7 @@ export default function SearchableArticleList({ articles, categoryName }: Search
                 </p>
               )}
               <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[11px] text-txt-muted">
-                <span className="text-goto-green font-semibold">{article.category.name}</span>
+                <span className="text-primary font-semibold">{article.category.name}</span>
                 <span className="h-2.5 w-px bg-border" />
                 <span>{article.author.name}</span>
                 <span className="h-2.5 w-px bg-border" />
@@ -159,7 +159,7 @@ export default function SearchableArticleList({ articles, categoryName }: Search
           <button
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-goto-green hover:text-goto-green disabled:opacity-30 disabled:hover:border-border disabled:hover:text-txt-primary"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-primary hover:text-primary disabled:opacity-30 disabled:hover:border-border disabled:hover:text-txt-primary"
           >
             <ChevronLeft size={16} />
             Sebelumnya
@@ -170,7 +170,7 @@ export default function SearchableArticleList({ articles, categoryName }: Search
           <button
             onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={page === totalPages - 1}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-goto-green hover:text-goto-green disabled:opacity-30 disabled:hover:border-border disabled:hover:text-txt-primary"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-primary hover:text-primary disabled:opacity-30 disabled:hover:border-border disabled:hover:text-txt-primary"
           >
             Selanjutnya
             <ChevronRight size={16} />

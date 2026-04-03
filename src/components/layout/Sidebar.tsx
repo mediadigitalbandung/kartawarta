@@ -30,7 +30,7 @@ function formatTime(dateStr: string): string {
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="border-l-[3px] border-goto-green pl-3 text-sm font-bold uppercase tracking-wide text-txt-primary">
+    <h3 className="border-l-[3px] border-primary pl-3 text-sm font-bold uppercase tracking-wide text-txt-primary">
       {children}
     </h3>
   );
@@ -44,7 +44,7 @@ export default function Sidebar({ trending = [], recent = [], popular = [] }: Si
         <div>
           <div className="flex items-center justify-between">
             <SectionTitle>Trending</SectionTitle>
-            <Link href="/search?q=trending" className="text-xs font-medium text-goto-green hover:underline">
+            <Link href="/search?q=trending" className="text-xs font-medium text-primary hover:underline">
               Lihat Lainnya &rarr;
             </Link>
           </div>
@@ -56,7 +56,7 @@ export default function Sidebar({ trending = [], recent = [], popular = [] }: Si
                   i < trending.length - 1 ? "border-b border-border" : ""
                 }`}
               >
-                <span className="shrink-0 text-2xl font-extrabold leading-none text-goto-green/20">
+                <span className="shrink-0 text-2xl font-extrabold leading-none text-primary/20">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <div className="flex-1">

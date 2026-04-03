@@ -77,7 +77,7 @@ type NotifIconType = "article_rejected" | "article_in_review" | "article_approve
 const NOTIF_ICON_MAP: Record<NotifIconType, { icon: React.ElementType; bg: string; color: string }> = {
   article_rejected: { icon: XCircle, bg: "bg-red-50", color: "text-red-500" },
   article_in_review: { icon: ClipboardCheck, bg: "bg-yellow-50", color: "text-yellow-500" },
-  article_approved: { icon: CheckCircle, bg: "bg-green-50", color: "text-goto-green" },
+  article_approved: { icon: CheckCircle, bg: "bg-green-50", color: "text-primary" },
   article_published: { icon: CheckCircle, bg: "bg-blue-50", color: "text-blue-500" },
   default: { icon: Bell, bg: "bg-zinc-800", color: "text-zinc-400" },
 };
@@ -158,7 +158,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   if (status === "loading") {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-goto-green border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     );
   }
@@ -224,7 +224,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
               className={cn(
                 "flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium transition-colors",
                 isActive
-                  ? "bg-goto-green/15 text-goto-green"
+                  ? "bg-primary/15 text-primary"
                   : "text-white/60 hover:text-white hover:bg-white/5"
               )}
             >
@@ -338,7 +338,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
                     {unreadCount > 0 && (
                       <button
                         onClick={markAllRead}
-                        className="text-xs font-medium text-goto-green hover:text-goto-dark transition-colors"
+                        className="text-xs font-medium text-primary hover:text-primary-dark transition-colors"
                       >
                         Tandai semua dibaca
                       </button>
@@ -366,7 +366,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
                             }}
                             className={cn(
                               "flex items-start gap-3 px-4 py-3 hover:bg-surface-secondary transition-colors border-b border-border last:border-b-0",
-                              !notif.isRead && "bg-goto-50/50"
+                              !notif.isRead && "bg-primary-50/50"
                             )}
                           >
                             <div className={cn("flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full", config.bg)}>
@@ -376,7 +376,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
                               <div className="flex items-center gap-2">
                                 <p className="text-sm font-semibold text-txt-primary truncate">{notif.title}</p>
                                 {!notif.isRead && (
-                                  <span className="h-2 w-2 rounded-full bg-goto-green flex-shrink-0" />
+                                  <span className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />
                                 )}
                               </div>
                               <p className="text-xs text-txt-secondary mt-0.5 line-clamp-2">{notif.message}</p>

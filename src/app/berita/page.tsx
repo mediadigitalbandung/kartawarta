@@ -106,7 +106,7 @@ export default async function BeritaPage({ searchParams }: PageProps) {
         {/* Header */}
         <div className="mb-6">
           <h1 className="flex items-center gap-3 text-xl font-bold text-txt-primary sm:text-2xl lg:text-3xl">
-            <span className="block h-7 w-[3px] rounded-full bg-goto-green" />
+            <span className="block h-7 w-[3px] rounded-full bg-primary" />
             Semua Berita
           </h1>
           <p className="mt-2 text-sm text-txt-secondary">
@@ -139,7 +139,7 @@ export default async function BeritaPage({ searchParams }: PageProps) {
                   href={buildUrl({ sort: "latest", page: 1 })}
                   className={`px-3 py-1.5 text-xs font-medium transition-colors ${
                     sort === "latest"
-                      ? "bg-goto-green text-white"
+                      ? "bg-primary text-white"
                       : "bg-surface text-txt-secondary hover:bg-surface-tertiary"
                   }`}
                 >
@@ -149,7 +149,7 @@ export default async function BeritaPage({ searchParams }: PageProps) {
                   href={buildUrl({ sort: "popular", page: 1 })}
                   className={`px-3 py-1.5 text-xs font-medium transition-colors ${
                     sort === "popular"
-                      ? "bg-goto-green text-white"
+                      ? "bg-primary text-white"
                       : "bg-surface text-txt-secondary hover:bg-surface-tertiary"
                   }`}
                 >
@@ -164,7 +164,7 @@ export default async function BeritaPage({ searchParams }: PageProps) {
                 href={buildUrl({ category: "all", page: 1 })}
                 className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
                   categorySlug === "all"
-                    ? "bg-goto-green text-white"
+                    ? "bg-primary text-white"
                     : "bg-surface text-txt-secondary hover:bg-surface-tertiary border border-border"
                 }`}
               >
@@ -176,7 +176,7 @@ export default async function BeritaPage({ searchParams }: PageProps) {
                   href={buildUrl({ category: cat.slug, page: 1 })}
                   className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
                     categorySlug === cat.slug
-                      ? "bg-goto-green text-white"
+                      ? "bg-primary text-white"
                       : "bg-surface text-txt-secondary hover:bg-surface-tertiary border border-border"
                   }`}
                 >
@@ -209,7 +209,7 @@ export default async function BeritaPage({ searchParams }: PageProps) {
             {page > 1 ? (
               <Link
                 href={buildUrl({ page: page - 1 })}
-                className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-goto-green hover:text-goto-green"
+                className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-primary hover:text-primary"
               >
                 <ChevronLeft size={16} />
                 <span className="hidden sm:inline">Sebelumnya</span>
@@ -242,7 +242,7 @@ export default async function BeritaPage({ searchParams }: PageProps) {
                   href={buildUrl({ page: p })}
                   className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium transition-colors ${
                     p === page
-                      ? "bg-goto-green text-white"
+                      ? "bg-primary text-white"
                       : "text-txt-secondary hover:bg-surface-secondary"
                   }`}
                 >
@@ -268,7 +268,7 @@ export default async function BeritaPage({ searchParams }: PageProps) {
             {page < totalPages ? (
               <Link
                 href={buildUrl({ page: page + 1 })}
-                className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-goto-green hover:text-goto-green"
+                className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-primary hover:text-primary"
               >
                 <span className="hidden sm:inline">Selanjutnya</span>
                 <ChevronRight size={16} />

@@ -19,7 +19,7 @@ export default async function RedaksiPage() {
       <div className="container-main py-12">
         <div className="mx-auto max-w-3xl">
           <h1 className="flex items-center gap-3 text-xl font-bold text-txt-primary sm:text-2xl lg:text-3xl">
-            <span className="block h-8 w-[3px] rounded-full bg-goto-green" />
+            <span className="block h-8 w-[3px] rounded-full bg-primary" />
             Susunan Redaksi
           </h1>
 
@@ -39,7 +39,7 @@ export default async function RedaksiPage() {
                   key={item.id}
                   className="flex items-center gap-4 rounded-[12px] border border-border bg-surface p-5"
                 >
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-goto-green text-lg font-bold text-white overflow-hidden">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-white overflow-hidden">
                     {item.photo ? (
                       <img src={item.photo} alt={item.name} className="h-12 w-12 object-cover" />
                     ) : (
@@ -47,7 +47,7 @@ export default async function RedaksiPage() {
                     )}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-goto-green">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-primary">
                       {item.position}
                     </p>
                     <p className="font-bold text-txt-primary">{item.name}</p>
@@ -62,7 +62,7 @@ export default async function RedaksiPage() {
             <p className="text-sm text-txt-muted">
               Susunan redaksi ini akan diperbarui seiring dengan perkembangan organisasi.
               Untuk informasi lebih lanjut, silakan hubungi{" "}
-              <a href="mailto:redaksi@kartawarta.com" className="text-goto-green hover:underline">
+              <a href="mailto:redaksi@kartawarta.com" className="text-primary hover:underline">
                 redaksi@kartawarta.com
               </a>
             </p>

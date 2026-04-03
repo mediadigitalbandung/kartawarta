@@ -153,7 +153,7 @@ export default function IklanPage() {
               <p className="mt-1 text-lg sm:text-2xl font-bold text-txt-primary">{totalImpressions.toLocaleString("id-ID")}</p>
             </div>
             <div className="rounded-[12px] border border-border bg-surface p-4 shadow-card">
-              <div className="flex items-center gap-2 text-sm text-txt-secondary"><MousePointer size={16} className="text-goto-green" /> Total Klik</div>
+              <div className="flex items-center gap-2 text-sm text-txt-secondary"><MousePointer size={16} className="text-primary" /> Total Klik</div>
               <p className="mt-1 text-lg sm:text-2xl font-bold text-txt-primary">{totalClicks.toLocaleString("id-ID")}</p>
             </div>
             <div className="rounded-[12px] border border-border bg-surface p-4 shadow-card">
@@ -197,7 +197,7 @@ export default function IklanPage() {
                         <td className="hidden sm:table-cell px-5 py-4 text-sm text-txt-secondary">{ad.clicks.toLocaleString("id-ID")}</td>
                         <td className="hidden lg:table-cell px-5 py-4 text-sm font-bold text-txt-primary">{ctr}</td>
                         <td className="px-3 sm:px-5 py-4">
-                          <span className={`inline-flex items-center gap-1 rounded-full px-3 py-0.5 text-sm font-medium ${ad.isActive ? "bg-goto-light text-goto-green" : "bg-red-50 text-red-600"}`}>
+                          <span className={`inline-flex items-center gap-1 rounded-full px-3 py-0.5 text-sm font-medium ${ad.isActive ? "bg-primary-light text-primary" : "bg-red-50 text-red-600"}`}>
                             <Power size={10} /> {ad.isActive ? "Aktif" : "Nonaktif"}
                           </span>
                         </td>

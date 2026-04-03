@@ -67,7 +67,7 @@ export default async function TagPage({ params, searchParams }: PageProps) {
       <div className="container-main py-8">
         {/* Breadcrumb */}
         <nav className="mb-6 flex items-center gap-2 text-sm text-txt-secondary">
-          <Link href="/" className="transition-colors hover:text-goto-green">Beranda</Link>
+          <Link href="/" className="transition-colors hover:text-primary">Beranda</Link>
           <span>&gt;</span>
           <span className="text-txt-muted">Tag</span>
           <span>&gt;</span>
@@ -77,7 +77,7 @@ export default async function TagPage({ params, searchParams }: PageProps) {
         {/* Header */}
         <div className="mb-6">
           <h1 className="flex items-center gap-3 text-xl font-bold text-txt-primary sm:text-2xl lg:text-3xl">
-            <Hash size={24} className="text-goto-green" />
+            <Hash size={24} className="text-primary" />
             Tag: #{tag.name}
           </h1>
           <p className="mt-2 text-sm text-txt-secondary">
@@ -99,7 +99,7 @@ export default async function TagPage({ params, searchParams }: PageProps) {
           <div className="py-16 text-center">
             <Hash size={48} className="mx-auto text-border" />
             <p className="mt-4 text-txt-secondary">Belum ada berita dengan tag ini</p>
-            <Link href="/" className="mt-4 inline-block text-sm font-medium text-goto-green hover:underline">
+            <Link href="/" className="mt-4 inline-block text-sm font-medium text-primary hover:underline">
               Kembali ke Beranda
             </Link>
           </div>
@@ -114,7 +114,7 @@ export default async function TagPage({ params, searchParams }: PageProps) {
             {page > 1 ? (
               <Link
                 href={`/tag/${params.slug}?page=${page - 1}`}
-                className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-goto-green hover:text-goto-green"
+                className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-primary hover:text-primary"
               >
                 <ChevronLeft size={16} />
                 <span className="hidden sm:inline">Sebelumnya</span>
@@ -144,7 +144,7 @@ export default async function TagPage({ params, searchParams }: PageProps) {
                   href={`/tag/${params.slug}?page=${p}`}
                   className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium transition-colors ${
                     p === page
-                      ? "bg-goto-green text-white"
+                      ? "bg-primary text-white"
                       : "text-txt-secondary hover:bg-surface-secondary"
                   }`}
                 >
@@ -167,7 +167,7 @@ export default async function TagPage({ params, searchParams }: PageProps) {
             {page < totalPages ? (
               <Link
                 href={`/tag/${params.slug}?page=${page + 1}`}
-                className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-goto-green hover:text-goto-green"
+                className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-primary hover:text-primary"
               >
                 <span className="hidden sm:inline">Selanjutnya</span>
                 <ChevronRight size={16} />

@@ -98,14 +98,14 @@ export default function PopularCarousel({ items }: PopularCarouselProps) {
                     <div className="h-full w-full bg-surface-tertiary" />
                   )}
                   {/* Rank number overlay */}
-                  <div className="absolute bottom-0 left-0 flex h-10 w-10 items-center justify-center bg-goto-green">
+                  <div className="absolute bottom-0 left-0 flex h-10 w-10 items-center justify-center bg-primary">
                     <span className="text-lg font-extrabold text-white">{i + 1}</span>
                   </div>
                 </div>
               </Link>
                 {/* Content */}
                 <div className="mt-2">
-                  <span className="text-[11px] font-bold uppercase tracking-wide text-goto-green">
+                  <span className="text-[11px] font-bold uppercase tracking-wide text-primary">
                     {article.category.name}
                   </span>
                   <Link href={`/berita/${article.slug}`}>

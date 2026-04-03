@@ -7,7 +7,7 @@ export default function NotFound() {
       <div className="container-main py-16 text-center">
         {/* 404 illustration */}
         <div className="mb-8">
-          <span className="text-8xl font-extrabold text-goto-green/20 sm:text-9xl select-none">404</span>
+          <span className="text-8xl font-extrabold text-primary/20 sm:text-9xl select-none">404</span>
         </div>
 
         <h1 className="text-2xl font-bold text-txt-primary sm:text-3xl">

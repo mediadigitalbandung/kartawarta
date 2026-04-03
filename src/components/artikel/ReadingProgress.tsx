@@ -48,7 +48,7 @@ export default function ReadingProgress() {
       aria-label="Progres membaca artikel"
     >
       <div
-        className="h-full bg-goto-green transition-[width] duration-150 ease-out"
+        className="h-full bg-primary transition-[width] duration-150 ease-out"
         style={{ width: `${progress}%` }}
       />
     </div>

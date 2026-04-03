@@ -42,7 +42,7 @@ export default function KontakPage() {
       <div className="container-main py-12">
         <div className="mx-auto max-w-4xl">
           <h1 className="flex items-center gap-3 text-xl font-bold text-txt-primary sm:text-2xl lg:text-3xl">
-            <span className="block h-8 w-[3px] rounded-full bg-goto-green" />
+            <span className="block h-8 w-[3px] rounded-full bg-primary" />
             Hubungi Kami
           </h1>
 
@@ -50,21 +50,21 @@ export default function KontakPage() {
             {/* Contact info */}
             <div className="space-y-4">
               <div className="rounded-[12px] border border-border bg-surface p-5">
-                <MapPin size={20} className="text-goto-green" />
+                <MapPin size={20} className="text-primary" />
                 <h3 className="mt-2 font-bold text-txt-primary">Alamat</h3>
                 <p className="mt-1 text-sm text-txt-secondary">
                   Bandung, Jawa Barat<br />Indonesia
                 </p>
               </div>
               <div className="rounded-[12px] border border-border bg-surface p-5">
-                <Mail size={20} className="text-goto-green" />
+                <Mail size={20} className="text-primary" />
                 <h3 className="mt-2 font-bold text-txt-primary">Email</h3>
                 <p className="mt-1 text-sm text-txt-secondary">
                   redaksi@kartawarta.com
                 </p>
               </div>
               <div className="rounded-[12px] border border-border bg-surface p-5">
-                <Phone size={20} className="text-goto-green" />
+                <Phone size={20} className="text-primary" />
                 <h3 className="mt-2 font-bold text-txt-primary">Telepon</h3>
                 <p className="mt-1 text-sm text-txt-secondary">
                   Hubungi via email
@@ -75,18 +75,18 @@ export default function KontakPage() {
             {/* Contact form */}
             <div className="md:col-span-2">
               {sent ? (
-                <div className="flex h-full items-center justify-center rounded-[12px] border border-goto-green/20 bg-goto-light p-8 text-center">
+                <div className="flex h-full items-center justify-center rounded-[12px] border border-primary/20 bg-primary-light p-8 text-center">
                   <div>
-                    <Send size={40} className="mx-auto text-goto-green" />
-                    <h3 className="mt-4 text-lg font-bold text-goto-dark">
+                    <Send size={40} className="mx-auto text-primary" />
+                    <h3 className="mt-4 text-lg font-bold text-primary-dark">
                       Pesan Terkirim!
                     </h3>
-                    <p className="mt-2 text-sm text-goto-green">
+                    <p className="mt-2 text-sm text-primary">
                       Terima kasih telah menghubungi kami. Tim redaksi akan merespons dalam 1-2 hari kerja.
                     </p>
                     <button
                       onClick={() => { setSent(false); setFormData({ name: "", email: "", subject: "", message: "" }); }}
-                      className="mt-4 text-sm text-goto-green hover:underline"
+                      className="mt-4 text-sm text-primary hover:underline"
                     >
                       Kirim pesan lagi
                     </button>

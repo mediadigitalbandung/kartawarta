@@ -105,7 +105,7 @@ export default function ShareBar({ articleUrl, articleTitle }: ShareBarProps) {
           <button
             onClick={handleCopyLink}
             className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-white transition-all ${
-              copied ? "bg-goto-green" : "bg-gray-500 hover:bg-gray-600"
+              copied ? "bg-primary" : "bg-gray-500 hover:bg-gray-600"
             }`}
             title="Salin Link"
           >
@@ -122,7 +122,7 @@ export default function ShareBar({ articleUrl, articleTitle }: ShareBarProps) {
       {/* Toast notification */}
       {copied && (
         <div className="absolute -top-12 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
-          <div className="flex items-center gap-2 rounded-full bg-goto-green px-4 py-2 text-sm font-medium text-white shadow-lg whitespace-nowrap">
+          <div className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-white shadow-lg whitespace-nowrap">
             <Check size={14} />
             Link berhasil disalin!
           </div>

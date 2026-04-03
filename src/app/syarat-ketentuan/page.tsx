@@ -10,7 +10,7 @@ export default function SyaratKetentuanPage() {
     <div className="container-main py-12">
       <div className="mx-auto max-w-3xl">
         <h1 className="text-3xl font-bold text-txt-primary">Syarat & Ketentuan</h1>
-        <div className="mt-2 h-1 w-16 bg-goto-green" />
+        <div className="mt-2 h-1 w-16 bg-primary" />
         <p className="mt-4 text-sm text-txt-muted">
           Terakhir diperbarui: 1 Januari 2026
         </p>
@@ -24,7 +24,7 @@ export default function SyaratKetentuanPage() {
 
           {/* Ketentuan Umum */}
           <section>
-            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">1. Ketentuan Umum</h2>
+            <h2 className="mb-3 border-l-[3px] border-primary pl-3 text-xl font-bold text-txt-primary">1. Ketentuan Umum</h2>
             <ul className="ml-6 list-disc space-y-2">
               <li>
                 Kartawarta adalah platform media digital yang menyajikan berita dan
@@ -47,7 +47,7 @@ export default function SyaratKetentuanPage() {
 
           {/* Penggunaan Konten */}
           <section>
-            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">2. Penggunaan Konten</h2>
+            <h2 className="mb-3 border-l-[3px] border-primary pl-3 text-xl font-bold text-txt-primary">2. Penggunaan Konten</h2>
             <ul className="ml-6 list-disc space-y-2">
               <li>
                 Seluruh konten yang tersedia di situs ini ditujukan untuk keperluan informasi dan
@@ -74,7 +74,7 @@ export default function SyaratKetentuanPage() {
 
           {/* Hak Cipta */}
           <section>
-            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">3. Hak Cipta</h2>
+            <h2 className="mb-3 border-l-[3px] border-primary pl-3 text-xl font-bold text-txt-primary">3. Hak Cipta</h2>
             <p>
               Seluruh konten yang dipublikasikan di Kartawarta, termasuk namun tidak
               terbatas pada artikel, foto, grafis, video, dan desain, dilindungi oleh hukum hak
@@ -98,7 +98,7 @@ export default function SyaratKetentuanPage() {
 
           {/* Komentar & Interaksi */}
           <section>
-            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">4. Komentar & Interaksi</h2>
+            <h2 className="mb-3 border-l-[3px] border-primary pl-3 text-xl font-bold text-txt-primary">4. Komentar & Interaksi</h2>
             <p>Pengguna yang memberikan komentar atau berinteraksi di platform wajib:</p>
             <ul className="ml-6 mt-2 list-disc space-y-2">
               <li>Menggunakan bahasa yang sopan dan tidak mengandung unsur SARA, ujaran kebencian,
@@ -116,7 +116,7 @@ export default function SyaratKetentuanPage() {
 
           {/* Pelaporan Konten */}
           <section>
-            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">5. Pelaporan Konten</h2>
+            <h2 className="mb-3 border-l-[3px] border-primary pl-3 text-xl font-bold text-txt-primary">5. Pelaporan Konten</h2>
             <p>
               Kami menyediakan mekanisme bagi pembaca untuk melaporkan konten yang dianggap tidak
               akurat, melanggar hukum, atau bertentangan dengan kode etik jurnalistik.
@@ -142,7 +142,7 @@ export default function SyaratKetentuanPage() {
 
           {/* Batasan Tanggung Jawab */}
           <section>
-            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">6. Batasan Tanggung Jawab</h2>
+            <h2 className="mb-3 border-l-[3px] border-primary pl-3 text-xl font-bold text-txt-primary">6. Batasan Tanggung Jawab</h2>
             <ul className="ml-6 list-disc space-y-2">
               <li>
                 Kartawarta berusaha menyajikan informasi yang akurat dan terkini, namun
@@ -171,7 +171,7 @@ export default function SyaratKetentuanPage() {
 
           {/* Perubahan Ketentuan */}
           <section>
-            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">7. Perubahan Ketentuan</h2>
+            <h2 className="mb-3 border-l-[3px] border-primary pl-3 text-xl font-bold text-txt-primary">7. Perubahan Ketentuan</h2>
             <p>
               Kartawarta berhak mengubah syarat dan ketentuan ini kapan saja.
               Perubahan akan berlaku efektif setelah dipublikasikan di halaman ini.

@@ -43,13 +43,13 @@ function formatDateTime(dateStr: string): string {
 }
 
 const actionLabels: Record<string, { label: string; color: string }> = {
-  CREATE: { label: "Buat", color: "bg-goto-green/10 text-goto-green" },
+  CREATE: { label: "Buat", color: "bg-primary/10 text-primary" },
   UPDATE: { label: "Ubah", color: "bg-blue-50 text-blue-600" },
   DELETE: { label: "Hapus", color: "bg-red-50 text-red-600" },
   LOGIN: { label: "Masuk", color: "bg-surface-tertiary text-txt-secondary" },
   LOGOUT: { label: "Keluar", color: "bg-surface-tertiary text-txt-secondary" },
-  PUBLISH: { label: "Terbit", color: "bg-goto-green/10 text-goto-green" },
-  APPROVE: { label: "Setujui", color: "bg-goto-green/10 text-goto-green" },
+  PUBLISH: { label: "Terbit", color: "bg-primary/10 text-primary" },
+  APPROVE: { label: "Setujui", color: "bg-primary/10 text-primary" },
   REJECT: { label: "Tolak", color: "bg-red-50 text-red-600" },
 };
 
@@ -211,7 +211,7 @@ export default function AktivitasPage() {
             setActionFilter(e.target.value);
             setPage(1);
           }}
-          className="rounded-lg border border-border bg-surface-secondary px-4 py-2.5 text-base text-txt-primary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
+          className="rounded-lg border border-border bg-surface-secondary px-4 py-2.5 text-base text-txt-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         >
           <option value="">Semua Aksi</option>
           {filterActions.filter(Boolean).map((a) => (

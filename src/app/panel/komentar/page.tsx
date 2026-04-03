@@ -219,7 +219,7 @@ export default function KomentarPage() {
               </p>
             </div>
             <div className="rounded-[12px] border border-border bg-surface p-4 shadow-card">
-              <div className="flex items-center gap-2 text-sm text-goto-green">
+              <div className="flex items-center gap-2 text-sm text-primary">
                 <CheckCircle size={16} /> Disetujui
               </div>
               <p className="mt-1 text-lg sm:text-2xl font-bold text-txt-primary">
@@ -243,7 +243,7 @@ export default function KomentarPage() {
                 onClick={() => setFilter(f.key)}
                 className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                   filter === f.key
-                    ? "bg-goto-green text-white"
+                    ? "bg-primary text-white"
                     : "bg-surface-tertiary text-txt-secondary hover:bg-border"
                 }`}
               >
@@ -277,7 +277,7 @@ export default function KomentarPage() {
                         <span
                           className={`badge text-sm ${
                             comment.isApproved
-                              ? "bg-goto-light text-goto-green"
+                              ? "bg-primary-light text-primary"
                               : "bg-yellow-50 text-yellow-600"
                           }`}
                         >
@@ -306,7 +306,7 @@ export default function KomentarPage() {
                             href={`/berita/${comment.article.slug}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-goto-green hover:underline"
+                            className="text-primary hover:underline"
                           >
                             {comment.article.title}
                           </a>
@@ -333,7 +333,7 @@ export default function KomentarPage() {
                         <button
                           onClick={() => handleApprove(comment.id)}
                           disabled={updating === comment.id}
-                          className="rounded-lg bg-goto-light p-2 text-goto-green hover:bg-goto-green/20 disabled:opacity-50"
+                          className="rounded-lg bg-primary-light p-2 text-primary hover:bg-primary/20 disabled:opacity-50"
                           title="Setujui"
                         >
                           <CheckCircle size={16} />

@@ -100,7 +100,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
   return (
     <section className="mt-10">
       <div className="flex items-center justify-between mb-5">
-        <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center gap-2">
+        <h2 className="border-l-[3px] border-primary pl-3 text-lg font-bold text-txt-primary flex items-center gap-2">
           <MessageCircle size={20} />
           Komentar
           {comments.length > 0 && (
@@ -132,7 +132,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
               className="rounded-[12px] border border-border bg-surface p-4"
             >
               <div className="flex items-center gap-2 mb-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-goto-green/10 text-goto-green">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
                   <User size={14} />
                 </div>
                 <div>
@@ -163,7 +163,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
         </h3>
 
         {success && (
-          <div className="mb-4 flex items-center gap-2 rounded-[12px] bg-goto-light px-4 py-3 text-sm text-goto-green">
+          <div className="mb-4 flex items-center gap-2 rounded-[12px] bg-primary-light px-4 py-3 text-sm text-primary">
             <CheckCircle size={16} />
             Komentar Anda akan ditampilkan setelah disetujui moderator.
           </div>

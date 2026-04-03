@@ -102,14 +102,14 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
       ? "bg-red-600 hover:bg-red-700 text-white"
       : options.variant === "warning"
         ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-        : "bg-goto-green hover:bg-goto-dark text-white";
+        : "bg-primary hover:bg-primary-dark text-white";
 
   const iconConfig =
     options.variant === "danger"
       ? { bg: "bg-red-100", color: "text-red-600", Icon: AlertTriangle }
       : options.variant === "warning"
         ? { bg: "bg-yellow-100", color: "text-yellow-600", Icon: AlertTriangle }
-        : { bg: "bg-goto-light", color: "text-goto-green", Icon: HelpCircle };
+        : { bg: "bg-primary-light", color: "text-primary", Icon: HelpCircle };
 
   return (
     <ConfirmContext.Provider value={{ confirm }}>

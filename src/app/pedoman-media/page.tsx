@@ -11,7 +11,7 @@ export default function PedomanMediaPage() {
       <div className="container-main py-12">
         <div className="mx-auto max-w-3xl">
           <h1 className="flex items-center gap-3 text-lg font-bold text-txt-primary sm:text-xl sm:text-2xl lg:text-3xl">
-            <span className="block h-8 w-[3px] rounded-full bg-goto-green" />
+            <span className="block h-8 w-[3px] rounded-full bg-primary" />
             Pedoman Media Siber
           </h1>
 
@@ -67,8 +67,8 @@ export default function PedomanMediaPage() {
               yang menjadi pelaku kejahatan, dan informasi pribadi yang tidak relevan dengan kepentingan publik.
             </p>
 
-            <div className="mt-10 rounded-[12px] border border-goto-green/20 bg-goto-light p-4">
-              <p className="text-sm text-goto-dark">
+            <div className="mt-10 rounded-[12px] border border-primary/20 bg-primary-light p-4">
+              <p className="text-sm text-primary-dark">
                 Pedoman ini mengacu pada Peraturan Dewan Pers Nomor 1/Peraturan-DP/III/2012 tentang
                 Pedoman Pemberitaan Media Siber.
               </p>

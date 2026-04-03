@@ -218,7 +218,7 @@ function CompareModal({
         {/* Modal header */}
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div className="flex items-center gap-2">
-            <GitCompareArrows size={20} className="text-goto-green" />
+            <GitCompareArrows size={20} className="text-primary" />
             <h2 className="text-base font-bold text-txt-primary">
               Perbandingan Revisi
             </h2>
@@ -423,7 +423,7 @@ export default function RevisionsPage() {
           <ArrowLeft size={14} /> Kembali ke Editor
         </button>
         <h1 className="flex items-center gap-2 text-lg sm:text-2xl font-bold text-txt-primary">
-          <History size={24} className="text-goto-green" />
+          <History size={24} className="text-primary" />
           Riwayat Revisi
         </h1>
         {articleTitle && (
@@ -468,7 +468,7 @@ export default function RevisionsPage() {
                   className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-surface-secondary transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-goto-light text-xs font-bold text-goto-green">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-light text-xs font-bold text-primary">
                       {versionLabel}
                     </span>
                     <div className="min-w-0">

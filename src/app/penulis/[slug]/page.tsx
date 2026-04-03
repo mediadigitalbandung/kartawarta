@@ -54,14 +54,14 @@ export default async function PenulisPage({ params }: { params: { slug: string }
         {/* Author profile */}
         <div className="rounded-[12px] border border-border bg-surface p-6">
           <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-            <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-goto-green text-4xl font-bold text-white">
+            <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-primary text-4xl font-bold text-white">
               {author.name.charAt(0)}
             </div>
             <div className="flex-1 text-center sm:text-left">
               <h1 className="text-xl font-bold text-txt-primary sm:text-2xl lg:text-3xl">
                 {author.name}
               </h1>
-              <p className="mt-1 text-sm text-goto-green">{author.role.replace(/_/g, " ")}</p>
+              <p className="mt-1 text-sm text-primary">{author.role.replace(/_/g, " ")}</p>
               {author.specialization && (
                 <p className="text-sm text-txt-muted">
                   Spesialisasi: {author.specialization}
@@ -98,7 +98,7 @@ export default async function PenulisPage({ params }: { params: { slug: string }
         {/* Articles by author */}
         <div className="mt-8">
           <h2 className="mb-4 flex items-center gap-3 text-base font-bold text-txt-primary sm:text-lg lg:text-xl">
-            <span className="block h-6 w-[3px] rounded-full bg-goto-green" />
+            <span className="block h-6 w-[3px] rounded-full bg-primary" />
             Artikel oleh {author.name}
           </h2>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">

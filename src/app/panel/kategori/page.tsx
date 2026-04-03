@@ -309,7 +309,7 @@ export default function KategoriPage() {
         <div
           className={`fixed right-4 top-4 z-[60] rounded-lg px-4 py-3 text-sm font-medium shadow-lg ${
             feedback.type === "success"
-              ? "bg-goto-green text-white"
+              ? "bg-primary text-white"
               : "bg-red-600 text-white"
           }`}
         >
@@ -331,7 +331,7 @@ export default function KategoriPage() {
           onClick={() => setActiveTab("kategori")}
           className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
             activeTab === "kategori"
-              ? "bg-surface text-goto-green shadow-sm"
+              ? "bg-surface text-primary shadow-sm"
               : "text-txt-secondary hover:text-txt-primary"
           }`}
         >
@@ -342,7 +342,7 @@ export default function KategoriPage() {
           onClick={() => setActiveTab("tag")}
           className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
             activeTab === "tag"
-              ? "bg-surface text-goto-green shadow-sm"
+              ? "bg-surface text-primary shadow-sm"
               : "text-txt-secondary hover:text-txt-primary"
           }`}
         >
@@ -357,7 +357,7 @@ export default function KategoriPage() {
           <div className="flex justify-end">
             <button
               onClick={() => openCatModal()}
-              className="flex items-center gap-2 rounded-lg bg-goto-green px-4 py-2 text-sm font-medium text-white hover:bg-goto-green/90 transition-colors"
+              className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors"
             >
               <Plus size={16} />
               Tambah Kategori
@@ -398,7 +398,7 @@ export default function KategoriPage() {
                         </td>
                         <td className="px-5 py-4 text-center text-sm text-txt-secondary">{cat.order}</td>
                         <td className="px-5 py-4 text-center">
-                          <span className="inline-flex items-center rounded-full bg-goto-green/10 px-3 py-0.5 text-sm font-medium text-goto-green">
+                          <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-0.5 text-sm font-medium text-primary">
                             {cat._count.articles}
                           </span>
                         </td>
@@ -406,7 +406,7 @@ export default function KategoriPage() {
                           <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => openCatModal(cat)}
-                              className="rounded-lg p-2 text-txt-secondary hover:bg-surface-secondary hover:text-goto-green transition-colors"
+                              className="rounded-lg p-2 text-txt-secondary hover:bg-surface-secondary hover:text-primary transition-colors"
                               title="Edit"
                               aria-label="Edit kategori"
                             >
@@ -447,7 +447,7 @@ export default function KategoriPage() {
                     const name = e.target.value;
                     setCatForm((f) => ({ ...f, name, slug: slugify(name) }));
                   }}
-                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2.5 text-base text-txt-primary placeholder:text-txt-secondary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
+                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2.5 text-base text-txt-primary placeholder:text-txt-secondary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   placeholder="Nama kategori"
                   required
                 />
@@ -458,7 +458,7 @@ export default function KategoriPage() {
                   type="text"
                   value={catForm.slug}
                   onChange={(e) => setCatForm((f) => ({ ...f, slug: e.target.value }))}
-                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2.5 text-base text-txt-primary placeholder:text-txt-secondary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
+                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2.5 text-base text-txt-primary placeholder:text-txt-secondary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   placeholder="slug-kategori"
                 />
               </div>
@@ -468,7 +468,7 @@ export default function KategoriPage() {
                   value={catForm.description}
                   onChange={(e) => setCatForm((f) => ({ ...f, description: e.target.value }))}
                   rows={2}
-                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2.5 text-base text-txt-primary placeholder:text-txt-secondary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
+                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2.5 text-base text-txt-primary placeholder:text-txt-secondary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   placeholder="Deskripsi singkat (opsional)"
                 />
               </div>
@@ -479,7 +479,7 @@ export default function KategoriPage() {
                   min={0}
                   value={catForm.order}
                   onChange={(e) => setCatForm((f) => ({ ...f, order: parseInt(e.target.value) || 0 }))}
-                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2.5 text-base text-txt-primary placeholder:text-txt-secondary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
+                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2.5 text-base text-txt-primary placeholder:text-txt-secondary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
@@ -493,7 +493,7 @@ export default function KategoriPage() {
                 <button
                   type="submit"
                   disabled={catSubmitting}
-                  className="rounded-lg bg-goto-green px-4 py-2 text-sm font-medium text-white hover:bg-goto-green/90 transition-colors disabled:opacity-50"
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors disabled:opacity-50"
                 >
                   {catSubmitting ? "Menyimpan..." : editingCat ? "Simpan Perubahan" : "Tambah"}
                 </button>
@@ -509,7 +509,7 @@ export default function KategoriPage() {
           <div className="flex justify-end">
             <button
               onClick={() => openTagModal()}
-              className="flex items-center gap-2 rounded-lg bg-goto-green px-4 py-2 text-sm font-medium text-white hover:bg-goto-green/90 transition-colors"
+              className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors"
             >
               <Plus size={16} />
               Tambah Tag
@@ -540,7 +540,7 @@ export default function KategoriPage() {
                         <td className="px-5 py-4 text-sm font-medium text-txt-primary">{tag.name}</td>
                         <td className="px-5 py-4 text-sm text-txt-secondary">{tag.slug}</td>
                         <td className="px-5 py-4 text-center">
-                          <span className="inline-flex items-center rounded-full bg-goto-green/10 px-3 py-0.5 text-sm font-medium text-goto-green">
+                          <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-0.5 text-sm font-medium text-primary">
                             {tag._count.articles}
                           </span>
                         </td>
@@ -548,7 +548,7 @@ export default function KategoriPage() {
                           <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => openTagModal(tag)}
-                              className="rounded-lg p-2 text-txt-secondary hover:bg-surface-secondary hover:text-goto-green transition-colors"
+                              className="rounded-lg p-2 text-txt-secondary hover:bg-surface-secondary hover:text-primary transition-colors"
                               title="Edit"
                               aria-label="Edit tag"
                             >
@@ -589,7 +589,7 @@ export default function KategoriPage() {
                     const name = e.target.value;
                     setTagForm({ name, slug: slugify(name) });
                   }}
-                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2.5 text-base text-txt-primary placeholder:text-txt-secondary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
+                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2.5 text-base text-txt-primary placeholder:text-txt-secondary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   placeholder="Nama tag"
                   required
                 />
@@ -600,7 +600,7 @@ export default function KategoriPage() {
                   type="text"
                   value={tagForm.slug}
                   onChange={(e) => setTagForm((f) => ({ ...f, slug: e.target.value }))}
-                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2.5 text-base text-txt-primary placeholder:text-txt-secondary focus:border-goto-green focus:outline-none focus:ring-1 focus:ring-goto-green"
+                  className="w-full rounded-lg border border-border bg-surface-secondary px-3 py-2.5 text-base text-txt-primary placeholder:text-txt-secondary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   placeholder="slug-tag"
                 />
               </div>
@@ -615,7 +615,7 @@ export default function KategoriPage() {
                 <button
                   type="submit"
                   disabled={tagSubmitting}
-                  className="rounded-lg bg-goto-green px-4 py-2 text-sm font-medium text-white hover:bg-goto-green/90 transition-colors disabled:opacity-50"
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors disabled:opacity-50"
                 >
                   {tagSubmitting ? "Menyimpan..." : editingTag ? "Simpan Perubahan" : "Tambah"}
                 </button>

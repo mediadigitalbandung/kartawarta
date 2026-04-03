@@ -40,7 +40,7 @@ export default function PaginatedArticles({ articles, perPage = 6 }: PaginatedAr
           <button
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-goto-green hover:text-goto-green disabled:opacity-30 disabled:hover:border-border disabled:hover:text-txt-primary"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-primary hover:text-primary disabled:opacity-30 disabled:hover:border-border disabled:hover:text-txt-primary"
           >
             <ChevronLeft size={16} />
             Sebelumnya
@@ -51,7 +51,7 @@ export default function PaginatedArticles({ articles, perPage = 6 }: PaginatedAr
           <button
             onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={page === totalPages - 1}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-goto-green hover:text-goto-green disabled:opacity-30 disabled:hover:border-border disabled:hover:text-txt-primary"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-primary hover:text-primary disabled:opacity-30 disabled:hover:border-border disabled:hover:text-txt-primary"
           >
             Selanjutnya
             <ChevronRight size={16} />

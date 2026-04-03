@@ -48,7 +48,7 @@ interface StatsItem {
 import { CREATOR_ROLES, EDITOR_ROLES } from "@/lib/roles";
 
 const statusColors: Record<string, string> = {
-  PUBLISHED: "bg-goto-light text-goto-green",
+  PUBLISHED: "bg-primary-light text-primary",
   IN_REVIEW: "bg-yellow-50 text-yellow-600",
   DRAFT: "bg-surface-tertiary text-txt-secondary",
   REJECTED: "bg-red-50 text-red-600",
@@ -123,7 +123,7 @@ function RecentActivity({ articles }: { articles: Article[] }) {
       .slice(0, 8)
       .map((a) => {
         const actionMap: Record<string, { label: string; color: string; icon: string }> = {
-          PUBLISHED: { label: "dipublikasikan", color: "text-goto-green", icon: "bg-goto-green" },
+          PUBLISHED: { label: "dipublikasikan", color: "text-primary", icon: "bg-primary" },
           IN_REVIEW: { label: "diajukan review", color: "text-yellow-600", icon: "bg-yellow-500" },
           APPROVED: { label: "disetujui", color: "text-blue-600", icon: "bg-blue-500" },
           REJECTED: { label: "ditolak", color: "text-red-600", icon: "bg-red-500" },
@@ -160,7 +160,7 @@ function RecentActivity({ articles }: { articles: Article[] }) {
                 </p>
               </div>
               <span className={`rounded px-2 py-0.5 text-xs font-semibold whitespace-nowrap ${
-                a.action.color === "text-goto-green" ? "bg-goto-light text-goto-green" :
+                a.action.color === "text-primary" ? "bg-primary-light text-primary" :
                 a.action.color === "text-yellow-600" ? "bg-yellow-50 text-yellow-600" :
                 a.action.color === "text-blue-600" ? "bg-blue-50 text-blue-600" :
                 a.action.color === "text-red-600" ? "bg-red-50 text-red-600" :
@@ -205,8 +205,8 @@ function ViewsRanking({ articles }: { articles: Article[] }) {
     <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
       <div className="border-b border-border px-6 py-5">
         <h2 className="flex items-center gap-2.5 text-base font-bold text-txt-primary">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-goto-light">
-            <TrendingUp size={16} className="text-goto-green" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-light">
+            <TrendingUp size={16} className="text-primary" />
           </div>
           Statistik Tayangan
         </h2>
@@ -244,11 +244,11 @@ function ViewsRanking({ articles }: { articles: Article[] }) {
                 >
                   <div className="flex items-center gap-3 mb-1">
                     <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-xs font-bold ${
-                      i < 3 ? "bg-goto-green text-white" : "bg-surface-tertiary text-txt-secondary"
+                      i < 3 ? "bg-primary text-white" : "bg-surface-tertiary text-txt-secondary"
                     }`}>
                       {i + 1}
                     </span>
-                    <span className="flex-1 text-sm font-medium text-txt-primary truncate group-hover:text-goto-green transition-colors">
+                    <span className="flex-1 text-sm font-medium text-txt-primary truncate group-hover:text-primary transition-colors">
                       {article.title}
                     </span>
                     <span className="text-sm font-bold text-txt-primary shrink-0">
@@ -258,7 +258,7 @@ function ViewsRanking({ articles }: { articles: Article[] }) {
                   <div className="ml-9 h-2 rounded-full bg-surface-tertiary overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
-                        i === 0 ? "bg-goto-green" : i < 3 ? "bg-goto-green/70" : "bg-goto-green/30"
+                        i === 0 ? "bg-primary" : i < 3 ? "bg-primary/70" : "bg-primary/30"
                       }`}
                       style={{ width: `${pct}%` }}
                     />
@@ -319,8 +319,8 @@ function MyArticleStats({ articles }: { articles: Article[] }) {
     <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
       <div className="border-b border-border px-6 py-5">
         <h2 className="flex items-center gap-2.5 text-base font-bold text-txt-primary">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-goto-light">
-            <TrendingUp size={16} className="text-goto-green" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-light">
+            <TrendingUp size={16} className="text-primary" />
           </div>
           Statistik Artikel Saya
         </h2>
@@ -372,11 +372,11 @@ function MyArticleStats({ articles }: { articles: Article[] }) {
                 >
                   <div className="flex items-center gap-3 mb-1">
                     <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-xs font-bold ${
-                      i < 3 ? "bg-goto-green text-white" : "bg-surface-tertiary text-txt-secondary"
+                      i < 3 ? "bg-primary text-white" : "bg-surface-tertiary text-txt-secondary"
                     }`}>
                       {i + 1}
                     </span>
-                    <span className="flex-1 text-sm font-medium text-txt-primary truncate group-hover:text-goto-green transition-colors">
+                    <span className="flex-1 text-sm font-medium text-txt-primary truncate group-hover:text-primary transition-colors">
                       {article.title}
                     </span>
                     <span className="text-sm font-bold text-txt-primary shrink-0">
@@ -386,7 +386,7 @@ function MyArticleStats({ articles }: { articles: Article[] }) {
                   <div className="ml-9 h-2 rounded-full bg-surface-tertiary overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
-                        i === 0 ? "bg-goto-green" : i < 3 ? "bg-goto-green/70" : "bg-goto-green/30"
+                        i === 0 ? "bg-primary" : i < 3 ? "bg-primary/70" : "bg-primary/30"
                       }`}
                       style={{ width: `${pct}%` }}
                     />
@@ -603,8 +603,8 @@ function ArticleCalendar({ articles }: { articles: Article[] }) {
     <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
       <div className="border-b border-border px-5 py-3.5 flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-sm font-bold text-txt-primary">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-goto-light">
-            <Calendar size={14} className="text-goto-green" />
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary-light">
+            <Calendar size={14} className="text-primary" />
           </div>
           Kalender Artikel
         </h2>
@@ -639,13 +639,13 @@ function ArticleCalendar({ articles }: { articles: Article[] }) {
                   key={day}
                   onClick={() => setSelectedDay(isSelected ? null : day)}
                   className={`relative flex flex-col items-center justify-center h-10 rounded-lg text-sm font-medium transition-colors ${
-                    isSelected ? "bg-goto-green text-white" : isToday ? "bg-goto-light text-goto-green font-bold" : count > 0 ? "bg-surface-secondary text-txt-primary hover:bg-goto-light" : "text-txt-muted hover:bg-surface-secondary"
+                    isSelected ? "bg-primary text-white" : isToday ? "bg-primary-light text-primary font-bold" : count > 0 ? "bg-surface-secondary text-txt-primary hover:bg-primary-light" : "text-txt-muted hover:bg-surface-secondary"
                   }`}
                   aria-label={`${day} ${monthName}${count > 0 ? `, ${count} artikel` : ""}`}
                 >
                   {day}
                   {count > 0 && (
-                    <span className={`absolute bottom-1 h-1 w-1 rounded-full ${isSelected ? "bg-white" : "bg-goto-green"}`} />
+                    <span className={`absolute bottom-1 h-1 w-1 rounded-full ${isSelected ? "bg-white" : "bg-primary"}`} />
                   )}
                 </button>
               );
@@ -659,7 +659,7 @@ function ArticleCalendar({ articles }: { articles: Article[] }) {
             <p className="text-xs font-semibold text-txt-secondary">
               {selectedDay ? `Artikel tanggal ${selectedDay} ${monthName}` : "Klik tanggal untuk lihat artikel"}
               {selectedDay !== null && selectedArticles.length > 0 && (
-                <span className="ml-2 text-goto-green">({selectedArticles.length} artikel)</span>
+                <span className="ml-2 text-primary">({selectedArticles.length} artikel)</span>
               )}
             </p>
           </div>
@@ -684,7 +684,7 @@ function ArticleCalendar({ articles }: { articles: Article[] }) {
                     className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface-secondary/50 transition-colors"
                   >
                     <span className={`h-2 w-2 rounded-full shrink-0 ${
-                      a.status === "PUBLISHED" ? "bg-goto-green" : a.status === "APPROVED" ? "bg-blue-500" : a.status === "IN_REVIEW" ? "bg-yellow-500" : "bg-gray-400"
+                      a.status === "PUBLISHED" ? "bg-primary" : a.status === "APPROVED" ? "bg-blue-500" : a.status === "IN_REVIEW" ? "bg-yellow-500" : "bg-gray-400"
                     }`} />
                     <span className="flex-1 text-sm font-medium text-txt-primary truncate">{a.title}</span>
                     <span className={`shrink-0 text-xs rounded px-2 py-0.5 font-semibold ${statusColors[a.status] || "bg-surface-tertiary text-txt-secondary"}`}>
@@ -765,9 +765,9 @@ export default function DashboardPage() {
 
           setStats([
             { label: "Total Artikel", value: formatNumber(totalArticles), icon: FileText, color: "text-blue-500 bg-blue-50" },
-            { label: "Total Tayangan", value: formatNumber(totalViews), icon: Eye, color: "text-goto-green bg-goto-light" },
+            { label: "Total Tayangan", value: formatNumber(totalViews), icon: Eye, color: "text-primary bg-primary-light" },
             { label: "Menunggu Review", value: pendingReview.toString(), icon: Clock, color: "text-yellow-500 bg-yellow-50" },
-            { label: "Dipublikasi", value: formatNumber(published), icon: CheckCircle, color: "text-goto-green bg-goto-light" },
+            { label: "Dipublikasi", value: formatNumber(published), icon: CheckCircle, color: "text-primary bg-primary-light" },
             { label: "Dijadwalkan", value: scheduled.toString(), icon: CalendarClock, color: "text-blue-500 bg-blue-50" },
             { label: "Laporan Masuk", value: reportsPending.toString(), icon: AlertTriangle, color: "text-red-500 bg-red-50" },
             { label: "Tayangan Hari Ini", value: formatNumber(todayViews), icon: TrendingUp, color: "text-purple-500 bg-purple-50" },
@@ -788,7 +788,7 @@ export default function DashboardPage() {
             { label: "Artikel Saya", value: formatNumber(myTotal), icon: FileText, color: "text-blue-500 bg-blue-50" },
             { label: "Draf Saya", value: myDrafts.toString(), icon: FileText, color: "text-surface-tertiary bg-surface-secondary" },
             { label: "Menunggu Review", value: myPendingReview.toString(), icon: Clock, color: "text-yellow-500 bg-yellow-50" },
-            { label: "Dipublikasi", value: formatNumber(myPublished), icon: CheckCircle, color: "text-goto-green bg-goto-light" },
+            { label: "Dipublikasi", value: formatNumber(myPublished), icon: CheckCircle, color: "text-primary bg-primary-light" },
           ]);
 
           // Recent: my articles sorted by createdAt
@@ -808,7 +808,7 @@ export default function DashboardPage() {
 
           setStats([
             { label: "Antrean Review", value: reviewQueue.toString(), icon: Clock, color: "text-yellow-500 bg-yellow-50" },
-            { label: "Disetujui Hari Ini", value: approvedToday.toString(), icon: CheckCircle, color: "text-goto-green bg-goto-light" },
+            { label: "Disetujui Hari Ini", value: approvedToday.toString(), icon: CheckCircle, color: "text-primary bg-primary-light" },
             { label: "Ditolak", value: rejected.toString(), icon: XCircle, color: "text-red-500 bg-red-50" },
             { label: "Total Artikel", value: formatNumber(totalArticles), icon: FileText, color: "text-blue-500 bg-blue-50" },
           ]);
@@ -911,8 +911,8 @@ export default function DashboardPage() {
       <div className="mb-6 rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
         <div className="border-b border-border px-6 py-5">
           <h2 className="flex items-center gap-2.5 text-base font-bold text-txt-primary">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-goto-light">
-              <Layers size={16} className="text-goto-green" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-light">
+              <Layers size={16} className="text-primary" />
             </div>
             Aksi Cepat
           </h2>
@@ -920,10 +920,10 @@ export default function DashboardPage() {
           <div className="grid grid-cols-2 gap-3 p-5">
             <Link
               href="/panel/artikel/baru"
-              className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
+              className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-primary hover:bg-primary-50"
               aria-label="Tulis artikel baru"
             >
-              <FileText size={24} className="text-goto-green" />
+              <FileText size={24} className="text-primary" />
               <span className="text-sm font-medium text-txt-secondary">
                 Tulis Artikel Baru
               </span>
@@ -931,7 +931,7 @@ export default function DashboardPage() {
             {(isEditorRole || isAdmin) && (
               <Link
                 href="/panel/artikel"
-                className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
+                className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-primary hover:bg-primary-50"
                 aria-label="Review artikel"
               >
                 <Clock size={24} className="text-yellow-500" />
@@ -943,7 +943,7 @@ export default function DashboardPage() {
             {isCreator && (
               <Link
                 href="/panel/artikel"
-                className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
+                className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-primary hover:bg-primary-50"
                 aria-label="Lihat artikel saya"
               >
                 <Send size={24} className="text-blue-500" />
@@ -955,7 +955,7 @@ export default function DashboardPage() {
             {!isCreator && (
               <Link
                 href="/panel/laporan"
-                className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
+                className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-primary hover:bg-primary-50"
                 aria-label="Cek laporan masuk"
               >
                 <AlertTriangle size={24} className="text-red-500" />
@@ -968,7 +968,7 @@ export default function DashboardPage() {
               <>
                 <Link
                   href="/panel/pengguna"
-                  className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
+                  className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-primary hover:bg-primary-50"
                   aria-label="Kelola pengguna"
                 >
                   <Users size={24} className="text-purple-500" />
@@ -978,7 +978,7 @@ export default function DashboardPage() {
                 </Link>
                 <Link
                   href="/panel/iklan"
-                  className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-goto-green hover:bg-goto-50"
+                  className="flex flex-col items-center gap-2 rounded-[12px] border-2 border-dashed border-border p-6 text-center transition-colors hover:border-primary hover:bg-primary-50"
                   aria-label="Kelola iklan"
                 >
                   <Megaphone size={24} className="text-blue-500" />
@@ -1000,7 +1000,7 @@ export default function DashboardPage() {
             </div>
             {isCreator ? "Artikel Saya Terbaru" : isEditorRole ? "Antrean Review" : "Artikel Terbaru"}
           </h2>
-          <Link href="/panel/artikel" className="text-sm font-semibold text-goto-green hover:text-goto-dark transition-colors">
+          <Link href="/panel/artikel" className="text-sm font-semibold text-primary hover:text-primary-dark transition-colors">
             Lihat Semua &rarr;
           </Link>
         </div>
@@ -1033,7 +1033,7 @@ export default function DashboardPage() {
                       )}
                       {article.reviewerName && (
                         <span className="flex items-center gap-1.5 text-sm text-txt-secondary">
-                          <CheckCircle size={14} className="text-goto-green" />
+                          <CheckCircle size={14} className="text-primary" />
                           <span className="text-txt-muted">Editor:</span> {article.reviewerName}
                         </span>
                       )}
@@ -1081,12 +1081,12 @@ export default function DashboardPage() {
       </div>
 
       {/* Editorial checklist reminder */}
-      <div className="mt-6 rounded-[12px] border border-goto-green/20 bg-goto-50 p-5">
-        <h3 className="flex items-center gap-2 font-semibold text-goto-dark">
+      <div className="mt-6 rounded-[12px] border border-primary/20 bg-primary-50 p-5">
+        <h3 className="flex items-center gap-2 font-semibold text-primary-dark">
           <CheckCircle size={18} />
           Pengingat Standar Jurnalistik
         </h3>
-        <ul className="mt-2 space-y-1 text-sm text-goto-green">
+        <ul className="mt-2 space-y-1 text-sm text-primary">
           <li>&#10003; Pastikan setiap artikel memiliki minimal 1 sumber terverifikasi</li>
           <li>&#10003; Judul tidak clickbait atau sensasional berlebihan</li>
           <li>&#10003; Cover both sides — berikan perspektif berimbang</li>

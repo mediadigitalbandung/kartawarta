@@ -32,8 +32,8 @@ const reasonLabels: Record<string, { label: string; color: string }> = {
 
 const statusConfig: Record<string, { label: string; icon: React.ElementType; color: string }> = {
   PENDING: { label: "Menunggu", icon: Clock, color: "text-yellow-600" },
-  REVIEWED: { label: "Ditinjau", icon: Eye, color: "text-goto-green" },
-  RESOLVED: { label: "Selesai", icon: CheckCircle, color: "text-goto-green" },
+  REVIEWED: { label: "Ditinjau", icon: Eye, color: "text-primary" },
+  RESOLVED: { label: "Selesai", icon: CheckCircle, color: "text-primary" },
   DISMISSED: { label: "Ditolak", icon: XCircle, color: "text-txt-muted" },
 };
 
@@ -252,7 +252,7 @@ export default function LaporanPage() {
                           <button
                             onClick={() => handleUpdateStatus(report.id, "REVIEWED")}
                             disabled={updating === report.id}
-                            className="rounded-[12px] bg-goto-light px-4 py-2 text-sm font-medium text-goto-green hover:bg-goto-green/20 disabled:opacity-50"
+                            className="rounded-[12px] bg-primary-light px-4 py-2 text-sm font-medium text-primary hover:bg-primary/20 disabled:opacity-50"
                             aria-label="Tinjau laporan"
                           >
                             {updating === report.id ? "..." : "Tinjau"}

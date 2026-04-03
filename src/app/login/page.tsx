@@ -50,7 +50,7 @@ function LoginContent() {
       <div className="w-full max-w-sm rounded-[12px] border border-border bg-surface p-5 sm:p-8 shadow-card">
         {/* Logo */}
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-goto-green">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary">
             <span className="text-lg font-bold text-white">JH</span>
           </div>
           <h1 className="text-xl font-bold text-txt-primary">
@@ -129,7 +129,7 @@ function LoginContent() {
         <p className="mt-8 text-center text-xs text-txt-secondary">
           Hanya untuk jurnalis dan redaksi terdaftar.
           <br />
-          <Link href="/kontak" className="mt-1 inline-block text-goto-green transition-colors hover:text-goto-dark hover:underline">
+          <Link href="/kontak" className="mt-1 inline-block text-primary transition-colors hover:text-primary-dark hover:underline">
             Hubungi admin
           </Link>{" "}
           untuk registrasi akun.
@@ -143,7 +143,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-goto-green border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     }>
       <LoginContent />

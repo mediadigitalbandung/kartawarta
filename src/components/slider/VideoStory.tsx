@@ -86,7 +86,7 @@ export default function VideoStory({ items }: VideoStoryProps) {
         </div>
       </Link>
       <div className="mt-2 flex items-start gap-2">
-        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-goto-green mt-0.5">
+        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary mt-0.5">
           <Play size={8} className="text-white ml-px" fill="white" />
         </div>
         <div className="min-w-0">
@@ -97,7 +97,7 @@ export default function VideoStory({ items }: VideoStoryProps) {
           </Link>
           <p className="mt-0.5 text-[10px] text-txt-muted flex items-center gap-1">
             {item.source}
-            <svg viewBox="0 0 16 16" fill="currentColor" className="h-3 w-3 text-goto-green">
+            <svg viewBox="0 0 16 16" fill="currentColor" className="h-3 w-3 text-primary">
               <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.28 5.78l-4 4a.75.75 0 01-1.06 0l-2-2a.75.75 0 111.06-1.06L6.75 8.19l3.47-3.47a.75.75 0 111.06 1.06z" />
             </svg>
           </p>

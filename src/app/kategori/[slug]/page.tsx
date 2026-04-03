@@ -129,14 +129,14 @@ export default async function CategoryPage({ params }: { params: { slug: string 
       <div className="container-main py-8">
         {/* Breadcrumb */}
         <nav className="mb-6 flex items-center gap-1.5 text-sm text-txt-muted">
-          <Link href="/" className="hover:text-goto-green">Beranda</Link>
+          <Link href="/" className="hover:text-primary">Beranda</Link>
           <ChevronRight size={14} />
           <span className="font-medium text-txt-primary">{category.name}</span>
         </nav>
 
         <div className="mb-6">
           <h1 className="flex items-center gap-3 text-xl font-bold text-txt-primary sm:text-2xl lg:text-3xl">
-            <span className="block h-7 w-[3px] rounded-full bg-goto-green" />
+            <span className="block h-7 w-[3px] rounded-full bg-primary" />
             {category.name}
           </h1>
           <p className="mt-1 text-sm text-txt-muted">
@@ -167,8 +167,8 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         {categoryPolling[params.slug] && (
           <div className="mb-8">
             <div className="flex items-center mb-4">
-              <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
-                <Vote size={18} className="mr-2 text-goto-green" />
+              <h2 className="border-l-[3px] border-primary pl-3 text-lg font-bold text-txt-primary flex items-center">
+                <Vote size={18} className="mr-2 text-primary" />
                 Polling {category.name}
               </h2>
             </div>
@@ -190,7 +190,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
                           <span className="font-bold text-txt-primary text-xs">{opt.percentage}%</span>
                         </div>
                         <div className="h-1.5 rounded-full bg-border">
-                          <div className="h-1.5 rounded-full bg-goto-green" style={{ width: `${opt.percentage}%` }} />
+                          <div className="h-1.5 rounded-full bg-primary" style={{ width: `${opt.percentage}%` }} />
                         </div>
                       </div>
                     ))}
@@ -211,10 +211,10 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         {/* Video Story */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center">
+            <h2 className="border-l-[3px] border-primary pl-3 text-lg font-bold text-txt-primary flex items-center">
               Video Story
             </h2>
-            <Link href="/video" className="text-sm font-medium text-goto-green hover:underline">
+            <Link href="/video" className="text-sm font-medium text-primary hover:underline">
               Lihat Semua &rarr;
             </Link>
           </div>
@@ -225,7 +225,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
           <div className="lg:col-span-2">
             {/* Section header */}
             <div className="mb-5">
-              <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
+              <h2 className="border-l-[3px] border-primary pl-3 text-lg font-bold text-txt-primary">
                 Berita Terkini {category.name}
               </h2>
             </div>
@@ -255,7 +255,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         {/* Semua Berita — searchable list view */}
         <section className="mt-8">
           <div className="mb-5">
-            <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
+            <h2 className="border-l-[3px] border-primary pl-3 text-lg font-bold text-txt-primary">
               Semua Berita {category.name}
             </h2>
           </div>

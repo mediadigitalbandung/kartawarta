@@ -180,17 +180,17 @@ export default function PollingCarousel({ items, categorySlug }: Props) {
                       // After voting — show results
                       <div key={opt.id}>
                         <div className="flex items-center justify-between text-sm mb-1">
-                          <span className={`text-xs flex items-center gap-1 ${isSelected ? "font-bold text-goto-green" : "text-txt-primary"}`}>
+                          <span className={`text-xs flex items-center gap-1 ${isSelected ? "font-bold text-primary" : "text-txt-primary"}`}>
                             {isSelected && <CheckCircle size={12} />}
                             {opt.label}
                           </span>
-                          <span className={`font-bold text-xs ${isTop ? "text-goto-green" : "text-txt-primary"}`}>
+                          <span className={`font-bold text-xs ${isTop ? "text-primary" : "text-txt-primary"}`}>
                             {opt.percentage}%
                           </span>
                         </div>
                         <div className="h-2 rounded-full bg-border overflow-hidden">
                           <div
-                            className={`h-full rounded-full transition-all duration-700 ${isSelected ? "bg-goto-green" : isTop ? "bg-goto-green/60" : "bg-goto-green/30"}`}
+                            className={`h-full rounded-full transition-all duration-700 ${isSelected ? "bg-primary" : isTop ? "bg-primary/60" : "bg-primary/30"}`}
                             style={{ width: `${opt.percentage}%` }}
                           />
                         </div>
@@ -204,7 +204,7 @@ export default function PollingCarousel({ items, categorySlug }: Props) {
                         className={`w-full text-left rounded-lg border px-4 py-2.5 text-sm font-medium transition-all ${
                           isVoting
                             ? "opacity-50 cursor-not-allowed border-border text-txt-muted"
-                            : "border-border text-txt-primary hover:border-goto-green hover:bg-goto-light/30 hover:text-goto-green active:scale-[0.98]"
+                            : "border-border text-txt-primary hover:border-primary hover:bg-primary-light/30 hover:text-primary active:scale-[0.98]"
                         }`}
                       >
                         {opt.label}
@@ -215,7 +215,7 @@ export default function PollingCarousel({ items, categorySlug }: Props) {
 
                 <p className="text-xs text-txt-muted mt-3">
                   {poll.totalVotes.toLocaleString("id-ID")} suara
-                  {hasVoted && <span className="text-goto-green ml-1">· Terima kasih telah voting!</span>}
+                  {hasVoted && <span className="text-primary ml-1">· Terima kasih telah voting!</span>}
                 </p>
               </div>
             </div>
@@ -235,7 +235,7 @@ export default function PollingCarousel({ items, categorySlug }: Props) {
                 scrollRef.current.scrollTo({ left: idx * cardWidth, behavior: "smooth" });
                 setTimeout(checkScroll, 400);
               }}
-              className="h-1.5 w-1.5 rounded-full bg-border hover:bg-goto-green transition-colors"
+              className="h-1.5 w-1.5 rounded-full bg-border hover:bg-primary transition-colors"
               aria-label={`Polling ${idx + 1}`}
             />
           ))}

@@ -265,7 +265,7 @@ export default function PollingPanelPage() {
                   ))}
                 </div>
                 {!editingId && formOptions.length < 10 && (
-                  <button type="button" onClick={addOption} className="mt-2 text-sm font-medium text-goto-green hover:text-goto-dark flex items-center gap-1">
+                  <button type="button" onClick={addOption} className="mt-2 text-sm font-medium text-primary hover:text-primary-dark flex items-center gap-1">
                     <Plus size={14} /> Tambah Opsi
                   </button>
                 )}
@@ -346,11 +346,11 @@ export default function PollingPanelPage() {
       ) : (
         <div className="space-y-3">
           {polls.map((poll) => (
-            <div key={poll.id} className={`rounded-[12px] border bg-surface p-5 shadow-card transition-all ${editingId === poll.id ? "border-goto-green bg-goto-light/10" : "border-border"}`}>
+            <div key={poll.id} className={`rounded-[12px] border bg-surface p-5 shadow-card transition-all ${editingId === poll.id ? "border-primary bg-primary-light/10" : "border-border"}`}>
               <div className="flex items-start gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${poll.isActive ? "bg-goto-light text-goto-green" : "bg-red-50 text-red-600"}`}>
+                    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${poll.isActive ? "bg-primary-light text-primary" : "bg-red-50 text-red-600"}`}>
                       <Power size={10} /> {poll.isActive ? "Aktif" : "Nonaktif"}
                     </span>
                     {poll.category && (
@@ -362,7 +362,7 @@ export default function PollingPanelPage() {
                     {poll.options.map((opt) => (
                       <div key={opt.id} className="flex items-center gap-3">
                         <div className="flex-1 h-2 rounded-full bg-border overflow-hidden">
-                          <div className="h-full rounded-full bg-goto-green/50" style={{ width: `${opt.percentage}%` }} />
+                          <div className="h-full rounded-full bg-primary/50" style={{ width: `${opt.percentage}%` }} />
                         </div>
                         <span className="text-xs text-txt-secondary w-24 truncate">{opt.label}</span>
                         <span className="text-xs font-bold text-txt-primary w-10 text-right">{opt.percentage}%</span>
@@ -376,7 +376,7 @@ export default function PollingPanelPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <button onClick={() => toggleActive(poll)} className={`btn-ghost rounded p-2 ${poll.isActive ? "hover:text-red-500" : "hover:text-goto-green"}`} title={poll.isActive ? "Nonaktifkan" : "Aktifkan"}>
+                  <button onClick={() => toggleActive(poll)} className={`btn-ghost rounded p-2 ${poll.isActive ? "hover:text-red-500" : "hover:text-primary"}`} title={poll.isActive ? "Nonaktifkan" : "Aktifkan"}>
                     <Power size={16} />
                   </button>
                   <button onClick={() => openEdit(poll)} className="btn-ghost rounded p-2" title="Edit"><Edit size={16} /></button>

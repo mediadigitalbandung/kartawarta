@@ -118,7 +118,7 @@ export default function PengaturanPage() {
   if (sessionStatus === "loading" || !loaded) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-goto-green border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     );
   }
@@ -128,7 +128,7 @@ export default function PengaturanPage() {
       {/* Toast — animated slide-in */}
       {toast && (
         <div className="fixed right-4 top-20 z-50 animate-fade-up">
-          <div className="flex items-center gap-3 rounded-[12px] border border-goto-green/30 bg-goto-green px-6 py-4 shadow-xl">
+          <div className="flex items-center gap-3 rounded-[12px] border border-primary/30 bg-primary px-6 py-4 shadow-xl">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
               <CheckCircle size={20} className="text-white" />
             </div>
@@ -143,7 +143,7 @@ export default function PengaturanPage() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2">
-          <Settings size={24} className="text-goto-green" />
+          <Settings size={24} className="text-primary" />
           <h1 className="text-xl sm:text-3xl font-bold text-txt-primary">
             Pengaturan Sistem
           </h1>
@@ -296,7 +296,7 @@ export default function PengaturanPage() {
                   updateField("enableComments", !settings.enableComments)
                 }
                 className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors ${
-                  settings.enableComments ? "bg-goto-green" : "bg-border"
+                  settings.enableComments ? "bg-primary" : "bg-border"
                 }`}
               >
                 <span
@@ -327,7 +327,7 @@ export default function PengaturanPage() {
                   )
                 }
                 className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors ${
-                  settings.autoModerateComments ? "bg-goto-green" : "bg-border"
+                  settings.autoModerateComments ? "bg-primary" : "bg-border"
                 }`}
               >
                 <span
@@ -345,7 +345,7 @@ export default function PengaturanPage() {
         {/* Konfigurasi AI */}
         <div className="rounded-[12px] border border-border bg-surface p-6 shadow-card">
           <div className="mb-4 flex items-center gap-2">
-            <Bot size={20} className="text-goto-green" />
+            <Bot size={20} className="text-primary" />
             <h2 className="text-lg font-semibold text-txt-primary">
               Konfigurasi AI
             </h2>

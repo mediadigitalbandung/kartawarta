@@ -75,7 +75,7 @@ export default function TopLoader() {
   return (
     <div className="fixed top-0 left-0 right-0 z-[100] h-[3px]">
       <div
-        className="h-full bg-goto-green transition-all ease-out"
+        className="h-full bg-primary transition-all ease-out"
         style={{
           width: `${progress}%`,
           opacity: progress >= 100 ? 0 : 1,

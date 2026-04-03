@@ -61,7 +61,7 @@ function ToolbarButton({
       className={cn(
         "rounded p-1.5 transition-colors",
         active
-          ? "bg-goto-light text-goto-green"
+          ? "bg-primary-light text-primary"
           : "text-txt-secondary hover:bg-surface-secondary",
         disabled && "cursor-not-allowed opacity-30"
       )}

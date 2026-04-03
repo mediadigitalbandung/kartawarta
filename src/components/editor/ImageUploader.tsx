@@ -174,12 +174,12 @@ export default function ImageUploader({ onUpload, currentImage }: ImageUploaderP
           onClick={() => inputRef.current?.click()}
           className={`flex cursor-pointer flex-col items-center justify-center rounded-[12px] border-2 border-dashed p-6 transition-colors ${
             dragActive
-              ? "border-goto-green bg-goto-green/5"
-              : "border-border hover:border-goto-green/50"
+              ? "border-primary bg-primary/5"
+              : "border-border hover:border-primary/50"
           }`}
         >
           {uploading ? (
-            <Loader2 size={24} className="animate-spin text-goto-green" />
+            <Loader2 size={24} className="animate-spin text-primary" />
           ) : (
             <ImageIcon size={24} className="text-txt-muted" />
           )}
@@ -204,7 +204,7 @@ export default function ImageUploader({ onUpload, currentImage }: ImageUploaderP
       />
 
       {sizeInfo && (
-        <p className="text-[10px] text-goto-green">{sizeInfo}</p>
+        <p className="text-[10px] text-primary">{sizeInfo}</p>
       )}
 
       {error && (

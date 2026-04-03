@@ -146,7 +146,7 @@ export default function EditIklanPage() {
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto flex items-center justify-center py-20">
-        <Loader2 size={32} className="animate-spin text-goto-green" />
+        <Loader2 size={32} className="animate-spin text-primary" />
       </div>
     );
   }
@@ -234,14 +234,14 @@ export default function EditIklanPage() {
                 <div className="space-y-3">
                   {!formImageUrl ? (
                     <label className="block cursor-pointer">
-                      <div className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border py-10 hover:border-goto-green hover:bg-goto-light/20 transition-colors ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
+                      <div className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border py-10 hover:border-primary hover:bg-primary-light/20 transition-colors ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
                         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-secondary">
                           <Upload size={22} className="text-txt-muted" />
                         </div>
                         <div className="text-center">
                           <p className="text-sm font-semibold text-txt-primary">{uploading ? "Mengupload..." : "Klik untuk upload gambar"}</p>
                           <p className="text-xs text-txt-muted mt-0.5">JPEG, PNG, WebP, GIF — Maks 5MB</p>
-                          {currentSpec && <p className="text-xs font-medium text-goto-green mt-1">Rekomendasi: {currentSpec.ratio}</p>}
+                          {currentSpec && <p className="text-xs font-medium text-primary mt-1">Rekomendasi: {currentSpec.ratio}</p>}
                         </div>
                       </div>
                       <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" disabled={uploading}
@@ -309,7 +309,7 @@ export default function EditIklanPage() {
 
             {/* Actions */}
             <div className="flex items-center justify-between">
-              <button type="button" onClick={() => setShowPreview(true)} className="flex items-center gap-1.5 text-sm font-medium text-goto-green hover:text-goto-dark transition-colors">
+              <button type="button" onClick={() => setShowPreview(true)} className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary-dark transition-colors">
                 <Eye size={15} /> Preview di Halaman
               </button>
               <div className="flex gap-3">

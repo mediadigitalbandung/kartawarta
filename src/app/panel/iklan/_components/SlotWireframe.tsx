@@ -2,7 +2,7 @@
 
 import { slotLabels, slotSpecs } from "./ad-constants";
 
-const AD = "bg-goto-green/15 border-2 border-dashed border-goto-green text-goto-green font-bold flex items-center justify-center rounded";
+const AD = "bg-primary/15 border-2 border-dashed border-primary text-primary font-bold flex items-center justify-center rounded";
 
 function Slot({ on, label, className }: { on: boolean; label: string; className?: string }) {
   if (!on) return null;
@@ -37,7 +37,7 @@ export default function SlotWireframe({ slot }: { slot: string }) {
 
         {/* ── Header Dark ── */}
         <div className="bg-[#1C1C1E] px-2.5 py-1.5 flex items-center">
-          <div className="h-4 w-4 rounded-full bg-goto-green flex items-center justify-center shrink-0">
+          <div className="h-4 w-4 rounded-full bg-primary flex items-center justify-center shrink-0">
             <span className="text-[4px] font-extrabold text-white">Kartawarta</span>
           </div>
           <div className="ml-1.5 leading-none">
@@ -49,7 +49,7 @@ export default function SlotWireframe({ slot }: { slot: string }) {
             <span className="text-[4px] text-white/30">Cari di sini...</span>
           </div>
           <span className="text-[5px] text-white/50 mr-1">Bookmark</span>
-          <div className="h-3.5 w-3.5 rounded-full bg-goto-green flex items-center justify-center">
+          <div className="h-3.5 w-3.5 rounded-full bg-primary flex items-center justify-center">
             <span className="text-[5px] text-white font-bold">S</span>
           </div>
         </div>
@@ -57,16 +57,16 @@ export default function SlotWireframe({ slot }: { slot: string }) {
         {/* ── Category Nav ── */}
         <div className="bg-white border-b border-[#e5e7eb] px-2.5 py-[3px] flex gap-[6px]">
           {["Terkini", "H.Pidana", "H.Perdata", "Tata Negara", "HAM", "H.Bisnis", "Opini", "Daerah"].map((c, i) => (
-            <span key={c} className={`text-[5px] whitespace-nowrap ${i === 0 ? "text-goto-green font-bold border-b border-goto-green" : "text-[#6B7280] font-medium"}`}>{c}</span>
+            <span key={c} className={`text-[5px] whitespace-nowrap ${i === 0 ? "text-primary font-bold border-b border-primary" : "text-[#6B7280] font-medium"}`}>{c}</span>
           ))}
         </div>
 
         {/* ── Trending Ticker ── */}
         <div className="bg-white border-b border-[#e5e7eb] px-2.5 py-[2px] flex items-center gap-1 overflow-hidden">
-          <span className="text-[4px] font-bold text-goto-green tracking-widest shrink-0">TRENDING</span>
+          <span className="text-[4px] font-bold text-primary tracking-widest shrink-0">TRENDING</span>
           {["Reformasi Intelijen", "Unhan", "HAM Operasi Intelijen"].map(t => (
             <span key={t} className="flex items-center gap-[2px] text-[4px] text-[#6B7280] whitespace-nowrap shrink-0">
-              <span className="h-[2px] w-[2px] rounded-full bg-goto-green" />{t}
+              <span className="h-[2px] w-[2px] rounded-full bg-primary" />{t}
             </span>
           ))}
         </div>
@@ -81,7 +81,7 @@ export default function SlotWireframe({ slot }: { slot: string }) {
             <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1E] via-[#1C1C1E]/60 to-transparent rounded" />
             <ImgBox h={55} className="rounded" />
             <div className="absolute bottom-1 left-1.5 right-1.5">
-              <div className="h-[3px] w-6 rounded-full bg-goto-green mb-[3px]" />
+              <div className="h-[3px] w-6 rounded-full bg-primary mb-[3px]" />
               <Bar w="80%" c="bg-white/70" />
               <div className="mt-[2px]"><Bar w="50%" c="bg-white/40" /></div>
             </div>
@@ -110,10 +110,10 @@ export default function SlotWireframe({ slot }: { slot: string }) {
           <div className="flex-[3] min-w-0">
             <div className="flex items-center justify-between mb-[3px]">
               <div className="flex items-center gap-[2px]">
-                <div className="w-[2px] h-[8px] bg-goto-green rounded-full" />
+                <div className="w-[2px] h-[8px] bg-primary rounded-full" />
                 <span className="text-[6px] font-bold text-[#1C1C1E]">Berita Terkini</span>
               </div>
-              <span className="text-[4px] text-goto-green font-medium">Lihat Semua</span>
+              <span className="text-[4px] text-primary font-medium">Lihat Semua</span>
             </div>
             <div className="grid grid-cols-2 gap-1">
               {[1, 2, 3, 4].map(i => (
@@ -123,7 +123,7 @@ export default function SlotWireframe({ slot }: { slot: string }) {
                     <Bar w="90%" c="bg-[#1C1C1E]/20" />
                     <Bar w="60%" c="bg-[#1C1C1E]/10" />
                     <div className="flex gap-[3px] items-center">
-                      <span className="h-[2px] w-[10px] rounded-full bg-goto-green/40" />
+                      <span className="h-[2px] w-[10px] rounded-full bg-primary/40" />
                       <Bar w="20px" c="bg-[#9CA3AF]/20" />
                     </div>
                   </div>
@@ -144,17 +144,17 @@ export default function SlotWireframe({ slot }: { slot: string }) {
             ) : (
               <>
                 <div className="flex items-center gap-[2px] mb-[3px]">
-                  <div className="w-[2px] h-[8px] bg-goto-green rounded-full" />
+                  <div className="w-[2px] h-[8px] bg-primary rounded-full" />
                   <span className="text-[6px] font-bold text-[#1C1C1E]">Terpopuler</span>
                 </div>
                 {[1, 2, 3, 4, 5].map(i => (
                   <div key={i} className="flex items-center gap-[3px] py-[2px] border-b border-[#f3f4f6]">
-                    <span className="text-[8px] font-extrabold text-goto-green w-[10px] text-center shrink-0">{i}</span>
+                    <span className="text-[8px] font-extrabold text-primary w-[10px] text-center shrink-0">{i}</span>
                     <ImgBox h={14} className="w-[20px] shrink-0 rounded-sm" />
                     <div className="flex-1 min-w-0 space-y-[1px]">
                       <Bar w={`${90 - i * 5}%`} c="bg-[#1C1C1E]/20" />
                       <div className="flex gap-[2px]">
-                        <span className="h-[2px] w-[8px] rounded-full bg-goto-green/40" />
+                        <span className="h-[2px] w-[8px] rounded-full bg-primary/40" />
                         <Bar w="12px" c="bg-[#9CA3AF]/20" />
                       </div>
                     </div>
@@ -168,14 +168,14 @@ export default function SlotWireframe({ slot }: { slot: string }) {
         {/* ── Jadwal Sidang — horizontal scroll cards ── */}
         <div className="px-2 mt-1.5">
           <div className="flex items-center gap-[2px] mb-[3px]">
-            <div className="w-[2px] h-[8px] bg-goto-green rounded-full" />
+            <div className="w-[2px] h-[8px] bg-primary rounded-full" />
             <span className="text-[6px] font-bold text-[#1C1C1E]">Jadwal Sidang</span>
           </div>
           <div className="flex gap-1 overflow-hidden">
             {[1, 2, 3, 4].map(i => (
               <div key={i} className="shrink-0 w-[50px] rounded border border-[#e5e7eb] bg-white p-[3px]">
                 <div className="flex items-center gap-[2px] mb-[2px]">
-                  <div className="h-[10px] w-[10px] rounded bg-goto-green flex items-center justify-center">
+                  <div className="h-[10px] w-[10px] rounded bg-primary flex items-center justify-center">
                     <span className="text-[4px] font-bold text-white">{i + 2}</span>
                   </div>
                   <div>
@@ -196,7 +196,7 @@ export default function SlotWireframe({ slot }: { slot: string }) {
           <div className="flex gap-4">
             <div>
               <div className="flex items-center gap-1 mb-[3px]">
-                <div className="h-[8px] w-[8px] rounded-full bg-goto-green flex items-center justify-center">
+                <div className="h-[8px] w-[8px] rounded-full bg-primary flex items-center justify-center">
                   <span className="text-[3px] text-white font-bold">Kartawarta</span>
                 </div>
                 <span className="text-[5px] font-bold text-white">Kartawarta</span>
@@ -243,10 +243,10 @@ export default function SlotWireframe({ slot }: { slot: string }) {
       </div>
 
       {/* ── Spec Summary ── */}
-      <div className="mt-4 rounded-xl bg-goto-light/50 p-3 space-y-1.5">
+      <div className="mt-4 rounded-xl bg-primary-light/50 p-3 space-y-1.5">
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold text-txt-primary">{slotLabels[slot]}</span>
-          <span className="rounded-full bg-goto-green px-2.5 py-0.5 text-[10px] font-bold text-white">{spec?.ratio}</span>
+          <span className="rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-bold text-white">{spec?.ratio}</span>
         </div>
         <p className="text-xs text-txt-secondary">{spec?.desc}</p>
         <div className="flex gap-3 text-[10px] text-txt-muted">

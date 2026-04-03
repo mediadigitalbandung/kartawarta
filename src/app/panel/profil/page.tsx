@@ -165,7 +165,7 @@ export default function ProfilPage() {
   if (loading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-goto-green border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     );
   }
@@ -181,7 +181,7 @@ export default function ProfilPage() {
         <div
           className={`mb-4 rounded-[12px] border p-4 text-sm ${
             message.type === "success"
-              ? "border-goto-green/30 bg-goto-green/10 text-goto-green"
+              ? "border-primary/30 bg-primary/10 text-primary"
               : "border-red-500/30 bg-red-500/10 text-red-400"
           }`}
         >
@@ -212,7 +212,7 @@ export default function ProfilPage() {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadingAvatar}
-                className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-goto-green text-white shadow-lg border-2 border-surface hover:bg-goto-dark transition-colors disabled:opacity-50"
+                className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white shadow-lg border-2 border-surface hover:bg-primary-dark transition-colors disabled:opacity-50"
                 aria-label="Ganti foto profil"
               >
                 {uploadingAvatar ? <Loader2 size={14} className="animate-spin" /> : <Camera size={14} />}
@@ -227,7 +227,7 @@ export default function ProfilPage() {
             </div>
             <h2 className="text-lg font-semibold text-txt-primary">{profile?.name}</h2>
             <p className="text-sm text-txt-secondary">{profile?.email}</p>
-            <span className="mt-2 inline-block rounded-full bg-goto-green/10 px-3 py-1 text-sm font-medium text-goto-green">
+            <span className="mt-2 inline-block rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
               {roleLabelsMap[profile?.role || ""] || profile?.role}
             </span>
           </div>

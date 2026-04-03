@@ -263,7 +263,7 @@ export default function EditArticlePage() {
       type="button"
       onClick={() => generateAI(feature, setter)}
       disabled={!title.trim() || !content.trim() || aiLoading[feature]}
-      className="flex items-center gap-1 text-xs text-goto-green hover:underline disabled:opacity-40 disabled:no-underline"
+      className="flex items-center gap-1 text-xs text-primary hover:underline disabled:opacity-40 disabled:no-underline"
     >
       {aiLoading[feature] ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
       Generate AI
@@ -843,12 +843,12 @@ export default function EditArticlePage() {
 
         {/* Admin Actions */}
         {currentStatus === "APPROVED" && (
-          <div className="mb-6 rounded-[12px] border-2 border-goto-green/30 bg-goto-50 p-5">
-            <h3 className="flex items-center gap-2 text-base font-bold text-goto-dark">
+          <div className="mb-6 rounded-[12px] border-2 border-primary/30 bg-primary-50 p-5">
+            <h3 className="flex items-center gap-2 text-base font-bold text-primary-dark">
               <CheckCircle size={18} />
               Artikel Disetujui — Siap Dipublikasi
             </h3>
-            <p className="mt-1 text-sm text-goto-green">
+            <p className="mt-1 text-sm text-primary">
               Artikel ini telah disetujui oleh editor. Anda dapat mempublikasi sekarang, menjadwalkan, atau mengembalikan ke editor.
             </p>
 
@@ -857,7 +857,7 @@ export default function EditArticlePage() {
                 <button
                   onClick={handleAdminPublish}
                   disabled={saving}
-                  className="flex items-center gap-1.5 rounded-[12px] bg-goto-green px-5 py-2.5 text-sm font-semibold text-white hover:bg-goto-dark disabled:opacity-50"
+                  className="flex items-center gap-1.5 rounded-[12px] bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark disabled:opacity-50"
                 >
                   <Upload size={16} />
                   Publikasi Sekarang
@@ -946,8 +946,8 @@ export default function EditArticlePage() {
         )}
 
         {currentStatus === "PUBLISHED" && (
-          <div className="mb-6 rounded-[12px] border border-goto-green/30 bg-goto-50 p-5">
-            <h3 className="flex items-center gap-2 text-base font-bold text-goto-dark">
+          <div className="mb-6 rounded-[12px] border border-primary/30 bg-primary-50 p-5">
+            <h3 className="flex items-center gap-2 text-base font-bold text-primary-dark">
               <CheckCircle size={18} />
               Artikel Sudah Dipublikasikan
             </h3>
@@ -972,7 +972,7 @@ export default function EditArticlePage() {
             href={`/panel/artikel/${articleId}/revisions`}
             className="inline-flex items-center gap-1.5 rounded-[12px] border border-border bg-surface px-4 py-2.5 text-sm font-medium text-txt-primary hover:bg-surface-secondary transition-colors"
           >
-            <History size={16} className="text-goto-green" />
+            <History size={16} className="text-primary" />
             Riwayat Revisi
           </Link>
         </div>
@@ -1089,11 +1089,11 @@ export default function EditArticlePage() {
                 onClick={() => { setReviewChoice("approve"); setRejectNote(""); }}
                 className={`cursor-pointer rounded-[12px] border-2 p-4 transition-all ${
                   reviewChoice === "approve"
-                    ? "border-goto-green bg-goto-green/5"
-                    : "border-border bg-white hover:border-goto-green/50"
+                    ? "border-primary bg-primary/5"
+                    : "border-border bg-white hover:border-primary/50"
                 } ${reviewChoice === "reject" ? "opacity-40 pointer-events-none" : ""}`}
               >
-                <div className="flex items-center gap-2 text-goto-green font-bold">
+                <div className="flex items-center gap-2 text-primary font-bold">
                   <CheckCircle size={20} />
                   Setujui
                 </div>
@@ -1165,7 +1165,7 @@ export default function EditArticlePage() {
                   disabled={saving || (reviewChoice === "reject" && !rejectNote.trim())}
                   className={`flex items-center gap-1.5 rounded-[12px] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50 ${
                     reviewChoice === "approve"
-                      ? "bg-goto-green hover:bg-goto-dark"
+                      ? "bg-primary hover:bg-primary-dark"
                       : "bg-red-600 hover:bg-red-700"
                   }`}
                 >
@@ -1189,19 +1189,19 @@ export default function EditArticlePage() {
 
         {/* Editor APPROVED — Publish or Cancel */}
         {currentStatus === "APPROVED" && isAssignedEditor && (
-          <div className="mb-6 rounded-[12px] border-2 border-goto-green/30 bg-goto-50 p-5">
-            <h3 className="flex items-center gap-2 text-base font-bold text-goto-dark">
+          <div className="mb-6 rounded-[12px] border-2 border-primary/30 bg-primary-50 p-5">
+            <h3 className="flex items-center gap-2 text-base font-bold text-primary-dark">
               <CheckCircle size={18} />
               Artikel Telah Disetujui — Siap Dipublikasi
             </h3>
-            <p className="mt-1 text-sm text-goto-green">
+            <p className="mt-1 text-sm text-primary">
               Artikel siap dipublikasi. Anda dapat mempublikasi atau membatalkan persetujuan.
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-3">
               <button
                 onClick={handleEditorPublish}
                 disabled={saving}
-                className="flex items-center gap-1.5 rounded-[12px] bg-goto-green px-5 py-2.5 text-sm font-semibold text-white hover:bg-goto-dark disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-[12px] bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark disabled:opacity-50"
               >
                 <Upload size={16} />
                 Publikasi Sekarang
@@ -1219,8 +1219,8 @@ export default function EditArticlePage() {
         )}
 
         {currentStatus === "PUBLISHED" && (
-          <div className="mb-6 rounded-[12px] border border-goto-green/30 bg-goto-50 p-5">
-            <h3 className="flex items-center gap-2 text-base font-bold text-goto-dark">
+          <div className="mb-6 rounded-[12px] border border-primary/30 bg-primary-50 p-5">
+            <h3 className="flex items-center gap-2 text-base font-bold text-primary-dark">
               <CheckCircle size={18} />
               Artikel Telah Dipublikasikan
             </h3>
@@ -1233,7 +1233,7 @@ export default function EditArticlePage() {
             href={`/panel/artikel/${articleId}/revisions`}
             className="inline-flex items-center gap-1.5 rounded-[12px] border border-border bg-surface px-4 py-2.5 text-sm font-medium text-txt-primary hover:bg-surface-secondary transition-colors"
           >
-            <History size={16} className="text-goto-green" />
+            <History size={16} className="text-primary" />
             Riwayat Revisi
           </Link>
         </div>
@@ -1527,8 +1527,8 @@ export default function EditArticlePage() {
 
       {/* PUBLISHED: Article locked */}
       {currentStatus === "PUBLISHED" && isOwner && (
-        <div className="mb-4 rounded-[12px] border border-goto-green/30 bg-goto-50 p-4">
-          <h3 className="flex items-center gap-2 text-sm font-semibold text-goto-dark">
+        <div className="mb-4 rounded-[12px] border border-primary/30 bg-primary-50 p-4">
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-primary-dark">
             <CheckCircle size={16} />
             Artikel Telah Dipublikasikan
           </h3>
@@ -1541,7 +1541,7 @@ export default function EditArticlePage() {
           href={`/panel/artikel/${articleId}/revisions`}
           className="inline-flex items-center gap-1.5 rounded-[12px] border border-border bg-surface px-4 py-2.5 text-sm font-medium text-txt-primary hover:bg-surface-secondary transition-colors"
         >
-          <History size={16} className="text-goto-green" />
+          <History size={16} className="text-primary" />
           Riwayat Revisi
         </Link>
       </div>
@@ -1574,7 +1574,7 @@ export default function EditArticlePage() {
                 <h3 className="text-sm font-medium text-txt-primary uppercase tracking-wider">
                   Sumber & Narasumber
                 </h3>
-                <button type="button" onClick={addSource} className="flex items-center gap-1 text-xs text-goto-green hover:underline">
+                <button type="button" onClick={addSource} className="flex items-center gap-1 text-xs text-primary hover:underline">
                   <Plus size={14} /> Tambah Sumber
                 </button>
               </div>
@@ -1700,8 +1700,8 @@ export default function EditArticlePage() {
               )}
             </div>
             {/* Journalism Checklist */}
-            <div className="rounded-[12px] border border-goto-green/20 bg-goto-50 p-4">
-              <button type="button" onClick={() => setShowChecklist(!showChecklist)} className="flex w-full items-center justify-between text-sm font-bold text-goto-dark">
+            <div className="rounded-[12px] border border-primary/20 bg-primary-50 p-4">
+              <button type="button" onClick={() => setShowChecklist(!showChecklist)} className="flex w-full items-center justify-between text-sm font-bold text-primary-dark">
                 <span className="flex items-center gap-1.5">
                   <CheckCircle size={16} />
                   Checklist Jurnalistik
@@ -1717,7 +1717,7 @@ export default function EditArticlePage() {
                     { key: "noSara" as const, label: "Tidak mengandung unsur SARA" },
                     { key: "properLanguage" as const, label: "Bahasa sesuai PUEBI" },
                   ].map((item) => (
-                    <label key={item.key} className="flex items-start gap-2 text-xs text-goto-green">
+                    <label key={item.key} className="flex items-start gap-2 text-xs text-primary">
                       <input
                         type="checkbox"
                         checked={checklist[item.key]}
@@ -1728,7 +1728,7 @@ export default function EditArticlePage() {
                     </label>
                   ))}
                   {allChecked && (
-                    <p className="mt-2 flex items-center gap-1 text-xs font-medium text-goto-green">
+                    <p className="mt-2 flex items-center gap-1 text-xs font-medium text-primary">
                       <CheckCircle size={12} /> Semua checklist terpenuhi
                     </p>
                   )}

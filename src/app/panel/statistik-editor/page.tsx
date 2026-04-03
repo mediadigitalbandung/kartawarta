@@ -116,7 +116,7 @@ export default function StatistikEditorPage() {
   ) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-goto-green border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     );
   }
@@ -126,7 +126,7 @@ export default function StatistikEditorPage() {
       <div>
         <div className="mb-6">
           <div className="flex items-center gap-2">
-            <BarChart3 size={24} className="text-goto-green" />
+            <BarChart3 size={24} className="text-primary" />
             <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">
               Statistik Editor
             </h1>
@@ -158,7 +158,7 @@ export default function StatistikEditorPage() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2">
-          <BarChart3 size={24} className="text-goto-green" />
+          <BarChart3 size={24} className="text-primary" />
           <h1 className="text-lg sm:text-2xl font-bold text-txt-primary">
             Statistik Editor
           </h1>
@@ -192,10 +192,10 @@ export default function StatistikEditorPage() {
           <p className="text-xs text-txt-secondary">Total Review</p>
         </div>
         <div className="rounded-[12px] border border-border bg-surface p-4 shadow-card">
-          <div className="inline-flex rounded-[12px] bg-goto-light p-2 text-goto-green">
+          <div className="inline-flex rounded-[12px] bg-primary-light p-2 text-primary">
             <CheckCircle size={18} />
           </div>
-          <p className="mt-2 text-xl sm:text-3xl font-extrabold text-goto-green">
+          <p className="mt-2 text-xl sm:text-3xl font-extrabold text-primary">
             {approved}
           </p>
           <p className="text-xs text-txt-secondary">Disetujui</p>
@@ -235,13 +235,13 @@ export default function StatistikEditorPage() {
                 <span className="text-sm font-medium text-txt-primary">
                   Disetujui
                 </span>
-                <span className="text-sm font-semibold text-goto-green">
+                <span className="text-sm font-semibold text-primary">
                   {approvalRate}%
                 </span>
               </div>
               <div className="h-3 w-full overflow-hidden rounded-full bg-surface-tertiary">
                 <div
-                  className="h-full rounded-full bg-goto-green transition-all duration-500"
+                  className="h-full rounded-full bg-primary transition-all duration-500"
                   style={{ width: `${approvalRate}%` }}
                 />
               </div>
@@ -309,7 +309,7 @@ export default function StatistikEditorPage() {
                       <span
                         className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
                           isApproved
-                            ? "bg-goto-light text-goto-green"
+                            ? "bg-primary-light text-primary"
                             : isRejected
                               ? "bg-red-50 text-red-600"
                               : "bg-surface-tertiary text-txt-secondary"

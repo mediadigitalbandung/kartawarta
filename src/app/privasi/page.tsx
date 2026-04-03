@@ -10,7 +10,7 @@ export default function PrivasiPage() {
     <div className="container-main py-12">
       <div className="mx-auto max-w-3xl">
         <h1 className="text-3xl font-bold text-txt-primary">Kebijakan Privasi</h1>
-        <div className="mt-2 h-1 w-16 bg-goto-green" />
+        <div className="mt-2 h-1 w-16 bg-primary" />
         <p className="mt-4 text-sm text-txt-muted">
           Terakhir diperbarui: 1 Januari 2026
         </p>
@@ -24,7 +24,7 @@ export default function PrivasiPage() {
 
           {/* Pengumpulan Data */}
           <section>
-            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">1. Pengumpulan Data</h2>
+            <h2 className="mb-3 border-l-[3px] border-primary pl-3 text-xl font-bold text-txt-primary">1. Pengumpulan Data</h2>
             <p>Kami dapat mengumpulkan informasi berikut dari pengguna:</p>
             <ul className="ml-6 mt-2 list-disc space-y-2">
               <li>
@@ -48,7 +48,7 @@ export default function PrivasiPage() {
 
           {/* Penggunaan Data */}
           <section>
-            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">2. Penggunaan Data</h2>
+            <h2 className="mb-3 border-l-[3px] border-primary pl-3 text-xl font-bold text-txt-primary">2. Penggunaan Data</h2>
             <p>Data yang kami kumpulkan digunakan untuk:</p>
             <ul className="ml-6 mt-2 list-disc space-y-2">
               <li>Menyediakan dan meningkatkan layanan platform berita kami.</li>
@@ -62,7 +62,7 @@ export default function PrivasiPage() {
 
           {/* Cookies */}
           <section>
-            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">3. Cookies</h2>
+            <h2 className="mb-3 border-l-[3px] border-primary pl-3 text-xl font-bold text-txt-primary">3. Cookies</h2>
             <p>
               Situs kami menggunakan cookies dan teknologi serupa untuk meningkatkan pengalaman
               browsing Anda. Cookies yang kami gunakan meliputi:
@@ -89,7 +89,7 @@ export default function PrivasiPage() {
 
           {/* Pihak Ketiga */}
           <section>
-            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">4. Pihak Ketiga</h2>
+            <h2 className="mb-3 border-l-[3px] border-primary pl-3 text-xl font-bold text-txt-primary">4. Pihak Ketiga</h2>
             <p>
               Kami tidak menjual, memperdagangkan, atau memindahkan informasi pribadi Anda kepada
               pihak ketiga tanpa persetujuan Anda, kecuali dalam situasi berikut:
@@ -113,7 +113,7 @@ export default function PrivasiPage() {
 
           {/* Keamanan Data */}
           <section>
-            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">5. Keamanan Data</h2>
+            <h2 className="mb-3 border-l-[3px] border-primary pl-3 text-xl font-bold text-txt-primary">5. Keamanan Data</h2>
             <p>
               Kami menerapkan langkah-langkah keamanan teknis dan organisasional yang wajar untuk
               melindungi data pribadi Anda dari akses tidak sah, pengubahan, pengungkapan, atau
@@ -133,7 +133,7 @@ export default function PrivasiPage() {
 
           {/* Hak Pengguna */}
           <section>
-            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">6. Hak Pengguna</h2>
+            <h2 className="mb-3 border-l-[3px] border-primary pl-3 text-xl font-bold text-txt-primary">6. Hak Pengguna</h2>
             <p>Sebagai pengguna, Anda memiliki hak untuk:</p>
             <ul className="ml-6 mt-2 list-disc space-y-2">
               <li>
@@ -165,7 +165,7 @@ export default function PrivasiPage() {
 
           {/* Kontak */}
           <section>
-            <h2 className="mb-3 border-l-[3px] border-goto-green pl-3 text-xl font-bold text-txt-primary">7. Kontak</h2>
+            <h2 className="mb-3 border-l-[3px] border-primary pl-3 text-xl font-bold text-txt-primary">7. Kontak</h2>
             <p>
               Jika Anda memiliki pertanyaan, keluhan, atau permintaan terkait kebijakan privasi ini,
               silakan hubungi kami:

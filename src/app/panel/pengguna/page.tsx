@@ -33,7 +33,7 @@ const roleLabels: Record<string, { label: string; color: string }> = {
   SUPER_ADMIN: { label: "Super Admin", color: "bg-red-50 text-red-600" },
   CHIEF_EDITOR: { label: "Editor Kepala", color: "bg-purple-50 text-purple-600" },
   EDITOR: { label: "Editor", color: "bg-blue-50 text-blue-600" },
-  SENIOR_JOURNALIST: { label: "Jurnalis Senior", color: "bg-goto-light text-goto-green" },
+  SENIOR_JOURNALIST: { label: "Jurnalis Senior", color: "bg-primary-light text-primary" },
   JOURNALIST: { label: "Jurnalis", color: "bg-blue-50 text-blue-600" },
   CONTRIBUTOR: { label: "Kontributor", color: "bg-surface-tertiary text-txt-secondary" },
 };
@@ -314,7 +314,7 @@ export default function PenggunaPage() {
                     <tr key={user.id} className="hover:bg-surface-secondary">
                       <td className="px-3 sm:px-5 py-4">
                         <div className="flex items-center gap-2 sm:gap-3">
-                          <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-goto-green text-xs sm:text-sm font-bold text-white">
+                          <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-primary text-xs sm:text-sm font-bold text-white">
                             {user.name.charAt(0)}
                           </div>
                           <div className="min-w-0">
@@ -335,7 +335,7 @@ export default function PenggunaPage() {
                       </td>
                       <td className="hidden md:table-cell px-5 py-4">
                         {user.isActive ? (
-                          <span className="flex items-center gap-1 text-sm text-goto-green">
+                          <span className="flex items-center gap-1 text-sm text-primary">
                             <UserCheck size={12} /> Aktif
                           </span>
                         ) : (

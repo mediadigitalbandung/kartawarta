@@ -236,10 +236,10 @@ export default async function HomePage() {
             {/* Left: Berita Terkini — 2/3 width, grid layout */}
             <div className="lg:col-span-3">
               <div className="flex items-center justify-between mb-5">
-                <Link href="/berita" className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary hover:text-goto-green transition-colors">
+                <Link href="/berita" className="border-l-[3px] border-primary pl-3 text-lg font-bold text-txt-primary hover:text-primary transition-colors">
                   Berita Terkini
                 </Link>
-                <Link href="/berita" className="text-sm font-medium text-goto-green hover:underline">
+                <Link href="/berita" className="text-sm font-medium text-primary hover:underline">
                   Lihat Semua
                 </Link>
               </div>
@@ -254,11 +254,11 @@ export default async function HomePage() {
             {trendingArticles.length > 0 && (
               <div className="lg:col-span-2 flex flex-col">
                 <div className="flex items-center justify-between mb-5">
-                  <Link href="/berita?sort=popular" className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center hover:text-goto-green transition-colors">
-                    <TrendingUp size={18} className="mr-2 text-goto-green" />
+                  <Link href="/berita?sort=popular" className="border-l-[3px] border-primary pl-3 text-lg font-bold text-txt-primary flex items-center hover:text-primary transition-colors">
+                    <TrendingUp size={18} className="mr-2 text-primary" />
                     Terpopuler
                   </Link>
-                  <Link href="/berita?sort=popular" className="text-sm font-medium text-goto-green hover:underline">
+                  <Link href="/berita?sort=popular" className="text-sm font-medium text-primary hover:underline">
                     Lihat Semua
                   </Link>
                 </div>
@@ -266,7 +266,7 @@ export default async function HomePage() {
                   {trendingArticles.slice(0, 8).map((article, i) => (
                     <div key={article.slug} className="group flex flex-1 items-center gap-3 py-3 first:pt-0">
                       {/* Rank number */}
-                      <span className="shrink-0 w-8 text-center text-2xl font-extrabold text-goto-green select-none">
+                      <span className="shrink-0 w-8 text-center text-2xl font-extrabold text-primary select-none">
                         {i + 1}
                       </span>
                       {/* Thumbnail */}
@@ -287,12 +287,12 @@ export default async function HomePage() {
                       {/* Text */}
                       <div className="flex-1 min-w-0">
                         <Link href={`/berita/${article.slug}`}>
-                          <h3 className="text-sm font-bold leading-snug text-txt-primary line-clamp-2 group-hover:text-goto-green transition-colors">
+                          <h3 className="text-sm font-bold leading-snug text-txt-primary line-clamp-2 group-hover:text-primary transition-colors">
                             {article.title}
                           </h3>
                         </Link>
                         <div className="mt-1 flex items-center gap-2 text-[11px] text-txt-muted">
-                          <span className="text-goto-green font-semibold">{article.category.name}</span>
+                          <span className="text-primary font-semibold">{article.category.name}</span>
                           <span className="h-2.5 w-px bg-border" />
                           <span>{article.viewCount?.toLocaleString("id-ID")} views</span>
                         </div>
@@ -313,19 +313,19 @@ export default async function HomePage() {
       <section className="bg-surface py-6">
         <div className="container-main">
           <div className="flex items-center justify-between mb-4">
-            <Link href="/jadwal-sidang" className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center hover:text-goto-green transition-colors">
-              <Calendar size={18} className="mr-2 text-goto-green" />
+            <Link href="/jadwal-sidang" className="border-l-[3px] border-primary pl-3 text-lg font-bold text-txt-primary flex items-center hover:text-primary transition-colors">
+              <Calendar size={18} className="mr-2 text-primary" />
               Jadwal Sidang Mendatang
             </Link>
-            <Link href="/jadwal-sidang" className="text-sm font-medium text-goto-green hover:underline">
+            <Link href="/jadwal-sidang" className="text-sm font-medium text-primary hover:underline">
               Lihat Semua
             </Link>
           </div>
           <HorizontalScroll>
             {jadwalSidangData.map((j) => (
-              <div key={j.date} className="shrink-0 w-[calc(100vw-48px)] sm:w-[260px] md:w-[300px] rounded-lg border border-border bg-surface-secondary p-4 hover:border-goto-green/40 transition-colors">
+              <div key={j.date} className="shrink-0 w-[calc(100vw-48px)] sm:w-[260px] md:w-[300px] rounded-lg border border-border bg-surface-secondary p-4 hover:border-primary/40 transition-colors">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="flex h-12 w-12 flex-col items-center justify-center rounded-lg bg-goto-green text-white">
+                  <div className="flex h-12 w-12 flex-col items-center justify-center rounded-lg bg-primary text-white">
                     <span className="text-lg font-extrabold leading-none">{j.date.split(" ")[0]}</span>
                     <span className="text-[9px] font-medium uppercase">{j.date.split(" ")[1]}</span>
                   </div>
@@ -335,7 +335,7 @@ export default async function HomePage() {
                   </div>
                 </div>
                 <p className="text-sm font-medium text-txt-primary leading-snug line-clamp-2">{j.highlight}</p>
-                <p className="text-xs font-semibold text-goto-green mt-1.5">{j.time}</p>
+                <p className="text-xs font-semibold text-primary mt-1.5">{j.time}</p>
               </div>
             ))}
           </HorizontalScroll>
@@ -352,7 +352,7 @@ export default async function HomePage() {
               <Radio size={18} className="mr-2 text-red-500 animate-pulse" />
               Live Sidang Hari Ini
             </Link>
-            <Link href="/live-sidang" className="text-sm font-medium text-goto-green hover:underline">
+            <Link href="/live-sidang" className="text-sm font-medium text-primary hover:underline">
               Lihat Semua
             </Link>
           </div>
@@ -395,7 +395,7 @@ export default async function HomePage() {
                 </div>
                 <h3 className="text-sm font-bold text-txt-primary leading-snug">{sidang.title}</h3>
                 <p className="text-xs text-txt-muted mt-1">{sidang.judge}</p>
-                <p className="text-xs font-semibold text-goto-green mt-2">{sidang.time}</p>
+                <p className="text-xs font-semibold text-primary mt-2">{sidang.time}</p>
               </div>
             ))}
           </div>
@@ -406,8 +406,8 @@ export default async function HomePage() {
       <section className="bg-surface py-8">
         <div className="container-main">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center cursor-default">
-              <Vote size={18} className="mr-2 text-goto-green" />
+            <h2 className="border-l-[3px] border-primary pl-3 text-lg font-bold text-txt-primary flex items-center cursor-default">
+              <Vote size={18} className="mr-2 text-primary" />
               Polling Hukum
             </h2>
           </div>
@@ -422,11 +422,11 @@ export default async function HomePage() {
       <section className="bg-surface-secondary py-8">
         <div className="container-main">
           <div className="flex items-center justify-between mb-5">
-            <Link href="/video" className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary flex items-center hover:text-goto-green transition-colors">
-              <Play size={18} className="mr-2 text-goto-green" />
+            <Link href="/video" className="border-l-[3px] border-primary pl-3 text-lg font-bold text-txt-primary flex items-center hover:text-primary transition-colors">
+              <Play size={18} className="mr-2 text-primary" />
               Video Story
             </Link>
-            <Link href="/video" className="text-sm font-medium text-goto-green hover:underline flex items-center gap-1">
+            <Link href="/video" className="text-sm font-medium text-primary hover:underline flex items-center gap-1">
               Lihat Semua &rarr;
             </Link>
           </div>
@@ -453,12 +453,12 @@ export default async function HomePage() {
             <div className="container-main">
               {/* Section header */}
               <div className="flex items-center justify-between mb-5">
-                <Link href={`/kategori/${categorySlug}`} className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary hover:text-goto-green transition-colors">
+                <Link href={`/kategori/${categorySlug}`} className="border-l-[3px] border-primary pl-3 text-lg font-bold text-txt-primary hover:text-primary transition-colors">
                   {categoryName}
                 </Link>
                 <Link
                   href={`/kategori/${categorySlug}`}
-                  className="text-sm font-medium text-goto-green hover:underline"
+                  className="text-sm font-medium text-primary hover:underline"
                 >
                   Lihat lainnya &rarr;
                 </Link>
@@ -486,7 +486,7 @@ export default async function HomePage() {
                             {featured.title}
                           </h3>
                           <div className="mt-1.5 flex items-center gap-2 text-[11px] text-white/50">
-                            <span className="text-goto-green font-semibold">{featured.author.name}</span>
+                            <span className="text-primary font-semibold">{featured.author.name}</span>
                             <span>{featured.publishedAt ? new Date(featured.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : ""}</span>
                           </div>
                         </div>
@@ -498,7 +498,7 @@ export default async function HomePage() {
                 {/* Center: Trending — scrollable list */}
                 {trending.length > 0 && (
                   <div className="lg:col-span-1">
-                    <Link href={`/kategori/${categorySlug}`} className="border-l-[3px] border-goto-green pl-3 text-sm font-bold text-txt-primary mb-3 block hover:text-goto-green transition-colors">
+                    <Link href={`/kategori/${categorySlug}`} className="border-l-[3px] border-primary pl-3 text-sm font-bold text-txt-primary mb-3 block hover:text-primary transition-colors">
                       Trending di {categoryName}
                     </Link>
                     <div className="space-y-0 divide-y divide-border max-h-[280px] overflow-y-auto scrollbar-hide">
@@ -513,12 +513,12 @@ export default async function HomePage() {
                           )}
                           <div className="flex-1 min-w-0">
                             <Link href={`/berita/${a.slug}`}>
-                              <h4 className="text-[13px] font-bold text-txt-primary leading-snug line-clamp-2 group-hover:text-goto-green transition-colors">
+                              <h4 className="text-[13px] font-bold text-txt-primary leading-snug line-clamp-2 group-hover:text-primary transition-colors">
                                 {a.title}
                               </h4>
                             </Link>
                             <div className="mt-1 flex items-center gap-1.5 text-[10px] text-txt-muted">
-                              <span className="text-goto-green font-semibold">{a.author.name}</span>
+                              <span className="text-primary font-semibold">{a.author.name}</span>
                               <span>{a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : ""}</span>
                             </div>
                           </div>
@@ -531,7 +531,7 @@ export default async function HomePage() {
                 {/* Right: Terbaru */}
                 {terbaru.length > 0 && (
                   <div className="lg:col-span-1">
-                    <Link href={`/kategori/${categorySlug}`} className="border-l-[3px] border-goto-green pl-3 text-sm font-bold text-txt-primary mb-3 block hover:text-goto-green transition-colors">
+                    <Link href={`/kategori/${categorySlug}`} className="border-l-[3px] border-primary pl-3 text-sm font-bold text-txt-primary mb-3 block hover:text-primary transition-colors">
                       Terbaru di {categoryName}
                     </Link>
                     <div className="space-y-0 divide-y divide-border max-h-[280px] overflow-y-auto scrollbar-hide">
@@ -546,12 +546,12 @@ export default async function HomePage() {
                           )}
                           <div className="flex-1 min-w-0">
                             <Link href={`/berita/${a.slug}`}>
-                              <h4 className="text-[13px] font-bold text-txt-primary leading-snug line-clamp-2 group-hover:text-goto-green transition-colors">
+                              <h4 className="text-[13px] font-bold text-txt-primary leading-snug line-clamp-2 group-hover:text-primary transition-colors">
                                 {a.title}
                               </h4>
                             </Link>
                             <div className="mt-1 flex items-center gap-1.5 text-[10px] text-txt-muted">
-                              <span className="text-goto-green font-semibold">{a.author.name}</span>
+                              <span className="text-primary font-semibold">{a.author.name}</span>
                               <span>{a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : ""}</span>
                             </div>
                           </div>
@@ -573,7 +573,7 @@ export default async function HomePage() {
       <section className="bg-surface-secondary py-8">
         <div className="container-main">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="border-l-[3px] border-goto-green pl-3 text-lg font-bold text-txt-primary">
+            <h2 className="border-l-[3px] border-primary pl-3 text-lg font-bold text-txt-primary">
               Kategori
             </h2>
           </div>
@@ -584,13 +584,13 @@ export default async function HomePage() {
                 <Link
                   key={cat.slug}
                   href={`/kategori/${cat.slug}`}
-                  className="group flex items-center gap-3 rounded-lg border border-border bg-surface p-3 transition-all duration-200 hover:border-goto-green/40 hover:shadow-sm"
+                  className="group flex items-center gap-3 rounded-lg border border-border bg-surface p-3 transition-all duration-200 hover:border-primary/40 hover:shadow-sm"
                 >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-goto-light text-goto-green">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-light text-primary">
                     <Icon size={16} />
                   </div>
                   <div className="min-w-0">
-                    <span className="block text-xs font-semibold text-txt-primary truncate group-hover:text-goto-green transition-colors">
+                    <span className="block text-xs font-semibold text-txt-primary truncate group-hover:text-primary transition-colors">
                       {cat.name}
                     </span>
                     <span className="block text-[10px] text-txt-muted">{cat._count.articles} artikel</span>

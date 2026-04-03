@@ -190,7 +190,7 @@ export default function NewArticlePage() {
       type="button"
       onClick={() => generateAI(feature, setter)}
       disabled={!title.trim() || !content.trim() || aiLoading[feature]}
-      className="flex items-center gap-1 text-xs text-goto-green hover:underline disabled:opacity-40 disabled:no-underline"
+      className="flex items-center gap-1 text-xs text-primary hover:underline disabled:opacity-40 disabled:no-underline"
     >
       {aiLoading[feature] ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
       Generate AI
@@ -381,8 +381,8 @@ export default function NewArticlePage() {
         <div className="mb-4 rounded-[12px] border border-border bg-surface p-4 shadow-card">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-goto-light">
-                <Lightbulb size={14} className="text-goto-green" />
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary-light">
+                <Lightbulb size={14} className="text-primary" />
               </div>
               <h3 className="text-sm font-bold text-txt-primary">Ide Berita dari Trending</h3>
               <span className="text-xs text-txt-muted">— klik untuk pakai sebagai judul</span>
@@ -401,7 +401,7 @@ export default function NewArticlePage() {
                 key={i}
                 type="button"
                 onClick={() => setTitle(item.label)}
-                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors hover:border-goto-green hover:text-goto-green ${
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors hover:border-primary hover:text-primary ${
                   item.hot
                     ? "border-red-200 bg-red-50 text-red-600 hover:bg-red-50"
                     : "border-border bg-surface-secondary text-txt-secondary"
@@ -448,7 +448,7 @@ export default function NewArticlePage() {
               <button
                 type="button"
                 onClick={addSource}
-                className="flex items-center gap-1 text-xs text-goto-green hover:underline"
+                className="flex items-center gap-1 text-xs text-primary hover:underline"
               >
                 <Plus size={14} /> Tambah Sumber
               </button>
@@ -671,11 +671,11 @@ export default function NewArticlePage() {
           </div>
 
           {/* Journalism Checklist */}
-          <div className="rounded-[12px] border border-goto-green/20 bg-goto-50 p-4">
+          <div className="rounded-[12px] border border-primary/20 bg-primary-50 p-4">
             <button
               type="button"
               onClick={() => setShowChecklist(!showChecklist)}
-              className="flex w-full items-center justify-between text-sm font-bold text-goto-dark"
+              className="flex w-full items-center justify-between text-sm font-bold text-primary-dark"
             >
               <span className="flex items-center gap-1.5">
                 <CheckCircle size={16} />
@@ -692,7 +692,7 @@ export default function NewArticlePage() {
                   { key: "noSara" as const, label: "Tidak mengandung unsur SARA" },
                   { key: "properLanguage" as const, label: "Bahasa sesuai PUEBI" },
                 ].map((item) => (
-                  <label key={item.key} className="flex items-start gap-2 text-xs text-goto-green">
+                  <label key={item.key} className="flex items-start gap-2 text-xs text-primary">
                     <input
                       type="checkbox"
                       checked={checklist[item.key]}
@@ -705,7 +705,7 @@ export default function NewArticlePage() {
                   </label>
                 ))}
                 {allChecked && (
-                  <p className="mt-2 flex items-center gap-1 text-xs font-medium text-goto-green">
+                  <p className="mt-2 flex items-center gap-1 text-xs font-medium text-primary">
                     <CheckCircle size={12} /> Semua checklist terpenuhi
                   </p>
                 )}

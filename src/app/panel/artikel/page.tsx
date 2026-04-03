@@ -41,7 +41,7 @@ interface Article {
 import { CREATOR_ROLES, EDITOR_ROLES } from "@/lib/roles";
 
 const statusConfig: Record<string, { label: string; icon: React.ElementType; color: string }> = {
-  PUBLISHED: { label: "Dipublikasi", icon: CheckCircle, color: "bg-goto-light text-goto-green" },
+  PUBLISHED: { label: "Dipublikasi", icon: CheckCircle, color: "bg-primary-light text-primary" },
   IN_REVIEW: { label: "Menunggu Review", icon: Clock, color: "bg-yellow-50 text-yellow-600" },
   DRAFT: { label: "Draf", icon: FileText, color: "bg-surface-tertiary text-txt-secondary" },
   APPROVED: { label: "Disetujui", icon: CheckCircle, color: "bg-blue-50 text-blue-600" },
@@ -74,7 +74,7 @@ function StatusTimeline({ status }: { status: string }) {
                 isRejected
                   ? "h-4 w-4 border border-red-500/40 bg-red-500/10 text-red-400"
                   : isCompleted
-                    ? "h-4 w-4 bg-goto-green text-white"
+                    ? "h-4 w-4 bg-primary text-white"
                     : "h-4 w-4 border border-border bg-surface-tertiary text-txt-muted"
               }`}
               title={stepLabels[step]}
@@ -87,7 +87,7 @@ function StatusTimeline({ status }: { status: string }) {
                   isRejected
                     ? "bg-red-500/20"
                     : !isArchived && currentIndex > i
-                      ? "bg-goto-green"
+                      ? "bg-primary"
                       : "bg-border"
                 }`}
               />
@@ -387,7 +387,7 @@ export default function ArtikelPage() {
               onClick={() => { setFilterStatus(status); setPage(1); }}
               className={`rounded-full px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors ${
                 filterStatus === status
-                  ? "bg-goto-green text-white"
+                  ? "bg-primary text-white"
                   : "bg-surface-tertiary text-txt-secondary hover:bg-border"
               }`}
             >
@@ -425,7 +425,7 @@ export default function ArtikelPage() {
                         type="checkbox"
                         checked={allFilteredSelected}
                         onChange={() => toggleSelectAll(filteredIds)}
-                        className="h-4 w-4 rounded border-border text-goto-green accent-goto-green"
+                        className="h-4 w-4 rounded border-border text-primary accent-goto-green"
                         aria-label="Pilih semua artikel"
                       />
                     </th>
@@ -447,13 +447,13 @@ export default function ArtikelPage() {
                     const config = statusConfig[article.status] || statusConfig.DRAFT;
                     const StatusIcon = config.icon;
                     return (
-                      <tr key={article.id} className={`hover:bg-surface-secondary ${selectedIds.has(article.id) ? "bg-goto-50" : ""}`}>
+                      <tr key={article.id} className={`hover:bg-surface-secondary ${selectedIds.has(article.id) ? "bg-primary-50" : ""}`}>
                         <td className="w-10 px-3 py-4 text-center">
                           <input
                             type="checkbox"
                             checked={selectedIds.has(article.id)}
                             onChange={() => toggleSelect(article.id)}
-                            className="h-4 w-4 rounded border-border text-goto-green accent-goto-green"
+                            className="h-4 w-4 rounded border-border text-primary accent-goto-green"
                             aria-label={`Pilih artikel ${article.title}`}
                           />
                         </td>
@@ -462,7 +462,7 @@ export default function ArtikelPage() {
                             href={`/berita/${article.slug}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="truncate block font-medium text-txt-primary text-sm hover:text-goto-green transition-colors cursor-pointer"
+                            className="truncate block font-medium text-txt-primary text-sm hover:text-primary transition-colors cursor-pointer"
                           >
                             {article.title}
                           </a>
@@ -487,7 +487,7 @@ export default function ArtikelPage() {
                         <td className="hidden xl:table-cell px-5 py-4 text-txt-secondary">
                           {article.reviewerName ? (
                             <span className="inline-flex items-center gap-1 text-sm">
-                              <UserCheck size={12} className="text-goto-green" />
+                              <UserCheck size={12} className="text-primary" />
                               {article.reviewerName}
                             </span>
                           ) : (

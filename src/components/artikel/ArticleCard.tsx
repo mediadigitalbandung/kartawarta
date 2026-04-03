@@ -51,7 +51,7 @@ export default function ArticleCard({
   verificationLabel = "UNVERIFIED",
   variant = "standard",
 }: ArticleCardProps) {
-  /* ── Hero variant (large featured card — ABC News style) ── */
+  /* ── Hero variant ── */
   if (variant === "hero" || variant === "featured") {
     return (
       <article className="group">
@@ -66,30 +66,30 @@ export default function ArticleCard({
                 className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
               />
             ) : (
-              <div className="h-full w-full bg-surface-secondary" />
+              <div className="h-full w-full bg-surface-container-low" />
             )}
           </div>
         </Link>
-        <div className="mt-3">
+        <div className="mt-4">
           <Link
             href={`/kategori/${category.slug}`}
-            className="text-xs font-bold uppercase tracking-wide text-goto-green"
+            className="text-label-md font-bold uppercase tracking-wider text-primary"
           >
             {category.name}
           </Link>
           <Link href={`/berita/${slug}`}>
-            <h2 className="mt-1 text-lg font-bold leading-tight text-txt-primary hover:underline sm:text-xl lg:text-2xl">
+            <h2 className="mt-2 font-serif text-headline-md leading-tight text-on-surface hover:text-primary transition-colors">
               {title}
             </h2>
           </Link>
           {excerpt && (
-            <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-txt-secondary">
+            <p className="mt-3 line-clamp-3 text-body-md leading-relaxed text-on-surface-variant">
               {truncate(excerpt, 200)}
             </p>
           )}
-          <p className="mt-2 text-xs text-txt-muted">
+          <p className="mt-3 text-label-md uppercase tracking-wider text-on-surface-variant">
             {formatTime(publishedAt)}
-            <span className="mx-1">&middot;</span>
+            <span className="mx-1.5">&middot;</span>
             {author.name}
           </p>
         </div>
@@ -97,10 +97,10 @@ export default function ArticleCard({
     );
   }
 
-  /* ── Compact variant (horizontal small card) ── */
+  /* ── Compact variant ── */
   if (variant === "compact") {
     return (
-      <article className="group flex gap-3">
+      <article className="group flex gap-4">
         <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-sm">
           {featuredImage ? (
             <Image
@@ -110,17 +110,17 @@ export default function ArticleCard({
               className="object-cover"
             />
           ) : (
-            <div className="h-full w-full bg-surface-secondary" />
+            <div className="h-full w-full bg-surface-container-low" />
           )}
         </div>
         <div className="flex flex-1 flex-col justify-center min-w-0">
           <Link
             href={`/berita/${slug}`}
-            className="line-clamp-2 text-sm font-semibold leading-snug text-txt-primary hover:underline"
+            className="line-clamp-2 text-title-sm leading-snug text-on-surface hover:text-primary transition-colors"
           >
             {title}
           </Link>
-          <p className="mt-1 text-xs text-txt-muted">
+          <p className="mt-1.5 text-label-sm uppercase tracking-wider text-on-surface-variant">
             {formatTime(publishedAt)}
           </p>
         </div>
@@ -128,29 +128,29 @@ export default function ArticleCard({
     );
   }
 
-  /* ── Headline variant (text-only, for "Just In" lists) ── */
+  /* ── Headline variant — no border, use spacing ── */
   if (variant === "headline") {
     return (
-      <article className="border-b border-border pb-3">
+      <article className="pb-4 mb-4">
         <Link
           href={`/kategori/${category.slug}`}
-          className="text-xs font-bold uppercase tracking-wide text-goto-green"
+          className="text-label-md font-bold uppercase tracking-wider text-primary"
         >
           {category.name}
         </Link>
         <Link href={`/berita/${slug}`}>
-          <h3 className="mt-0.5 text-sm font-semibold leading-snug text-txt-primary hover:underline">
+          <h3 className="mt-1 text-title-sm leading-snug text-on-surface hover:text-primary transition-colors">
             {title}
           </h3>
         </Link>
-        <p className="mt-1 text-xs text-txt-muted">
+        <p className="mt-1.5 text-label-sm uppercase tracking-wider text-on-surface-variant">
           {formatTime(publishedAt)}
         </p>
       </article>
     );
   }
 
-  /* ── Standard / Default variant (medium vertical card — clean, no border/shadow) ── */
+  /* ── Standard / Default variant ── */
   return (
     <article className="group">
       <Link href={`/berita/${slug}`} className="block">
@@ -163,25 +163,25 @@ export default function ArticleCard({
               className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
             />
           ) : (
-            <div className="h-full w-full bg-surface-secondary" />
+            <div className="h-full w-full bg-surface-container-low" />
           )}
         </div>
       </Link>
-      <div className="mt-2">
+      <div className="mt-3">
         <Link
           href={`/kategori/${category.slug}`}
-          className="text-xs font-bold uppercase tracking-wide text-goto-green"
+          className="text-label-md font-bold uppercase tracking-wider text-primary"
         >
           {category.name}
         </Link>
         <Link href={`/berita/${slug}`}>
-          <h3 className="mt-1 line-clamp-2 text-base font-bold leading-snug text-txt-primary hover:underline">
+          <h3 className="mt-1.5 line-clamp-2 font-serif text-title-lg leading-snug text-on-surface hover:text-primary transition-colors">
             {title}
           </h3>
         </Link>
-        <p className="mt-2 text-xs text-txt-muted">
+        <p className="mt-2.5 text-label-md uppercase tracking-wider text-on-surface-variant">
           {formatTime(publishedAt)}
-          <span className="mx-1">&middot;</span>
+          <span className="mx-1.5">&middot;</span>
           {author.name}
         </p>
       </div>

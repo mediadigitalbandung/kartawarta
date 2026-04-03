@@ -12,7 +12,7 @@ export default function TentangPage() {
       <div className="container-main py-12">
         <div className="mx-auto max-w-3xl">
           <h1 className="flex items-center gap-3 text-xl font-bold text-txt-primary sm:text-2xl lg:text-3xl">
-            <span className="block h-8 w-[3px] rounded-full bg-goto-green" />
+            <span className="block h-8 w-[3px] rounded-full bg-primary" />
             Tentang Kami
           </h1>
 
@@ -45,7 +45,7 @@ export default function TentangPage() {
               const Icon = item.icon;
               return (
                 <div key={item.title} className="rounded-[12px] border border-border bg-surface p-6">
-                  <Icon size={24} className="text-goto-green" />
+                  <Icon size={24} className="text-primary" />
                   <h3 className="mt-3 font-bold text-txt-primary">{item.title}</h3>
                   <p className="mt-1 text-sm text-txt-secondary">{item.desc}</p>
                 </div>

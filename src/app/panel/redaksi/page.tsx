@@ -260,7 +260,7 @@ export default function RedaksiPanelPage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-txt-muted truncate">{form.photo}</p>
                       <div className="flex items-center gap-3 mt-1">
-                        <label className="text-xs text-goto-green hover:text-goto-dark cursor-pointer flex items-center gap-1">
+                        <label className="text-xs text-primary hover:text-primary-dark cursor-pointer flex items-center gap-1">
                           <Upload size={12} /> Ganti foto
                           <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={uploading}
                             onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f); e.target.value = ""; }}
@@ -274,11 +274,11 @@ export default function RedaksiPanelPage() {
                   </div>
                 ) : (
                   <label className="block cursor-pointer">
-                    <div className={`flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-border py-6 hover:border-goto-green hover:bg-goto-light/20 transition-colors ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
+                    <div className={`flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-border py-6 hover:border-primary hover:bg-primary-light/20 transition-colors ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
                       <Upload size={20} className="text-txt-muted" />
                       <span className="text-sm font-medium text-txt-primary">{uploading ? "Mengupload..." : "Upload foto anggota"}</span>
                       <span className="text-xs text-txt-muted">JPEG, PNG, WebP — Maks 2MB</span>
-                      <span className="text-[11px] text-goto-green">Foto juga akan tersimpan di profil pengguna</span>
+                      <span className="text-[11px] text-primary">Foto juga akan tersimpan di profil pengguna</span>
                     </div>
                     <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={uploading}
                       onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f); e.target.value = ""; }}
@@ -317,7 +317,7 @@ export default function RedaksiPanelPage() {
 
               {/* Preview card — sama persis seperti di halaman publik */}
               <div className="flex items-center gap-4 rounded-[12px] border border-border bg-surface p-5">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-goto-green text-xl font-bold text-white overflow-hidden">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-xl font-bold text-white overflow-hidden">
                   {form.photo ? (
                     <img src={form.photo} alt={form.name || "Preview"} className="h-14 w-14 object-cover" />
                   ) : form.name ? (
@@ -327,7 +327,7 @@ export default function RedaksiPanelPage() {
                   )}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-goto-green">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-primary">
                     {form.position || "Jabatan"}
                   </p>
                   <p className="font-bold text-txt-primary text-base">
@@ -350,10 +350,10 @@ export default function RedaksiPanelPage() {
                       <div
                         key={m.id}
                         className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs transition-colors ${
-                          editingId === m.id ? "bg-goto-light/50 border border-goto-green/30" : "bg-surface-secondary"
+                          editingId === m.id ? "bg-primary-light/50 border border-primary/30" : "bg-surface-secondary"
                         }`}
                       >
-                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-goto-green text-[10px] font-bold text-white overflow-hidden">
+                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white overflow-hidden">
                           {m.photo ? (
                             <img src={m.photo} alt={m.name} className="h-7 w-7 object-cover" />
                           ) : (
@@ -365,7 +365,7 @@ export default function RedaksiPanelPage() {
                           <span className="text-txt-muted text-[10px]">{m.position}</span>
                         </div>
                         {editingId === m.id && (
-                          <span className="text-[9px] font-bold text-goto-green">EDITING</span>
+                          <span className="text-[9px] font-bold text-primary">EDITING</span>
                         )}
                       </div>
                     ))}
@@ -395,9 +395,9 @@ export default function RedaksiPanelPage() {
       ) : (
         <div className="space-y-3">
           {members.map((m) => (
-            <div key={m.id} className={`rounded-[12px] border bg-surface p-4 sm:p-5 shadow-card flex items-center gap-4 hover:shadow-card-hover transition-all ${editingId === m.id ? "border-goto-green bg-goto-light/10" : "border-border"}`}>
+            <div key={m.id} className={`rounded-[12px] border bg-surface p-4 sm:p-5 shadow-card flex items-center gap-4 hover:shadow-card-hover transition-all ${editingId === m.id ? "border-primary bg-primary-light/10" : "border-border"}`}>
               <GripVertical size={16} className="text-txt-muted shrink-0 hidden sm:block" />
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-goto-green text-lg font-bold text-white overflow-hidden">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-white overflow-hidden">
                 {m.photo ? (
                   <img src={m.photo} alt={m.name} className="h-12 w-12 object-cover" />
                 ) : (
@@ -405,7 +405,7 @@ export default function RedaksiPanelPage() {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-wider text-goto-green">{m.position}</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-primary">{m.position}</p>
                 <p className="font-bold text-txt-primary text-base">{m.name}</p>
                 {m.desc && <p className="text-sm text-txt-muted truncate">{m.desc}</p>}
               </div>

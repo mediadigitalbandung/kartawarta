@@ -68,13 +68,13 @@ export default function BookmarkPage() {
         <div className="mb-8">
           <Link
             href="/"
-            className="mb-3 inline-flex items-center gap-1 text-sm text-txt-secondary hover:text-goto-green"
+            className="mb-3 inline-flex items-center gap-1 text-sm text-txt-secondary hover:text-primary"
           >
             <ArrowLeft size={14} />
             Beranda
           </Link>
           <h1 className="flex items-center gap-3 text-2xl font-extrabold text-txt-primary sm:text-3xl">
-            <Bookmark size={28} className="text-goto-green" />
+            <Bookmark size={28} className="text-primary" />
             Bookmark Saya
           </h1>
           <p className="mt-1 text-sm text-txt-secondary">
@@ -144,7 +144,7 @@ export default function BookmarkPage() {
                   {article.category && (
                     <Link
                       href={`/kategori/${article.category.slug}`}
-                      className="text-xs font-bold uppercase tracking-wide text-goto-green hover:underline"
+                      className="text-xs font-bold uppercase tracking-wide text-primary hover:underline"
                     >
                       {article.category.name}
                     </Link>
@@ -152,7 +152,7 @@ export default function BookmarkPage() {
 
                   {/* Title */}
                   <Link href={`/berita/${article.slug}`}>
-                    <h2 className="mt-1 text-base font-bold leading-snug text-txt-primary line-clamp-2 hover:text-goto-green transition-colors">
+                    <h2 className="mt-1 text-base font-bold leading-snug text-txt-primary line-clamp-2 hover:text-primary transition-colors">
                       {article.title}
                     </h2>
                   </Link>

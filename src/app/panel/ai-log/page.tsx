@@ -136,7 +136,7 @@ export default function AIPage() {
   if (sessionStatus === "loading") {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-goto-green border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     );
   }
@@ -146,7 +146,7 @@ export default function AIPage() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl sm:text-3xl font-bold text-txt-primary flex items-center gap-2">
-          <Sparkles size={24} className="text-goto-green" />
+          <Sparkles size={24} className="text-primary" />
           AI Tools
         </h1>
         <p className="text-base text-txt-secondary mt-1">Generate tag SEO otomatis dan monitor penggunaan AI</p>
@@ -158,7 +158,7 @@ export default function AIPage() {
           onClick={() => setActiveTab("generate")}
           className={`px-5 py-3 text-sm font-semibold border-b-2 transition-colors ${
             activeTab === "generate"
-              ? "border-goto-green text-goto-green"
+              ? "border-primary text-primary"
               : "border-transparent text-txt-secondary hover:text-txt-primary"
           }`}
         >
@@ -171,7 +171,7 @@ export default function AIPage() {
           onClick={() => setActiveTab("log")}
           className={`px-5 py-3 text-sm font-semibold border-b-2 transition-colors ${
             activeTab === "log"
-              ? "border-goto-green text-goto-green"
+              ? "border-primary text-primary"
               : "border-transparent text-txt-secondary hover:text-txt-primary"
           }`}
         >
@@ -187,8 +187,8 @@ export default function AIPage() {
         <>
           <div className="rounded-2xl border border-border bg-surface shadow-card p-6 mb-6">
             <div className="flex items-start gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-goto-light shrink-0">
-                <Sparkles size={24} className="text-goto-green" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-light shrink-0">
+                <Sparkles size={24} className="text-primary" />
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-txt-primary">Bulk Generate Tags</h3>
@@ -213,7 +213,7 @@ export default function AIPage() {
             <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
               <div className="border-b border-border px-5 py-3.5">
                 <h3 className="flex items-center gap-2 text-sm font-bold text-txt-primary">
-                  <CheckCircle size={16} className="text-goto-green" />
+                  <CheckCircle size={16} className="text-primary" />
                   Hasil Generate
                 </h3>
               </div>
@@ -224,7 +224,7 @@ export default function AIPage() {
                     <p className="text-xs text-txt-muted">Artikel Diproses</p>
                   </div>
                   <div className="rounded-xl bg-surface-secondary p-3 text-center">
-                    <p className="text-2xl font-extrabold text-goto-green">{bulkResult.totalTagsAdded}</p>
+                    <p className="text-2xl font-extrabold text-primary">{bulkResult.totalTagsAdded}</p>
                     <p className="text-xs text-txt-muted">Tags Ditambahkan</p>
                   </div>
                   <div className="rounded-xl bg-surface-secondary p-3 text-center">
@@ -244,7 +244,7 @@ export default function AIPage() {
                         <p className="text-sm font-semibold text-txt-primary mb-2">{r.title}</p>
                         <div className="flex flex-wrap gap-1.5">
                           {r.tags.map((tag) => (
-                            <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-goto-light px-2.5 py-0.5 text-xs font-medium text-goto-green">
+                            <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-primary-light px-2.5 py-0.5 text-xs font-medium text-primary">
                               <Tag size={10} />
                               {tag}
                             </span>
@@ -268,8 +268,8 @@ export default function AIPage() {
             <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="rounded-2xl border border-border bg-surface p-5 shadow-card">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-goto-light">
-                    <Cpu size={20} className="text-goto-green" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-light">
+                    <Cpu size={20} className="text-primary" />
                   </div>
                   <div>
                     <p className="text-xs text-txt-muted">Total Token</p>
@@ -311,7 +311,7 @@ export default function AIPage() {
                   <div key={u.userId} className="flex items-center justify-between rounded-lg bg-surface-secondary px-4 py-2.5">
                     <button
                       onClick={() => setFilterUser(filterUser === u.userId ? "" : u.userId)}
-                      className={`text-sm font-medium transition-colors ${filterUser === u.userId ? "text-goto-green" : "text-txt-primary hover:text-goto-green"}`}
+                      className={`text-sm font-medium transition-colors ${filterUser === u.userId ? "text-primary" : "text-txt-primary hover:text-primary"}`}
                     >
                       {u.name}
                     </button>
@@ -328,14 +328,14 @@ export default function AIPage() {
           {filterUser && (
             <div className="mb-4 flex items-center gap-2">
               <span className="text-sm text-txt-secondary">Filter: {stats?.byUser.find((u) => u.userId === filterUser)?.name}</span>
-              <button onClick={() => setFilterUser("")} className="text-xs text-goto-green hover:underline">Hapus filter</button>
+              <button onClick={() => setFilterUser("")} className="text-xs text-primary hover:underline">Hapus filter</button>
             </div>
           )}
 
           {/* Log Table */}
           {logLoading ? (
             <div className="flex min-h-[20vh] items-center justify-center">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-goto-green border-t-transparent" />
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
             </div>
           ) : (
             <div className="rounded-2xl border border-border bg-surface shadow-card overflow-x-auto">
@@ -360,7 +360,7 @@ export default function AIPage() {
                         <td className="px-3 sm:px-5 py-4 text-xs sm:text-sm text-txt-secondary whitespace-nowrap">{formatDate(log.createdAt)}</td>
                         <td className="hidden sm:table-cell px-5 py-4 text-sm text-txt-primary">{log.userName}</td>
                         <td className="px-3 sm:px-5 py-4">
-                          <span className="inline-block rounded-full bg-goto-light px-2.5 py-0.5 text-xs font-medium text-goto-green">
+                          <span className="inline-block rounded-full bg-primary-light px-2.5 py-0.5 text-xs font-medium text-primary">
                             {FEATURE_LABELS[log.feature] || log.feature}
                           </span>
                         </td>

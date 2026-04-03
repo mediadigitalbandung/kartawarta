@@ -181,7 +181,7 @@ export default function MediaPage() {
 
       {/* Upload area */}
       {showUpload && (
-        <div className="mb-6 rounded-[12px] border-2 border-dashed border-goto-green/30 bg-goto-50 p-6">
+        <div className="mb-6 rounded-[12px] border-2 border-dashed border-primary/30 bg-primary-50 p-6">
           <h3 className="mb-3 text-base font-bold text-txt-primary">
             Upload Gambar Baru
           </h3>
@@ -218,7 +218,7 @@ export default function MediaPage() {
             onClick={() => { setFilterUser(""); setPage(1); }}
             className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
               !filterUser
-                ? "bg-goto-green text-white"
+                ? "bg-primary text-white"
                 : "bg-surface-tertiary text-txt-secondary hover:bg-border"
             }`}
           >
@@ -230,7 +230,7 @@ export default function MediaPage() {
               onClick={() => { setFilterUser(u.id); setPage(1); }}
               className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                 filterUser === u.id
-                  ? "bg-goto-green text-white"
+                  ? "bg-primary text-white"
                   : "bg-surface-tertiary text-txt-secondary hover:bg-border"
               }`}
             >
@@ -275,7 +275,7 @@ export default function MediaPage() {
                       title="Salin URL"
                     >
                       {copied === item.id ? (
-                        <CheckCircle size={18} className="text-goto-green" />
+                        <CheckCircle size={18} className="text-primary" />
                       ) : (
                         <Copy size={18} />
                       )}

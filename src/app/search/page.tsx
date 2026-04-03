@@ -69,7 +69,7 @@ function highlightText(text: string, keyword: string): React.ReactNode {
   const parts = text.split(regex);
   return parts.map((part, i) =>
     regex.test(part) ? (
-      <mark key={i} className="bg-goto-light text-goto-green font-semibold rounded px-0.5">
+      <mark key={i} className="bg-primary-light text-primary font-semibold rounded px-0.5">
         {part}
       </mark>
     ) : (
@@ -359,7 +359,7 @@ function SearchContent() {
                 onClick={() => { setSortBy(opt.value); setPage(0); }}
                 className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
                   sortBy === opt.value
-                    ? "bg-goto-green text-white"
+                    ? "bg-primary text-white"
                     : "bg-surface-secondary text-txt-secondary hover:bg-surface-tertiary"
                 }`}
               >
@@ -379,7 +379,7 @@ function SearchContent() {
                 onClick={() => { setTimeRange(opt.value); setPage(0); }}
                 className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
                   timeRange === opt.value
-                    ? "bg-goto-green text-white"
+                    ? "bg-primary text-white"
                     : "bg-surface-secondary text-txt-secondary hover:bg-surface-tertiary"
                 }`}
               >
@@ -393,7 +393,7 @@ function SearchContent() {
       {/* Loading */}
       {loading && (
         <div className="mt-8 flex justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-goto-green border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
         </div>
       )}
 
@@ -427,7 +427,7 @@ function SearchContent() {
               <div className="mt-2">
                 <Link
                   href={`/kategori/${article.category.slug}`}
-                  className="text-xs font-bold uppercase tracking-wide text-goto-green"
+                  className="text-xs font-bold uppercase tracking-wide text-primary"
                 >
                   {article.category.name}
                 </Link>
@@ -453,7 +453,7 @@ function SearchContent() {
           <button
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-goto-green hover:text-goto-green disabled:opacity-30 disabled:hover:border-border disabled:hover:text-txt-primary"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-primary hover:text-primary disabled:opacity-30 disabled:hover:border-border disabled:hover:text-txt-primary"
           >
             <ChevronLeft size={16} />
             Sebelumnya
@@ -464,7 +464,7 @@ function SearchContent() {
           <button
             onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={page === totalPages - 1}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-goto-green hover:text-goto-green disabled:opacity-30 disabled:hover:border-border disabled:hover:text-txt-primary"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-all hover:border-primary hover:text-primary disabled:opacity-30 disabled:hover:border-border disabled:hover:text-txt-primary"
           >
             Selanjutnya
             <ChevronRight size={16} />
@@ -493,13 +493,13 @@ export default function SearchPage() {
     <div className="bg-surface min-h-screen">
       <div className="container-main py-8">
         <h1 className="flex items-center gap-3 text-xl font-bold text-txt-primary sm:text-2xl lg:text-3xl">
-          <span className="block h-7 w-[3px] rounded-full bg-goto-green" />
+          <span className="block h-7 w-[3px] rounded-full bg-primary" />
           Pencarian
         </h1>
         <Suspense
           fallback={
             <div className="mt-8 flex justify-center">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-goto-green border-t-transparent" />
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
             </div>
           }
         >
