@@ -15,19 +15,16 @@ import {
   Bookmark,
 } from "lucide-react";
 
-const categoryNavMain = [
+const categoryNav = [
   { name: "Terkini", href: "/" },
   { name: "Hukum", href: "/kategori/hukum" },
   { name: "Bisnis", href: "/kategori/bisnis-ekonomi" },
   { name: "Olahraga", href: "/kategori/olahraga" },
   { name: "Hiburan", href: "/kategori/hiburan" },
   { name: "Kesehatan", href: "/kategori/kesehatan" },
+  { name: "Pertanian", href: "/kategori/pertanian-peternakan" },
   { name: "Teknologi", href: "/kategori/teknologi" },
   { name: "Politik", href: "/kategori/politik" },
-];
-
-const categoryNavMore = [
-  { name: "Pertanian & Peternakan", href: "/kategori/pertanian-peternakan" },
   { name: "Pendidikan", href: "/kategori/pendidikan" },
   { name: "Lingkungan", href: "/kategori/lingkungan" },
   { name: "Gaya Hidup", href: "/kategori/gaya-hidup" },
@@ -37,7 +34,6 @@ const categoryNavMore = [
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { data: session } = useSession();
   const pathname = usePathname();
@@ -201,19 +197,19 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Row 2: Category navigation — no border, background shift */}
+      {/* Row 2: Category navigation */}
       <nav className="bg-surface-container-lowest relative" aria-label="Navigasi kategori">
         <div className="container-main">
-          <ul className="flex items-center gap-1 overflow-x-auto scrollbar-hide lg:justify-between lg:gap-0">
-            {categoryNavMain.map((item) => {
+          <ul className="flex items-center gap-0 overflow-x-auto scrollbar-hide">
+            {categoryNav.map((item) => {
               const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
               return (
               <li key={item.href} className="shrink-0">
                 <Link
                   href={item.href}
-                  className={`relative inline-block px-3 py-3 text-label-lg transition-all duration-200 whitespace-nowrap ${
+                  className={`relative inline-block px-2.5 sm:px-3 py-3 text-label-lg transition-all duration-200 whitespace-nowrap ${
                     isActive
-                      ? "text-primary font-bold after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:bg-primary"
+                      ? "text-primary font-bold after:absolute after:bottom-0 after:left-2.5 after:right-2.5 after:h-[2px] after:bg-primary"
                       : "text-on-surface-variant font-medium hover:text-primary"
                   }`}
                 >
@@ -222,35 +218,6 @@ export default function Header() {
               </li>
               );
             })}
-            {/* Lainnya dropdown */}
-            <li className="relative shrink-0">
-              <button
-                onClick={() => setMoreOpen(!moreOpen)}
-                className="inline-flex items-center gap-1 px-3 py-3 text-label-lg font-medium text-on-surface-variant hover:text-primary transition-colors whitespace-nowrap"
-                aria-label="Kategori lainnya"
-                aria-expanded={moreOpen}
-              >
-                Lainnya
-                <ChevronRight size={14} className={`transition-transform duration-200 ${moreOpen ? "rotate-90" : ""}`} />
-              </button>
-              {moreOpen && (
-                <>
-                  <div className="fixed inset-0 z-10" onClick={() => setMoreOpen(false)} />
-                  <div className="absolute right-0 top-full z-20 mt-0 w-52 rounded-md bg-surface-container-lowest py-1 shadow-ambient">
-                    {categoryNavMore.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className="block px-4 py-2.5 text-body-sm text-on-surface hover:bg-surface-container-low hover:text-primary transition-colors"
-                        onClick={() => setMoreOpen(false)}
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
-                </>
-              )}
-            </li>
           </ul>
         </div>
       </nav>
@@ -291,7 +258,7 @@ export default function Header() {
               </span>
             </div>
             <ul className="space-y-0.5 px-3 pb-3">
-              {[...categoryNavMain, ...categoryNavMore].map((item) => (
+              {categoryNav.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
