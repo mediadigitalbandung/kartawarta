@@ -64,12 +64,19 @@ export default function Header() {
 
   return (
     <>
-      {/* Row 1: Top bar — White header */}
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-100" role="banner" aria-label="Header utama">
-        <div className="container-main">
-          <div className="flex items-center justify-between py-3">
+      {/* Row 1: Top bar — Split Blue/White header */}
+      <header className="sticky top-0 z-50 bg-gradient-primary border-b border-[#001530]" role="banner" aria-label="Header utama">
+        <div className="container-main flex items-stretch justify-between">
+          
+          {/* Left side: Logo Block with White Background */}
+          <div className="relative flex items-center bg-white py-3 pr-6 sm:pr-10 pl-5 sm:pl-8 lg:pl-8 -ml-5 sm:-ml-8 lg:-ml-8">
+            {/* Extend white background to the far left screen edge */}
+            <div className="absolute top-0 bottom-0 right-full w-[50vw] bg-white"></div>
+            {/* Slanted edge on the right */}
+            <div className="absolute top-0 bottom-0 left-full w-8 sm:w-12 bg-white" style={{ clipPath: "polygon(0 0, 100% 100%, 0 100%)" }}></div>
+            
             {/* Logo */}
-            <Link href="/" className="group flex shrink-0 items-center gap-3">
+            <Link href="/" className="group flex shrink-0 items-center gap-3 relative z-10">
               <Image
                 src="/kartawarta-icon.png"
                 alt="Kartawarta"
@@ -85,19 +92,21 @@ export default function Header() {
                 </span>
               </span>
             </Link>
+          </div>
 
-            {/* Right: Date + Search + actions */}
-            <div className="flex items-center gap-3">
+          {/* Right side: Date, Search, Actions */}
+          <div className="flex flex-1 items-center justify-end gap-3 py-3 pl-12 sm:pl-16 relative z-10">
             {/* Live date */}
-            <span className="hidden text-label-sm text-gray-500 md:block uppercase tracking-wider">
+            <span className="hidden text-label-sm text-white/50 md:block uppercase tracking-wider">
               {new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
             </span>
-            <div className="hidden h-4 w-px bg-gray-200 md:block" />
+            <div className="hidden h-4 w-px bg-white/20 md:block" />
+            
             {/* Search */}
             <form action="/search" className="relative hidden md:block md:w-64 lg:w-80" role="search" aria-label="Pencarian artikel">
               <Search
                 size={16}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500"
                 aria-hidden="true"
               />
               <input
@@ -105,29 +114,29 @@ export default function Header() {
                 name="q"
                 placeholder="Cari berita..."
                 aria-label="Cari artikel"
-                className="w-full rounded-md bg-white border border-gray-200 py-2 pl-10 pr-4 text-body-sm text-gray-900 placeholder:text-gray-400 transition-all focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
+                className="w-full rounded-md bg-white border border-transparent py-2 pl-10 pr-4 text-body-sm text-gray-900 placeholder:text-gray-400 transition-all shadow-inner focus:border-white focus:outline-none focus:ring-2 focus:ring-white/50"
               />
             </form>
 
-              {/* Bookmark link */}
-              <Link
-                href="/bookmark"
-                className="hidden md:flex items-center gap-1.5 rounded-md px-3 py-1.5 text-label-sm font-medium text-gray-500 transition-colors hover:text-primary hover:bg-gray-50"
-                title="Bookmark Saya"
-              >
-                <Bookmark size={14} />
-                <span className="hidden lg:inline">Bookmark</span>
-              </Link>
+            {/* Bookmark link */}
+            <Link
+              href="/bookmark"
+              className="hidden md:flex items-center gap-1.5 rounded-md px-3 py-1.5 text-label-sm font-medium text-white/70 transition-colors hover:text-white hover:bg-white/10"
+              title="Bookmark Saya"
+            >
+              <Bookmark size={14} />
+              <span className="hidden lg:inline">Bookmark</span>
+            </Link>
 
-              {/* User area */}
-              {session ? (
-                <div className="relative">
-                  <button
-                    onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex h-10 w-10 items-center justify-center rounded-md bg-gray-100 text-label-lg font-bold text-primary transition-all hover:bg-gray-200"
-                    aria-label="Menu pengguna"
-                    aria-expanded={userMenuOpen}
-                  >
+            {/* User area */}
+            {session ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex h-10 w-10 items-center justify-center rounded-md bg-white/10 text-label-lg font-bold text-white transition-all hover:bg-white/20"
+                  aria-label="Menu pengguna"
+                  aria-expanded={userMenuOpen}
+                >
                     {session.user?.name?.charAt(0)?.toUpperCase() || "U"}
                   </button>
                   {userMenuOpen && (
@@ -167,33 +176,33 @@ export default function Header() {
                 </div>
               ) : null}
 
-              {/* Mobile menu toggle */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="flex h-10 w-10 items-center justify-center rounded-md text-gray-500 transition-colors hover:text-primary hover:bg-gray-50 lg:hidden"
-                aria-label="Menu"
-              >
-                {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-              </button>
-            </div>
+            {/* Mobile menu toggle */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="flex h-10 w-10 items-center justify-center rounded-md text-white/70 transition-colors hover:text-white hover:bg-white/10 lg:hidden"
+              aria-label="Menu"
+            >
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
-          {/* Mobile search bar */}
-          <div className={`overflow-hidden md:hidden transition-all duration-500 ease-in-out ${scrolled || mobileMenuOpen ? "max-h-0 pb-0 opacity-0 -translate-y-2" : "max-h-14 pb-3 opacity-100 translate-y-0"}`}>
-            <form action="/search" className="relative" role="search" aria-label="Pencarian artikel (mobile)">
-              <Search
-                size={16}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-                aria-hidden="true"
-              />
-              <input
-                type="text"
-                name="q"
-                placeholder="Cari berita..."
-                aria-label="Cari artikel"
-                className="w-full rounded-md bg-white border border-gray-200 py-2 pl-10 pr-4 text-body-sm text-gray-900 placeholder:text-gray-400 transition-all focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
-              />
-            </form>
-          </div>
+        </div>
+
+        {/* Mobile search bar */}
+        <div className={`overflow-hidden md:hidden transition-all duration-500 ease-in-out container-main ${scrolled || mobileMenuOpen ? "max-h-0 pb-0 opacity-0 -translate-y-2" : "max-h-16 pb-3 opacity-100 translate-y-0"}`}>
+          <form action="/search" className="relative" role="search" aria-label="Pencarian artikel (mobile)">
+            <Search
+              size={16}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500"
+              aria-hidden="true"
+            />
+            <input
+              type="text"
+              name="q"
+              placeholder="Cari berita..."
+              aria-label="Cari artikel"
+              className="w-full rounded-md bg-white border border-transparent py-2.5 pl-10 pr-4 text-body-sm text-gray-900 placeholder:text-gray-400 transition-all shadow-inner focus:outline-none focus:ring-2 focus:ring-white/50"
+            />
+          </form>
         </div>
       </header>
 
