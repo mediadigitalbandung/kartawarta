@@ -887,21 +887,21 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats grid */}
-      <div className={`mb-8 grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4 sm:grid-cols-3 ${isAdmin ? "md:grid-cols-4 lg:grid-cols-7" : "md:grid-cols-4"}`}>
+      <div className={`mb-8 grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4 sm:grid-cols-3 ${isAdmin ? "md:grid-cols-4 xl:grid-cols-7" : "md:grid-cols-4"}`}>
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
             <div
               key={stat.label}
-              className="rounded-[12px] border border-border bg-surface p-4 shadow-card"
+              className="rounded-[12px] border border-border bg-surface p-3 sm:p-4 shadow-card overflow-hidden"
             >
-              <div className={`inline-flex rounded-[12px] p-2 ${stat.color}`}>
-                <Icon size={18} />
+              <div className={`inline-flex rounded-[12px] p-1.5 sm:p-2 ${stat.color}`}>
+                <Icon size={16} />
               </div>
-              <p className="mt-2 text-xl sm:text-3xl font-extrabold text-txt-primary">
+              <p className="mt-1.5 text-lg sm:text-2xl xl:text-3xl font-extrabold text-txt-primary truncate">
                 {stat.value}
               </p>
-              <p className="text-xs text-txt-secondary">{stat.label}</p>
+              <p className="text-[10px] sm:text-xs text-txt-secondary truncate">{stat.label}</p>
             </div>
           );
         })}
