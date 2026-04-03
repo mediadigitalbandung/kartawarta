@@ -723,8 +723,8 @@ export default function DashboardPage() {
 
         // Creators fetch only their articles; editors/admins fetch all
         const articlesUrl = isCreator
-          ? `/api/articles?limit=100&status=ALL&authorId=${userId}`
-          : `/api/articles?limit=100&status=ALL`;
+          ? `/api/articles?limit=1000&status=ALL&authorId=${userId}`
+          : `/api/articles?limit=1000&status=ALL`;
 
         const fetches: Promise<Response>[] = [fetch(articlesUrl)];
         // Only admins/editors see reports
