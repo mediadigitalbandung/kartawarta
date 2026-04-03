@@ -11,6 +11,7 @@ import {
   Save,
   X,
   Users,
+  Upload,
 } from "lucide-react";
 
 interface RedaksiMember {
@@ -33,7 +34,26 @@ export default function RedaksiPanelPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState(emptyForm);
+
+  async function handlePhotoUpload(file: File) {
+    if (file.size > 2 * 1024 * 1024) { showError("Ukuran foto maksimal 2MB"); return; }
+    try {
+      setUploading(true);
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      if (!res.ok) { const j = await res.json(); throw new Error(j.error || "Upload gagal"); }
+      const json = await res.json();
+      setForm((f) => ({ ...f, photo: json.data?.url || "" }));
+      success("Foto berhasil diupload");
+    } catch (err) {
+      showError(err instanceof Error ? err.message : "Upload gagal");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   const fetchMembers = useCallback(async () => {
     try {
@@ -147,11 +167,33 @@ export default function RedaksiPanelPage() {
               <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Deskripsi</label>
               <input type="text" placeholder="Tugas dan tanggung jawab" value={form.desc} onChange={(e) => setForm({ ...form, desc: e.target.value })} className="input w-full" />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">URL Foto</label>
-                <input type="url" placeholder="https://..." value={form.photo} onChange={(e) => setForm({ ...form, photo: e.target.value })} className="input w-full" />
-              </div>
+            {/* Foto upload */}
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Foto</label>
+              {form.photo ? (
+                <div className="flex items-center gap-4">
+                  <img src={form.photo} alt="Foto" className="h-16 w-16 rounded-full object-cover border border-border" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-txt-muted truncate">{form.photo}</p>
+                    <button type="button" onClick={() => setForm({ ...form, photo: "" })} className="text-xs text-red-500 hover:text-red-700 mt-1 flex items-center gap-1">
+                      <X size={12} /> Hapus foto
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <label className="block cursor-pointer">
+                  <div className={`flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border py-5 hover:border-goto-green hover:bg-goto-light/20 transition-colors ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
+                    <Upload size={18} className="text-txt-muted" />
+                    <span className="text-sm text-txt-secondary">{uploading ? "Mengupload..." : "Upload foto (maks 2MB)"}</span>
+                  </div>
+                  <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={uploading}
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f); e.target.value = ""; }}
+                  />
+                </label>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Urutan</label>
                 <input type="number" min={0} value={form.order} onChange={(e) => setForm({ ...form, order: Number(e.target.value) })} className="input w-full" />
