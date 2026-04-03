@@ -308,6 +308,15 @@ export default async function ArticlePage({ params, searchParams }: { params: { 
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
             {/* Article */}
             <article className="lg:col-span-2">
+              {/* Print-only header */}
+              <div className="print-header hidden">
+                <img src="/logo-jhb.png" alt="JHB" />
+                <div>
+                  <div className="print-title">Jurnalis Hukum Bandung</div>
+                  <div className="print-subtitle">Media Hukum Digital Terpercaya — jurnalishukumbandung.com</div>
+                </div>
+              </div>
+
               {/* Category badge & verification */}
               <div className="mb-4 flex items-center gap-3">
                 <Link
@@ -540,6 +549,13 @@ export default async function ArticlePage({ params, searchParams }: { params: { 
 
               {/* Comments — only on published articles */}
               {isPublished && <CommentSection articleId={article.id} />}
+
+              {/* Print-only footer */}
+              <div className="print-footer hidden">
+                &copy; {new Date().getFullYear()} Jurnalis Hukum Bandung — jurnalishukumbandung.com
+                <br />Artikel ini dicetak pada {new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+                <br />Sumber: {articleUrl}
+              </div>
             </article>
 
             {/* Sidebar */}
