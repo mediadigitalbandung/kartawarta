@@ -109,20 +109,50 @@ function StockCard({ s }: { s: StockItem }) {
   );
 }
 
-/* ── Stock Carousel — CSS animation infinite loop ── */
+/* ── Stock Carousel — JS animation infinite loop with native scroll ── */
 function StockCarousel({ stocks, lastUpdate }: { stocks: StockItem[]; lastUpdate: string }) {
   const [paused, setPaused] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const set1Ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let animationFrameId: number;
+    let lastTime = performance.now();
+    const speed = 30; // px per second
+
+    const animate = (time: number) => {
+      const dt = (time - lastTime) / 1000;
+      lastTime = time;
+
+      if (!paused && scrollRef.current && set1Ref.current && stocks.length > 0) {
+        const node = scrollRef.current;
+        // The gap between Set 1 and Set 2 is 10px (gap-2.5)
+        const resetPoint = set1Ref.current.offsetWidth + 10;
+        
+        node.scrollLeft += speed * dt;
+        
+        // Loop back seamlessly
+        if (node.scrollLeft >= resetPoint) {
+          node.scrollLeft -= resetPoint;
+        }
+      }
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animationFrameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [paused, stocks.length]);
 
   if (stocks.length === 0) return null;
-
-  // Total animation duration based on number of cards
-  const duration = stocks.length * 15; // slow: ~15s per card
 
   return (
     <div
       className="bg-gray-50/30 border-b border-gray-100 overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onTouchStart={() => setPaused(true)}
+      onTouchEnd={() => setPaused(false)}
+      onTouchCancel={() => setPaused(false)}
     >
       <div className="container-main py-3">
         <div className="flex items-center justify-between mb-3">
@@ -135,22 +165,22 @@ function StockCarousel({ stocks, lastUpdate }: { stocks: StockItem[]; lastUpdate
         </div>
       </div>
 
-      {/* Infinite CSS scroll on Desktop / Native scroll on Mobile */}
-      <div className="relative overflow-hidden md:overflow-visible">
-        <div className="overflow-x-auto hide-scrollbar touch-pan-x w-full">
-          <div
-            className="flex gap-2.5 w-max md:stock-scroll-animated"
-            style={{
-              "--scroll-duration": `${duration}s`,
-              animationPlayState: paused ? "paused" : "running",
-            } as React.CSSProperties}
-          >
+      {/* Infinte scrolling via JS, while supporting native drag / touchpan */}
+      <div className="relative overflow-visible">
+        <div
+          ref={scrollRef}
+          className="overflow-x-auto hide-scrollbar touch-pan-x w-full"
+          style={{ scrollBehavior: 'auto' }}
+        >
+          {/* We ensure a constant padding on the left and right inside the scroll container.
+              The reset point measures just the items, so keeping padding outside or symmetrical is key. */}
+          <div className="flex gap-2.5 w-max px-5 sm:px-8">
             {/* Set 1 */}
-            <div className="flex gap-2.5 pl-5 sm:pl-8">
+            <div ref={set1Ref} className="flex gap-2.5">
               {stocks.map((s) => <StockCard key={`a-${s.symbol}`} s={s} />)}
             </div>
-            {/* Set 2 (duplicate for seamless loop, hidden on mobile) */}
-            <div className="hidden md:flex gap-2.5 pr-8">
+            {/* Set 2 (duplicate for seamless loop, always rendered to allow the JS loop trick) */}
+            <div className="flex gap-2.5">
               {stocks.map((s) => <StockCard key={`b-${s.symbol}`} s={s} />)}
             </div>
           </div>
@@ -166,16 +196,6 @@ function StockCarousel({ stocks, lastUpdate }: { stocks: StockItem[]; lastUpdate
         .hide-scrollbar {
           -ms-overflow-style: none;
           scrollbar-width: none;
-        }
-
-        @media (min-width: 768px) {
-          .md\\:stock-scroll-animated {
-            animation: stockScroll var(--scroll-duration) linear infinite !important;
-          }
-        }
-        @keyframes stockScroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
         }
       `}</style>
     </div>
