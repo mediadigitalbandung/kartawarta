@@ -142,6 +142,7 @@ model Category {
   icon        String?
   order       Int       @default(0)
   articles    Article[]
+  polls       Poll[]
 
   @@map("categories")
 }
@@ -318,6 +319,45 @@ model RedaksiMember {
   updatedAt DateTime @updatedAt
 
   @@map("redaksi_members")
+}
+
+model Poll {
+  id         String       @id @default(cuid())
+  question   String
+  image      String?
+  categoryId String?
+  category   Category?    @relation(fields: [categoryId], references: [id])
+  isActive   Boolean      @default(true)
+  order      Int          @default(0)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  options    PollOption[]
+
+  @@map("polls")
+}
+
+model PollOption {
+  id     String     @id @default(cuid())
+  label  String
+  votes  Int        @default(0)
+  poll   Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  pollId String
+  pollVotes PollVote[]
+
+  @@map("poll_options")
+}
+
+model PollVote {
+  id        String     @id @default(cuid())
+  optionId  String
+  option    PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  ip        String
+  fingerprint String?
+  createdAt DateTime   @default(now())
+
+  @@unique([optionId, ip])
+  @@index([ip])
+  @@map("poll_votes")
 }
 
 model ContactMessage {

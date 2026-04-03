@@ -411,7 +411,7 @@ export default async function HomePage() {
               Polling Hukum
             </h2>
           </div>
-          <PollingCarousel items={pollingData} />
+          <PollingCarousel />
         </div>
       </section>
 

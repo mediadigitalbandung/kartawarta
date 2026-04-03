@@ -1,0 +1,114 @@
+import { NextRequest } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { successResponse, errorResponse, ApiError } from "@/lib/api-utils";
+
+const voteSchema = z.object({
+  optionId: z.string().min(1),
+  fingerprint: z.string().optional(),
+});
+
+// POST /api/polls/:id/vote — public, 1 vote per IP per poll
+export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const body = await request.json();
+    const data = voteSchema.parse(body);
+
+    // Get IP from headers
+    const forwarded = request.headers.get("x-forwarded-for");
+    const ip = forwarded ? forwarded.split(",")[0].trim() : request.headers.get("x-real-ip") || "unknown";
+
+    // Check if poll exists and is active
+    const poll = await prisma.poll.findUnique({
+      where: { id: params.id },
+      include: { options: { select: { id: true } } },
+    });
+
+    if (!poll || !poll.isActive) {
+      throw new ApiError("Polling tidak ditemukan atau sudah ditutup", 404);
+    }
+
+    // Check option belongs to this poll
+    const validOption = poll.options.find((o) => o.id === data.optionId);
+    if (!validOption) {
+      throw new ApiError("Opsi tidak valid", 400);
+    }
+
+    // Check if already voted (any option in this poll)
+    const allOptionIds = poll.options.map((o) => o.id);
+    const existingVote = await prisma.pollVote.findFirst({
+      where: {
+        optionId: { in: allOptionIds },
+        ip,
+      },
+    });
+
+    if (existingVote) {
+      throw new ApiError("Anda sudah memberikan suara di polling ini", 409);
+    }
+
+    // Create vote + increment option count
+    await prisma.$transaction([
+      prisma.pollVote.create({
+        data: {
+          optionId: data.optionId,
+          ip,
+          fingerprint: data.fingerprint || null,
+        },
+      }),
+      prisma.pollOption.update({
+        where: { id: data.optionId },
+        data: { votes: { increment: 1 } },
+      }),
+    ]);
+
+    // Return updated poll
+    const updatedPoll = await prisma.poll.findUnique({
+      where: { id: params.id },
+      include: { options: { select: { id: true, label: true, votes: true }, orderBy: { id: "asc" } } },
+    });
+
+    const totalVotes = updatedPoll!.options.reduce((sum, o) => sum + o.votes, 0);
+    return successResponse({
+      voted: true,
+      totalVotes,
+      options: updatedPoll!.options.map((o) => ({
+        ...o,
+        percentage: totalVotes > 0 ? Math.round((o.votes / totalVotes) * 100) : 0,
+      })),
+    });
+  } catch (error) {
+    if (typeof error === "object" && error !== null && "code" in error && (error as { code: string }).code === "P2002") {
+      throw new ApiError("Anda sudah memberikan suara di polling ini", 409);
+    }
+    return errorResponse(error);
+  }
+}
+
+// GET /api/polls/:id/vote — check if current IP already voted
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const forwarded = request.headers.get("x-forwarded-for");
+    const ip = forwarded ? forwarded.split(",")[0].trim() : request.headers.get("x-real-ip") || "unknown";
+
+    const poll = await prisma.poll.findUnique({
+      where: { id: params.id },
+      include: { options: { select: { id: true } } },
+    });
+
+    if (!poll) return successResponse({ voted: false });
+
+    const allOptionIds = poll.options.map((o) => o.id);
+    const existingVote = await prisma.pollVote.findFirst({
+      where: { optionId: { in: allOptionIds }, ip },
+      select: { optionId: true },
+    });
+
+    return successResponse({
+      voted: !!existingVote,
+      votedOptionId: existingVote?.optionId || null,
+    });
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
