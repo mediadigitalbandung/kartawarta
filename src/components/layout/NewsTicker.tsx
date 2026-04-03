@@ -72,7 +72,9 @@ function useTrending() {
 /* ── Stock Card ── */
 function StockCard({ s }: { s: StockItem }) {
   return (
-    <div className="shrink-0 rounded-[12px] px-4 py-3 min-w-[150px] sm:min-w-[170px] bg-white border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_6px_14px_-4px_rgba(0,0,0,0.12)] transition-all hover:-translate-y-0.5 relative overflow-hidden group cursor-default">
+    <div className={`shrink-0 rounded-[12px] px-4 py-3 min-w-[150px] sm:min-w-[170px] border shadow-[0_2px_10px_-4px_rgba(0,0,0,0.08)] hover:shadow-[0_6px_14px_-4px_rgba(0,0,0,0.12)] transition-all hover:-translate-y-0.5 relative overflow-hidden group cursor-default ${
+      s.direction === "up" ? "bg-emerald-50/60 border-emerald-100" : s.direction === "down" ? "bg-red-50/60 border-red-100" : "bg-gray-50/60 border-gray-100"
+    }`}>
       {/* Decorative top accent line */}
       <div className={`absolute top-0 left-0 w-full h-1 transition-colors ${
         s.direction === "up" ? "bg-emerald-500" : s.direction === "down" ? "bg-red-500" : "bg-gray-300"
