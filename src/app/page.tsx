@@ -28,7 +28,7 @@ const categoryIconMap: Record<string, LucideIcon> = {
 };
 
 export default async function HomePage() {
-  const [articles, categories, trendingArticles, tickerArticles] = await Promise.all([
+  const [articles, categories, trendingArticles] = await Promise.all([
     prisma.article.findMany({
       where: { status: "PUBLISHED" },
       include: { author: true, category: true },
@@ -45,11 +45,6 @@ export default async function HomePage() {
       orderBy: { viewCount: "desc" },
       take: 10,
     }),
-    prisma.article.findMany({
-      where: { status: "PUBLISHED" },
-      orderBy: { publishedAt: "desc" },
-      take: 5,
-    }),
   ]);
 
   const headlineArticles = articles.slice(0, 5);
@@ -57,8 +52,6 @@ export default async function HomePage() {
   const breakingArticles = articles.slice(11, 16);
   const terkiniArticles = articles.slice(16, 24);
   const restArticles = articles.slice(24);
-
-  const tickerItems = tickerArticles.map((a) => ({ title: a.title, slug: a.slug }));
 
   // Group remaining articles by category
   const articlesByCategory: Record<string, { categorySlug: string; articles: typeof restArticles }> = {};
@@ -89,7 +82,7 @@ export default async function HomePage() {
         }}
       />
 
-      <NewsTicker items={tickerItems} />
+      <NewsTicker />
 
       {/* AD: Leaderboard — top of page */}
       <BannerAd size="leaderboard" slot="HEADER" className="bg-surface-container-lowest" />
