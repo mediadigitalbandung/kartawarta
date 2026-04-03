@@ -63,7 +63,7 @@ function AdContent({ ad }: { ad: Ad }) {
       <img
         src={ad.imageUrl}
         alt="Iklan"
-        className="w-full h-auto rounded-lg"
+        className="w-full h-auto block"
         loading="lazy"
       />
     ) : null;
@@ -94,7 +94,7 @@ export default function BannerAd({ size, slot, className = "" }: BannerAdProps) 
   if (!ad) return null;
 
   return (
-    <div className={`py-2 ${className}`}>
+    <div className={className}>
       <div className="container-main">
         <AdContent ad={ad} />
       </div>
