@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRef, useState, useEffect, useCallback } from "react";
-import { ArrowUpRight, ArrowDownRight, Minus, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
 
 /* ── Types ── */
 interface TickerItem { title: string; href: string; hot?: boolean }
@@ -92,48 +92,94 @@ function useTrending() {
   return items;
 }
 
-/* ── Stock Carousel ── */
+/* ── Stock Card ── */
+function StockCard({ s }: { s: StockItem }) {
+  return (
+    <div
+      className={`shrink-0 rounded-sm px-4 py-3 min-w-[150px] sm:min-w-[165px] transition-colors ${
+        s.direction === "up"
+          ? "bg-emerald-500/10 hover:bg-emerald-500/15"
+          : s.direction === "down"
+          ? "bg-red-500/10 hover:bg-red-500/15"
+          : "bg-white/5 hover:bg-white/8"
+      }`}
+    >
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-label-md font-bold text-white/70">{s.symbol}</span>
+        {s.direction === "up" ? (
+          <ArrowUpRight size={16} className="text-emerald-400" />
+        ) : s.direction === "down" ? (
+          <ArrowDownRight size={16} className="text-red-400" />
+        ) : (
+          <Minus size={14} className="text-white/30" />
+        )}
+      </div>
+      <div className="text-title-lg font-mono font-bold text-white leading-none">
+        {fmtPrice(s.price, s.symbol)}
+      </div>
+      <div className="mt-1.5 flex items-center gap-2">
+        <span className={`text-label-md font-mono font-semibold ${
+          s.direction === "up" ? "text-emerald-400" : s.direction === "down" ? "text-red-400" : "text-white/40"
+        }`}>
+          {s.change >= 0 ? "+" : ""}{s.change.toFixed(2)}
+        </span>
+        <span className={`text-label-sm font-mono ${
+          s.direction === "up" ? "text-emerald-400/60" : s.direction === "down" ? "text-red-400/60" : "text-white/20"
+        }`}>
+          ({s.changePercent >= 0 ? "+" : ""}{s.changePercent.toFixed(2)}%)
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ── Stock Carousel — Infinite Loop ── */
 function StockCarousel({ stocks, lastUpdate }: { stocks: StockItem[]; lastUpdate: string }) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [hovered, setHovered] = useState(false);
 
-  const checkScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 5);
-    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 5);
-  }, []);
+  // Duplicate stocks for seamless looping
+  const loopedStocks = [...stocks, ...stocks, ...stocks];
 
-  useEffect(() => {
-    checkScroll();
-    const el = scrollRef.current;
-    if (el) el.addEventListener("scroll", checkScroll, { passive: true });
-    return () => { if (el) el.removeEventListener("scroll", checkScroll); };
-  }, [checkScroll, stocks]);
-
-  // Auto-scroll carousel
+  // Infinite auto-scroll: when reaching end of first set, jump back to start
   useEffect(() => {
     const el = scrollRef.current;
-    if (!el) return;
-    let direction = 1;
+    if (!el || stocks.length === 0) return;
+
+    // Calculate width of one set of cards
+    const getSetWidth = () => {
+      const cards = el.children;
+      if (cards.length === 0) return 0;
+      const cardCount = stocks.length;
+      let width = 0;
+      for (let i = 0; i < cardCount && i < cards.length; i++) {
+        width += (cards[i] as HTMLElement).offsetWidth + 10; // 10 = gap
+      }
+      return width;
+    };
+
+    // Start in the middle set
+    const setWidth = getSetWidth();
+    if (setWidth > 0) el.scrollLeft = setWidth;
+
     const interval = setInterval(() => {
-      const maxScroll = el.scrollWidth - el.clientWidth;
-      if (el.scrollLeft >= maxScroll - 2) direction = -1;
-      if (el.scrollLeft <= 2) direction = 1;
-      el.scrollBy({ left: direction * 1, behavior: "auto" });
-    }, 30);
-    return () => clearInterval(interval);
-  }, [stocks]);
+      if (hovered) return;
+      el.scrollLeft += 0.8;
 
-  function scroll(dir: number) {
-    scrollRef.current?.scrollBy({ left: dir * 300, behavior: "smooth" });
-  }
+      // If scrolled past 2 sets, jump back to 1 set (seamless)
+      const sw = getSetWidth();
+      if (sw > 0 && el.scrollLeft >= sw * 2) {
+        el.scrollLeft -= sw;
+      }
+    }, 20);
+
+    return () => clearInterval(interval);
+  }, [stocks, hovered]);
 
   if (stocks.length === 0) return null;
 
   return (
-    <div className="bg-on-surface">
+    <div className="bg-on-surface" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
       <div className="container-main py-3">
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
@@ -142,77 +188,20 @@ function StockCarousel({ stocks, lastUpdate }: { stocks: StockItem[]; lastUpdate
             <span className="text-label-md font-bold uppercase tracking-widest text-white/50">Market</span>
             <span className="hidden sm:inline text-label-sm text-white/20">Live</span>
           </div>
-          <div className="flex items-center gap-3">
-            {lastUpdate && (
-              <span className="text-label-sm text-white/20 font-mono">
-                Update {lastUpdate} WIB
-              </span>
-            )}
-            {/* Nav arrows */}
-            <div className="hidden sm:flex items-center gap-1">
-              <button
-                onClick={() => scroll(-1)}
-                disabled={!canScrollLeft}
-                className="flex h-7 w-7 items-center justify-center rounded-sm bg-white/5 text-white/40 hover:bg-white/10 hover:text-white/70 transition-colors disabled:opacity-20 disabled:cursor-default"
-              >
-                <ChevronLeft size={14} />
-              </button>
-              <button
-                onClick={() => scroll(1)}
-                disabled={!canScrollRight}
-                className="flex h-7 w-7 items-center justify-center rounded-sm bg-white/5 text-white/40 hover:bg-white/10 hover:text-white/70 transition-colors disabled:opacity-20 disabled:cursor-default"
-              >
-                <ChevronRight size={14} />
-              </button>
-            </div>
-          </div>
+          {lastUpdate && (
+            <span className="text-label-sm text-white/20 font-mono">
+              Update {lastUpdate} WIB
+            </span>
+          )}
         </div>
 
-        {/* Cards carousel */}
+        {/* Infinite carousel */}
         <div
           ref={scrollRef}
-          className="flex gap-2.5 overflow-x-auto scrollbar-hide scroll-smooth"
+          className="flex gap-2.5 overflow-x-auto scrollbar-hide"
         >
-          {stocks.map((s) => (
-            <div
-              key={s.symbol}
-              className={`shrink-0 rounded-sm px-4 py-3 min-w-[150px] sm:min-w-[165px] transition-colors ${
-                s.direction === "up"
-                  ? "bg-emerald-500/10 hover:bg-emerald-500/15"
-                  : s.direction === "down"
-                  ? "bg-red-500/10 hover:bg-red-500/15"
-                  : "bg-white/5 hover:bg-white/8"
-              }`}
-            >
-              {/* Symbol + arrow */}
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-label-md font-bold text-white/70">{s.symbol}</span>
-                {s.direction === "up" ? (
-                  <ArrowUpRight size={16} className="text-emerald-400" />
-                ) : s.direction === "down" ? (
-                  <ArrowDownRight size={16} className="text-red-400" />
-                ) : (
-                  <Minus size={14} className="text-white/30" />
-                )}
-              </div>
-              {/* Price */}
-              <div className="text-title-lg font-mono font-bold text-white leading-none">
-                {fmtPrice(s.price, s.symbol)}
-              </div>
-              {/* Change */}
-              <div className="mt-1.5 flex items-center gap-2">
-                <span className={`text-label-md font-mono font-semibold ${
-                  s.direction === "up" ? "text-emerald-400" : s.direction === "down" ? "text-red-400" : "text-white/40"
-                }`}>
-                  {s.change >= 0 ? "+" : ""}{s.change.toFixed(2)}
-                </span>
-                <span className={`text-label-sm font-mono ${
-                  s.direction === "up" ? "text-emerald-400/60" : s.direction === "down" ? "text-red-400/60" : "text-white/20"
-                }`}>
-                  ({s.changePercent >= 0 ? "+" : ""}{s.changePercent.toFixed(2)}%)
-                </span>
-              </div>
-            </div>
+          {loopedStocks.map((s, i) => (
+            <StockCard key={`${s.symbol}-${i}`} s={s} />
           ))}
         </div>
       </div>
