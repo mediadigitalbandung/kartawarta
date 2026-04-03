@@ -198,7 +198,7 @@ export default function Header() {
       </header>
 
       {/* Row 2: Category navigation */}
-      <nav className="bg-surface-container-lowest relative" aria-label="Navigasi kategori">
+      <nav className="bg-[#1C1C1E] relative border-b border-[#2C2C2E]" aria-label="Navigasi kategori">
         <div className="container-main">
           <ul className="flex items-center gap-0 overflow-x-auto scrollbar-hide">
             {categoryNav.map((item) => {
@@ -210,7 +210,7 @@ export default function Header() {
                   className={`relative inline-block px-2.5 sm:px-3 py-3 text-label-lg transition-all duration-200 whitespace-nowrap ${
                     isActive
                       ? "text-primary font-bold after:absolute after:bottom-0 after:left-2.5 after:right-2.5 after:h-[2px] after:bg-primary"
-                      : "text-on-surface-variant font-medium hover:text-primary"
+                      : "text-white/70 font-medium hover:text-white"
                   }`}
                 >
                   {item.name}
