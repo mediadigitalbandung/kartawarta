@@ -9,17 +9,14 @@ const ID_KEYWORDS = /indonesia|jakarta|bandung|surabaya|jawa|timnas|pssi|persib|
 const INTL_KEYWORDS = /nba|nfl|premier league|champions league|la liga|bundesliga|serie a|ligue 1|cricket|ipl|nhl|mlb|trump|biden|putin|ukraine|russia|china|israel|palestine|gaza|nato|eu\b|brexit|elon musk|tesla|spacex|nasa|oscar|grammy|emmy|super bowl|world cup|euro 2|copa america|wimbledon|us open|australian open|french open|bollywood|hollywood|kpop|blackpink|bts\b|taylor swift|drake|beyonce|kanye|kardashian|royal family|king charles|pope|vatican|olympics 20|fifa|uefa|afc asian|nba draft|f1 grand prix|formula 1|motogp (?!mandalika)|ufc\b|wwe\b|boxing|pga|lpga|masters|super league|eredivisie|antwerp|ried|lueders|macau|khaleej|kholood|al-|fc\b(?!.*indonesia)/i;
 
 function isIndonesianTrend(tag: string): boolean {
-  // If it matches Indonesian keywords, keep it
-  if (ID_KEYWORDS.test(tag)) return true;
-  // If it matches international keywords, reject it
+  // Reject international keywords first
   if (INTL_KEYWORDS.test(tag)) return false;
-  // Short generic terms (1-2 words, all latin) are likely international
-  const words = tag.trim().split(/\s+/);
-  if (words.length <= 2 && /^[a-z\s]+$/i.test(tag)) return false;
-  // If contains Indonesian words, keep
-  if (/yang|dan|dari|untuk|dengan|dalam|ini|itu|baru|hari|kasus|soal|tentang/i.test(tag)) return true;
-  // Default: keep if 3+ words
-  return words.length >= 3;
+  // Accept if matches Indonesian keywords
+  if (ID_KEYWORDS.test(tag)) return true;
+  // Accept if contains Indonesian language words
+  if (/yang|dan|dari|untuk|dengan|dalam|ini|itu|baru|hari|kasus|soal|tentang|harga|berita|hasil|jadwal|cara|daftar|lowongan|resmi|terbaru/i.test(tag)) return true;
+  // Reject everything else (all-latin generic terms are likely international)
+  return false;
 }
 
 // Category detection
