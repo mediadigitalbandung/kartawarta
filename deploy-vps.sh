@@ -7,7 +7,7 @@ set -e
 
 DOMAIN="kartawarta.com"
 APP_DIR="/var/www/kartawarta"
-REPO="https://github.com/bonelade/Jurnalis-Hukum-Bandung.git"
+REPO="https://github.com/mediadigitalbandung/kartawarta.git"
 DB_NAME="kartawarta"
 DB_USER="kartawarta"
 DB_PASS=$(openssl rand -hex 16)

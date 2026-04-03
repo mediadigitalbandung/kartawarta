@@ -2,10 +2,10 @@
 
 ## Project
 - **Nama:** Kartawarta v2.0
-- **Stack:** Next.js 14, TypeScript, Tailwind CSS, Prisma, Supabase (PostgreSQL), NextAuth
-- **Deploy:** Vercel (auto-deploy dari GitHub master)
-- **Repo:** github.com/bonelade/Kartawarta
-- **URL:** https://kartawarta.vercel.app
+- **Stack:** Next.js 14, TypeScript, Tailwind CSS, Prisma, PostgreSQL, NextAuth
+- **Deploy:** VPS Hostinger (Ubuntu 24.04, 145.79.15.99)
+- **Repo:** github.com/mediadigitalbandung/kartawarta
+- **URL:** https://kartawarta.com
 
 ## Workflow: Auto Commit, Push & Deploy
 
