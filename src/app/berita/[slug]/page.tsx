@@ -359,7 +359,7 @@ export default async function ArticlePage({ params, searchParams }: { params: { 
 
               {/* Ad — below meta */}
               <div className="mt-6">
-                <BannerAd slot="HEADER" />
+                <BannerAd slot="HEADER" noWrapper />
               </div>
 
               {/* Featured Image */}
@@ -435,7 +435,7 @@ export default async function ArticlePage({ params, searchParams }: { params: { 
 
               {/* Ad — after content */}
               <div className="mt-8">
-                <BannerAd slot="IN_ARTICLE" />
+                <BannerAd slot="IN_ARTICLE" noWrapper />
               </div>
 
               {/* Share bar + bookmark */}
@@ -516,7 +516,7 @@ export default async function ArticlePage({ params, searchParams }: { params: { 
 
               {/* Ad — before related */}
               <div className="mt-8">
-                <BannerAd slot="FOOTER" />
+                <BannerAd slot="FOOTER" noWrapper />
               </div>
 
               {/* Related articles */}
