@@ -193,30 +193,22 @@ export default function RedaksiPanelPage() {
             {/* Pick from existing users */}
             {users.length > 0 && (
               <div className="mb-5">
-                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">
-                  <UserPlus size={14} className="inline mr-1" />
-                  Pilih dari Pengguna Terdaftar
-                </label>
-                <div className="flex gap-2 flex-wrap">
+                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Pilih dari Pengguna Terdaftar</label>
+                <select
+                  className="input w-full"
+                  value=""
+                  onChange={(e) => {
+                    const user = users.find((u) => u.id === e.target.value);
+                    if (user) selectUser(user);
+                  }}
+                >
+                  <option value="">— Pilih pengguna untuk autofill —</option>
                   {users.map((u) => (
-                    <button
-                      key={u.id}
-                      type="button"
-                      onClick={() => selectUser(u)}
-                      className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all hover:border-goto-green hover:bg-goto-light/30 ${
-                        form.name === u.name ? "border-goto-green bg-goto-light/30 text-goto-green" : "border-border text-txt-secondary"
-                      }`}
-                    >
-                      {u.avatar ? (
-                        <img src={u.avatar} alt={u.name} className="h-5 w-5 rounded-full object-cover" />
-                      ) : (
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-goto-green text-[10px] font-bold text-white">{u.name.charAt(0)}</span>
-                      )}
-                      {u.name}
-                      <span className="text-txt-muted">({roleLabels[u.role] || u.role})</span>
-                    </button>
+                    <option key={u.id} value={u.id}>
+                      {u.name} ({roleLabels[u.role] || u.role})
+                    </option>
                   ))}
-                </div>
+                </select>
               </div>
             )}
 
