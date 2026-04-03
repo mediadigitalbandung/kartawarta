@@ -3,6 +3,7 @@ export const revalidate = 60;
 import Link from "next/link";
 import Image from "next/image";
 import NewsTicker from "@/components/layout/NewsTicker";
+import HeroCarousel from "@/components/slider/HeroCarousel";
 import PollingCarousel from "@/components/slider/PollingCarousel";
 import BannerAd, { SidebarAd, InlineAd, NativeAd } from "@/components/ads/BannerAd";
 import { Scale, Briefcase, Trophy, Film, Heart, Wheat, Cpu, Vote as VoteIcon, GraduationCap, Leaf, Compass, BookOpen, TrendingUp, LucideIcon, ArrowRight } from "lucide-react";
@@ -45,11 +46,11 @@ export default async function HomePage() {
     }),
   ]);
 
-  const hero = articles[0];
-  const heroSide = articles.slice(1, 4);
-  const editorsPickArticles = articles.slice(4, 8);
-  const terkiniArticles = articles.slice(8, 20);
-  const restArticles = articles.slice(20);
+  const heroMain = articles.slice(0, 5);  // 5 articles rotate in hero
+  const heroSide = articles.slice(5, 8);  // 3 side stories
+  const editorsPickArticles = articles.slice(8, 12);
+  const terkiniArticles = articles.slice(12, 24);
+  const restArticles = articles.slice(24);
 
   // Group by category
   const articlesByCategory: Record<string, { slug: string; articles: typeof restArticles }> = {};
@@ -78,76 +79,12 @@ export default async function HomePage() {
       <NewsTicker />
 
       {/* ════════════════════════════════════════════
-          HERO — Full-bleed main story + side stories
+          HERO — Auto-rotating carousel + side stories
           ════════════════════════════════════════════ */}
-      {hero && (
-        <section className="bg-on-surface">
-          <div className="container-main py-0">
-            <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[28rem] lg:min-h-[32rem]">
-              {/* Main story — spans 8 cols */}
-              <div className="lg:col-span-8 relative">
-                <Link href={`/berita/${hero.slug}`} className="block relative h-full min-h-[24rem] lg:min-h-full overflow-hidden group">
-                  {hero.featuredImage ? (
-                    <Image src={hero.featuredImage} alt={hero.title} fill className="object-cover transition-transform duration-700 group-hover:scale-[1.03]" priority />
-                  ) : (
-                    <div className="absolute inset-0 bg-primary" />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 lg:p-10">
-                    <span className="inline-block text-label-sm font-bold uppercase tracking-widest text-secondary mb-3">
-                      {hero.category.name}
-                    </span>
-                    <h1 className="font-serif text-display-sm sm:text-display-md lg:text-display-lg text-white leading-[1.1] max-w-2xl">
-                      {hero.title}
-                    </h1>
-                    {hero.excerpt && (
-                      <p className="mt-4 text-body-md text-white/60 max-w-xl line-clamp-2 hidden sm:block">
-                        {hero.excerpt}
-                      </p>
-                    )}
-                    <div className="mt-4 flex items-center gap-3 text-label-sm uppercase tracking-wider text-white/40">
-                      <span className="text-white/60 font-semibold">{hero.author.name}</span>
-                      <span>/</span>
-                      <span>{timeAgo(hero.publishedAt)}</span>
-                    </div>
-                  </div>
-                </Link>
-              </div>
-
-              {/* Side stories — 4 cols, stacked */}
-              <div className="lg:col-span-4 flex flex-col">
-                {heroSide.map((a, i) => (
-                  <Link
-                    key={a.slug}
-                    href={`/berita/${a.slug}`}
-                    className={`group flex-1 relative overflow-hidden ${i < heroSide.length - 1 ? "border-b border-white/10" : ""}`}
-                  >
-                    <div className="absolute inset-0">
-                      {a.featuredImage ? (
-                        <Image src={a.featuredImage} alt={a.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
-                      ) : (
-                        <div className="absolute inset-0 bg-primary-container" />
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
-                    </div>
-                    <div className="relative p-5 flex flex-col justify-end h-full min-h-[8rem]">
-                      <span className="text-label-sm font-bold uppercase tracking-widest text-secondary/80 mb-1">
-                        {a.category.name}
-                      </span>
-                      <h2 className="font-serif text-title-lg text-white leading-snug line-clamp-2 group-hover:text-white/90 transition-colors">
-                        {a.title}
-                      </h2>
-                      <span className="mt-2 text-label-sm text-white/40 uppercase tracking-wider">
-                        {timeAgo(a.publishedAt)}
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+      <HeroCarousel
+        main={JSON.parse(JSON.stringify(heroMain))}
+        side={JSON.parse(JSON.stringify(heroSide))}
+      />
 
       {/* AD: Header */}
       <BannerAd size="leaderboard" slot="HEADER" className="bg-surface" />
