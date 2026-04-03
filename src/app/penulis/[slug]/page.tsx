@@ -48,8 +48,29 @@ export default async function PenulisPage({ params }: { params: { slug: string }
     year: "numeric",
   });
 
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://kartawarta.com";
+  const authorJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    mainEntity: {
+      "@type": "Person",
+      name: author.name,
+      description: author.bio || `Penulis di Kartawarta`,
+      url: `${siteUrl}/penulis/${params.slug}`,
+      worksFor: { "@type": "Organization", name: "Kartawarta", url: siteUrl },
+    },
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Beranda", item: siteUrl },
+        { "@type": "ListItem", position: 2, name: author.name, item: `${siteUrl}/penulis/${params.slug}` },
+      ],
+    },
+  };
+
   return (
     <div className="bg-surface min-h-screen">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(authorJsonLd) }} />
       <div className="container-main py-8">
         {/* Author profile */}
         <div className="rounded-[12px] border border-border bg-surface p-6">

@@ -1,21 +1,23 @@
 {
-  "name": "Kartawarta",
-  "short_name": "Kartawarta News",
-  "description": "Portal berita digital terpercaya",
+  "name": "Kartawarta — Media Digital Terpercaya",
+  "short_name": "Kartawarta",
+  "description": "Portal berita digital terpercaya. Menyajikan berita terkini, analisis mendalam, dan informasi akurat.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FFFFFF",
-  "theme_color": "#00AA13",
+  "background_color": "#ffffff",
+  "theme_color": "#002045",
   "orientation": "portrait-primary",
+  "categories": ["news", "media"],
+  "lang": "id",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/kartawarta-icon.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/kartawarta-icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

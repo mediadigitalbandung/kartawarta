@@ -48,7 +48,16 @@ export const metadata: Metadata = {
     type: "website",
     locale: "id_ID",
     siteName: "Kartawarta",
+    images: [{ url: "/kartawarta-icon.png", width: 512, height: 512, alt: "Kartawarta" }],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kartawarta - Media Digital Terpercaya",
+    description: "Portal berita digital terpercaya. Menyajikan berita terkini, analisis mendalam, dan informasi akurat.",
+    images: ["/kartawarta-icon.png"],
+  },
+  verification: {},
+  category: "news",
   icons: {
     icon: "/kartawarta-icon.png",
     apple: "/kartawarta-icon.png",

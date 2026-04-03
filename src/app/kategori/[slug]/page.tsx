@@ -124,8 +124,26 @@ export default async function CategoryPage({ params }: { params: { slug: string 
     viewCount: a.viewCount,
   }));
 
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://kartawarta.com";
+  const categoryJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `${category.name} — Kartawarta`,
+    description: category.description || `Berita ${category.name} terbaru dari Kartawarta.`,
+    url: `${siteUrl}/kategori/${category.slug}`,
+    isPartOf: { "@type": "WebSite", name: "Kartawarta", url: siteUrl },
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Beranda", item: siteUrl },
+        { "@type": "ListItem", position: 2, name: category.name, item: `${siteUrl}/kategori/${category.slug}` },
+      ],
+    },
+  };
+
   return (
     <div className="bg-surface min-h-screen">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(categoryJsonLd) }} />
       <div className="container-main py-8">
         {/* Breadcrumb */}
         <nav className="mb-6 flex items-center gap-1.5 text-sm text-txt-muted">
