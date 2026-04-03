@@ -1,57 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="300" height="250" viewBox="0 0 300 250">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="300" height="250" viewBox="0 0 300 250">
   <defs>
     <linearGradient id="topbg" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#1C1C1E;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#2a2d30;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#1C1C1E"/>
+      <stop offset="100%" style="stop-color:#2a2d30"/>
     </linearGradient>
     <linearGradient id="greenbar" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#00AA13;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#008C10;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#00AA13"/>
+      <stop offset="100%" style="stop-color:#008C10"/>
     </linearGradient>
   </defs>
-
-  <!-- Main background -->
   <rect width="300" height="250" fill="white" rx="8"/>
   <rect width="300" height="250" fill="none" stroke="#E5E7EB" stroke-width="1" rx="8"/>
-
-  <!-- Top green header area -->
-  <rect width="300" height="110" fill="url(#topbg)" rx="8"/>
-  <rect x="0" y="102" width="300" height="8" fill="url(#topbg)"/>
-
-  <!-- Green accent stripe -->
+  <rect width="300" height="130" fill="url(#topbg)" rx="8"/>
+  <rect x="0" y="122" width="300" height="8" fill="url(#topbg)"/>
   <rect x="0" y="0" width="300" height="4" fill="url(#greenbar)" rx="2"/>
-
-  <!-- Logo circle -->
-  <circle cx="150" cy="48" r="34" fill="#00AA13"/>
-  <circle cx="150" cy="48" r="34" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
-  <text x="150" y="43" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="11" fill="white">JURNALIS</text>
-  <text x="150" y="56" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="11" fill="white">HUKUM</text>
-  <text x="150" y="69" text-anchor="middle" font-family="Arial Black, Arial" font-weight="700" font-size="9" fill="rgba(255,255,255,0.65)">BANDUNG</text>
-
-  <!-- Tagline white -->
-  <text x="150" y="96" text-anchor="middle" font-family="Arial, sans-serif" font-weight="600" font-size="11" fill="rgba(255,255,255,0.8)">Media Hukum Digital Terpercaya</text>
-
-  <!-- Stats row -->
-  <rect x="12" y="118" width="82" height="52" rx="6" fill="#F7F7F8"/>
-  <text x="53" y="138" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="18" fill="#00AA13">50K+</text>
-  <text x="53" y="153" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#6B7280">Pembaca/bulan</text>
-
-  <rect x="109" y="118" width="82" height="52" rx="6" fill="#F7F7F8"/>
-  <text x="150" y="138" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="18" fill="#00AA13">500+</text>
-  <text x="150" y="153" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#6B7280">Artikel Hukum</text>
-
-  <rect x="206" y="118" width="82" height="52" rx="6" fill="#F7F7F8"/>
-  <text x="247" y="138" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="18" fill="#00AA13">7+</text>
-  <text x="247" y="153" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#6B7280">Kategori Hukum</text>
-
-  <!-- Divider -->
-  <line x1="20" y1="182" x2="280" y2="182" stroke="#E5E7EB" stroke-width="1"/>
-
-  <!-- Body text -->
-  <text x="150" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="12" fill="#1C1C1E">Iklankan Bisnis Hukum Anda</text>
-  <text x="150" y="215" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#6B7280">Hukum Pidana · Perdata · Tata Negara · HAM</text>
-
-  <!-- CTA Button -->
-  <rect x="30" y="225" width="240" height="16" rx="8" fill="url(#greenbar)"/>
-  <text x="150" y="236" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="10" fill="white">Hubungi Kami Sekarang →</text>
+  <image href="/logo-jhb.png" x="115" y="14" width="70" height="70" preserveAspectRatio="xMidYMid meet"/>
+  <text x="150" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="13" fill="white">Jurnalis Hukum Bandung</text>
+  <text x="150" y="118" text-anchor="middle" font-family="Arial, sans-serif" font-weight="500" font-size="10" fill="rgba(255,255,255,0.7)">Media Hukum Digital Terpercaya</text>
+  <line x1="20" y1="145" x2="280" y2="145" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="150" y="168" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="13" fill="#1C1C1E">Iklankan Bisnis Hukum Anda</text>
+  <text x="150" y="186" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#6B7280">Hukum Pidana · Perdata · Tata Negara · HAM</text>
+  <rect x="50" y="202" width="200" height="34" rx="17" fill="url(#greenbar)"/>
+  <text x="150" y="224" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="12" fill="white">Hubungi Kami Sekarang →</text>
 </svg>

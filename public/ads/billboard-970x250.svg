@@ -1,70 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="970" height="250" viewBox="0 0 970 250">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="970" height="250" viewBox="0 0 970 250">
   <defs>
     <linearGradient id="bbg" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#1C1C1E;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#222426;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#1a2e1b;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#1C1C1E"/>
+      <stop offset="50%" style="stop-color:#222426"/>
+      <stop offset="100%" style="stop-color:#1a2e1b"/>
     </linearGradient>
     <linearGradient id="greenpanel" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#00AA13;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#007A0D;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#00AA13"/>
+      <stop offset="100%" style="stop-color:#007A0D"/>
     </linearGradient>
     <linearGradient id="ctabtn" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#00AA13;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#00CC18;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#00AA13"/>
+      <stop offset="100%" style="stop-color:#00CC18"/>
     </linearGradient>
     <pattern id="grid" patternUnits="userSpaceOnUse" width="40" height="40">
       <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
     </pattern>
   </defs>
-
-  <!-- Background -->
   <rect width="970" height="250" fill="url(#bbg)"/>
   <rect width="970" height="250" fill="url(#grid)"/>
-
-  <!-- Top green stripe -->
   <rect x="0" y="0" width="970" height="5" fill="url(#greenpanel)"/>
-
-  <!-- Left visual panel -->
   <rect x="0" y="5" width="420" height="245" fill="url(#greenpanel)" opacity="0.08"/>
-
-  <!-- Big logo/icon area left -->
   <circle cx="140" cy="125" r="90" fill="rgba(0,170,19,0.08)"/>
   <circle cx="140" cy="125" r="65" fill="rgba(0,170,19,0.12)"/>
-  <circle cx="140" cy="125" r="48" fill="#00AA13"/>
-  <circle cx="140" cy="125" r="48" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
-  <text x="140" y="112" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="22" fill="white">JURNALIS</text>
-  <text x="140" y="132" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="22" fill="white">HUKUM</text>
-  <text x="140" y="150" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="14" fill="rgba(255,255,255,0.8)">BANDUNG</text>
-
-  <!-- Vertical divider -->
+  <image href="/logo-jhb.png" x="75" y="60" width="130" height="130" preserveAspectRatio="xMidYMid meet"/>
   <line x1="290" y1="30" x2="290" y2="220" stroke="rgba(0,170,19,0.3)" stroke-width="1"/>
-
-  <!-- Right content area -->
-  <!-- Tag -->
   <rect x="320" y="28" width="80" height="20" rx="10" fill="#00AA13"/>
   <text x="360" y="41" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="10" fill="white">PASANG IKLAN</text>
-
-  <!-- Big headline -->
   <text x="320" y="82" font-family="Arial Black, Arial" font-weight="900" font-size="32" fill="white">Raih Klien Hukum</text>
   <text x="320" y="118" font-family="Arial Black, Arial" font-weight="900" font-size="32" fill="#00AA13">Lebih Banyak</text>
-  <text x="320" y="150" font-family="Arial, sans-serif" font-size="15" fill="rgba(255,255,255,0.7)">Iklankan jasa hukum Anda kepada 50.000+ pembaca aktif</text>
-  <text x="320" y="170" font-family="Arial, sans-serif" font-size="15" fill="rgba(255,255,255,0.7)">di portal berita hukum terpercaya Kota Bandung</text>
-
-  <!-- Stats row -->
-  <rect x="320" y="185" width="95" height="42" rx="8" fill="rgba(255,255,255,0.07)"/>
-  <text x="367" y="204" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="18" fill="#00AA13">50K+</text>
-  <text x="367" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.5)">Pembaca/bln</text>
-
-  <rect x="426" y="185" width="95" height="42" rx="8" fill="rgba(255,255,255,0.07)"/>
-  <text x="473" y="204" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="18" fill="#00AA13">500+</text>
-  <text x="473" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.5)">Artikel Aktif</text>
-
-  <rect x="532" y="185" width="95" height="42" rx="8" fill="rgba(255,255,255,0.07)"/>
-  <text x="579" y="204" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="18" fill="#00AA13">7</text>
-  <text x="579" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.5)">Slot Tersedia</text>
-
-  <!-- CTA Button -->
+  <text x="320" y="152" font-family="Arial, sans-serif" font-size="15" fill="rgba(255,255,255,0.7)">Iklankan jasa hukum Anda di portal berita</text>
+  <text x="320" y="172" font-family="Arial, sans-serif" font-size="15" fill="rgba(255,255,255,0.7)">hukum terpercaya Kota Bandung</text>
+  <rect x="320" y="192" width="110" height="38" rx="8" fill="rgba(255,255,255,0.07)"/>
+  <text x="375" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="11" fill="rgba(255,255,255,0.6)">7 Kategori Hukum</text>
+  <text x="375" y="224" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.4)">Pidana · Perdata · HAM</text>
   <rect x="690" y="90" width="250" height="70" rx="35" fill="url(#ctabtn)"/>
   <rect x="690" y="90" width="250" height="70" rx="35" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
   <text x="815" y="120" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="16" fill="white">Hubungi Kami</text>

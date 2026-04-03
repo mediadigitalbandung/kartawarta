@@ -1,43 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="728" height="90" viewBox="0 0 728 90">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="728" height="90" viewBox="0 0 728 90">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#1C1C1E;stop-opacity:1" />
-      <stop offset="55%" style="stop-color:#222426;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#00AA13;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#00AA13;stop-opacity:0" />
-      <stop offset="100%" style="stop-color:#00AA13;stop-opacity:0.15" />
+      <stop offset="0%" style="stop-color:#1C1C1E"/>
+      <stop offset="55%" style="stop-color:#222426"/>
+      <stop offset="100%" style="stop-color:#00AA13"/>
     </linearGradient>
   </defs>
-
-  <!-- Background -->
-  <rect width="728" height="90" fill="url(#bg)" rx="0"/>
-  <rect width="728" height="90" fill="url(#glow)" rx="0"/>
-
-  <!-- Left accent bar -->
+  <rect width="728" height="90" fill="url(#bg)"/>
   <rect x="0" y="0" width="4" height="90" fill="#00AA13"/>
-
-  <!-- Logo circle -->
-  <circle cx="50" cy="45" r="26" fill="#00AA13"/>
-  <text x="50" y="41" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="9" fill="white">JURNALIS</text>
-  <text x="50" y="52" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="9" fill="white">HUKUM</text>
-  <text x="50" y="63" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="8" fill="rgba(255,255,255,0.7)">BANDUNG</text>
-
-  <!-- Divider -->
-  <line x1="90" y1="20" x2="90" y2="70" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-
-  <!-- Main text -->
-  <text x="108" y="35" font-family="Arial, sans-serif" font-weight="700" font-size="15" fill="white">Pasang Iklan di Media Hukum Terpercaya Bandung</text>
-  <text x="108" y="55" font-family="Arial, sans-serif" font-weight="400" font-size="12" fill="rgba(255,255,255,0.65)">Jangkau 50.000+ pembaca profesional hukum setiap bulannya</text>
-
-  <!-- Dot decorations -->
-  <circle cx="104" cy="65" r="2" fill="#00AA13"/>
-  <circle cx="112" cy="65" r="2" fill="rgba(0,170,19,0.4)"/>
-  <circle cx="120" cy="65" r="2" fill="rgba(0,170,19,0.2)"/>
-
-  <!-- CTA Button -->
+  <image href="/logo-jhb.png" x="14" y="9" width="72" height="72" preserveAspectRatio="xMidYMid meet"/>
+  <line x1="100" y1="20" x2="100" y2="70" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <text x="118" y="38" font-family="Arial, sans-serif" font-weight="700" font-size="16" fill="white">Pasang Iklan di Media Hukum Terpercaya Bandung</text>
+  <text x="118" y="58" font-family="Arial, sans-serif" font-weight="400" font-size="12" fill="rgba(255,255,255,0.65)">Berita hukum pidana, perdata, tata negara, HAM — akurat &amp; terverifikasi</text>
+  <circle cx="118" cy="72" r="2" fill="#00AA13"/>
+  <circle cx="126" cy="72" r="2" fill="rgba(0,170,19,0.4)"/>
+  <circle cx="134" cy="72" r="2" fill="rgba(0,170,19,0.2)"/>
   <rect x="560" y="25" width="148" height="40" rx="20" fill="#00AA13"/>
-  <rect x="560" y="25" width="148" height="40" rx="20" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
   <text x="634" y="49" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="13" fill="white">Iklankan Sekarang →</text>
 </svg>

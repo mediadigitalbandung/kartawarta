@@ -1,46 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="728" height="90" viewBox="0 0 728 90">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="728" height="90" viewBox="0 0 728 90">
   <defs>
     <linearGradient id="fbg" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.97" />
-      <stop offset="100%" style="stop-color:#F0FFF2;stop-opacity:0.97" />
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.97"/>
+      <stop offset="100%" style="stop-color:#F0FFF2;stop-opacity:0.97"/>
     </linearGradient>
     <linearGradient id="fctabtn" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#00AA13;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#00CC18;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#00AA13"/>
+      <stop offset="100%" style="stop-color:#00CC18"/>
     </linearGradient>
-    <filter id="topshadow">
-      <feDropShadow dx="0" dy="-3" stdDeviation="6" flood-color="rgba(0,0,0,0.12)"/>
-    </filter>
   </defs>
-
-  <!-- Background with top shadow effect -->
-  <rect width="728" height="90" fill="url(#fbg)" rx="0" filter="url(#topshadow)"/>
+  <rect width="728" height="90" fill="url(#fbg)"/>
   <rect x="0" y="0" width="728" height="2" fill="rgba(0,0,0,0.06)"/>
-
-  <!-- Left green accent -->
   <rect x="0" y="0" width="4" height="90" fill="#00AA13"/>
-
-  <!-- Logo circle -->
-  <circle cx="48" cy="45" r="26" fill="#1C1C1E"/>
-  <text x="48" y="40" text-anchor="middle" font-family="Arial Black, Arial" font-weight="900" font-size="10" fill="#00AA13">JHB</text>
-  <text x="48" y="53" text-anchor="middle" font-family="Arial, sans-serif" font-weight="600" font-size="8" fill="rgba(255,255,255,0.65)">HUKUM</text>
-
-  <!-- Divider -->
-  <line x1="86" y1="18" x2="86" y2="72" stroke="#E5E7EB" stroke-width="1"/>
-
-  <!-- Live indicator -->
-  <circle cx="102" cy="30" r="4" fill="#00AA13"/>
-  <circle cx="102" cy="30" r="4" fill="#00AA13" opacity="0.4">
-    <animate attributeName="r" values="4;8;4" dur="2s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.4;0;0.4" dur="2s" repeatCount="indefinite"/>
-  </circle>
-  <text x="112" y="34" font-family="Arial, sans-serif" font-weight="700" font-size="10" fill="#00AA13">LIVE</text>
-
-  <!-- Main text -->
-  <text x="100" y="54" font-family="Arial, sans-serif" font-weight="700" font-size="15" fill="#1C1C1E">Iklan Anda bisa tampil di sini — Jangkau pembaca hukum Bandung</text>
-  <text x="100" y="70" font-family="Arial, sans-serif" font-size="11" fill="#6B7280">50.000+ pembaca aktif setiap bulan · Harga mulai dari Rp 500.000/minggu</text>
-
-  <!-- CTA button -->
+  <image href="/logo-jhb.png" x="16" y="13" width="64" height="64" preserveAspectRatio="xMidYMid meet"/>
+  <line x1="92" y1="18" x2="92" y2="72" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="108" y="34" font-family="Arial, sans-serif" font-weight="700" font-size="15" fill="#1C1C1E">Iklan Anda bisa tampil di sini — Jurnalis Hukum Bandung</text>
+  <text x="108" y="54" font-family="Arial, sans-serif" font-size="12" fill="#6B7280">Berita hukum digital terpercaya · Harga terjangkau · Laporan statistik</text>
+  <circle cx="108" cy="70" r="3" fill="#00AA13"/>
+  <text x="116" y="73" font-family="Arial, sans-serif" font-size="9" fill="#6B7280">Terverifikasi Dewan Pers</text>
   <rect x="555" y="22" width="158" height="46" rx="23" fill="url(#fctabtn)"/>
   <text x="634" y="42" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="12" fill="white">Pasang Iklan</text>
   <text x="634" y="57" text-anchor="middle" font-family="Arial, sans-serif" font-weight="600" font-size="11" fill="rgba(255,255,255,0.85)">Sekarang →</text>
