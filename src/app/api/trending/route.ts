@@ -33,7 +33,7 @@ export async function GET() {
       return successResponse(getFallbackTags());
     }
 
-    // Try AI curation
+    // Try AI to translate/localize non-Indonesian trends
     const aiTags = await filterWithAI(rawTrends);
 
     if (aiTags && aiTags.length > 0) {
@@ -45,8 +45,12 @@ export async function GET() {
       return successResponse(tags);
     }
 
-    // Fallback: return raw trends directly
-    const tags = rawTrends.slice(0, 15).map((label, i) => ({
+    // No AI: filter for Indonesian-looking trends (contains Indonesian words or names)
+    const idKeywords = /indonesia|jakarta|jawa|jokowi|prabowo|timnas|rupiah|dpr|kpk|pilkada|bpjs|pln|pertamina|garuda|liga|persib|persija/i;
+    const filtered = rawTrends.filter((t) => idKeywords.test(t) || /[a-z]{2,}/i.test(t));
+    const finalTrends = filtered.length >= 5 ? filtered : rawTrends;
+
+    const tags = finalTrends.slice(0, 15).map((label, i) => ({
       label,
       href: `/search?q=${encodeURIComponent(label)}`,
       hot: i < 3,
@@ -65,15 +69,18 @@ async function filterWithAI(trends: string[]): Promise<string[] | null> {
 
     if (!setting?.value) return null;
 
-    const prompt = `Kamu adalah editor media berita "Kartawarta". Dari daftar trending topik Google Indonesia berikut, pilih dan format menjadi headline tags yang menarik untuk portal berita umum.
+    const prompt = `Kamu adalah editor media berita Indonesia "Kartawarta". Dari daftar trending topik Google Indonesia berikut, pilih yang RELEVAN untuk pembaca Indonesia dan terjemahkan/kontekstualisasikan ke bahasa Indonesia jika perlu.
 
 Daftar trending:
 ${trends.map((t, i) => `${i + 1}. ${t}`).join("\n")}
 
 Aturan:
-- Pilih 10-15 tags yang paling menarik dan relevan untuk pembaca Indonesia
-- Cakup berbagai topik: politik, ekonomi, olahraga, hiburan, teknologi, kesehatan, dll
-- Format ulang jadi lebih informatif jika perlu (contoh: nama orang → konteksnya)
+- Pilih 10-15 tags yang relevan untuk pembaca INDONESIA
+- PRIORITASKAN topik nasional Indonesia (politik, ekonomi, olahraga lokal, selebriti Indonesia, dll)
+- Jika trending topik internasional, terjemahkan dan tambahkan konteks Indonesia (contoh: "Champions League" → "Hasil Liga Champions Tadi Malam")
+- Jika topik sama sekali tidak relevan untuk Indonesia, SKIP
+- Jika kurang dari 8 yang relevan, tambahkan topik nasional yang sedang aktual
+- Tulis dalam Bahasa Indonesia
 - Setiap tag maksimal 6 kata
 - Format output: HANYA daftar tags dipisah baris baru, tanpa nomor, tanpa penjelasan`;
 
