@@ -94,8 +94,15 @@ export default function TambahIklanPage() {
 
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* ─── Right: Slot Wireframe (mobile: top, desktop: sticky right) ─── */}
+          <div className="lg:col-span-2 lg:order-2">
+            <div className="lg:sticky lg:top-20">
+              <SlotWireframe slot={formSlot} />
+            </div>
+          </div>
+
           {/* ─── Left: Form ─── */}
-          <div className="lg:col-span-3 space-y-5">
+          <div className="lg:col-span-3 lg:order-1 space-y-5">
             <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6 shadow-card space-y-5">
               <h2 className="text-base font-bold text-txt-primary">Detail Iklan</h2>
 
@@ -230,12 +237,6 @@ export default function TambahIklanPage() {
             </div>
           </div>
 
-          {/* ─── Right: Slot Wireframe ─── */}
-          <div className="lg:col-span-2">
-            <div className="sticky top-20">
-              <SlotWireframe slot={formSlot} />
-            </div>
-          </div>
         </div>
       </form>
 
