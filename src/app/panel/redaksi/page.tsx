@@ -223,6 +223,15 @@ export default function RedaksiPanelPage() {
                     </option>
                   ))}
                 </select>
+                {form.userId && !form.photo && (
+                  <div className="mt-2 flex items-start gap-2 rounded-xl bg-yellow-50 border border-yellow-200 px-4 py-3">
+                    <span className="text-yellow-500 text-base leading-none mt-0.5">!</span>
+                    <div className="text-sm">
+                      <p className="font-semibold text-yellow-800">Pengguna ini belum memiliki foto</p>
+                      <p className="text-yellow-700 mt-0.5">Upload foto di bawah, foto akan otomatis tersimpan di profil pengguna ini juga.</p>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
