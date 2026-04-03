@@ -8,7 +8,7 @@ import HeadlineSlider from "@/components/slider/HeadlineSlider";
 import BreakingSlider from "@/components/slider/BreakingSlider";
 import SubHeadlineSlider from "@/components/slider/SubHeadlineSlider";
 import PollingCarousel from "@/components/slider/PollingCarousel";
-import BannerAd, { SidebarAd } from "@/components/ads/BannerAd";
+import BannerAd, { SidebarAd, InlineAd, NativeAd } from "@/components/ads/BannerAd";
 import { Scale, Briefcase, Trophy, Film, Heart, Wheat, Cpu, Vote as VoteIcon, GraduationCap, Leaf, Compass, BookOpen, TrendingUp, LucideIcon } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
@@ -91,6 +91,9 @@ export default async function HomePage() {
 
       <NewsTicker items={tickerItems} />
 
+      {/* AD: Leaderboard — top of page */}
+      <BannerAd size="leaderboard" slot="HEADER" className="bg-surface-container-lowest" />
+
       {/* ═══════════════════════════════════════════
           SECTION 1: Hero — Headline + Breaking
           ═══════════════════════════════════════════ */}
@@ -172,14 +175,18 @@ export default async function HomePage() {
                     </div>
                   ))}
                 </div>
+                {/* AD: Sidebar rectangle under Terpopuler */}
+                <div className="mt-6">
+                  <SidebarAd size="rectangle" />
+                </div>
               </div>
             )}
           </div>
         </div>
       </section>
 
-      {/* Banner Ad */}
-      <BannerAd size="leaderboard" className="bg-surface-container-low" />
+      {/* AD: Full-width banner between sections */}
+      <BannerAd size="banner" slot="BETWEEN_SECTIONS" className="bg-surface-container-low" />
 
       {/* ═══════════════════════════════════════════
           SECTION 3: Polling
@@ -195,8 +202,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Banner Ad */}
-      <BannerAd slot="IN_ARTICLE" className="bg-surface" />
+      {/* AD: Inline ad before category sections */}
+      <InlineAd className="bg-surface" />
 
       {/* ═══════════════════════════════════════════
           SECTION 4: Category Sections
@@ -206,8 +213,8 @@ export default async function HomePage() {
         const rest = catArticles.slice(1, 5);
 
         return (
+          <div key={categorySlug}>
           <section
-            key={categorySlug}
             className={`py-12 ${idx % 2 === 0 ? "bg-surface" : "bg-surface-container-low"}`}
           >
             <div className="container-main">
@@ -296,12 +303,25 @@ export default async function HomePage() {
                 )}
               </div>
             </div>
+
+            {/* AD: Native ad inside some category sections */}
+            {idx === 1 && (
+              <div className="mt-8">
+                <NativeAd />
+              </div>
+            )}
           </section>
+
+          {/* AD: Banner between every 3 category sections */}
+          {idx > 0 && idx % 3 === 2 && (
+            <BannerAd size="banner" slot="BETWEEN_SECTIONS" className={idx % 2 === 0 ? "bg-surface-container-low" : "bg-surface"} />
+          )}
+        </div>
         );
       })}
 
-      {/* Banner Ad — Footer */}
-      <BannerAd slot="FOOTER" className="bg-surface" />
+      {/* AD: Footer leaderboard */}
+      <BannerAd size="leaderboard" slot="FOOTER" className="bg-surface" />
 
       {/* ═══════════════════════════════════════════
           SECTION 5: Category Grid
