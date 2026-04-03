@@ -285,7 +285,7 @@ function SearchContent() {
                 // Delay to allow clicks on suggestions
                 setTimeout(() => setInputFocused(false), 200);
               }}
-              placeholder="Cari berita hukum..."
+              placeholder="Cari berita..."
               className="input w-full py-3 pl-12 pr-4 text-lg"
               autoFocus
             />

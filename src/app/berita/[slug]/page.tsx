@@ -241,14 +241,23 @@ export default async function ArticlePage({ params, searchParams }: { params: { 
     image: article.featuredImage ? [article.featuredImage] : [],
     datePublished: article.publishedAt?.toISOString(),
     dateModified: article.updatedAt.toISOString(),
-    author: { "@type": "Person", name: article.author.name },
+    author: {
+      "@type": "Person",
+      name: article.author.name,
+      url: `${appUrl}/penulis/${slugify(article.author.name)}`,
+    },
     publisher: {
       "@type": "Organization",
       name: "Kartawarta",
-      logo: { "@type": "ImageObject", url: `${appUrl}/logo.png` },
+      logo: { "@type": "ImageObject", url: `${appUrl}/kartawarta-icon.png`, width: 512, height: 512 },
+      url: appUrl,
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },
     articleSection: article.category.name,
+    isAccessibleForFree: true,
+    wordCount: countWords(article.content),
+    ...(article.tags.length > 0 && { keywords: article.tags.map((t: { name: string }) => t.name).join(", ") }),
+    inLanguage: "id-ID",
   };
 
   const breadcrumbLd = {

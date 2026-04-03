@@ -23,8 +23,8 @@ export default function TentangPage() {
               hukum yang terpercaya, akurat, dan berimbang bagi masyarakat.
             </p>
             <p>
-              Kami percaya bahwa akses terhadap informasi hukum yang berkualitas adalah hak setiap warga negara.
-              Melalui jurnalisme investigatif dan analisis mendalam, kami berusaha menyajikan berita hukum yang
+              Kami percaya bahwa akses terhadap informasi yang berkualitas adalah hak setiap warga negara.
+              Melalui jurnalisme investigatif dan analisis mendalam, kami berusaha menyajikan berita yang
               tidak hanya informatif, tetapi juga edukatif.
             </p>
             <p>

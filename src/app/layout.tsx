@@ -82,6 +82,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" className={`${newsreader.variable} ${workSans.variable}`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <meta name="theme-color" content="#002045" />
+        <meta name="google" content="notranslate" />
+      </head>
       <body className="flex min-h-screen flex-col font-sans bg-surface text-on-surface antialiased">
         <Providers>
           <a

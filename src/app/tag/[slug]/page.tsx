@@ -18,12 +18,13 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const tag = await prisma.tag.findUnique({ where: { slug: params.slug } });
   if (!tag) return { title: "Tag Tidak Ditemukan" };
+  const title = `Berita ${tag.name} Terbaru`;
+  const description = `Baca berita terbaru tentang ${tag.name}. Kumpulan artikel dan analisis terkait ${tag.name} dari Kartawarta.`;
   return {
-    title: `Berita ${tag.name} Terbaru - Kartawarta`,
-    description: `Baca berita terbaru tentang ${tag.name}. Kumpulan artikel dan analisis hukum terkait ${tag.name} di Bandung dan Indonesia.`,
-    alternates: {
-      canonical: `/tag/${params.slug}`,
-    },
+    title,
+    description,
+    openGraph: { title: `${title} — Kartawarta`, description, type: "website" },
+    alternates: { canonical: `/tag/${params.slug}` },
   };
 }
 
@@ -62,8 +63,26 @@ export default async function TagPage({ params, searchParams }: PageProps) {
     pageNumbers.push(i);
   }
 
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://kartawarta.com";
+  const tagJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `Berita ${tag.name} — Kartawarta`,
+    url: `${siteUrl}/tag/${tag.slug}`,
+    isPartOf: { "@type": "WebSite", name: "Kartawarta", url: siteUrl },
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Beranda", item: siteUrl },
+        { "@type": "ListItem", position: 2, name: "Tag", item: `${siteUrl}/tag` },
+        { "@type": "ListItem", position: 3, name: tag.name, item: `${siteUrl}/tag/${tag.slug}` },
+      ],
+    },
+  };
+
   return (
     <div className="bg-surface min-h-screen">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(tagJsonLd) }} />
       <div className="container-main py-8">
         {/* Breadcrumb */}
         <nav className="mb-6 flex items-center gap-2 text-sm text-txt-secondary">

@@ -66,13 +66,32 @@ export default async function HomePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "NewsMediaOrganization",
-            name: "Kartawarta",
-            url: "https://kartawarta.com",
-            logo: { "@type": "ImageObject", url: "https://kartawarta.com/kartawarta-icon.png" },
-          }),
+          __html: JSON.stringify([
+            {
+              "@context": "https://schema.org",
+              "@type": "NewsMediaOrganization",
+              name: "Kartawarta",
+              url: "https://kartawarta.com",
+              logo: { "@type": "ImageObject", url: "https://kartawarta.com/kartawarta-icon.png", width: 512, height: 512 },
+              description: "Portal berita digital terpercaya. Menyajikan berita terkini, analisis mendalam, dan informasi akurat.",
+              foundingDate: "2024",
+              sameAs: [],
+              publishingPrinciples: "https://kartawarta.com/pedoman-media",
+              ethicsPolicy: "https://kartawarta.com/kode-etik",
+              contactPoint: { "@type": "ContactPoint", contactType: "customer service", url: "https://kartawarta.com/kontak" },
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "Kartawarta",
+              url: "https://kartawarta.com",
+              potentialAction: {
+                "@type": "SearchAction",
+                target: { "@type": "EntryPoint", urlTemplate: "https://kartawarta.com/search?q={search_term_string}" },
+                "query-input": "required name=search_term_string",
+              },
+            },
+          ]),
         }}
       />
 

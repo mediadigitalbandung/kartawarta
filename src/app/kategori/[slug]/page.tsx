@@ -78,7 +78,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const category = await getCategory(params.slug);
   if (!category) return { title: "Kategori Tidak Ditemukan" };
 
-  const title = `${category.name} - Berita Hukum Terkini`;
+  const title = `${category.name} - Berita Terkini`;
   const description = `Kumpulan berita ${category.name.toLowerCase()} terbaru dari Kartawarta.`;
 
   return {
