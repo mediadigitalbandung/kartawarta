@@ -12,6 +12,7 @@ import {
   X,
   Users,
   Upload,
+  UserPlus,
 } from "lucide-react";
 
 interface RedaksiMember {
@@ -24,12 +25,29 @@ interface RedaksiMember {
   isActive: boolean;
 }
 
+interface UserOption {
+  id: string;
+  name: string;
+  avatar: string | null;
+  role: string;
+}
+
+const roleLabels: Record<string, string> = {
+  SUPER_ADMIN: "Super Admin",
+  CHIEF_EDITOR: "Pemimpin Redaksi",
+  EDITOR: "Editor",
+  SENIOR_JOURNALIST: "Jurnalis Senior",
+  JOURNALIST: "Jurnalis",
+  CONTRIBUTOR: "Kontributor",
+};
+
 const emptyForm = { position: "", name: "", desc: "", photo: "", order: 0, isActive: true };
 
 export default function RedaksiPanelPage() {
   const { success, error: showError } = useToast();
   const { confirm } = useConfirm();
   const [members, setMembers] = useState<RedaksiMember[]>([]);
+  const [users, setUsers] = useState<UserOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -55,21 +73,29 @@ export default function RedaksiPanelPage() {
     }
   }
 
-  const fetchMembers = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/redaksi");
-      if (!res.ok) throw new Error("Gagal memuat data");
-      const json = await res.json();
-      setMembers(json.data || []);
+      const [resMembers, resUsers] = await Promise.all([
+        fetch("/api/redaksi"),
+        fetch("/api/users"),
+      ]);
+      if (resMembers.ok) {
+        const json = await resMembers.json();
+        setMembers(json.data || []);
+      }
+      if (resUsers.ok) {
+        const json = await resUsers.json();
+        setUsers((json.data || []).filter((u: UserOption & { isActive: boolean }) => u.isActive !== false));
+      }
     } catch {
-      showError("Gagal memuat susunan redaksi");
+      showError("Gagal memuat data");
     } finally {
       setLoading(false);
     }
   }, [showError]);
 
-  useEffect(() => { fetchMembers(); }, [fetchMembers]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   function openAdd() {
     setEditingId(null);
@@ -81,6 +107,15 @@ export default function RedaksiPanelPage() {
     setEditingId(m.id);
     setForm({ position: m.position, name: m.name, desc: m.desc || "", photo: m.photo || "", order: m.order, isActive: m.isActive });
     setShowForm(true);
+  }
+
+  function selectUser(user: UserOption) {
+    setForm((f) => ({
+      ...f,
+      name: user.name,
+      photo: user.avatar || f.photo,
+      position: f.position || (roleLabels[user.role] || user.role),
+    }));
   }
 
   function closeForm() {
@@ -112,7 +147,7 @@ export default function RedaksiPanelPage() {
       if (!res.ok) { const j = await res.json(); throw new Error(j.error || "Gagal menyimpan"); }
       success(editingId ? "Berhasil diperbarui" : "Berhasil ditambahkan");
       closeForm();
-      fetchMembers();
+      fetchData();
     } catch (err) {
       showError(err instanceof Error ? err.message : "Gagal menyimpan");
     } finally {
@@ -127,7 +162,7 @@ export default function RedaksiPanelPage() {
       const res = await fetch(`/api/redaksi/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Gagal menghapus");
       success("Berhasil dihapus");
-      fetchMembers();
+      fetchData();
     } catch {
       showError("Gagal menghapus anggota redaksi");
     }
@@ -145,75 +180,175 @@ export default function RedaksiPanelPage() {
         </button>
       </div>
 
-      {/* Form */}
+      {/* Form + Preview split layout */}
       {showForm && (
-        <div className="mb-6 rounded-2xl border border-border bg-surface p-5 sm:p-6 shadow-card">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold text-txt-primary">{editingId ? "Edit Anggota" : "Tambah Anggota Baru"}</h2>
-            <button onClick={closeForm} className="p-1 hover:bg-surface-secondary rounded-lg"><X size={18} /></button>
-          </div>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Jabatan *</label>
-                <input type="text" placeholder="Contoh: Pemimpin Redaksi" value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} required className="input w-full" />
-              </div>
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Nama *</label>
-                <input type="text" placeholder="Nama lengkap" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required className="input w-full" />
-              </div>
-            </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Deskripsi</label>
-              <input type="text" placeholder="Tugas dan tanggung jawab" value={form.desc} onChange={(e) => setForm({ ...form, desc: e.target.value })} className="input w-full" />
-            </div>
-            {/* Foto upload */}
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Foto</label>
-              {form.photo ? (
-                <div className="flex items-center gap-4">
-                  <img src={form.photo} alt="Foto" className="h-16 w-16 rounded-full object-cover border border-border" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-txt-muted truncate">{form.photo}</p>
-                    <button type="button" onClick={() => setForm({ ...form, photo: "" })} className="text-xs text-red-500 hover:text-red-700 mt-1 flex items-center gap-1">
-                      <X size={12} /> Hapus foto
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <label className="block cursor-pointer">
-                  <div className={`flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border py-5 hover:border-goto-green hover:bg-goto-light/20 transition-colors ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
-                    <Upload size={18} className="text-txt-muted" />
-                    <span className="text-sm text-txt-secondary">{uploading ? "Mengupload..." : "Upload foto (maks 2MB)"}</span>
-                  </div>
-                  <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={uploading}
-                    onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f); e.target.value = ""; }}
-                  />
-                </label>
-              )}
+        <div className="mb-6 grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* Left: Form */}
+          <div className="lg:col-span-3 rounded-2xl border border-border bg-surface p-5 sm:p-6 shadow-card">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-bold text-txt-primary">{editingId ? "Edit Anggota" : "Tambah Anggota Baru"}</h2>
+              <button onClick={closeForm} className="p-1 hover:bg-surface-secondary rounded-lg"><X size={18} /></button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Urutan</label>
-                <input type="number" min={0} value={form.order} onChange={(e) => setForm({ ...form, order: Number(e.target.value) })} className="input w-full" />
+            {/* Pick from existing users */}
+            {users.length > 0 && (
+              <div className="mb-5">
+                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">
+                  <UserPlus size={14} className="inline mr-1" />
+                  Pilih dari Pengguna Terdaftar
+                </label>
+                <div className="flex gap-2 flex-wrap">
+                  {users.map((u) => (
+                    <button
+                      key={u.id}
+                      type="button"
+                      onClick={() => selectUser(u)}
+                      className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all hover:border-goto-green hover:bg-goto-light/30 ${
+                        form.name === u.name ? "border-goto-green bg-goto-light/30 text-goto-green" : "border-border text-txt-secondary"
+                      }`}
+                    >
+                      {u.avatar ? (
+                        <img src={u.avatar} alt={u.name} className="h-5 w-5 rounded-full object-cover" />
+                      ) : (
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-goto-green text-[10px] font-bold text-white">{u.name.charAt(0)}</span>
+                      )}
+                      {u.name}
+                      <span className="text-txt-muted">({roleLabels[u.role] || u.role})</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Jabatan *</label>
+                  <input type="text" placeholder="Contoh: Pemimpin Redaksi" value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} required className="input w-full" />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Nama *</label>
+                  <input type="text" placeholder="Nama lengkap" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required className="input w-full" />
+                </div>
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Status</label>
-                <select value={form.isActive ? "true" : "false"} onChange={(e) => setForm({ ...form, isActive: e.target.value === "true" })} className="input w-full">
-                  <option value="true">Aktif</option>
-                  <option value="false">Nonaktif</option>
-                </select>
+                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Deskripsi</label>
+                <input type="text" placeholder="Tugas dan tanggung jawab" value={form.desc} onChange={(e) => setForm({ ...form, desc: e.target.value })} className="input w-full" />
               </div>
+
+              {/* Foto upload */}
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Foto</label>
+                {form.photo ? (
+                  <div className="flex items-center gap-4">
+                    <img src={form.photo} alt="Foto" className="h-16 w-16 rounded-full object-cover border border-border" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-txt-muted truncate">{form.photo}</p>
+                      <button type="button" onClick={() => setForm({ ...form, photo: "" })} className="text-xs text-red-500 hover:text-red-700 mt-1 flex items-center gap-1">
+                        <X size={12} /> Hapus foto
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <label className="block cursor-pointer">
+                    <div className={`flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border py-5 hover:border-goto-green hover:bg-goto-light/20 transition-colors ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
+                      <Upload size={18} className="text-txt-muted" />
+                      <span className="text-sm text-txt-secondary">{uploading ? "Mengupload..." : "Upload foto (maks 2MB)"}</span>
+                    </div>
+                    <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={uploading}
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f); e.target.value = ""; }}
+                    />
+                  </label>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Urutan</label>
+                  <input type="number" min={0} value={form.order} onChange={(e) => setForm({ ...form, order: Number(e.target.value) })} className="input w-full" />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Status</label>
+                  <select value={form.isActive ? "true" : "false"} onChange={(e) => setForm({ ...form, isActive: e.target.value === "true" })} className="input w-full">
+                    <option value="true">Aktif</option>
+                    <option value="false">Nonaktif</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button type="button" onClick={closeForm} className="btn-secondary px-5 py-2.5 text-sm">Batal</button>
+                <button type="submit" disabled={submitting} className="btn-primary px-6 py-2.5 text-sm font-semibold disabled:opacity-50">
+                  <Save size={14} className="mr-1.5" />
+                  {submitting ? "Menyimpan..." : editingId ? "Simpan Perubahan" : "Tambah"}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Right: Live Preview */}
+          <div className="lg:col-span-2">
+            <div className="lg:sticky lg:top-20 rounded-2xl border border-border bg-surface p-5 sm:p-6 shadow-card">
+              <h3 className="text-sm font-bold text-txt-primary mb-4">Preview Tampilan</h3>
+
+              {/* Preview card — sama persis seperti di halaman publik */}
+              <div className="flex items-center gap-4 rounded-[12px] border border-border bg-surface p-5">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-goto-green text-xl font-bold text-white overflow-hidden">
+                  {form.photo ? (
+                    <img src={form.photo} alt={form.name || "Preview"} className="h-14 w-14 object-cover" />
+                  ) : form.name ? (
+                    form.name.charAt(0).toUpperCase()
+                  ) : (
+                    "?"
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-goto-green">
+                    {form.position || "Jabatan"}
+                  </p>
+                  <p className="font-bold text-txt-primary text-base">
+                    {form.name || "Nama Anggota"}
+                  </p>
+                  {form.desc && <p className="text-sm text-txt-muted">{form.desc}</p>}
+                </div>
+              </div>
+
+              <p className="text-[11px] text-txt-muted mt-3 text-center">
+                Seperti ini tampilannya di halaman Redaksi
+              </p>
+
+              {/* Mini overview — all members */}
+              {members.length > 0 && (
+                <div className="mt-5 pt-4 border-t border-border">
+                  <p className="text-xs font-semibold text-txt-secondary mb-3">Susunan Lengkap ({members.length} anggota)</p>
+                  <div className="space-y-2 max-h-[300px] overflow-y-auto scrollbar-hide">
+                    {members.map((m) => (
+                      <div
+                        key={m.id}
+                        className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs transition-colors ${
+                          editingId === m.id ? "bg-goto-light/50 border border-goto-green/30" : "bg-surface-secondary"
+                        }`}
+                      >
+                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-goto-green text-[10px] font-bold text-white overflow-hidden">
+                          {m.photo ? (
+                            <img src={m.photo} alt={m.name} className="h-7 w-7 object-cover" />
+                          ) : (
+                            m.name.charAt(0).toUpperCase()
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <span className="font-bold text-txt-primary block truncate">{m.name}</span>
+                          <span className="text-txt-muted text-[10px]">{m.position}</span>
+                        </div>
+                        {editingId === m.id && (
+                          <span className="text-[9px] font-bold text-goto-green">EDITING</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="flex justify-end gap-3 pt-2">
-              <button type="button" onClick={closeForm} className="btn-secondary px-5 py-2.5 text-sm">Batal</button>
-              <button type="submit" disabled={submitting} className="btn-primary px-6 py-2.5 text-sm font-semibold disabled:opacity-50">
-                <Save size={14} className="mr-1.5" />
-                {submitting ? "Menyimpan..." : editingId ? "Simpan Perubahan" : "Tambah"}
-              </button>
-            </div>
-          </form>
+          </div>
         </div>
       )}
 
@@ -226,7 +361,7 @@ export default function RedaksiPanelPage() {
             </div>
           ))}
         </div>
-      ) : members.length === 0 ? (
+      ) : members.length === 0 && !showForm ? (
         <div className="rounded-[12px] border-2 border-dashed border-border py-16 text-center">
           <Users size={40} className="mx-auto text-txt-muted mb-3" />
           <p className="text-txt-muted text-base">Belum ada anggota redaksi.</p>
@@ -234,12 +369,12 @@ export default function RedaksiPanelPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {members.map((m, i) => (
-            <div key={m.id} className="rounded-[12px] border border-border bg-surface p-4 sm:p-5 shadow-card flex items-center gap-4 hover:shadow-card-hover transition-all">
+          {members.map((m) => (
+            <div key={m.id} className={`rounded-[12px] border bg-surface p-4 sm:p-5 shadow-card flex items-center gap-4 hover:shadow-card-hover transition-all ${editingId === m.id ? "border-goto-green bg-goto-light/10" : "border-border"}`}>
               <GripVertical size={16} className="text-txt-muted shrink-0 hidden sm:block" />
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-goto-green text-lg font-bold text-white">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-goto-green text-lg font-bold text-white overflow-hidden">
                 {m.photo ? (
-                  <img src={m.photo} alt={m.name} className="h-12 w-12 rounded-full object-cover" />
+                  <img src={m.photo} alt={m.name} className="h-12 w-12 object-cover" />
                 ) : (
                   m.name.charAt(0).toUpperCase()
                 )}
