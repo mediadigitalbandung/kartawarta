@@ -18,7 +18,14 @@ import {
   Eye,
   EyeOff,
   AtSign,
+  AlertCircle,
 } from "lucide-react";
+
+interface EmailRoute {
+  from: string;
+  to: string;
+  enabled: boolean;
+}
 
 interface User {
   id: string;
@@ -91,19 +98,26 @@ export default function PenggunaPage() {
   const [formRole, setFormRole] = useState("");
   const [formSpec, setFormSpec] = useState("");
   const [formKartawartaEmail, setFormKartawartaEmail] = useState("");
+  const [emailRoutes, setEmailRoutes] = useState<EmailRoute[]>([]);
 
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const res = await fetch("/api/users");
-      if (!res.ok) {
-        throw new Error("Gagal memuat pengguna");
-      }
+      const [resUsers, resEmails] = await Promise.all([
+        fetch("/api/users"),
+        fetch("/api/email-routing").catch(() => null),
+      ]);
 
-      const json = await res.json();
+      if (!resUsers.ok) throw new Error("Gagal memuat pengguna");
+      const json = await resUsers.json();
       setUsers(json.data || []);
+
+      if (resEmails?.ok) {
+        const emailJson = await resEmails.json();
+        setEmailRoutes(emailJson.data || []);
+      }
     } catch (err) {
       setError("Gagal memuat daftar pengguna. Silakan coba lagi.");
       console.error("Fetch users error:", err);
@@ -329,17 +343,33 @@ export default function PenggunaPage() {
                   return (
                     <tr key={user.id} className="hover:bg-surface-secondary">
                       <td className="px-3 sm:px-5 py-4">
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-primary text-xs sm:text-sm font-bold text-white">
-                            {user.name.charAt(0)}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="font-medium text-txt-primary text-sm truncate">{user.name}</p>
-                            <p className="flex items-center gap-1 text-xs text-txt-secondary truncate">
-                              <Mail size={10} /> {user.email}
-                            </p>
-                          </div>
-                        </div>
+                        {(() => {
+                          const kartawartaRoute = emailRoutes.find(r => r.to === user.email && r.enabled);
+                          return (
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-primary text-xs sm:text-sm font-bold text-white">
+                                {user.name.charAt(0)}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="font-medium text-txt-primary text-sm truncate">{user.name}</p>
+                                {kartawartaRoute ? (
+                                  <p className="flex items-center gap-1 text-xs text-primary font-medium truncate">
+                                    <AtSign size={10} /> {kartawartaRoute.from}
+                                  </p>
+                                ) : (
+                                  <div className="flex items-center gap-1.5">
+                                    <p className="flex items-center gap-1 text-xs text-txt-secondary truncate">
+                                      <Mail size={10} /> {user.email}
+                                    </p>
+                                    <span className="inline-flex items-center gap-0.5 text-[9px] text-yellow-600 bg-yellow-50 px-1.5 py-0.5 rounded-full shrink-0">
+                                      <AlertCircle size={8} /> Belum ada @kartawarta
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </td>
                       <td className="px-3 sm:px-5 py-4">
                         <span className={`inline-flex items-center gap-1 rounded-full px-3 py-0.5 text-sm font-medium ${role.color}`}>
@@ -439,14 +469,21 @@ export default function PenggunaPage() {
                 required
                 className="input w-full"
               />
-              <input
-                type="email"
-                placeholder="Email"
-                value={formEmail}
-                onChange={(e) => setFormEmail(e.target.value.toLowerCase())}
-                required
-                className="input w-full"
-              />
+              <div>
+                <input
+                  type="email"
+                  placeholder="Email Gmail (contoh: nama@gmail.com)"
+                  value={formEmail}
+                  onChange={(e) => setFormEmail(e.target.value.toLowerCase())}
+                  required
+                  className="input w-full"
+                />
+                {formEmail && !formEmail.endsWith("@gmail.com") && (
+                  <p className="mt-1 flex items-center gap-1 text-xs text-yellow-600">
+                    <AlertCircle size={10} /> Disarankan pakai email Gmail untuk kemudahan integrasi
+                  </p>
+                )}
+              </div>
               <div>
                 <div className="relative">
                   <input
