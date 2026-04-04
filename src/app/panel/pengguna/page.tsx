@@ -143,10 +143,11 @@ export default function PenggunaPage() {
   function openEditModal(user: User) {
     setEditingUser(user);
     setFormName(user.name);
-    setFormEmail(user.email);
+    setFormEmail(user.email.replace("@gmail.com", ""));
     setFormPassword("");
     setFormRole(user.role);
     setFormSpec(user.specialization || "");
+    setFormKartawartaEmail("");
     setShowModal(true);
   }
 
@@ -168,9 +169,10 @@ export default function PenggunaPage() {
 
       if (editingUser) {
         // Update existing user
+        const fullGmailEdit = formEmail.includes("@") ? formEmail : `${formEmail}@gmail.com`;
         const body: Record<string, string | undefined> = {
           name: formName,
-          email: formEmail,
+          email: fullGmailEdit,
           role: formRole,
           specialization: formSpec || undefined,
         };
@@ -192,12 +194,13 @@ export default function PenggunaPage() {
         success("Pengguna berhasil diperbarui");
       } else {
         // Create new user
+        const fullGmail = formEmail.includes("@") ? formEmail : `${formEmail}@gmail.com`;
         const res = await fetch("/api/users", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name: formName,
-            email: formEmail,
+            email: fullGmail,
             password: formPassword,
             role: formRole,
             specialization: formSpec || undefined,
@@ -344,7 +347,9 @@ export default function PenggunaPage() {
                     <tr key={user.id} className="hover:bg-surface-secondary">
                       <td className="px-3 sm:px-5 py-4">
                         {(() => {
+                          const isKartawarta = user.email.endsWith("@kartawarta.com");
                           const kartawartaRoute = emailRoutes.find(r => r.to === user.email && r.enabled);
+                          const kartawartaEmail = isKartawarta ? user.email : kartawartaRoute?.from || null;
                           return (
                             <div className="flex items-center gap-2 sm:gap-3">
                               <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-primary text-xs sm:text-sm font-bold text-white">
@@ -352,18 +357,18 @@ export default function PenggunaPage() {
                               </div>
                               <div className="min-w-0">
                                 <p className="font-medium text-txt-primary text-sm truncate">{user.name}</p>
-                                {kartawartaRoute ? (
+                                {kartawartaEmail ? (
                                   <p className="flex items-center gap-1 text-xs text-primary font-medium truncate">
-                                    <AtSign size={10} /> {kartawartaRoute.from}
+                                    <AtSign size={10} /> {kartawartaEmail}
                                   </p>
                                 ) : (
                                   <div className="flex items-center gap-1.5">
                                     <p className="flex items-center gap-1 text-xs text-txt-secondary truncate">
                                       <Mail size={10} /> {user.email}
                                     </p>
-                                    <span className="inline-flex items-center gap-0.5 text-[9px] text-yellow-600 bg-yellow-50 px-1.5 py-0.5 rounded-full shrink-0">
-                                      <AlertCircle size={8} /> Belum ada @kartawarta
-                                    </span>
+                                    <Link href="/panel/email" className="inline-flex items-center gap-0.5 text-[9px] text-yellow-600 bg-yellow-50 px-1.5 py-0.5 rounded-full shrink-0 hover:bg-yellow-100">
+                                      <AlertCircle size={8} /> Buat @kartawarta
+                                    </Link>
                                   </div>
                                 )}
                               </div>
@@ -470,19 +475,20 @@ export default function PenggunaPage() {
                 className="input w-full"
               />
               <div>
-                <input
-                  type="email"
-                  placeholder="Email Gmail (contoh: nama@gmail.com)"
-                  value={formEmail}
-                  onChange={(e) => setFormEmail(e.target.value.toLowerCase())}
-                  required
-                  className="input w-full"
-                />
-                {formEmail && !formEmail.endsWith("@gmail.com") && (
-                  <p className="mt-1 flex items-center gap-1 text-xs text-yellow-600">
-                    <AlertCircle size={10} /> Disarankan pakai email Gmail untuk kemudahan integrasi
-                  </p>
-                )}
+                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Email Gmail</label>
+                <div className="flex items-center gap-0">
+                  <input
+                    type="text"
+                    placeholder="namauser"
+                    value={formEmail.replace("@gmail.com", "")}
+                    onChange={(e) => setFormEmail(e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ""))}
+                    required
+                    className="input rounded-r-none flex-1"
+                  />
+                  <span className="inline-flex items-center px-3 py-2 border border-l-0 border-border bg-surface-secondary text-sm text-txt-secondary rounded-r-lg whitespace-nowrap">
+                    @gmail.com
+                  </span>
+                </div>
               </div>
               <div>
                 <div className="relative">
