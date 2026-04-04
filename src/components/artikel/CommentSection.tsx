@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { MessageCircle, Send, CheckCircle, User } from "lucide-react";
+import Turnstile from "@/components/ui/Turnstile";
 
 interface Comment {
   id: string;
@@ -37,6 +38,8 @@ export default function CommentSection({ articleId }: { articleId: string }) {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const onCaptchaVerify = useCallback((token: string) => setCaptchaToken(token), []);
 
   const fetchComments = useCallback(async () => {
     try {
@@ -78,6 +81,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
           authorName: name.trim(),
           authorEmail: email.trim(),
           content: content.trim(),
+          captchaToken,
         }),
       });
 
@@ -225,9 +229,10 @@ export default function CommentSection({ articleId }: { articleId: string }) {
               {content.length}/2000
             </p>
           </div>
+          <Turnstile onVerify={onCaptchaVerify} onExpire={() => setCaptchaToken("")} />
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || !captchaToken}
             className="btn-primary flex items-center gap-1.5 px-5 py-2.5 text-sm font-semibold disabled:opacity-50"
           >
             {submitting ? (

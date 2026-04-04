@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Mail, MapPin, Phone, Send } from "lucide-react";
+import Turnstile from "@/components/ui/Turnstile";
 
 export default function KontakPage() {
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const onCaptchaVerify = useCallback((token: string) => setCaptchaToken(token), []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,7 +21,7 @@ export default function KontakPage() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, captchaToken }),
       });
 
       const data = await res.json();
@@ -122,10 +125,11 @@ export default function KontakPage() {
                       <label className="mb-1 block text-sm font-medium text-txt-primary">Pesan</label>
                       <textarea required rows={5} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} className="input w-full" />
                     </div>
+                    <Turnstile onVerify={onCaptchaVerify} onExpire={() => setCaptchaToken("")} />
                     {error && (
                       <p className="text-sm text-red-600">{error}</p>
                     )}
-                    <button type="submit" disabled={sending} className="btn-primary flex items-center gap-2 disabled:opacity-50">
+                    <button type="submit" disabled={sending || !captchaToken} className="btn-primary flex items-center gap-2 disabled:opacity-50">
                       <Send size={16} /> {sending ? "Mengirim..." : "Kirim Pesan"}
                     </button>
                   </div>

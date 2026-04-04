@@ -4,7 +4,7 @@ import { successResponse, errorResponse, ApiError } from "@/lib/api-utils";
 import { commentRateLimit } from "@/lib/rate-limit";
 import { sanitizeText, sanitizeEmail } from "@/lib/sanitize";
 import { prisma } from "@/lib/prisma";
-
+import { verifyTurnstile } from "@/lib/turnstile";
 
 const contactSchema = z.object({
   name: z.string().min(1, "Nama wajib diisi").max(100),
@@ -22,7 +22,15 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const data = contactSchema.parse(body);
+    const { captchaToken, ...rest } = body;
+
+    // Verify Turnstile CAPTCHA
+    if (captchaToken) {
+      const valid = await verifyTurnstile(captchaToken);
+      if (!valid) throw new ApiError("Verifikasi CAPTCHA gagal. Coba lagi.", 400);
+    }
+
+    const data = contactSchema.parse(rest);
 
     const sanitized = {
       name: sanitizeText(data.name),
