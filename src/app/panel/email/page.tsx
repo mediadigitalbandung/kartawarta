@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import Link from "next/link";
-import { Plus, Trash2, Mail, Power, AtSign, ArrowRight, Loader2, RefreshCw, Users } from "lucide-react";
+import { Plus, Trash2, Mail, Power, AtSign, ArrowRight, Loader2, RefreshCw, Users, ChevronDown, Copy, Check, ExternalLink } from "lucide-react";
 
 interface EmailRoute {
   id: string;
@@ -24,6 +24,14 @@ export default function EmailRoutingPage() {
 
   const [localPart, setLocalPart] = useState("");
   const [destinationEmail, setDestinationEmail] = useState("");
+  const [expandedSetup, setExpandedSetup] = useState<string | null>(null);
+  const [copied, setCopied] = useState<string | null>(null);
+
+  function copyText(text: string, label: string) {
+    navigator.clipboard.writeText(text);
+    setCopied(label);
+    setTimeout(() => setCopied(null), 2000);
+  }
 
   const fetchEmails = useCallback(async () => {
     try {
@@ -194,8 +202,8 @@ export default function EmailRoutingPage() {
       ) : (
         <div className="space-y-3">
           {emails.map((email) => (
-            <div key={email.id} className={`rounded-[12px] border bg-surface p-5 shadow-card transition-all ${email.enabled ? "border-border" : "border-border opacity-60"}`}>
-              <div className="flex items-center justify-between gap-4">
+            <div key={email.id} className={`rounded-[12px] border bg-surface shadow-card transition-all ${email.enabled ? "border-border" : "border-border opacity-60"}`}>
+              <div className="flex items-center justify-between gap-4 p-5">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${email.enabled ? "bg-primary/10 text-primary" : "bg-surface-tertiary text-txt-muted"}`}>
                     <Mail size={18} />
@@ -214,6 +222,15 @@ export default function EmailRoutingPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
+                  {email.enabled && (
+                    <button
+                      onClick={() => setExpandedSetup(expandedSetup === email.id ? null : email.id)}
+                      className="btn-ghost rounded px-2.5 py-1.5 text-xs font-medium text-primary flex items-center gap-1"
+                      title="Setup Gmail Send As"
+                    >
+                      Setup Gmail <ChevronDown size={12} className={`transition-transform ${expandedSetup === email.id ? "rotate-180" : ""}`} />
+                    </button>
+                  )}
                   <button
                     onClick={() => handleToggle(email.id, email.enabled)}
                     className={`btn-ghost rounded p-2 ${email.enabled ? "hover:text-red-500" : "hover:text-primary"}`}
@@ -230,6 +247,62 @@ export default function EmailRoutingPage() {
                   </button>
                 </div>
               </div>
+
+              {/* Gmail Setup Instructions */}
+              {expandedSetup === email.id && (
+                <div className="border-t border-border px-5 py-4 bg-surface-secondary/50">
+                  <h4 className="text-xs font-bold text-txt-primary mb-3">Setup &quot;Send As&quot; di Gmail untuk {email.from}</h4>
+
+                  <div className="space-y-3 mb-4">
+                    <p className="text-xs text-txt-secondary">
+                      <strong>Langkah 1:</strong> Buka Gmail → Settings (⚙️) → <strong>Accounts and Import</strong> → &quot;Send mail as&quot; → <strong>Add another email address</strong>
+                    </p>
+                    <p className="text-xs text-txt-secondary">
+                      <strong>Langkah 2:</strong> Isi nama dan email <strong>{email.from}</strong>, centang &quot;Treat as an alias&quot;, klik Next
+                    </p>
+                    <p className="text-xs text-txt-secondary">
+                      <strong>Langkah 3:</strong> Isi SMTP credentials berikut:
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {[
+                      { label: "SMTP Server", value: "smtp-relay.brevo.com" },
+                      { label: "Port", value: "587" },
+                      { label: "Username", value: "a715cf001@smtp-brevo.com" },
+                      { label: "Password", value: "4UhR5vsHMc3PIqrD" },
+                    ].map((item) => (
+                      <div key={item.label} className="flex items-center justify-between rounded-lg bg-surface px-3 py-2 border border-border">
+                        <div>
+                          <span className="text-[10px] text-txt-muted block">{item.label}</span>
+                          <span className="text-xs font-mono font-medium text-txt-primary">{item.value}</span>
+                        </div>
+                        <button
+                          onClick={() => copyText(item.value, item.label)}
+                          className="btn-ghost p-1.5 rounded"
+                          title="Copy"
+                        >
+                          {copied === item.label ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-3 space-y-2 text-xs text-txt-secondary">
+                    <p><strong>Langkah 4:</strong> Pilih <strong>Secured connection using TLS</strong> → klik Add Account</p>
+                    <p><strong>Langkah 5:</strong> Cek inbox Gmail untuk kode verifikasi, masukkan kode → selesai!</p>
+                  </div>
+
+                  <a
+                    href="https://mail.google.com/mail/u/0/#settings/accounts"
+                    target="_blank"
+                    rel="noopener"
+                    className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+                  >
+                    <ExternalLink size={10} /> Buka Gmail Settings langsung
+                  </a>
+                </div>
+              )}
             </div>
           ))}
         </div>
