@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Search, CheckCircle, AlertTriangle, XCircle, ExternalLink, Globe, FileText, Image, Type, Tag, RefreshCw, TrendingUp } from "lucide-react";
+import { Search, CheckCircle, AlertTriangle, XCircle, ExternalLink, Globe, FileText, Image, Type, Tag, RefreshCw, TrendingUp, Sparkles, Loader2, Wand2, Zap } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
 
 interface SeoData {
   overview: {
@@ -53,6 +54,27 @@ function CoverageBar({ label, value, icon: Icon }: { label: string; value: numbe
 export default function SeoDashboardPage() {
   const [data, setData] = useState<SeoData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState<"auto" | "ai" | null>(null);
+  const { success: showSuccess, error: showError } = useToast();
+
+  async function handleBulkGenerate(mode: "all" | "ai") {
+    try {
+      setGenerating(mode === "ai" ? "ai" : "auto");
+      const res = await fetch("/api/ai/bulk-seo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Gagal generate");
+      showSuccess(json.data?.message || `${json.data?.processed} artikel berhasil di-update`);
+      fetchData();
+    } catch (err) {
+      showError(err instanceof Error ? err.message : "Gagal generate SEO");
+    } finally {
+      setGenerating(null);
+    }
+  }
 
   const fetchData = useCallback(async () => {
     try {
@@ -168,6 +190,40 @@ export default function SeoDashboardPage() {
           ))}
         </div>
       </div>
+
+      {/* Bulk Generate SEO */}
+      {articleAudit.some(a => a.issues.length > 0) && (
+        <div className="rounded-2xl border border-border bg-surface p-5 shadow-card mb-6">
+          <h3 className="text-sm font-bold text-txt-primary mb-3 flex items-center gap-1.5">
+            <Wand2 size={14} className="text-primary" /> Generate SEO Otomatis
+          </h3>
+          <p className="text-xs text-txt-secondary mb-4">
+            Artikel yang belum memiliki SEO Title dan Meta Description bisa di-generate otomatis.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => handleBulkGenerate("all")}
+              disabled={!!generating}
+              className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm font-semibold disabled:opacity-50"
+            >
+              {generating === "auto" ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
+              {generating === "auto" ? "Generating..." : "Auto Generate (Cepat)"}
+            </button>
+            <button
+              onClick={() => handleBulkGenerate("ai")}
+              disabled={!!generating}
+              className="btn-secondary flex items-center gap-2 px-5 py-2.5 text-sm font-semibold disabled:opacity-50 border border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100"
+            >
+              {generating === "ai" ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+              {generating === "ai" ? "AI Generating..." : "AI Generate (DeepSeek)"}
+            </button>
+          </div>
+          <div className="mt-3 flex gap-4 text-[10px] text-txt-muted">
+            <span><strong>Auto:</strong> Ambil dari judul & excerpt — instan, gratis</span>
+            <span><strong>AI:</strong> Generate dari konten via DeepSeek — lebih berkualitas, maks 20 artikel/batch</span>
+          </div>
+        </div>
+      )}
 
       {/* Article SEO Audit */}
       <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">

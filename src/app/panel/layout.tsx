@@ -56,7 +56,6 @@ const menuItems: MenuItem[] = [
   { name: "Iklan", href: "/panel/iklan", icon: Megaphone, adminOnly: true },
   { name: "Redaksi", href: "/panel/redaksi", icon: Users, adminOnly: true },
   { name: "Polling", href: "/panel/polling", icon: Vote, adminOnly: true },
-  { name: "AI Tools", href: "/panel/ai-log", icon: Sparkles, adminOnly: true },
   { name: "Pengguna", href: "/panel/pengguna", icon: Users, adminOnly: true },
   { name: "Analytics", href: "/panel/analytics", icon: BarChart3, adminOnly: true },
   { name: "SEO", href: "/panel/seo", icon: Search, adminOnly: true },
