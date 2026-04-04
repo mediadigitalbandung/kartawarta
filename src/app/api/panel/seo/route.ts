@@ -32,6 +32,7 @@ export async function GET() {
       prisma.article.findMany({
         where: { status: "PUBLISHED" },
         select: {
+          id: true,
           title: true,
           slug: true,
           seoTitle: true,
@@ -40,9 +41,9 @@ export async function GET() {
           excerpt: true,
           publishedAt: true,
           viewCount: true,
+          category: { select: { name: true } },
         },
         orderBy: { publishedAt: "desc" },
-        take: 20,
       }),
     ]);
 
@@ -61,6 +62,7 @@ export async function GET() {
       if (a.seoTitle && a.seoTitle.length > 60) issues.push("SEO Title terlalu panjang");
       if (a.seoDescription && a.seoDescription.length > 160) issues.push("Meta Description terlalu panjang");
       return {
+        id: a.id,
         title: a.title,
         slug: a.slug,
         url: `${siteUrl}/berita/${a.slug}`,
@@ -68,6 +70,7 @@ export async function GET() {
         seoDescription: a.seoDescription,
         hasImage: !!a.featuredImage,
         hasExcerpt: !!a.excerpt,
+        category: (a as Record<string, unknown> & { category: { name: string } }).category?.name || "",
         issues,
         score: issues.length === 0 ? 100 : Math.max(0, 100 - issues.length * 20),
         views: a.viewCount,

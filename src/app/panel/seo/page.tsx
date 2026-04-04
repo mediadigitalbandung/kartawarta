@@ -20,8 +20,8 @@ interface SeoData {
   coverage: { seoTitle: number; image: number; excerpt: number };
   urls: { sitemap: string; newsSitemap: string; robots: string; searchConsole: string; publisherCenter: string };
   articleAudit: {
-    title: string; slug: string; url: string; seoTitle: string | null; seoDescription: string | null;
-    hasImage: boolean; hasExcerpt: boolean; issues: string[]; score: number; views: number; publishedAt: string;
+    id: string; title: string; slug: string; url: string; seoTitle: string | null; seoDescription: string | null;
+    hasImage: boolean; hasExcerpt: boolean; category: string; issues: string[]; score: number; views: number; publishedAt: string;
   }[];
 }
 
@@ -55,6 +55,10 @@ export default function SeoDashboardPage() {
   const [data, setData] = useState<SeoData | null>(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [auditFilter, setAuditFilter] = useState<"all" | "perfect" | "issues">("all");
+  const [auditSearch, setAuditSearch] = useState("");
+  const [auditPage, setAuditPage] = useState(1);
+  const AUDIT_PER_PAGE = 15;
   const { success: showSuccess, error: showError } = useToast();
 
   async function handleAIGenerate() {
@@ -215,66 +219,131 @@ export default function SeoDashboardPage() {
       )}
 
       {/* Article SEO Audit */}
-      <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
-        <div className="px-5 py-4 border-b border-border flex items-center justify-between">
-          <h3 className="text-sm font-bold text-txt-primary flex items-center gap-1.5"><Search size={14} className="text-primary" /> Audit SEO Artikel (20 Terbaru)</h3>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-surface-secondary border-b border-border">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-txt-secondary">Artikel</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-txt-secondary">Skor</th>
-                <th className="hidden sm:table-cell px-4 py-3 text-center text-xs font-medium text-txt-secondary">SEO Title</th>
-                <th className="hidden sm:table-cell px-4 py-3 text-center text-xs font-medium text-txt-secondary">Meta Desc</th>
-                <th className="hidden md:table-cell px-4 py-3 text-center text-xs font-medium text-txt-secondary">Gambar</th>
-                <th className="hidden md:table-cell px-4 py-3 text-center text-xs font-medium text-txt-secondary">Excerpt</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-txt-secondary">Masalah</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {articleAudit.map((a) => (
-                <tr key={a.slug} className="hover:bg-surface-secondary">
-                  <td className="px-4 py-3 max-w-[200px]">
-                    <a href={a.url} target="_blank" rel="noopener" className="text-sm font-medium text-txt-primary hover:text-primary truncate block">{a.title}</a>
-                    <span className="text-xs text-txt-muted">{a.views.toLocaleString("id-ID")} views</span>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <span className={`inline-flex items-center justify-center h-8 w-8 rounded-full text-xs font-bold ${
-                      a.score >= 80 ? "bg-green-50 text-green-600" : a.score >= 50 ? "bg-yellow-50 text-yellow-600" : "bg-red-50 text-red-600"
-                    }`}>{a.score}</span>
-                  </td>
-                  <td className="hidden sm:table-cell px-4 py-3 text-center">
-                    {a.seoTitle ? <CheckCircle size={14} className="mx-auto text-green-500" /> : <XCircle size={14} className="mx-auto text-red-400" />}
-                  </td>
-                  <td className="hidden sm:table-cell px-4 py-3 text-center">
-                    {a.seoDescription ? <CheckCircle size={14} className="mx-auto text-green-500" /> : <XCircle size={14} className="mx-auto text-red-400" />}
-                  </td>
-                  <td className="hidden md:table-cell px-4 py-3 text-center">
-                    {a.hasImage ? <CheckCircle size={14} className="mx-auto text-green-500" /> : <XCircle size={14} className="mx-auto text-red-400" />}
-                  </td>
-                  <td className="hidden md:table-cell px-4 py-3 text-center">
-                    {a.hasExcerpt ? <CheckCircle size={14} className="mx-auto text-green-500" /> : <XCircle size={14} className="mx-auto text-red-400" />}
-                  </td>
-                  <td className="px-4 py-3">
-                    {a.issues.length === 0 ? (
-                      <span className="text-xs text-green-500 font-medium">Sempurna</span>
-                    ) : (
-                      <div className="space-y-0.5">
-                        {a.issues.map((issue, i) => (
-                          <span key={i} className="flex items-center gap-1 text-xs text-yellow-600">
-                            <AlertTriangle size={10} className="shrink-0" /> {issue}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {(() => {
+        const perfectCount = articleAudit.filter(a => a.issues.length === 0).length;
+        const issuesCount = articleAudit.filter(a => a.issues.length > 0).length;
+
+        const filtered = articleAudit
+          .filter(a => {
+            if (auditFilter === "perfect") return a.issues.length === 0;
+            if (auditFilter === "issues") return a.issues.length > 0;
+            return true;
+          })
+          .filter(a => !auditSearch || a.title.toLowerCase().includes(auditSearch.toLowerCase()) || a.category.toLowerCase().includes(auditSearch.toLowerCase()));
+
+        const totalPages = Math.ceil(filtered.length / AUDIT_PER_PAGE);
+        const paginated = filtered.slice((auditPage - 1) * AUDIT_PER_PAGE, auditPage * AUDIT_PER_PAGE);
+
+        return (
+          <div className="rounded-2xl border border-border bg-surface shadow-card overflow-hidden">
+            <div className="px-5 py-4 border-b border-border">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                <h3 className="text-sm font-bold text-txt-primary flex items-center gap-1.5"><Search size={14} className="text-primary" /> Audit SEO Artikel</h3>
+                <span className="text-xs text-txt-muted">{articleAudit.length} artikel total</span>
+              </div>
+
+              {/* Filter tabs */}
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <button onClick={() => { setAuditFilter("all"); setAuditPage(1); }} className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${auditFilter === "all" ? "bg-primary text-white" : "bg-surface-secondary text-txt-secondary hover:bg-surface-tertiary"}`}>
+                  Semua ({articleAudit.length})
+                </button>
+                <button onClick={() => { setAuditFilter("perfect"); setAuditPage(1); }} className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${auditFilter === "perfect" ? "bg-green-500 text-white" : "bg-green-50 text-green-600 hover:bg-green-100"}`}>
+                  <span className="inline-flex items-center gap-1"><CheckCircle size={10} /> Sempurna ({perfectCount})</span>
+                </button>
+                <button onClick={() => { setAuditFilter("issues"); setAuditPage(1); }} className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${auditFilter === "issues" ? "bg-red-500 text-white" : "bg-red-50 text-red-600 hover:bg-red-100"}`}>
+                  <span className="inline-flex items-center gap-1"><AlertTriangle size={10} /> Ada Masalah ({issuesCount})</span>
+                </button>
+              </div>
+
+              {/* Search */}
+              <div className="relative max-w-xs">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted" />
+                <input
+                  type="text"
+                  placeholder="Cari judul atau kategori..."
+                  value={auditSearch}
+                  onChange={(e) => { setAuditSearch(e.target.value); setAuditPage(1); }}
+                  className="input w-full pl-9 py-2 text-xs"
+                />
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-surface-secondary border-b border-border">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-txt-secondary">Artikel</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-txt-secondary">Skor</th>
+                    <th className="hidden sm:table-cell px-4 py-3 text-center text-xs font-medium text-txt-secondary">SEO Title</th>
+                    <th className="hidden sm:table-cell px-4 py-3 text-center text-xs font-medium text-txt-secondary">Meta Desc</th>
+                    <th className="hidden md:table-cell px-4 py-3 text-center text-xs font-medium text-txt-secondary">Gambar</th>
+                    <th className="hidden md:table-cell px-4 py-3 text-center text-xs font-medium text-txt-secondary">Excerpt</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-txt-secondary">Masalah</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {paginated.map((a) => (
+                    <tr key={a.slug} className="hover:bg-surface-secondary">
+                      <td className="px-4 py-3 max-w-[220px]">
+                        <a href={a.url} target="_blank" rel="noopener" className="text-sm font-medium text-txt-primary hover:text-primary truncate block">{a.title}</a>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-[10px] text-primary font-medium">{a.category}</span>
+                          <span className="text-[10px] text-txt-muted">·</span>
+                          <span className="text-[10px] text-txt-muted">{a.views.toLocaleString("id-ID")} views</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={`inline-flex items-center justify-center h-8 w-8 rounded-full text-xs font-bold ${
+                          a.score >= 80 ? "bg-green-50 text-green-600" : a.score >= 50 ? "bg-yellow-50 text-yellow-600" : "bg-red-50 text-red-600"
+                        }`}>{a.score}</span>
+                      </td>
+                      <td className="hidden sm:table-cell px-4 py-3 text-center">
+                        {a.seoTitle ? <CheckCircle size={14} className="mx-auto text-green-500" /> : <XCircle size={14} className="mx-auto text-red-400" />}
+                      </td>
+                      <td className="hidden sm:table-cell px-4 py-3 text-center">
+                        {a.seoDescription ? <CheckCircle size={14} className="mx-auto text-green-500" /> : <XCircle size={14} className="mx-auto text-red-400" />}
+                      </td>
+                      <td className="hidden md:table-cell px-4 py-3 text-center">
+                        {a.hasImage ? <CheckCircle size={14} className="mx-auto text-green-500" /> : <XCircle size={14} className="mx-auto text-red-400" />}
+                      </td>
+                      <td className="hidden md:table-cell px-4 py-3 text-center">
+                        {a.hasExcerpt ? <CheckCircle size={14} className="mx-auto text-green-500" /> : <XCircle size={14} className="mx-auto text-red-400" />}
+                      </td>
+                      <td className="px-4 py-3">
+                        {a.issues.length === 0 ? (
+                          <span className="inline-flex items-center gap-1 text-xs text-green-500 font-medium"><CheckCircle size={10} /> Sempurna</span>
+                        ) : (
+                          <div className="space-y-0.5">
+                            {a.issues.map((issue, i) => (
+                              <span key={i} className="flex items-center gap-1 text-xs text-yellow-600">
+                                <AlertTriangle size={10} className="shrink-0" /> {issue}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                  {paginated.length === 0 && (
+                    <tr><td colSpan={7} className="px-4 py-8 text-center text-sm text-txt-muted">Tidak ada artikel ditemukan</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between px-5 py-3 border-t border-border">
+                <p className="text-xs text-txt-muted">Halaman {auditPage} dari {totalPages} ({filtered.length} artikel)</p>
+                <div className="flex gap-1.5">
+                  <button onClick={() => setAuditPage(p => Math.max(1, p - 1))} disabled={auditPage <= 1} className="btn-ghost px-3 py-1.5 text-xs disabled:opacity-40">← Prev</button>
+                  <button onClick={() => setAuditPage(p => Math.min(totalPages, p + 1))} disabled={auditPage >= totalPages} className="btn-ghost px-3 py-1.5 text-xs disabled:opacity-40">Next →</button>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 }
