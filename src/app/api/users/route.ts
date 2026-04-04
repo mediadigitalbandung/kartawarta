@@ -4,7 +4,6 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { successResponse, errorResponse, requireRole, requireAuth, logAudit, ApiError } from "@/lib/api-utils";
 import { createEmailForward, addDestinationAddress } from "@/lib/cloudflare-email";
-import { slugify } from "@/lib/utils";
 
 // GET /api/users
 export async function GET() {
@@ -90,17 +89,17 @@ export async function POST(request: NextRequest) {
 
     await logAudit(session.user.id, "CREATE", "user", user.id, `Membuat user: ${user.name} (${user.role})`);
 
-    // Auto-create email: firstname@kartawarta.com → user's email
+    // Create email@kartawarta.com if requested
     let emailCreated = false;
-    try {
-      const localPart = slugify(data.name.split(" ")[0].toLowerCase());
-      if (localPart.length >= 2) {
+    const kartawartaEmail = body.kartawartaEmail as string | undefined;
+    if (kartawartaEmail && kartawartaEmail.length >= 2) {
+      try {
         await addDestinationAddress(data.email);
-        await createEmailForward(localPart, data.email);
+        await createEmailForward(kartawartaEmail, data.email);
         emailCreated = true;
+      } catch {
+        // Non-critical — email routing might not be active yet
       }
-    } catch {
-      // Non-critical — email routing might not be active yet
     }
 
     return successResponse({ ...user, emailCreated }, 201);

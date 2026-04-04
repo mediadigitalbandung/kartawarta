@@ -90,6 +90,7 @@ export default function PenggunaPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [formRole, setFormRole] = useState("");
   const [formSpec, setFormSpec] = useState("");
+  const [formKartawartaEmail, setFormKartawartaEmail] = useState("");
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -121,6 +122,7 @@ export default function PenggunaPage() {
     setFormPassword("");
     setFormRole("");
     setFormSpec("");
+    setFormKartawartaEmail("");
     setEditingUser(null);
   }
 
@@ -185,6 +187,7 @@ export default function PenggunaPage() {
             password: formPassword,
             role: formRole,
             specialization: formSpec || undefined,
+            kartawartaEmail: formKartawartaEmail || undefined,
           }),
         });
 
@@ -194,7 +197,7 @@ export default function PenggunaPage() {
         }
 
         const json = await res.json();
-        const emailInfo = json.data?.emailCreated ? ` — Email ${formName.split(" ")[0].toLowerCase()}@kartawarta.com dibuat` : "";
+        const emailInfo = json.data?.emailCreated ? ` — Email ${formKartawartaEmail}@kartawarta.com dibuat` : "";
         success(`Pengguna berhasil ditambahkan${emailInfo}`);
       }
 
@@ -486,10 +489,28 @@ export default function PenggunaPage() {
                 onChange={(e) => setFormSpec(e.target.value)}
                 className="input w-full"
               />
-              {!editingUser && formName && (
-                <div className="flex items-center gap-2 text-xs text-txt-muted bg-surface-secondary rounded-lg px-3 py-2.5">
-                  <AtSign size={12} className="text-primary shrink-0" />
-                  <span>Email <strong className="text-primary">{formName.split(" ")[0].toLowerCase()}@kartawarta.com</strong> akan otomatis dibuat dan forward ke <strong>{formEmail || "..."}</strong></span>
+              {!editingUser && (
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Email @kartawarta.com (opsional)</label>
+                  <div className="flex items-center gap-0">
+                    <input
+                      type="text"
+                      placeholder="contoh: owen"
+                      value={formKartawartaEmail}
+                      onChange={(e) => setFormKartawartaEmail(e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ""))}
+                      className="input rounded-r-none flex-1"
+                    />
+                    <span className="inline-flex items-center px-3 py-2 border border-l-0 border-border bg-surface-secondary text-sm text-txt-secondary rounded-r-lg whitespace-nowrap">
+                      @kartawarta.com
+                    </span>
+                  </div>
+                  {formKartawartaEmail && formEmail && (
+                    <p className="mt-1.5 flex items-center gap-1.5 text-xs text-txt-muted">
+                      <AtSign size={10} className="text-primary shrink-0" />
+                      <span><strong className="text-primary">{formKartawartaEmail}@kartawarta.com</strong> akan forward ke <strong>{formEmail}</strong></span>
+                    </p>
+                  )}
+                  <p className="mt-1 text-[10px] text-txt-muted">Kosongkan jika tidak perlu email @kartawarta.com</p>
                 </div>
               )}
               <div className="flex justify-end gap-2 pt-2">
