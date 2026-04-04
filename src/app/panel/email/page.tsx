@@ -14,6 +14,12 @@ interface EmailRoute {
   to: string;
 }
 
+interface UserOption {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export default function EmailRoutingPage() {
   const { success, error: showError } = useToast();
   const { confirm } = useConfirm();
@@ -24,6 +30,8 @@ export default function EmailRoutingPage() {
 
   const [localPart, setLocalPart] = useState("");
   const [destinationEmail, setDestinationEmail] = useState("");
+  const [users, setUsers] = useState<UserOption[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState("");
   const [expandedSetup, setExpandedSetup] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
 
@@ -36,13 +44,20 @@ export default function EmailRoutingPage() {
   const fetchEmails = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/email-routing");
-      if (res.ok) {
-        const json = await res.json();
+      const [resEmails, resUsers] = await Promise.all([
+        fetch("/api/email-routing"),
+        fetch("/api/users"),
+      ]);
+      if (resEmails.ok) {
+        const json = await resEmails.json();
         setEmails(json.data || []);
       }
+      if (resUsers.ok) {
+        const json = await resUsers.json();
+        setUsers((json.data || []).map((u: { id: string; name: string; email: string }) => ({ id: u.id, name: u.name, email: u.email })));
+      }
     } catch {
-      showError("Gagal memuat data email");
+      showError("Gagal memuat data");
     } finally {
       setLoading(false);
     }
@@ -130,6 +145,36 @@ export default function EmailRoutingPage() {
         <div className="mb-6 rounded-2xl border border-border bg-surface p-5 sm:p-6 shadow-card">
           <h2 className="text-base font-bold text-txt-primary mb-4">Buat Email Baru</h2>
           <form onSubmit={handleCreate} className="space-y-4">
+            {/* User selector */}
+            {users.length > 0 && (
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Pilih dari Pengguna (opsional)</label>
+                <select
+                  value={selectedUserId}
+                  onChange={(e) => {
+                    const uid = e.target.value;
+                    setSelectedUserId(uid);
+                    if (uid) {
+                      const user = users.find(u => u.id === uid);
+                      if (user) {
+                        setLocalPart(user.name.split(" ")[0].toLowerCase().replace(/[^a-z0-9._-]/g, ""));
+                        setDestinationEmail(user.email);
+                      }
+                    } else {
+                      setLocalPart("");
+                      setDestinationEmail("");
+                    }
+                  }}
+                  className="input w-full"
+                >
+                  <option value="">— Isi manual —</option>
+                  {users.map(u => (
+                    <option key={u.id} value={u.id}>{u.name} ({u.email})</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-txt-secondary">Email Kartawarta</label>
