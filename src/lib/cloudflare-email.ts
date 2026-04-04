@@ -103,32 +103,41 @@ export async function toggleEmailRule(ruleId: string, enabled: boolean): Promise
 
 /** Add destination address (must be verified by recipient) */
 export async function addDestinationAddress(email: string): Promise<{ id: string; email: string; verified: string }> {
-  const { zoneId } = getConfig();
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+  if (!accountId) throw new Error("CLOUDFLARE_ACCOUNT_ID not set");
+
   // First check if already exists
-  const listRes = await fetch(`${CF_API}/zones/${zoneId}/email/routing/addresses`, {
+  const listRes = await fetch(`${CF_API}/accounts/${accountId}/email/routing/addresses`, {
     headers: headers(),
   });
-  const listJson = await listRes.json();
+  const listText = await listRes.text();
+  let listJson;
+  try { listJson = JSON.parse(listText); } catch { listJson = { result: [] }; }
   const existing = (listJson.result || []).find((a: { email: string }) => a.email === email);
   if (existing) return existing;
 
-  const res = await fetch(`${CF_API}/zones/${zoneId}/email/routing/addresses`, {
+  const res = await fetch(`${CF_API}/accounts/${accountId}/email/routing/addresses`, {
     method: "POST",
     headers: headers(),
     body: JSON.stringify({ email }),
   });
-  const json = await res.json();
+  const text = await res.text();
+  let json;
+  try { json = JSON.parse(text); } catch { throw new Error("Invalid response from Cloudflare"); }
   if (!json.success) throw new Error(json.errors?.[0]?.message || "Failed to add destination");
   return json.result;
 }
 
 /** List destination addresses */
 export async function listDestinationAddresses(): Promise<{ id: string; email: string; verified: string }[]> {
-  const { zoneId } = getConfig();
-  const res = await fetch(`${CF_API}/zones/${zoneId}/email/routing/addresses`, {
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+  if (!accountId) return [];
+  const res = await fetch(`${CF_API}/accounts/${accountId}/email/routing/addresses`, {
     headers: headers(),
   });
-  const json = await res.json();
+  const text = await res.text();
+  let json;
+  try { json = JSON.parse(text); } catch { return []; }
   if (!json.success) return [];
   return json.result || [];
 }
