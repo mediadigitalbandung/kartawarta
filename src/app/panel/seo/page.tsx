@@ -54,25 +54,25 @@ function CoverageBar({ label, value, icon: Icon }: { label: string; value: numbe
 export default function SeoDashboardPage() {
   const [data, setData] = useState<SeoData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [generating, setGenerating] = useState<"auto" | "ai" | null>(null);
+  const [generating, setGenerating] = useState(false);
   const { success: showSuccess, error: showError } = useToast();
 
-  async function handleBulkGenerate(mode: "all" | "ai") {
+  async function handleAIGenerate() {
     try {
-      setGenerating(mode === "ai" ? "ai" : "auto");
+      setGenerating(true);
       const res = await fetch("/api/ai/bulk-seo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode }),
+        body: JSON.stringify({}),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Gagal generate");
+      if (!json.success) throw new Error(json.error || "Gagal generate");
       showSuccess(json.data?.message || `${json.data?.processed} artikel berhasil di-update`);
       fetchData();
     } catch (err) {
       showError(err instanceof Error ? err.message : "Gagal generate SEO");
     } finally {
-      setGenerating(null);
+      setGenerating(false);
     }
   }
 
@@ -200,28 +200,17 @@ export default function SeoDashboardPage() {
           <p className="text-xs text-txt-secondary mb-4">
             Artikel yang belum memiliki SEO Title dan Meta Description bisa di-generate otomatis.
           </p>
-          <div className="flex flex-wrap gap-3">
-            <button
-              onClick={() => handleBulkGenerate("all")}
-              disabled={!!generating}
-              className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm font-semibold disabled:opacity-50"
-            >
-              {generating === "auto" ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
-              {generating === "auto" ? "Generating..." : "Auto Generate (Cepat)"}
-            </button>
-            <button
-              onClick={() => handleBulkGenerate("ai")}
-              disabled={!!generating}
-              className="btn-secondary flex items-center gap-2 px-5 py-2.5 text-sm font-semibold disabled:opacity-50 border border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100"
-            >
-              {generating === "ai" ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
-              {generating === "ai" ? "AI Generating..." : "AI Generate (DeepSeek)"}
-            </button>
-          </div>
-          <div className="mt-3 flex gap-4 text-[10px] text-txt-muted">
-            <span><strong>Auto:</strong> Ambil dari judul & excerpt — instan, gratis</span>
-            <span><strong>AI:</strong> Generate dari konten via DeepSeek — lebih berkualitas, maks 20 artikel/batch</span>
-          </div>
+          <button
+            onClick={handleAIGenerate}
+            disabled={generating}
+            className="btn-primary flex items-center gap-2 px-5 py-2.5 text-sm font-semibold disabled:opacity-50"
+          >
+            {generating ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+            {generating ? "AI Generating..." : "AI Generate SEO (DeepSeek)"}
+          </button>
+          <p className="mt-3 text-[10px] text-txt-muted">
+            Generate SEO Title & Meta Description menggunakan AI DeepSeek — maks 20 artikel per batch. Pastikan API Key sudah dikonfigurasi di Pengaturan.
+          </p>
         </div>
       )}
 
