@@ -6,16 +6,18 @@
 const CF_API = "https://api.cloudflare.com/client/v4";
 
 function getConfig() {
-  const token = process.env.CLOUDFLARE_API_TOKEN;
+  const apiKey = process.env.CLOUDFLARE_GLOBAL_API_KEY;
+  const email = process.env.CLOUDFLARE_EMAIL;
   const zoneId = process.env.CLOUDFLARE_ZONE_ID;
-  if (!token || !zoneId) throw new Error("Cloudflare env vars not configured");
-  return { token, zoneId };
+  if (!apiKey || !email || !zoneId) throw new Error("Cloudflare env vars not configured (CLOUDFLARE_GLOBAL_API_KEY, CLOUDFLARE_EMAIL, CLOUDFLARE_ZONE_ID)");
+  return { apiKey, email, zoneId };
 }
 
 function headers() {
-  const { token } = getConfig();
+  const { apiKey, email } = getConfig();
   return {
-    Authorization: `Bearer ${token}`,
+    "X-Auth-Email": email,
+    "X-Auth-Key": apiKey,
     "Content-Type": "application/json",
   };
 }
