@@ -170,6 +170,25 @@ export default async function RootLayout({
         />
         {/* Google AdSense Meta Tag Verification */}
         <meta name="google-adsense-account" content={adsenseClientId} />
+        {/* Google Reader Revenue Manager (Subscribe with Google Basic) */}
+        <script
+          async
+          src="https://news.google.com/swg/js/v1/swg-basic.js"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (self.SWG_BASIC = self.SWG_BASIC || []).push( basicSubscriptions => {
+                basicSubscriptions.init({
+                  type: "NewsArticle",
+                  isPartOfType: ["Product"],
+                  isPartOfProductId: "CAowiorGDA:openaccess",
+                  clientOptions: { theme: "light", lang: "id" },
+                });
+              });
+            `
+          }}
+        />
         {/* Google Analytics 4 (gtag) — Measurement ID from Pengaturan → Google.
             Renders nothing until configured, so safe to mount unconditionally. */}
         <GoogleAnalytics />
