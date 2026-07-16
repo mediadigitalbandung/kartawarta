@@ -96,6 +96,9 @@ NEXT_PUBLIC_APP_NAME="Kartawarta"
 # Cron
 CRON_SECRET="${CRON_SECRET}"
 
+# Google AdSense
+NEXT_PUBLIC_ADSENSE_CLIENT_ID="ca-pub-5936356841993880"
+
 # Email (Resend — optional, isi nanti)
 # RESEND_API_KEY=""
 # EMAIL_FROM="Kartawarta <noreply@kartawarta.com>"
