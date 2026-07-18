@@ -563,3 +563,10 @@
     }
   }
 }
+
+/* ── Google AdSense Offset Fix for Sticky Navigation ── */
+header.sticky {
+  top: var(--adsense-top-offset, 0px) !important;
+  transition: top 0.15s ease-in-out;
+}
+

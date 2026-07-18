@@ -9,6 +9,7 @@ import PublicTicker from "@/components/layout/PublicTicker";
 import PublicFooter from "@/components/layout/PublicFooter";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import SideRailAds from "@/components/ads/SideRailAds";
+import AdSenseOffsetFix from "@/components/ads/AdSenseOffsetFix";
 import InstallPrompt from "@/components/pwa/InstallPrompt";
 import InstallTracker from "@/components/pwa/InstallTracker";
 import InstallTeaser from "@/components/pwa/InstallTeaser";
@@ -195,6 +196,7 @@ export default async function RootLayout({
       </head>
       <body className="flex min-h-screen flex-col font-sans bg-surface text-on-surface antialiased">
         <Providers>
+          <AdSenseOffsetFix />
           <a
             href="#main-content"
             className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-[200] focus:bg-primary focus:text-on-primary focus:px-4 focus:py-2 focus:text-sm"
