@@ -3,20 +3,16 @@
 import { useEffect } from "react";
 
 /**
- * Dynamic layout correction for Google AdSense top and bottom anchor overlay ads.
+ * Dynamic layout offset correction for Google AdSense top and bottom anchor overlay ads.
  *
- * This component uses a dual-strategy to resolve overlaps:
- * 1. It directly scans the DOM for fixed AdSense containers (ins, google-auto-placed, iframes)
- *    and measures their heights.
- * 2. It checks for margin-top/padding-top/margin-bottom/padding-bottom styles injected on
- *    <html> or <body> tags.
+ * This component resolves navigation and widget overlap issues by:
+ * 1. Scanning the DOM for fixed AdSense elements (ins, google-auto-placed, iframes)
+ *    and reading their bounding box dimensions.
+ * 2. Parsing margins/paddings injected on <html> or <body> tags.
+ * 3. Exposing `--adsense-top-offset` and `--adsense-bottom-offset` CSS variables.
  *
- * It exposes two CSS variables on the root:
- * - `--adsense-top-offset` (used to push down sticky header navigation)
- * - `--adsense-bottom-offset` (used to push up bottom PWA install prompts / widgets)
- *
- * It listens to both style mutations and childList modifications on <body> to handle
- * ads injected dynamically and asynchronously.
+ * Optimization: It compares values before calling `style.setProperty` to prevent
+ * infinite recursion loops with the MutationObserver.
  */
 export default function AdSenseOffsetFix() {
   useEffect(() => {
@@ -29,24 +25,57 @@ export default function AdSenseOffsetFix() {
       let topOffset = 0;
       let bottomOffset = 0;
 
-      // Strategy 1: Scan DOM directly for fixed Google AdSense elements
+      // Strategy 1: Scan DOM directly for fixed/absolute Google AdSense elements near edges
       try {
         const elements = document.querySelectorAll(
-          "ins.adsbygoogle, .google-auto-placed, iframe[id^='google_ads']"
+          "ins.adsbygoogle, .google-auto-placed, iframe[id^='google_ads'], iframe[id^='aswift']"
         );
+        
+        const viewportHeight = window.innerHeight;
+
         for (const el of Array.from(elements)) {
-          const computedStyle = window.getComputedStyle(el);
-          const position = computedStyle.position;
+          const rect = el.getBoundingClientRect();
           
-          if (position === "fixed") {
-            const rect = el.getBoundingClientRect();
-            if (rect.height > 0 && rect.width > 0) {
-              const top = computedStyle.top;
-              const bottom = computedStyle.bottom;
+          if (rect.height > 0 && rect.width > 0) {
+            // Check if element is visually flush with the top of the viewport
+            if (rect.top >= -5 && rect.top <= 10) {
+              const computedStyle = window.getComputedStyle(el);
+              const position = computedStyle.position;
               
-              if (top === "0px" || top.startsWith("0")) {
+              let isFloating = position === "fixed" || position === "absolute";
+              let parent = el.parentElement;
+              
+              // Traverse up to see if any parent element is fixed/absolute
+              while (parent && !isFloating && parent !== document.body) {
+                const parentStyle = window.getComputedStyle(parent);
+                if (parentStyle.position === "fixed" || parentStyle.position === "absolute") {
+                  isFloating = true;
+                }
+                parent = parent.parentElement;
+              }
+              
+              if (isFloating) {
                 topOffset = Math.max(topOffset, rect.height);
-              } else if (bottom === "0px" || bottom.startsWith("0")) {
+              }
+            }
+            
+            // Check if element is visually flush with the bottom of the viewport
+            if (rect.bottom >= viewportHeight - 10 && rect.bottom <= viewportHeight + 5) {
+              const computedStyle = window.getComputedStyle(el);
+              const position = computedStyle.position;
+              
+              let isFloating = position === "fixed" || position === "absolute";
+              let parent = el.parentElement;
+              
+              while (parent && !isFloating && parent !== document.body) {
+                const parentStyle = window.getComputedStyle(parent);
+                if (parentStyle.position === "fixed" || parentStyle.position === "absolute") {
+                  isFloating = true;
+                }
+                parent = parent.parentElement;
+              }
+              
+              if (isFloating) {
                 bottomOffset = Math.max(bottomOffset, rect.height);
               }
             }
@@ -56,7 +85,7 @@ export default function AdSenseOffsetFix() {
         console.error("Error scanning DOM for AdSense elements:", err);
       }
 
-      // Strategy 2: Fallback to html style properties (margin-top / padding-top / margin-bottom / padding-bottom)
+      // Strategy 2: Fallback to html style properties (margin/padding top/bottom)
       if (topOffset === 0) {
         const htmlMarginTop = html.style.marginTop || getComputedStyle(html).marginTop;
         if (htmlMarginTop && htmlMarginTop !== "0px") {
@@ -118,17 +147,25 @@ export default function AdSenseOffsetFix() {
         }
       }
 
-      // Apply dynamic CSS variable offsets to html element
-      if (topOffset > 0) {
-        html.style.setProperty("--adsense-top-offset", `${topOffset}px`);
-      } else {
-        html.style.removeProperty("--adsense-top-offset");
+      // Apply dynamic CSS variable offsets to html element ONLY if values changed
+      const currentTop = html.style.getPropertyValue("--adsense-top-offset");
+      const newTop = topOffset > 0 ? `${topOffset}px` : "";
+      if (currentTop !== newTop) {
+        if (newTop) {
+          html.style.setProperty("--adsense-top-offset", newTop);
+        } else {
+          html.style.removeProperty("--adsense-top-offset");
+        }
       }
 
-      if (bottomOffset > 0) {
-        html.style.setProperty("--adsense-bottom-offset", `${bottomOffset}px`);
-      } else {
-        html.style.removeProperty("--adsense-bottom-offset");
+      const currentBottom = html.style.getPropertyValue("--adsense-bottom-offset");
+      const newBottom = bottomOffset > 0 ? `${bottomOffset}px` : "";
+      if (currentBottom !== newBottom) {
+        if (newBottom) {
+          html.style.setProperty("--adsense-bottom-offset", newBottom);
+        } else {
+          html.style.removeProperty("--adsense-bottom-offset");
+        }
       }
     };
 
@@ -153,13 +190,13 @@ export default function AdSenseOffsetFix() {
       }
     });
 
-    observer.observe(html, { attributes: true, attributeFilter: ["style"] });
+    observer.observe(html, { attributes: true, attributeFilter: ["style"], childList: true });
     if (body) {
       observer.observe(body, { attributes: true, attributeFilter: ["style"], childList: true });
     }
 
-    // Occasional polling verification (handles any delayed lazy iframe sizing transitions)
-    const interval = setInterval(updateOffset, 2000);
+    // Polling verification to handle delayed dynamic transitions
+    const interval = setInterval(updateOffset, 1500);
 
     return () => {
       observer.disconnect();
