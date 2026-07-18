@@ -570,3 +570,14 @@ header.sticky {
   transition: top 0.15s ease-in-out;
 }
 
+/* Offset bottom fixed widgets (PWA prompt & teaser) when a bottom anchor ad is visible */
+.fixed.bottom-3 {
+  bottom: calc(var(--adsense-bottom-offset, 0px) + 12px) !important;
+  transition: bottom 0.15s ease-in-out;
+}
+.fixed.bottom-4 {
+  bottom: calc(var(--adsense-bottom-offset, 0px) + 16px) !important;
+  transition: bottom 0.15s ease-in-out;
+}
+
+
