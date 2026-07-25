@@ -502,6 +502,8 @@ export default function PengaturanPage() {
 
   // AI
   const [aiPrimaryProvider, setAiPrimaryProvider] = useState("qwen");
+  const [aiWriterInstructions, setAiWriterInstructions] = useState("");
+  const [aiMaxTokens, setAiMaxTokens] = useState("1000");
   const [anthropicKey, setAnthropicKey] = useState("");
   const [deepseekKey, setDeepseekKey] = useState("");
   const [qwenKey, setQwenKey] = useState("");
@@ -608,6 +610,8 @@ export default function PengaturanPage() {
         setWebsiteUrl(map.website_url || "");
 
         setAiPrimaryProvider(map.ai_primary_provider || "qwen");
+        setAiWriterInstructions(map.ai_writer_instructions || map.perplexity_instructions || "");
+        setAiMaxTokens(map.ai_max_tokens || "1000");
         setAnthropicKey(map.anthropic_api_key || "");
         setDeepseekKey(map.deepseek_api_key || "");
         setQwenKey(map.qwen_api_key || "");
@@ -1243,6 +1247,39 @@ export default function PengaturanPage() {
             </select>
           </Field>
           <Field
+            label="Arahan Penulis AI General (Gaya, Karakter & Norma Jurnalistik)"
+            hint="Arahan universal untuk SEMUA mesin AI (Qwen, Claude, DeepSeek, Perplexity, Local AI) saat membuat draf berita: gaya bahasa, tone, aturan 5W1H, norma jurnalistik, dan hal yang harus/dihindari. Dipakai otomatis di setiap pembuatan konten AI."
+          >
+            <textarea
+              rows={5}
+              value={aiWriterInstructions}
+              onChange={(e) => {
+                setAiWriterInstructions(e.target.value);
+                markDirty("ai");
+              }}
+              className="input resize-none"
+              placeholder={"Contoh: Tulis dengan gaya jurnalistik ringkas, tegas, dan obyektif. Gunakan kalimat aktif, hindari istilah asing tanpa penjelasan. Sertakan konteks lokal Bandung/Jawa Barat bila relevan. Buka artikel dengan lead 5W1H yang kuat di paragraf pertama. Hindari bahasa promosi atau clickbait."}
+            />
+          </Field>
+          <Field
+            label="Batas Maksimum Token Output AI (Default: 1000)"
+            hint="Batas maksimum panjang jawaban untuk pemanggilan AI secara universal (menghemat kuota & biaya API). Default disarankan: 1000 token."
+          >
+            <input
+              type="number"
+              min={100}
+              max={8000}
+              step={100}
+              value={aiMaxTokens}
+              onChange={(e) => {
+                setAiMaxTokens(e.target.value);
+                markDirty("ai");
+              }}
+              className="input"
+              placeholder="1000"
+            />
+          </Field>
+          <Field
             label="Anthropic API Key"
             hint={
               <>
@@ -1730,6 +1767,8 @@ export default function PengaturanPage() {
             onSave={() =>
               saveSection("ai", [
                 ["ai_primary_provider", aiPrimaryProvider],
+                ["ai_writer_instructions", aiWriterInstructions],
+                ["ai_max_tokens", aiMaxTokens],
                 ["anthropic_api_key", anthropicKey],
                 ["deepseek_api_key", deepseekKey],
                 ["qwen_api_key", qwenKey],

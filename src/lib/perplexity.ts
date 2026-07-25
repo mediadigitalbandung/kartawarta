@@ -181,6 +181,10 @@ export async function isPerplexityConfigured(): Promise<boolean> {
  */
 export async function getPerplexityInstructions(): Promise<string> {
   try {
+    const general = await prisma.systemSetting.findUnique({ where: { key: "ai_writer_instructions" } });
+    if (general?.value && general.value.trim().length > 0) {
+      return general.value.trim();
+    }
     const row = await prisma.systemSetting.findUnique({ where: { key: "perplexity_instructions" } });
     return (row?.value ?? "").trim();
   } catch {

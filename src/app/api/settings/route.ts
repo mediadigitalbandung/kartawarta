@@ -27,6 +27,8 @@ const ALLOWED_KEYS = [
   "maintenance_mode",
   // AI providers
   "ai_primary_provider",
+  "ai_writer_instructions",
+  "ai_max_tokens",
   "deepseek_api_key",
   "anthropic_api_key",
   "qwen_api_key",

@@ -51,7 +51,7 @@ export interface CallAIResult {
   durationMs: number;
 }
 
-const DEFAULT_MAX_TOKENS = 1024;
+const DEFAULT_MAX_TOKENS = 1000;
 const DEFAULT_TEMPERATURE = 0.7;
 const DEFAULT_TIMEOUT_MS = 60_000;
 const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL || "claude-haiku-4-5";
@@ -199,6 +199,55 @@ export async function getPrimaryProvider(): Promise<Provider> {
   return "anthropic";
 }
 
+export async function getMaxTokens(): Promise<number> {
+  try {
+    const setting = await prisma.systemSetting.findUnique({
+      where: { key: "ai_max_tokens" },
+    });
+    if (setting?.value && setting.value.trim().length > 0) {
+      const parsed = parseInt(setting.value.trim(), 10);
+      if (!isNaN(parsed) && parsed > 0) {
+        return parsed;
+      }
+    }
+  } catch {
+    // ignore
+  }
+  const envVal = process.env.AI_MAX_TOKENS;
+  if (envVal) {
+    const parsed = parseInt(envVal, 10);
+    if (!isNaN(parsed) && parsed > 0) return parsed;
+  }
+  return DEFAULT_MAX_TOKENS;
+}
+
+export async function getGeneralSystemPrompt(customPrompt?: string): Promise<string> {
+  let instructions = "";
+  try {
+    const row = await prisma.systemSetting.findUnique({
+      where: { key: "ai_writer_instructions" },
+    });
+    if (row?.value && row.value.trim().length > 0) {
+      instructions = row.value.trim();
+    } else {
+      const legacyRow = await prisma.systemSetting.findUnique({
+        where: { key: "perplexity_instructions" },
+      });
+      if (legacyRow?.value && legacyRow.value.trim().length > 0) {
+        instructions = legacyRow.value.trim();
+      }
+    }
+  } catch {
+    // ignore
+  }
+
+  const base = customPrompt ?? DEFAULT_SYSTEM_PROMPT;
+  if (instructions) {
+    return `${base}\n\nArahan Penulis & Gaya Jurnalistik Tambahan:\n${instructions}`;
+  }
+  return base;
+}
+
 /**
  * Call Anthropic Claude via official SDK.
  */
@@ -212,13 +261,16 @@ async function callAnthropic(
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
 
+  const system = await getGeneralSystemPrompt(opts.systemPrompt);
+  const maxTokens = opts.maxTokens ?? (await getMaxTokens());
+
   try {
     const response = await client.messages.create(
       {
         model: ANTHROPIC_MODEL,
-        max_tokens: opts.maxTokens ?? DEFAULT_MAX_TOKENS,
+        max_tokens: maxTokens,
         temperature: opts.temperature ?? DEFAULT_TEMPERATURE,
-        system: opts.systemPrompt ?? DEFAULT_SYSTEM_PROMPT,
+        system,
         messages: [{ role: "user", content: opts.userPrompt }],
       },
       { signal: controller.signal },
@@ -258,6 +310,9 @@ async function callDeepSeek(
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
 
+  const system = await getGeneralSystemPrompt(opts.systemPrompt);
+  const maxTokens = opts.maxTokens ?? (await getMaxTokens());
+
   try {
     const response = await fetch(DEEPSEEK_ENDPOINT, {
       method: "POST",
@@ -271,11 +326,11 @@ async function callDeepSeek(
         messages: [
           {
             role: "system",
-            content: opts.systemPrompt ?? DEFAULT_SYSTEM_PROMPT,
+            content: system,
           },
           { role: "user", content: opts.userPrompt },
         ],
-        max_tokens: opts.maxTokens ?? DEFAULT_MAX_TOKENS,
+        max_tokens: maxTokens,
         temperature: opts.temperature ?? DEFAULT_TEMPERATURE,
       }),
     });
@@ -320,7 +375,12 @@ export async function callQwen(
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
 
-  const [endpoint, model] = await Promise.all([getQwenEndpoint(), getQwenModel()]);
+  const [endpoint, model, system, maxTokens] = await Promise.all([
+    getQwenEndpoint(),
+    getQwenModel(),
+    getGeneralSystemPrompt(opts.systemPrompt),
+    opts.maxTokens ?? getMaxTokens(),
+  ]);
 
   try {
     const response = await fetch(endpoint, {
@@ -335,11 +395,11 @@ export async function callQwen(
         messages: [
           {
             role: "system",
-            content: opts.systemPrompt ?? DEFAULT_SYSTEM_PROMPT,
+            content: system,
           },
           { role: "user", content: opts.userPrompt },
         ],
-        max_tokens: opts.maxTokens ?? DEFAULT_MAX_TOKENS,
+        max_tokens: maxTokens,
         temperature: opts.temperature ?? DEFAULT_TEMPERATURE,
       }),
     });
