@@ -269,7 +269,7 @@ export function MultiplexAd({ className = "" }: { className?: string }) {
       {ad ? (
         <AdContent ad={ad} />
       ) : (
-        <AdSenseUnit format="autorelaxed" minHeight="280px" />
+        <AdSenseUnit slot="6384285370" format="autorelaxed" minHeight="280px" />
       )}
     </div>
   );
