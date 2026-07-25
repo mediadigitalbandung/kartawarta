@@ -1,3 +1,5 @@
+import { headers } from "next/headers";
+import { isBotOrPrefetch } from "@/lib/bot-detection";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -87,10 +89,13 @@ export default async function PejabatDetailPage({ params: paramsPromise }: PageP
 
   if (!official) notFound();
 
-  // Fire-and-forget viewCount
-  prisma.publicOfficial
-    .update({ where: { id: official.id }, data: { viewCount: { increment: 1 } } })
-    .catch(() => {});
+  // Fire-and-forget viewCount for human visitors
+  const reqHeaders = await headers();
+  if (!isBotOrPrefetch(reqHeaders.get("user-agent"), reqHeaders)) {
+    prisma.publicOfficial
+      .update({ where: { id: official.id }, data: { viewCount: { increment: 1 } } })
+      .catch(() => {});
+  }
 
   // Related articles — search by official name in title
   const relatedArticles = await prisma.article.findMany({

@@ -1,3 +1,5 @@
+import { headers } from "next/headers";
+import { isBotOrPrefetch } from "@/lib/bot-detection";
 import Link from "next/link";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -65,10 +67,13 @@ export default async function GlossaryDetailPage({ params: paramsPromise }: { pa
       })
     : [];
 
-  // Increment view count async (non-blocking)
-  void prisma.glossary
-    .update({ where: { id: item.id }, data: { viewCount: { increment: 1 } } })
-    .catch(() => {});
+  // Increment view count async for human visitors
+  const reqHeaders = await headers();
+  if (!isBotOrPrefetch(reqHeaders.get("user-agent"), reqHeaders)) {
+    void prisma.glossary
+      .update({ where: { id: item.id }, data: { viewCount: { increment: 1 } } })
+      .catch(() => {});
+  }
 
   return (
     <>

@@ -1,3 +1,5 @@
+import { headers } from "next/headers";
+import { isBotOrPrefetch } from "@/lib/bot-detection";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -159,10 +161,13 @@ export default async function LiveBlogDetailPage({ params: paramsPromise }: Prop
 
   if (!blog) notFound();
 
-  // Increment view count
-  prisma.liveBlog
-    .update({ where: { id: blog.id }, data: { viewCount: { increment: 1 } } })
-    .catch(() => {});
+  // Increment view count for human visitors
+  const reqHeaders = await headers();
+  if (!isBotOrPrefetch(reqHeaders.get("user-agent"), reqHeaders)) {
+    prisma.liveBlog
+      .update({ where: { id: blog.id }, data: { viewCount: { increment: 1 } } })
+      .catch(() => {});
+  }
 
   const jsonLd = buildJsonLd({
     ...blog,

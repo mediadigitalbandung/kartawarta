@@ -1,3 +1,5 @@
+import { headers } from "next/headers";
+import { isBotOrPrefetch } from "@/lib/bot-detection";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -96,10 +98,13 @@ export default async function RegulasiDetailPage({ params: paramsPromise }: Page
 
   if (!regulation) notFound();
 
-  // Increment viewCount — fire and forget
-  prisma.regulation
-    .update({ where: { id }, data: { viewCount: { increment: 1 } } })
-    .catch(() => {});
+  // Increment viewCount for human visitors — fire and forget
+  const reqHeaders = await headers();
+  if (!isBotOrPrefetch(reqHeaders.get("user-agent"), reqHeaders)) {
+    prisma.regulation
+      .update({ where: { id }, data: { viewCount: { increment: 1 } } })
+      .catch(() => {});
+  }
 
   // Fetch linked article if exists
   const linkedArticle = regulation.articleId

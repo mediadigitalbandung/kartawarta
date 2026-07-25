@@ -1,3 +1,5 @@
+import { headers } from "next/headers";
+import { isBotOrPrefetch } from "@/lib/bot-detection";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
@@ -81,10 +83,13 @@ export default async function EmitenDetailPage({
   const company = (await prismaAny.publicCompany.findUnique({ where: { ticker } })) as CompanyDetail | null;
   if (!company || !company.isActive) notFound();
 
-  // Increment view count (fire-and-forget)
-  prismaAny.publicCompany
-    .update({ where: { ticker }, data: { viewCount: { increment: 1 } } })
-    .catch(() => null);
+  // Increment view count for human visitors
+  const reqHeaders = await headers();
+  if (!isBotOrPrefetch(reqHeaders.get("user-agent"), reqHeaders)) {
+    prismaAny.publicCompany
+      .update({ where: { ticker }, data: { viewCount: { increment: 1 } } })
+      .catch(() => null);
+  }
 
   // Related articles: search by ticker in title or content (case-insensitive, limit 5)
   const relatedArticles = await prisma.article.findMany({

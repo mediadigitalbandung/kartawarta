@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import CopyProtection from "@/components/artikel/CopyProtection";
 import ReadingProgress from "@/components/artikel/ReadingProgress";
+import ArticleViewTracker from "@/components/artikel/ArticleViewTracker";
 import PrintButton from "@/components/artikel/PrintButton";
 import ShareBar from "@/components/artikel/ShareBar";
 import { FeaturedImage } from "@/components/artikel/FeaturedImage";
@@ -257,21 +258,9 @@ export default async function ArticlePage({ params: paramsPromise, searchParams:
     }
   }
 
-  // Increment view count only for published articles. Fire-and-forget — never
-  // block SSR rendering on a counter write. Errors are swallowed because the
-  // counter is non-critical (used for trending/Top, not for paywall, audit,
-  // or revenue). Awaiting this would add ~30–60 ms to TTFB per article hit
-  // and propagate Prisma transient errors to the reader as a 500.
-  if (isPublished) {
-    prisma.article
-      .update({
-        where: { slug: params.slug },
-        data: { viewCount: { increment: 1 } },
-      })
-      .catch(() => {
-        /* non-critical: swallow transient DB error so the page still renders */
-      });
-  }
+  // View tracking is handled client-side via <ArticleViewTracker articleId={article.id} />
+  // calling POST /api/articles/view, which filters out search engine crawlers, bots,
+  // and Next.js prefetch requests to align 1:1 with Google Search Console & AdSense.
 
   // Status label mapping for non-published preview
   const statusLabels: Record<string, { label: string; color: string }> = {
@@ -466,7 +455,10 @@ export default async function ArticlePage({ params: paramsPromise, searchParams:
       />
       <ReadingProgress />
       {isPublished && (
-        <ReadTracker slug={article.slug} categorySlug={article.category.slug} />
+        <>
+          <ReadTracker slug={article.slug} categorySlug={article.category.slug} />
+          <ArticleViewTracker articleId={article.id} />
+        </>
       )}
       <CopyProtection
         authorName={article.author.name}

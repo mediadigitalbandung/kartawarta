@@ -110,15 +110,6 @@ export async function GET(
     }
     const approvedAt = article.approvedAt || (approverId ? article.reviewedAt : null);
 
-    // MED-DB2: fire-and-forget — don't block GET response on a write.
-    // Non-critical counter; swallow errors silently.
-    if (article.status === "PUBLISHED") {
-      prisma.article.update({
-        where: { id: params.id },
-        data: { viewCount: { increment: 1 } },
-      }).catch(() => {/* non-critical */});
-    }
-
     return successResponse({ ...article, reviewerName, approverName, approvedAt });
   } catch (error) {
     return errorResponse(error);
