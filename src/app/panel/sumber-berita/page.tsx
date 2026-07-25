@@ -131,6 +131,65 @@ export default function SumberBeritaPage() {
   const [autoPublishEnabled, setAutoPublishEnabled] = useState(false);
   const [savingAutoSettings, setSavingAutoSettings] = useState(false);
 
+  // Tab & Progress Generator state
+  type ScrapeProgressItem = {
+    id: string;
+    url: string;
+    status: string;
+    sourceName: string;
+    scrapedBy: string;
+    claimedAt: string;
+    updatedAt: string;
+    progressPercent: number;
+    stepMessage: string;
+    article: {
+      id: string;
+      title: string;
+      slug: string;
+      status: string;
+      featuredImage?: string | null;
+      publishedAt?: string | null;
+    } | null;
+  };
+
+  const [activeTab, setActiveTab] = useState<"sources" | "progress">("sources");
+  const [progressStatusFilter, setProgressStatusFilter] = useState<"all" | "CLAIMED" | "DONE">("all");
+  const [progressItems, setProgressItems] = useState<ScrapeProgressItem[]>([]);
+  const [progressSummary, setProgressSummary] = useState({
+    totalCompleted: 0,
+    totalInProgress: 0,
+    activeSourcesCount: 0,
+  });
+  const [loadingProgress, setLoadingProgress] = useState(false);
+
+  const fetchProgress = useCallback(async () => {
+    try {
+      setLoadingProgress(true);
+      const params = new URLSearchParams();
+      if (progressStatusFilter !== "all") params.set("status", progressStatusFilter);
+      const res = await fetch(`/api/news-sources/scrape-progress?${params}`);
+      if (res.ok) {
+        const json = await res.json();
+        setProgressItems(json.data?.items || []);
+        if (json.data?.summary) {
+          setProgressSummary(json.data.summary);
+        }
+      }
+    } catch {
+      /* ignore */
+    } finally {
+      setLoadingProgress(false);
+    }
+  }, [progressStatusFilter]);
+
+  useEffect(() => {
+    if (activeTab === "progress") {
+      fetchProgress();
+      const interval = setInterval(fetchProgress, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [activeTab, fetchProgress]);
+
   const fetchSources = useCallback(async () => {
     try {
       setLoading(true);
@@ -339,248 +398,489 @@ export default function SumberBeritaPage() {
         )}
       </div>
 
-      {/* Legal banner */}
-      <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-900">
-        <div className="flex items-start gap-2">
-          <AlertTriangle size={18} className="mt-0.5 flex-shrink-0" />
-          <div className="space-y-1">
-            <p className="font-semibold">Catatan etis & legal</p>
-            <ul className="list-disc pl-5 space-y-1 text-yellow-800">
-              <li>Pakai HANYA situs yang merilis berita untuk publik (situs resmi BUMN, Pemda, klub olahraga, dll). Hindari situs media komersial yang konten-nya berhak cipta penuh.</li>
-              <li>Setiap draft otomatis dapat footer atribusi link ke sumber asli.</li>
-              <li>Sebelum publish, editor wajib review draft — paraphrase AI harus diverifikasi tetap sesuai fakta sumber.</li>
-              <li>robots.txt situs sumber dihormati. URL yang diblok robots akan ditolak saat tambah sumber.</li>
-            </ul>
-          </div>
-        </div>
+      {/* Navigation Tabs */}
+      <div className="mb-6 flex gap-2 border-b border-border pb-1 overflow-x-auto">
+        <button
+          type="button"
+          onClick={() => setActiveTab("sources")}
+          className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors ${
+            activeTab === "sources"
+              ? "border-primary text-primary"
+              : "border-transparent text-txt-secondary hover:text-txt-primary"
+          }`}
+        >
+          <Globe size={16} />
+          Daftar Sumber Berita ({sources.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("progress")}
+          className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors ${
+            activeTab === "progress"
+              ? "border-primary text-primary"
+              : "border-transparent text-txt-secondary hover:text-txt-primary"
+          }`}
+        >
+          <Sparkles size={16} />
+          Progress Generator Scrape
+          {progressSummary.totalInProgress > 0 && (
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white animate-pulse">
+              {progressSummary.totalInProgress}
+            </span>
+          )}
+        </button>
       </div>
-      {/* Auto Scrape & Auto Publish Control Panel */}
-      {isSuperAdmin && (
-        <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 p-5 shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <Sparkles className="text-primary" size={20} />
-                <h2 className="text-base font-bold text-txt-primary">
-                  Otomatisasi Content Engine (Rutin Tiap 30 Menit Tanpa Batas)
-                </h2>
+
+      {/* Tab 1: Daftar Sumber Berita */}
+      {activeTab === "sources" && (
+        <>
+          {/* Legal banner */}
+          <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-900">
+            <div className="flex items-start gap-2">
+              <AlertTriangle size={18} className="mt-0.5 flex-shrink-0" />
+              <div className="space-y-1">
+                <p className="font-semibold">Catatan etis & legal</p>
+                <ul className="list-disc pl-5 space-y-1 text-yellow-800">
+                  <li>Pakai HANYA situs yang merilis berita untuk publik (situs resmi BUMN, Pemda, klub olahraga, dll). Hindari situs media komersial yang konten-nya berhak cipta penuh.</li>
+                  <li>Setiap draft otomatis dapat footer atribusi link ke sumber asli.</li>
+                  <li>Sebelum publish, editor wajib review draft — paraphrase AI harus diverifikasi tetap sesuai fakta sumber.</li>
+                  <li>robots.txt situs sumber dihormati. URL yang diblok robots akan ditolak saat tambah sumber.</li>
+                </ul>
               </div>
-              <p className="mt-1 text-xs text-txt-secondary max-w-2xl">
-                Secara otomatis mengambil berita baru dari situs sumber aktif, memproses via AI (Qwen), mengekstrak foto resmi asli, dan langsung mempublikasikannya secara kontinyu tanpa batas.
+            </div>
+          </div>
+          {/* Auto Scrape & Auto Publish Control Panel */}
+          {isSuperAdmin && (
+            <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 p-5 shadow-sm">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="text-primary" size={20} />
+                    <h2 className="text-base font-bold text-txt-primary">
+                      Otomatisasi Content Engine (Rutin Tiap 30 Menit Tanpa Batas)
+                    </h2>
+                  </div>
+                  <p className="mt-1 text-xs text-txt-secondary max-w-2xl">
+                    Secara otomatis mengambil berita baru dari situs sumber aktif, memproses via AI (Qwen), mengekstrak foto resmi asli, dan langsung mempublikasikannya secara kontinyu tanpa batas.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="flex items-center gap-2.5 rounded-lg border border-border bg-surface px-3.5 py-2">
+                    <span className="text-xs font-semibold text-txt-primary">Auto Scrape (30 Min)</span>
+                    <button
+                      type="button"
+                      onClick={handleToggleAutoScrape}
+                      disabled={savingAutoSettings}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        autoScrapeEnabled ? "bg-primary" : "bg-surface-tertiary"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                          autoScrapeEnabled ? "translate-x-6" : "translate-x-1"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-2">
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">⚡ Auto Publish Langsung</span>
+                    <button
+                      type="button"
+                      onClick={handleToggleAutoPublish}
+                      disabled={savingAutoSettings}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        autoPublishEnabled ? "bg-emerald-600" : "bg-surface-tertiary"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                          autoPublishEnabled ? "translate-x-6" : "translate-x-1"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 size={32} className="animate-spin text-primary" />
+            </div>
+          ) : sources.length === 0 ? (
+            <div className="rounded-lg border-2 border-dashed border-border bg-surface p-12 text-center">
+              <Globe size={48} className="mx-auto text-txt-muted/40" />
+              <p className="mt-4 text-base font-medium text-txt-primary">Belum ada sumber berita</p>
+              <p className="mt-1 text-sm text-txt-secondary">
+                {canAdd
+                  ? "Tambah link halaman daftar berita untuk mulai auto-paraphrase"
+                  : "Belum ada sumber yang disiapkan."}
               </p>
             </div>
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2.5 rounded-lg border border-border bg-surface px-3.5 py-2">
-                <span className="text-xs font-semibold text-txt-primary">Auto Scrape (30 Min)</span>
-                <button
-                  type="button"
-                  onClick={handleToggleAutoScrape}
-                  disabled={savingAutoSettings}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    autoScrapeEnabled ? "bg-primary" : "bg-surface-tertiary"
-                  }`}
+          ) : (
+            <div className="grid gap-4">
+              {sources.map((s) => (
+                <div
+                  key={s.id}
+                  className="rounded-lg border border-border bg-surface p-5 shadow-card transition-shadow hover:shadow-card-hover"
                 >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-                      autoScrapeEnabled ? "translate-x-6" : "translate-x-1"
-                    }`}
-                  />
-                </button>
-              </div>
-              <div className="flex items-center gap-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-2">
-                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">⚡ Auto Publish Langsung</span>
-                <button
-                  type="button"
-                  onClick={handleToggleAutoPublish}
-                  disabled={savingAutoSettings}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    autoPublishEnabled ? "bg-emerald-600" : "bg-surface-tertiary"
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-                      autoPublishEnabled ? "translate-x-6" : "translate-x-1"
-                    }`}
-                  />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <Loader2 size={32} className="animate-spin text-primary" />
-        </div>
-      ) : sources.length === 0 ? (
-        <div className="rounded-lg border-2 border-dashed border-border bg-surface p-12 text-center">
-          <Globe size={48} className="mx-auto text-txt-muted/40" />
-          <p className="mt-4 text-base font-medium text-txt-primary">Belum ada sumber berita</p>
-          <p className="mt-1 text-sm text-txt-secondary">
-            {canAdd
-              ? "Tambah link halaman daftar berita untuk mulai auto-paraphrase"
-              : "Belum ada sumber yang disiapkan."}
-          </p>
-        </div>
-      ) : (
-        <div className="grid gap-4">
-          {sources.map((s) => (
-            <div
-              key={s.id}
-              className="rounded-lg border border-border bg-surface p-5 shadow-card"
-            >
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="text-base font-bold text-txt-primary">
-                      {s.name}
-                    </h3>
-                    {s.isActive ? (
-                      <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700">
-                        Aktif
-                      </span>
-                    ) : (
-                      <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-zinc-600">
-                        Nonaktif
-                      </span>
-                    )}
-                    {s.category && (
-                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
-                        {s.category.name}
-                      </span>
-                    )}
-                    {isSuperAdmin && (
-                      <span
-                        className="rounded-full bg-surface-tertiary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-txt-secondary"
-                        title="Akun yang menambahkan / men-scrape sumber ini"
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-lg font-bold text-txt-primary">{s.name}</h3>
+                        {s.isActive ? (
+                          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-800">
+                            Aktif
+                          </span>
+                        ) : (
+                          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-zinc-600">
+                            Nonaktif
+                          </span>
+                        )}
+                        {s.category && (
+                          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
+                            {s.category.name}
+                          </span>
+                        )}
+                        {isSuperAdmin && (
+                          <span
+                            className="rounded-full bg-surface-tertiary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-txt-secondary"
+                            title="Akun yang menambahkan / men-scrape sumber ini"
+                          >
+                            {s.owner?.name ?? "Bersama (lama)"}
+                          </span>
+                        )}
+                        {s.useHeadless && (
+                          <span
+                            className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-800"
+                            title="Render JavaScript via headless Chromium (lambat, untuk SPA)"
+                          >
+                            JS Render
+                          </span>
+                        )}
+                        {s.crawlSubcategories && (
+                          <span
+                            className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-violet-800"
+                            title={`Deep crawl ke max ${s.crawlMaxPages} halaman sub-kategori`}
+                          >
+                            Deep Crawl
+                          </span>
+                        )}
+                      </div>
+                      <a
+                        href={s.listingUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1 inline-flex items-center gap-1 text-xs text-txt-secondary hover:text-primary break-all"
                       >
-                        {s.owner?.name ?? "Bersama (lama)"}
-                      </span>
-                    )}
-                    {s.useHeadless && (
-                      <span
-                        className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-800"
-                        title="Render JavaScript via headless Chromium (lambat, untuk SPA)"
-                      >
-                        JS Render
-                      </span>
-                    )}
-                    {s.crawlSubcategories && (
-                      <span
-                        className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-violet-800"
-                        title={`Deep crawl ke max ${s.crawlMaxPages} halaman sub-kategori`}
-                      >
-                        Deep Crawl
-                      </span>
-                    )}
-                  </div>
-                  <a
-                    href={s.listingUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-1 inline-flex items-center gap-1 text-xs text-txt-secondary hover:text-primary break-all"
-                  >
-                    {s.listingUrl} <ExternalLink size={11} />
-                  </a>
-                  {s.description && (
-                    <p className="mt-2 text-sm text-txt-secondary">{s.description}</p>
-                  )}
-                  <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-txt-muted">
-                    <span><strong className="text-txt-primary">{s.totalScraped}</strong> draft dibuat</span>
-                    <span>Frekuensi tiap <strong className="text-txt-primary">{s.frequencyHours}j</strong></span>
-                    <span>Last check: {fmtDate(s.lastCheckedAt)}</span>
-                    {s.lastSuccessAt && (
-                      <span>Last success: {fmtDate(s.lastSuccessAt)}</span>
-                    )}
-                  </div>
-                  {s.lastError && (
-                    <div className="mt-2 rounded-md bg-red-50 px-3 py-2 text-xs text-red-700">
-                      <span className="font-semibold">Error terakhir:</span> {s.lastError}
+                        {s.listingUrl} <ExternalLink size={11} />
+                      </a>
+                      {s.description && (
+                        <p className="mt-2 text-sm text-txt-secondary">{s.description}</p>
+                      )}
+                      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-txt-muted">
+                        <span><strong className="text-txt-primary">{s.totalScraped}</strong> draft dibuat</span>
+                        <span>Frekuensi tiap <strong className="text-txt-primary">{s.frequencyHours}j</strong></span>
+                        <span>Last check: {fmtDate(s.lastCheckedAt)}</span>
+                        {s.lastSuccessAt && (
+                          <span>Last success: {fmtDate(s.lastSuccessAt)}</span>
+                        )}
+                      </div>
+                      {s.lastError && (
+                        <div className="mt-2 rounded-md bg-red-50 px-3 py-2 text-xs text-red-700">
+                          <span className="font-semibold">Error terakhir:</span> {s.lastError}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
 
-                {/* Actions */}
-                <div className="flex flex-wrap gap-1">
-                  <button
-                    onClick={() => handlePreview(s)}
-                    disabled={busyId === s.id}
-                    className="btn-secondary text-xs disabled:opacity-50"
-                    title="Lihat artikel terdeteksi tanpa save"
-                  >
-                    {busyId === s.id && busyAction === "preview" ? (
-                      <Loader2 size={14} className="animate-spin" />
-                    ) : (
-                      <Eye size={14} />
-                    )}
-                    Preview
-                  </button>
-                  <button
-                    onClick={() => handleScrape(s, 3)}
-                    disabled={busyId === s.id || !s.isActive}
-                    className="btn-primary text-xs disabled:opacity-50"
-                    title="Ambil 3 artikel baru sekarang"
-                  >
-                    {busyId === s.id && busyAction === "scrape" ? (
-                      <Loader2 size={14} className="animate-spin" />
-                    ) : (
-                      <RefreshCw size={14} />
-                    )}
-                    Scrape Now
-                  </button>
-                  {canManageSource(s) && (
-                    <>
+                    {/* Actions */}
+                    <div className="flex flex-wrap gap-1">
                       <button
-                        onClick={() => setEditing(s)}
-                        className="btn-ghost text-xs"
-                        title="Edit"
-                      >
-                        <Edit size={14} />
-                      </button>
-                      <button
-                        onClick={() => handleToggle(s)}
+                        onClick={() => handlePreview(s)}
                         disabled={busyId === s.id}
-                        className="btn-ghost text-xs disabled:opacity-50"
-                        title={s.isActive ? "Nonaktifkan" : "Aktifkan"}
+                        className="btn-secondary text-xs disabled:opacity-50"
+                        title="Lihat artikel terdeteksi tanpa save"
                       >
-                        {s.isActive ? <PowerOff size={14} /> : <Power size={14} />}
+                        {busyId === s.id && busyAction === "preview" ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          <Eye size={14} />
+                        )}
+                        Preview
                       </button>
                       <button
-                        onClick={() => handleDelete(s)}
-                        disabled={busyId === s.id}
-                        className="btn-ghost text-xs text-red-600 hover:bg-red-50 disabled:opacity-50"
-                        title="Hapus"
+                        onClick={() => handleScrape(s, 3)}
+                        disabled={busyId === s.id || !s.isActive}
+                        className="btn-primary text-xs disabled:opacity-50"
+                        title="Ambil 3 artikel baru sekarang"
                       >
-                        <Trash2 size={14} />
+                        {busyId === s.id && busyAction === "scrape" ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          <RefreshCw size={14} />
+                        )}
+                        Scrape Now
                       </button>
-                    </>
-                  )}
+                      {canManageSource(s) && (
+                        <>
+                          <button
+                            onClick={() => setEditing(s)}
+                            disabled={busyId === s.id}
+                            className="btn-ghost text-xs disabled:opacity-50"
+                            title="Edit"
+                          >
+                            <Edit size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleToggle(s)}
+                            disabled={busyId === s.id}
+                            className="btn-ghost text-xs disabled:opacity-50"
+                            title={s.isActive ? "Nonaktifkan" : "Aktifkan"}
+                          >
+                            {s.isActive ? (
+                              <PowerOff size={14} className="text-amber-600" />
+                            ) : (
+                              <Power size={14} className="text-emerald-600" />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => handleDelete(s)}
+                            disabled={busyId === s.id}
+                            className="btn-ghost text-xs text-red-600 hover:bg-red-50 disabled:opacity-50"
+                            title="Hapus"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Cron trigger info — SUPER_ADMIN only */}
+          {isSuperAdmin && (
+            <div className="mt-8 rounded-lg bg-surface-container-low p-5 text-sm text-txt-secondary">
+              <div className="flex items-start gap-2">
+                <RefreshCw size={16} className="mt-0.5 text-primary flex-shrink-0" />
+                <div>
+                  <p className="font-semibold text-txt-primary">Cron otomatis</p>
+                  <p className="mt-1">
+                    Endpoint <code className="rounded-lg bg-surface-tertiary px-1.5 py-0.5 text-xs font-mono">POST /api/cron/scrape-sources</code> sudah dilindungi <code className="text-xs font-mono">CRON_SECRET</code>.
+                    Setting di crontab VPS (per 30 menit):
+                  </p>
+                  <pre className="mt-2 overflow-x-auto rounded-md bg-primary px-3 py-2 text-[11px] text-white">{`*/30 * * * * curl -s -X POST https://kartawarta.com/api/cron/scrape-sources -H "Authorization: Bearer $CRON_SECRET" >> /var/log/karta-scrape.log 2>&1`}</pre>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
 
-      {/* Cron trigger info — SUPER_ADMIN only (server crontab config) */}
-      {isSuperAdmin && (
-      <div className="mt-8 rounded-lg bg-surface-container-low p-5 text-sm text-txt-secondary">
-        <div className="flex items-start gap-2">
-          <RefreshCw size={16} className="mt-0.5 text-primary flex-shrink-0" />
-          <div>
-            <p className="font-semibold text-txt-primary">Cron otomatis</p>
-            <p className="mt-1">
-              Endpoint <code className="rounded-lg bg-surface-tertiary px-1.5 py-0.5 text-xs font-mono">POST /api/cron/scrape-sources</code> sudah dilindungi <code className="text-xs font-mono">CRON_SECRET</code>.
-              Setting di crontab VPS (per jam):
-            </p>
-            <pre className="mt-2 overflow-x-auto rounded-md bg-primary px-3 py-2 text-[11px] text-white">{`0 * * * * curl -s -X POST https://kartawarta.com/api/cron/scrape-sources -H "Authorization: Bearer $CRON_SECRET" >> /var/log/karta-scrape.log 2>&1`}</pre>
-            <p className="mt-2 text-xs">
-              Tiap jam cron akan walk semua sumber aktif yang sudah lewat <em>frequencyHours</em>-nya, ambil maks 2 artikel baru per sumber, dan stop setelah total 6 draft.
-            </p>
+      {/* Tab 2: Progress Generator Scrape */}
+      {activeTab === "progress" && (
+        <div className="space-y-6">
+          {/* Summary Stat Cards */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                  Sudah Selesai (Completed)
+                </span>
+                <CheckCircle className="text-emerald-500" size={18} />
+              </div>
+              <p className="mt-2 text-2xl font-bold text-txt-primary">
+                {progressSummary.totalCompleted.toLocaleString("id-ID")}
+              </p>
+              <p className="mt-0.5 text-xs text-txt-secondary">Artikel berhasil di-scrape & diterbitkan</p>
+            </div>
+
+            <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                  Sedang Berjalan (In Progress)
+                </span>
+                <Loader2 className="text-amber-500 animate-spin" size={18} />
+              </div>
+              <p className="mt-2 text-2xl font-bold text-txt-primary">
+                {progressSummary.totalInProgress.toLocaleString("id-ID")}
+              </p>
+              <p className="mt-0.5 text-xs text-txt-secondary">Proses generator AI & ekstraksi aktif</p>
+            </div>
+
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                  Sumber Berita Aktif
+                </span>
+                <Globe className="text-primary" size={18} />
+              </div>
+              <p className="mt-2 text-2xl font-bold text-txt-primary">
+                {progressSummary.activeSourcesCount.toLocaleString("id-ID")}
+              </p>
+              <p className="mt-0.5 text-xs text-txt-secondary">Situs dipantau otomatis tiap 30 menit</p>
+            </div>
           </div>
+
+          {/* Filter Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-1.5 rounded-full bg-surface-tertiary p-1 text-xs font-medium">
+              <button
+                type="button"
+                onClick={() => setProgressStatusFilter("all")}
+                className={`rounded-full px-3 py-1.5 transition-colors ${
+                  progressStatusFilter === "all"
+                    ? "bg-primary text-white shadow-sm"
+                    : "text-txt-secondary hover:text-txt-primary"
+                }`}
+              >
+                Semua Progress
+              </button>
+              <button
+                type="button"
+                onClick={() => setProgressStatusFilter("CLAIMED")}
+                className={`rounded-full px-3 py-1.5 transition-colors ${
+                  progressStatusFilter === "CLAIMED"
+                    ? "bg-amber-500 text-white shadow-sm"
+                    : "text-txt-secondary hover:text-txt-primary"
+                }`}
+              >
+                ⚡ Sedang Berjalan ({progressSummary.totalInProgress})
+              </button>
+              <button
+                type="button"
+                onClick={() => setProgressStatusFilter("DONE")}
+                className={`rounded-full px-3 py-1.5 transition-colors ${
+                  progressStatusFilter === "DONE"
+                    ? "bg-emerald-600 text-white shadow-sm"
+                    : "text-txt-secondary hover:text-txt-primary"
+                }`}
+              >
+                ✅ Sudah Selesai
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={fetchProgress}
+              disabled={loadingProgress}
+              className="btn-ghost flex items-center gap-1.5 text-xs"
+            >
+              <RefreshCw size={14} className={loadingProgress ? "animate-spin" : ""} />
+              Refresh Progress
+            </button>
+          </div>
+
+          {/* Progress Items List */}
+          {loadingProgress && progressItems.length === 0 ? (
+            <div className="flex justify-center py-16">
+              <Loader2 size={32} className="animate-spin text-primary" />
+            </div>
+          ) : progressItems.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-border bg-surface p-12 text-center">
+              <Sparkles size={40} className="mx-auto text-txt-muted/40" />
+              <p className="mt-3 text-base font-semibold text-txt-primary">Belum ada riwayat generator progress</p>
+              <p className="mt-1 text-xs text-txt-secondary">
+                Jalankan &quot;Scrape Now&quot; pada salah satu sumber berita atau tunggu siklus otomatis 30-menit.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {progressItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="rounded-xl border border-border bg-surface p-4 shadow-sm transition-all hover:border-primary/30"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="space-y-1 min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-bold text-primary">
+                          {item.sourceName}
+                        </span>
+                        {item.status === "DONE" ? (
+                          <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/40 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+                            <CheckCircle size={12} /> Sudah Selesai (100%)
+                          </span>
+                        ) : item.status === "CLAIMED" ? (
+                          <span className="rounded-full bg-amber-100 dark:bg-amber-950/40 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1">
+                            <Loader2 size={12} className="animate-spin" /> Sedang Berjalan ({item.progressPercent}%)
+                          </span>
+                        ) : (
+                          <span className="rounded-full bg-rose-100 px-2.5 py-0.5 text-[11px] font-bold text-rose-700">
+                            Gagal
+                          </span>
+                        )}
+                        <span className="text-xs text-txt-muted">
+                          {fmtDate(item.updatedAt || item.claimedAt)}
+                        </span>
+                      </div>
+
+                      {/* Article Title or Target URL */}
+                      {item.article ? (
+                        <h3 className="text-base font-bold text-txt-primary hover:text-primary transition-colors mt-1">
+                          <a
+                            href={`/berita/${item.article.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1.5"
+                          >
+                            {item.article.title}
+                            <ExternalLink size={14} className="text-txt-muted shrink-0" />
+                          </a>
+                        </h3>
+                      ) : (
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-1 inline-block text-xs font-mono text-txt-secondary hover:text-primary truncate max-w-full"
+                        >
+                          {item.url}
+                        </a>
+                      )}
+
+                      <p className="text-xs text-txt-secondary">
+                        Status: <strong className="text-txt-primary">{item.stepMessage}</strong>
+                      </p>
+                    </div>
+
+                    {item.article && (
+                      <a
+                        href={`/panel/artikel?search=${encodeURIComponent(item.article.title)}`}
+                        className="btn-ghost text-xs px-3 py-1.5 shrink-0"
+                      >
+                        Buka di CMS
+                      </a>
+                    )}
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="mt-3">
+                    <div className="flex items-center justify-between text-[11px] text-txt-secondary mb-1">
+                      <span>Progress Generator</span>
+                      <span className="font-bold font-mono">{item.progressPercent}%</span>
+                    </div>
+                    <div className="w-full bg-surface-tertiary rounded-full h-2.5 overflow-hidden">
+                      <div
+                        className={`h-2.5 rounded-full transition-all duration-500 ${
+                          item.status === "DONE"
+                            ? "bg-emerald-500"
+                            : item.status === "CLAIMED"
+                            ? "bg-amber-500 animate-pulse"
+                            : "bg-rose-500"
+                        }`}
+                        style={{ width: `${item.progressPercent}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      </div>
       )}
 
       {/* Add / Edit modal */}
