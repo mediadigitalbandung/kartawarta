@@ -650,8 +650,8 @@ export async function startApproveDraft(
     select: { mediaKind: true, status: true, videoUrl: true },
   });
   if (!post) return { success: false, error: "SocialPost not found" };
-  if (post.status !== "DRAFT" && post.status !== "REJECTED") {
-    return { success: false, error: `SocialPost is not in DRAFT or REJECTED state (is ${post.status})` };
+  if (post.status !== "DRAFT" && post.status !== "REJECTED" && post.status !== "PENDING") {
+    return { success: false, error: `SocialPost is not in DRAFT, PENDING or REJECTED state (is ${post.status})` };
   }
 
   if (post.mediaKind === "REELS") {

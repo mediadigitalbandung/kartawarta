@@ -28,6 +28,7 @@ import {
   Film,
   Play,
   Music,
+  AlertTriangle,
 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
@@ -272,8 +273,41 @@ function PostsTab() {
   const [filterStatus, setFilterStatus] = useState<PostStatus | "ALL">("ALL");
   const [testingPublish, setTestingPublish] = useState(false);
   const [testingReel, setTestingReel] = useState(false);
+  const [retryingBatch, setRetryingBatch] = useState(false);
   // Instagram Reel (story-card video) creation
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
+
+  async function handleBatchRetryPending() {
+    const ok = await confirm({
+      title: "Coba Lagi Semua (Pending & Rejected)",
+      message: "Proses ulang semua postingan sosial media yang dalam status PENDING atau REJECTED?",
+      variant: "default",
+    });
+    if (!ok) return;
+
+    try {
+      setRetryingBatch(true);
+      const res = await fetch("/api/social/posts/retry-pending", { method: "POST" });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || "Gagal memproses ulang");
+      
+      const { successCount, failCount, errors, total } = json.data || {};
+      if (total === 0) {
+        showSuccess("Tidak ada antrean PENDING atau REJECTED untuk diproses.");
+      } else {
+        showSuccess(
+          `Selesai memproses ulang!\nBerhasil: ${successCount}\nGagal: ${failCount}${
+            errors?.length ? `\nError: ${errors.join(", ")}` : ""
+          }`,
+        );
+      }
+      fetchPosts();
+    } catch (err) {
+      showError(err instanceof Error ? err.message : "Gagal memproses ulang antrean");
+    } finally {
+      setRetryingBatch(false);
+    }
+  }
 
   async function handleTestPublish(targetPlatform?: "INSTAGRAM" | "FACEBOOK" | "THREADS" | "ALL", isStory?: boolean) {
     let platformLabel = "Semua Platform";
@@ -428,8 +462,30 @@ function PostsTab() {
     }
   }
 
+  const hasTokenExpiredError = posts.some(
+    (p) => (p.errorMessage || "").includes("TOKEN_EXPIRED") || (p.errorMessage || "").includes("190"),
+  );
+  const pendingOrRejectedCount = posts.filter(
+    (p) => p.status === "PENDING" || p.status === "REJECTED",
+  ).length;
+
   return (
     <div>
+      {/* Alert Banner for Expired Meta Token */}
+      {hasTokenExpiredError && (
+        <div className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-900 shadow-sm">
+          <div className="flex items-start gap-2.5">
+            <AlertTriangle className="mt-0.5 text-red-600 shrink-0" size={18} />
+            <div className="space-y-1">
+              <p className="font-bold text-red-800">Page Access Token Facebook/Meta Kadaluarsa (Meta Code 190)</p>
+              <p className="text-xs text-red-700">
+                Facebook & Instagram menolak postingan karena Access Token telah kadaluarsa. Harap buka tab <strong>Settings</strong> di atas, lalu perbarui <strong>Long-lived Page Access Token</strong> yang baru agar postingan otomatis kembali lancar. Setelah memperbarui token, klik tombol <strong>&quot;Coba Lagi Semua&quot;</strong> di bawah.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Filters */}
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <select
@@ -462,6 +518,22 @@ function PostsTab() {
           <RefreshCw size={14} />
           Refresh
         </button>
+        {pendingOrRejectedCount > 0 && (
+          <button
+            type="button"
+            onClick={handleBatchRetryPending}
+            disabled={retryingBatch}
+            className="btn-primary flex items-center gap-1.5 px-3 py-2 text-xs font-semibold disabled:opacity-50"
+            title="Kirim ulang semua antrean Pending & Rejected"
+          >
+            {retryingBatch ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <RefreshCw size={14} />
+            )}
+            Coba Lagi Semua ({pendingOrRejectedCount})
+          </button>
+        )}
         <div className="flex flex-wrap items-center gap-2 ml-auto">
           <span className="hidden sm:inline text-xs font-semibold text-txt-muted">
             Uji Coba:
