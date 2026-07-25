@@ -118,12 +118,14 @@ function AdContent({ ad }: { ad: Ad }) {
 function AdPlaceholder({
   minHeight = "90px",
   format = "auto",
+  slot = "4804111401",
 }: {
   label?: string;
   minHeight?: string;
   format?: string;
+  slot?: string;
 }) {
-  return <AdSenseUnit format={format} minHeight={minHeight} responsive={true} />;
+  return <AdSenseUnit slot={slot} format={format} minHeight={minHeight} responsive={true} />;
 }
 
 /* ── Main Banner Ad ──
@@ -132,7 +134,7 @@ export default function BannerAd({ size = "banner", slot, className = "", noWrap
   const resolvedSlot = slot || sizeToSlot[size] || "BETWEEN_SECTIONS";
   const ad = useAd(resolvedSlot);
 
-  const inner = ad ? <AdContent ad={ad} /> : showPlaceholder ? <AdPlaceholder format="horizontal" minHeight="90px" /> : null;
+  const inner = ad ? <AdContent ad={ad} /> : showPlaceholder ? <AdPlaceholder slot="4804111401" format="horizontal" minHeight="90px" /> : null;
   if (!inner) return null;
   if (noWrapper) return inner;
 
@@ -223,7 +225,7 @@ export function SidebarAd({ slot = "SIDEBAR", index }: { slot?: string; index?: 
     return content;
   }
 
-  return <AdPlaceholder label="Iklan Sidebar" minHeight="250px" format="rectangle" />;
+  return <AdPlaceholder slot="4804111401" label="Iklan Sidebar" minHeight="250px" format="rectangle" />;
 }
 
 /* ── Inline Ad ──
@@ -234,7 +236,7 @@ export function InlineAd({ className = "" }: { className?: string }) {
   return (
     <div className={className}>
       <div className="container-main py-6">
-        {ad ? <AdContent ad={ad} /> : <AdSenseUnit format="fluid" minHeight="120px" />}
+        {ad ? <AdContent ad={ad} /> : <AdSenseUnit slot="1163613860" format="fluid" minHeight="120px" />}
       </div>
     </div>
   );
@@ -251,7 +253,7 @@ export function NativeAd({ className = "" }: { className?: string }) {
       {ad ? (
         <AdContent ad={ad} />
       ) : (
-        <AdSenseUnit format="auto" minHeight="120px" />
+        <AdSenseUnit slot="1163613860" format="fluid" minHeight="120px" />
       )}
     </div>
   );
