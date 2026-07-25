@@ -28,6 +28,9 @@ const ALLOWED_KEYS = [
   // AI providers
   "deepseek_api_key",
   "anthropic_api_key",
+  "qwen_api_key",
+  "qwen_endpoint",
+  "qwen_model",
   // Local / self-hosted AI (OpenAI-compatible, e.g. Ollama/LM Studio on a Mac
   // mini over Tailscale) — extra drafting engine alongside Perplexity.
   "localai_enabled",

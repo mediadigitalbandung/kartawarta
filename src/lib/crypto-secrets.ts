@@ -126,6 +126,7 @@ export function isEncrypted(stored: string): boolean {
 export const SENSITIVE_SETTING_KEYS: ReadonlyArray<string> = [
   "deepseek_api_key",
   "anthropic_api_key",
+  "qwen_api_key",
   "google_credentials_json",
   "cloudflare_api_token",
   "twitter_consumer_key",
