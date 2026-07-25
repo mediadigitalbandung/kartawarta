@@ -100,6 +100,9 @@ async function handler(req: NextRequest) {
     });
     const autoPublish = autoPublishRow?.value === "true";
 
+    const summary: SourceResult[] = [];
+    let totalOk = 0;
+
     for (const source of eligible) {
       if (totalOk >= TOTAL_RUN_LIMIT) break;
 
