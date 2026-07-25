@@ -182,8 +182,10 @@ interface AiParaphrase {
 
 function stripCodeFence(raw: string): string {
   const trimmed = raw.trim();
-  const fenced = trimmed.match(/^```(?:json)?\s*\n?([\s\S]*?)\n?```$/);
-  if (fenced) return fenced[1].trim();
+  const match = trimmed.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/i);
+  if (match) return match[1].trim();
+  const jsonObjectMatch = trimmed.match(/\{[\s\S]*\}/);
+  if (jsonObjectMatch) return jsonObjectMatch[0].trim();
   return trimmed;
 }
 
