@@ -19,7 +19,7 @@ export const maxDuration = 180;
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await requireRole([...ADMIN_ROLES]);
+    const session = await requireRole(ADMIN_ROLES);
     const raw = await req.json().catch(() => ({}));
     const apply = raw?.apply === true;
 

@@ -29,6 +29,7 @@ import {
   Instagram,
   Facebook,
   Copy,
+  Sparkles,
 } from "lucide-react";
 import { exportToCsv } from "@/lib/csv-utils";
 
