@@ -28,7 +28,7 @@ export default function AdSenseScript({ adsenseClientId }: AdSenseScriptProps) {
       src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`}
       crossOrigin="anonymous"
       data-cfasync="false"
-      strategy="afterInteractive"
+      strategy="beforeInteractive"
     />
   );
 }
