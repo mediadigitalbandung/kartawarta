@@ -501,6 +501,7 @@ export default function PengaturanPage() {
   const [websiteUrl, setWebsiteUrl] = useState("");
 
   // AI
+  const [aiPrimaryProvider, setAiPrimaryProvider] = useState("qwen");
   const [anthropicKey, setAnthropicKey] = useState("");
   const [deepseekKey, setDeepseekKey] = useState("");
   const [qwenKey, setQwenKey] = useState("");
@@ -606,6 +607,7 @@ export default function PengaturanPage() {
         setAlamatRedaksi(map.alamat_redaksi || "");
         setWebsiteUrl(map.website_url || "");
 
+        setAiPrimaryProvider(map.ai_primary_provider || "qwen");
         setAnthropicKey(map.anthropic_api_key || "");
         setDeepseekKey(map.deepseek_api_key || "");
         setQwenKey(map.qwen_api_key || "");
@@ -1220,9 +1222,26 @@ export default function PengaturanPage() {
         <Section
           icon={<Sparkles size={18} />}
           title="2. AI Providers"
-          description="Anthropic Claude (primary) + DeepSeek (fallback)"
+          description="Konfigurasi prioritas mesin AI (Qwen / Anthropic / DeepSeek) & API keys"
           active={activeSub === "ai"}
         >
+          <Field
+            label="Penyedia AI Utama (Primary AI Engine)"
+            hint="Mesin AI utama yang dieksekusi pertama kali untuk semua fitur (generate draf, sorotan, SEO title, meta description, FAQ, dll). Bila penyedia utama mengalami gangguan/kuota habis, sistem otomatis berpindah ke provider cadangan."
+          >
+            <select
+              value={aiPrimaryProvider}
+              onChange={(e) => {
+                setAiPrimaryProvider(e.target.value);
+                markDirty("ai");
+              }}
+              className="input font-semibold text-primary"
+            >
+              <option value="qwen">Qwen — Alibaba Cloud Model Studio (Disarankan / Utama)</option>
+              <option value="anthropic">Anthropic — Claude Haiku</option>
+              <option value="deepseek">DeepSeek — DeepSeek Chat</option>
+            </select>
+          </Field>
           <Field
             label="Anthropic API Key"
             hint={
@@ -1710,6 +1729,7 @@ export default function PengaturanPage() {
           <SaveBar
             onSave={() =>
               saveSection("ai", [
+                ["ai_primary_provider", aiPrimaryProvider],
                 ["anthropic_api_key", anthropicKey],
                 ["deepseek_api_key", deepseekKey],
                 ["qwen_api_key", qwenKey],

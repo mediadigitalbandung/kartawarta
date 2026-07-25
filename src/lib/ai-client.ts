@@ -178,6 +178,27 @@ async function getQwenModel(): Promise<string> {
   return QWEN_MODEL;
 }
 
+export async function getPrimaryProvider(): Promise<Provider> {
+  try {
+    const setting = await prisma.systemSetting.findUnique({
+      where: { key: "ai_primary_provider" },
+    });
+    if (setting?.value && setting.value.trim().length > 0) {
+      const val = setting.value.trim().toLowerCase();
+      if (val === "qwen" || val === "deepseek" || val === "anthropic") {
+        return val as Provider;
+      }
+    }
+  } catch {
+    // ignore
+  }
+  const envVal = (process.env.AI_PRIMARY_PROVIDER || "").trim().toLowerCase();
+  if (envVal === "qwen" || envVal === "deepseek" || envVal === "anthropic") {
+    return envVal as Provider;
+  }
+  return "anthropic";
+}
+
 /**
  * Call Anthropic Claude via official SDK.
  */
@@ -419,55 +440,52 @@ export async function callAI(opts: CallAIOptions): Promise<CallAIResult> {
     return result;
   }
 
-  // Default path: Anthropic primary, DeepSeek secondary, Qwen fallback.
+  // Default path: dynamic primary provider order with fallback chain.
+  const primary = await getPrimaryProvider();
+  const providerOrder: Provider[] =
+    primary === "qwen"
+      ? ["qwen", "anthropic", "deepseek"]
+      : primary === "deepseek"
+      ? ["deepseek", "anthropic", "qwen"]
+      : ["anthropic", "deepseek", "qwen"];
+
   const [anthropicKey, deepseekKey, qwenKey] = await Promise.all([
     getApiKey("anthropic"),
     getApiKey("deepseek"),
     getApiKey("qwen"),
   ]);
 
+  const keys: Record<Provider, string | null> = {
+    anthropic: anthropicKey,
+    deepseek: deepseekKey,
+    qwen: qwenKey,
+  };
+
+  const callers: Record<Provider, (opts: CallAIOptions, key: string) => Promise<CallAIResult>> = {
+    anthropic: callAnthropic,
+    deepseek: callDeepSeek,
+    qwen: callQwen,
+  };
+
   const errors: string[] = [];
 
-  if (anthropicKey) {
-    try {
-      const result = await callAnthropic(opts, anthropicKey);
-      logUsage(opts, result);
-      return result;
-    } catch (err) {
-      if (!isRetryable(err)) {
-        throw err;
+  for (const provider of providerOrder) {
+    const key = keys[provider];
+    if (key) {
+      try {
+        const result = await callers[provider](opts, key);
+        logUsage(opts, result);
+        return result;
+      } catch (err) {
+        if (!isRetryable(err)) {
+          throw err;
+        }
+        const msg = err instanceof Error ? err.message : String(err);
+        errors.push(`${provider}: ${msg}`);
       }
-      const msg = err instanceof Error ? err.message : String(err);
-      errors.push(`anthropic: ${msg}`);
+    } else {
+      errors.push(`${provider}: no API key configured`);
     }
-  } else {
-    errors.push("anthropic: no API key configured");
-  }
-
-  if (deepseekKey) {
-    try {
-      const result = await callDeepSeek(opts, deepseekKey);
-      logUsage(opts, result);
-      return result;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      errors.push(`deepseek: ${msg}`);
-    }
-  } else {
-    errors.push("deepseek: no API key configured");
-  }
-
-  if (qwenKey) {
-    try {
-      const result = await callQwen(opts, qwenKey);
-      logUsage(opts, result);
-      return result;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      errors.push(`qwen: ${msg}`);
-    }
-  } else {
-    errors.push("qwen: no API key configured");
   }
 
   throw new Error(`AI providers exhausted: ${errors.join("; ")}`);
