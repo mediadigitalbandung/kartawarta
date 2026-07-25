@@ -37,14 +37,14 @@ export interface CallAIOptions {
   temperature?: number;
   userId?: string;
   articleTitle?: string;
-  forceProvider?: "anthropic" | "deepseek";
+  forceProvider?: "anthropic" | "deepseek" | "qwen";
   /** Override the 60s default per-call timeout (ms). */
   timeoutMs?: number;
 }
 
 export interface CallAIResult {
   text: string;
-  provider: "anthropic" | "deepseek";
+  provider: "anthropic" | "deepseek" | "qwen";
   inputTokens: number;
   outputTokens: number;
   totalTokens: number;
@@ -57,10 +57,13 @@ const DEFAULT_TIMEOUT_MS = 60_000;
 const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL || "claude-haiku-4-5";
 const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || "deepseek-chat";
 const DEEPSEEK_ENDPOINT = "https://api.deepseek.com/chat/completions";
+const QWEN_MODEL = process.env.QWEN_MODEL || "qwen-plus";
+const QWEN_DEFAULT_ENDPOINT =
+  "https://ws-0yaoz0jn6a2nc9ah.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1/chat/completions";
 const DEFAULT_SYSTEM_PROMPT =
   "Kamu adalah asisten AI untuk Kartawarta — media berita digital Bandung dengan fokus bisnis, ekonomi, pemerintahan, dan hukum, plus topik general (olahraga, hiburan, teknologi, pendidikan, kesehatan, lingkungan). Jawab dalam Bahasa Indonesia.";
 
-type Provider = "anthropic" | "deepseek";
+type Provider = "anthropic" | "deepseek" | "qwen";
 
 /**
  * Decide whether an Anthropic error should trigger DeepSeek fallback.
@@ -113,9 +116,17 @@ export function isRetryable(err: unknown): boolean {
  */
 async function getApiKey(provider: Provider): Promise<string | null> {
   const settingKey =
-    provider === "anthropic" ? "anthropic_api_key" : "deepseek_api_key";
+    provider === "anthropic"
+      ? "anthropic_api_key"
+      : provider === "deepseek"
+      ? "deepseek_api_key"
+      : "qwen_api_key";
   const envKey =
-    provider === "anthropic" ? "ANTHROPIC_API_KEY" : "DEEPSEEK_API_KEY";
+    provider === "anthropic"
+      ? "ANTHROPIC_API_KEY"
+      : provider === "deepseek"
+      ? "DEEPSEEK_API_KEY"
+      : "QWEN_API_KEY";
 
   try {
     const setting = await prisma.systemSetting.findUnique({
@@ -133,6 +144,38 @@ async function getApiKey(provider: Provider): Promise<string | null> {
     return envValue.trim();
   }
   return null;
+}
+
+async function getQwenEndpoint(): Promise<string> {
+  try {
+    const setting = await prisma.systemSetting.findUnique({
+      where: { key: "qwen_endpoint" },
+    });
+    if (setting?.value && setting.value.trim().length > 0) {
+      let url = setting.value.trim();
+      if (!url.endsWith("/chat/completions")) {
+        url = url.replace(/\/+$/, "") + "/chat/completions";
+      }
+      return url;
+    }
+  } catch {
+    // ignore
+  }
+  return process.env.QWEN_ENDPOINT || QWEN_DEFAULT_ENDPOINT;
+}
+
+async function getQwenModel(): Promise<string> {
+  try {
+    const setting = await prisma.systemSetting.findUnique({
+      where: { key: "qwen_model" },
+    });
+    if (setting?.value && setting.value.trim().length > 0) {
+      return setting.value.trim();
+    }
+  } catch {
+    // ignore
+  }
+  return QWEN_MODEL;
 }
 
 /**
@@ -246,11 +289,80 @@ async function callDeepSeek(
 }
 
 /**
+ * Call Qwen (Alibaba Cloud Model Studio / DashScope) via raw fetch (OpenAI-compatible endpoint).
+ */
+export async function callQwen(
+  opts: CallAIOptions,
+  apiKey: string,
+): Promise<CallAIResult> {
+  const start = Date.now();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+
+  const [endpoint, model] = await Promise.all([getQwenEndpoint(), getQwenModel()]);
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          {
+            role: "system",
+            content: opts.systemPrompt ?? DEFAULT_SYSTEM_PROMPT,
+          },
+          { role: "user", content: opts.userPrompt },
+        ],
+        max_tokens: opts.maxTokens ?? DEFAULT_MAX_TOKENS,
+        temperature: opts.temperature ?? DEFAULT_TEMPERATURE,
+      }),
+    });
+
+    if (!response.ok) {
+      const body = await response.text().catch(() => "");
+      throw new Error(
+        `Qwen HTTP ${response.status}: ${body.slice(0, 300)}`,
+      );
+    }
+
+    const data = (await response.json()) as {
+      choices?: Array<{ message?: { content?: string } }>;
+      usage?: { prompt_tokens?: number; completion_tokens?: number };
+    };
+
+    const text = data.choices?.[0]?.message?.content?.trim() ?? "";
+    const inputTokens = data.usage?.prompt_tokens ?? 0;
+    const outputTokens = data.usage?.completion_tokens ?? 0;
+
+    return {
+      text,
+      provider: "qwen",
+      inputTokens,
+      outputTokens,
+      totalTokens: inputTokens + outputTokens,
+      durationMs: Date.now() - start,
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+/**
  * Fire-and-forget log to AIUsageLog. Errors are swallowed — logging must
  * never block or fail the caller.
  */
 function logUsage(opts: CallAIOptions, result: CallAIResult): void {
-  const model = result.provider === "anthropic" ? ANTHROPIC_MODEL : DEEPSEEK_MODEL;
+  const model =
+    result.provider === "anthropic"
+      ? ANTHROPIC_MODEL
+      : result.provider === "deepseek"
+      ? DEEPSEEK_MODEL
+      : QWEN_MODEL;
   // Route through the shared chokepoint so these rows ALSO get a frozen costIdr +
   // usdIdrRate (previously only Perplexity rows did), keeping the AI stats'
   // historical Rupiah consistent across providers. Fire-and-forget inside.
@@ -268,7 +380,7 @@ function logUsage(opts: CallAIOptions, result: CallAIResult): void {
 }
 
 /**
- * Main entry point. Try Anthropic first, fall back to DeepSeek on any failure.
+ * Main entry point. Try Anthropic first, fall back to DeepSeek, then Qwen on failure.
  * If `forceProvider` is set, skip the fallback path and call only that provider.
  */
 export async function callAI(opts: CallAIOptions): Promise<CallAIResult> {
@@ -295,11 +407,23 @@ export async function callAI(opts: CallAIOptions): Promise<CallAIResult> {
     logUsage(opts, result);
     return result;
   }
+  if (opts.forceProvider === "qwen") {
+    const key = await getApiKey("qwen");
+    if (!key) {
+      throw new Error(
+        "AI provider 'qwen' forced but no API key configured",
+      );
+    }
+    const result = await callQwen(opts, key);
+    logUsage(opts, result);
+    return result;
+  }
 
-  // Default path: Anthropic primary, DeepSeek fallback.
-  const [anthropicKey, deepseekKey] = await Promise.all([
+  // Default path: Anthropic primary, DeepSeek secondary, Qwen fallback.
+  const [anthropicKey, deepseekKey, qwenKey] = await Promise.all([
     getApiKey("anthropic"),
     getApiKey("deepseek"),
+    getApiKey("qwen"),
   ]);
 
   const errors: string[] = [];
@@ -310,9 +434,6 @@ export async function callAI(opts: CallAIOptions): Promise<CallAIResult> {
       logUsage(opts, result);
       return result;
     } catch (err) {
-      // If the error is non-retryable (e.g. 400 Bad Request from a malformed
-      // prompt), don't waste a DeepSeek call — the prompt would fail there
-      // too and the response would be misleading. Re-throw immediately.
       if (!isRetryable(err)) {
         throw err;
       }
@@ -334,6 +455,19 @@ export async function callAI(opts: CallAIOptions): Promise<CallAIResult> {
     }
   } else {
     errors.push("deepseek: no API key configured");
+  }
+
+  if (qwenKey) {
+    try {
+      const result = await callQwen(opts, qwenKey);
+      logUsage(opts, result);
+      return result;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      errors.push(`qwen: ${msg}`);
+    }
+  } else {
+    errors.push("qwen: no API key configured");
   }
 
   throw new Error(`AI providers exhausted: ${errors.join("; ")}`);

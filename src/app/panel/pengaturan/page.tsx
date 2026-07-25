@@ -503,6 +503,9 @@ export default function PengaturanPage() {
   // AI
   const [anthropicKey, setAnthropicKey] = useState("");
   const [deepseekKey, setDeepseekKey] = useState("");
+  const [qwenKey, setQwenKey] = useState("");
+  const [qwenEndpoint, setQwenEndpoint] = useState("https://ws-0yaoz0jn6a2nc9ah.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1");
+  const [qwenModel, setQwenModel] = useState("qwen-plus");
   const [geminiKey, setGeminiKey] = useState("");
   const [perplexityKey, setPerplexityKey] = useState("");
   const [perplexityInstructions, setPerplexityInstructions] = useState("");
@@ -605,6 +608,9 @@ export default function PengaturanPage() {
 
         setAnthropicKey(map.anthropic_api_key || "");
         setDeepseekKey(map.deepseek_api_key || "");
+        setQwenKey(map.qwen_api_key || "");
+        setQwenEndpoint(map.qwen_endpoint || "https://ws-0yaoz0jn6a2nc9ah.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1");
+        setQwenModel(map.qwen_model || "qwen-plus");
         setGeminiKey(map.gemini_api_key || "");
         setPerplexityKey(map.perplexity_api_key || "");
         setPerplexityInstructions(map.perplexity_instructions || "");
@@ -872,6 +878,30 @@ export default function PengaturanPage() {
       });
     } catch (err) {
       setTest("localai", {
+        loading: false,
+        success: false,
+        message: err instanceof Error ? err.message : "Network error",
+      });
+    }
+  }
+
+  async function handleTestQwen() {
+    setTest("qwen", { loading: true });
+    try {
+      const res = await fetch("/api/ai/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ provider: "qwen" }),
+      });
+      const json = await res.json();
+      const d = json.data;
+      setTest("qwen", {
+        loading: false,
+        success: !!(json.success && d?.success),
+        message: d?.success ? `Sukses (${d?.durationMs}ms): ${d?.response}` : d?.error || json.error || "Test Qwen gagal",
+      });
+    } catch (err) {
+      setTest("qwen", {
         loading: false,
         success: false,
         message: err instanceof Error ? err.message : "Network error",
@@ -1243,6 +1273,90 @@ export default function PengaturanPage() {
               placeholder="sk-..."
             />
           </Field>
+          {/* Qwen (Alibaba Cloud Model Studio / DashScope) */}
+          <div className="space-y-3 rounded-lg border border-border bg-surface-secondary/60 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-txt-primary">Qwen (Alibaba Cloud Model Studio)</p>
+                <p className="text-xs text-txt-muted">
+                  Model AI berperforma tinggi dari Alibaba Cloud sebagai cadangan/opsi pemrosesan draf & fitur AI.
+                </p>
+              </div>
+            </div>
+            <Field
+              label="Qwen API Key"
+              hint={
+                <>
+                  Dapatkan di{" "}
+                  <a
+                    href="https://bailian.console.aliyun.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    Alibaba Cloud Model Studio (Bailian)
+                  </a>
+                  . Format: sk-ws-...
+                </>
+              }
+            >
+              <SecretInput
+                value={qwenKey}
+                onChange={(v) => {
+                  setQwenKey(v);
+                  markDirty("ai");
+                }}
+                placeholder="sk-ws-..."
+              />
+            </Field>
+            <Field
+              label="Qwen Endpoint / API Host"
+              hint="Endpoint OpenAI-compatible dari Alibaba Cloud Studio. Default: https://ws-0yaoz0jn6a2nc9ah.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1"
+            >
+              <input
+                type="text"
+                value={qwenEndpoint}
+                onChange={(e) => {
+                  setQwenEndpoint(e.target.value);
+                  markDirty("ai");
+                }}
+                className="input"
+                placeholder="https://ws-0yaoz0jn6a2nc9ah.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1"
+              />
+            </Field>
+            <Field
+              label="Qwen Model"
+              hint="Model yang digunakan. Contoh: qwen-plus, qwen-max, qwen-turbo, qwen2.5-72b-instruct"
+            >
+              <input
+                type="text"
+                value={qwenModel}
+                onChange={(e) => {
+                  setQwenModel(e.target.value);
+                  markDirty("ai");
+                }}
+                className="input"
+                placeholder="qwen-plus"
+              />
+            </Field>
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <button
+                type="button"
+                onClick={handleTestQwen}
+                disabled={testResults.qwen?.loading}
+                className="btn-secondary flex items-center gap-2 text-xs"
+              >
+                {testResults.qwen?.loading ? <Loader2 size={14} className="animate-spin" /> : <PlugZap size={14} />}
+                Tes Koneksi Qwen
+              </button>
+              {testResults.qwen && !testResults.qwen.loading && (
+                <span className={`inline-flex items-center gap-1 text-xs ${testResults.qwen.success ? "text-green-600" : "text-red-600"}`}>
+                  {testResults.qwen.success ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
+                  {testResults.qwen.message}
+                </span>
+              )}
+            </div>
+          </div>
           <Field
             label="Gemini API Key (suara Reel / TTS)"
             hint={
@@ -1598,6 +1712,9 @@ export default function PengaturanPage() {
               saveSection("ai", [
                 ["anthropic_api_key", anthropicKey],
                 ["deepseek_api_key", deepseekKey],
+                ["qwen_api_key", qwenKey],
+                ["qwen_endpoint", qwenEndpoint],
+                ["qwen_model", qwenModel],
                 ["gemini_api_key", geminiKey],
                 ["perplexity_api_key", perplexityKey],
                 ["perplexity_instructions", perplexityInstructions],

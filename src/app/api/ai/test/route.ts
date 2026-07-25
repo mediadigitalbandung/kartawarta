@@ -20,19 +20,19 @@ import { callAI } from "@/lib/ai-client";
 export const dynamic = "force-dynamic";
 
 const bodySchema = z.object({
-  provider: z.enum(["anthropic", "deepseek"]).optional(),
+  provider: z.enum(["anthropic", "deepseek", "qwen"]).optional(),
 });
 
 interface ProviderResult {
   success: boolean;
-  provider: "anthropic" | "deepseek";
+  provider: "anthropic" | "deepseek" | "qwen";
   response?: string;
   durationMs?: number;
   error?: string;
 }
 
 async function runOne(
-  provider: "anthropic" | "deepseek",
+  provider: "anthropic" | "deepseek" | "qwen",
 ): Promise<ProviderResult> {
   try {
     const result = await callAI({
@@ -67,15 +67,16 @@ export async function POST(req: NextRequest) {
       return successResponse(r);
     }
 
-    // No provider given — test both
-    const [anthropic, deepseek] = await Promise.all([
+    // No provider given — test all three
+    const [anthropic, deepseek, qwen] = await Promise.all([
       runOne("anthropic"),
       runOne("deepseek"),
+      runOne("qwen"),
     ]);
 
     return successResponse({
-      success: anthropic.success || deepseek.success,
-      results: { anthropic, deepseek },
+      success: anthropic.success || deepseek.success || qwen.success,
+      results: { anthropic, deepseek, qwen },
     });
   } catch (err) {
     return errorResponse(err);
