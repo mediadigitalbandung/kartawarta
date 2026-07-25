@@ -75,6 +75,7 @@ export default function SorotanPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [sorotanStatus, setSorotanStatus] = useState<"all" | "complete" | "partial" | "none">("all");
   const [onlyWithSorotan, setOnlyWithSorotan] = useState(true);
   const [scope, setScope] = useState<"all" | "me">("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -109,6 +110,7 @@ export default function SorotanPage() {
         page: String(page),
         limit: "15",
         scope,
+        sorotanStatus,
         onlyWithSorotan: String(onlyWithSorotan),
       });
       if (debouncedSearch) params.set("search", debouncedSearch);
@@ -125,7 +127,7 @@ export default function SorotanPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, scope, onlyWithSorotan, debouncedSearch]);
+  }, [page, scope, sorotanStatus, onlyWithSorotan, debouncedSearch]);
 
   const fetchAutoSettings = useCallback(async () => {
     if (!isAdmin) return;
@@ -463,22 +465,38 @@ export default function SorotanPage() {
             aria-label="Cari artikel"
           />
         </div>
-        <div className="flex items-center gap-1 rounded-full bg-surface-tertiary p-1 text-xs font-medium">
+        <div className="flex flex-wrap items-center gap-1 rounded-full bg-surface-tertiary p-1 text-xs font-medium">
           <button
-            onClick={() => { setOnlyWithSorotan(true); setPage(1); }}
+            onClick={() => { setSorotanStatus("all"); setOnlyWithSorotan(false); setPage(1); }}
             className={`rounded-full px-3 py-1.5 transition-colors ${
-              onlyWithSorotan ? "bg-primary text-white" : "text-txt-secondary"
+              sorotanStatus === "all" ? "bg-primary text-white shadow-sm" : "text-txt-secondary hover:text-txt-primary"
             }`}
           >
-            Sudah ada Sorotan
+            Semua Artikel
           </button>
           <button
-            onClick={() => { setOnlyWithSorotan(false); setPage(1); }}
+            onClick={() => { setSorotanStatus("complete"); setOnlyWithSorotan(true); setPage(1); }}
             className={`rounded-full px-3 py-1.5 transition-colors ${
-              !onlyWithSorotan ? "bg-primary text-white" : "text-txt-secondary"
+              sorotanStatus === "complete" ? "bg-emerald-600 text-white shadow-sm" : "text-txt-secondary hover:text-txt-primary"
             }`}
           >
-            Semua artikel
+            Lengkap (10/10)
+          </button>
+          <button
+            onClick={() => { setSorotanStatus("partial"); setOnlyWithSorotan(true); setPage(1); }}
+            className={`rounded-full px-3 py-1.5 transition-colors ${
+              sorotanStatus === "partial" ? "bg-amber-600 text-white shadow-sm" : "text-txt-secondary hover:text-txt-primary"
+            }`}
+          >
+            Sebagian (1-9/10)
+          </button>
+          <button
+            onClick={() => { setSorotanStatus("none"); setOnlyWithSorotan(false); setPage(1); }}
+            className={`rounded-full px-3 py-1.5 transition-colors ${
+              sorotanStatus === "none" ? "bg-rose-600 text-white shadow-sm" : "text-txt-secondary hover:text-txt-primary"
+            }`}
+          >
+            Belum Ada (0/10)
           </button>
         </div>
       </div>
