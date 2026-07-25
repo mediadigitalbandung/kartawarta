@@ -49,11 +49,15 @@ function extractHeroFromMeta(
   const candidates = [
     $('meta[property="og:image:secure_url"]').attr("content"),
     $('meta[property="og:image"]').attr("content"),
+    $('meta[name="og:image"]').attr("content"),
     $('meta[name="twitter:image"]').attr("content"),
+    $('meta[name="twitter:image:src"]').attr("content"),
+    $('meta[name="thumbnail"]').attr("content"),
+    $('meta[itemprop="image"]').attr("content"),
     $('link[rel="image_src"]').attr("href"),
-  ].filter((s): s is string => typeof s === "string" && s.length > 0);
+  ].filter((s): s is string => typeof s === "string" && s.trim().length > 0);
   for (const c of candidates) {
-    const abs = absolutise(c, baseUrl);
+    const abs = absolutise(c.trim(), baseUrl);
     if (abs && /^https?:/i.test(abs)) return abs;
   }
   return undefined;
@@ -61,16 +65,36 @@ function extractHeroFromMeta(
 
 function extractHeroFromHtml(html: string, baseUrl: string): string | undefined {
   const $ = cheerio.load(html);
-  // First img inside the article — Readability usually keeps figure>img
-  const first = $("img").first();
-  if (first.length === 0) return undefined;
-  const src =
-    first.attr("src") ||
-    first.attr("data-src") ||
-    first.attr("data-lazy-src");
-  if (!src) return undefined;
-  const abs = absolutise(src, baseUrl);
-  return abs || undefined;
+  const selectors = [
+    "figure img",
+    ".featured-image img",
+    ".lead-image img",
+    ".post-thumbnail img",
+    ".entry-thumb img",
+    ".main-image img",
+    ".article-image img",
+    "article img",
+    "main img",
+    "img",
+  ];
+
+  for (const sel of selectors) {
+    const el = $(sel).first();
+    if (el.length > 0) {
+      const src =
+        el.attr("src") ||
+        el.attr("data-src") ||
+        el.attr("data-original") ||
+        el.attr("data-lazy-src") ||
+        el.attr("srcset")?.split(",")[0]?.trim()?.split(" ")[0];
+      if (src && !src.startsWith("data:")) {
+        const abs = absolutise(src, baseUrl);
+        if (abs && /^https?:/i.test(abs)) return abs;
+      }
+    }
+  }
+
+  return undefined;
 }
 
 function extractDateFromMeta(
@@ -184,13 +208,14 @@ export async function fetchArticle(
 
   const wordCount = countWords(plain);
 
-  // Hero image: Readability output → meta → first <img>
-  let heroImageUrl: string | undefined;
-  if (options.imageSelector) {
+  // Hero image: meta (og:image/twitter) on full page → custom selector → full page HTML → articleHtml
+  let heroImageUrl = extractHeroFromMeta($, finalUrl);
+
+  if (!heroImageUrl && options.imageSelector) {
     const sel = $(options.imageSelector).first();
     if (sel.length > 0) {
       const src =
-        sel.attr("src") || sel.attr("data-src") || sel.attr("data-lazy-src");
+        sel.attr("src") || sel.attr("data-src") || sel.attr("data-lazy-src") || sel.attr("data-original");
       if (src) {
         const abs = absolutise(src, finalUrl);
         if (abs) heroImageUrl = abs;
@@ -198,10 +223,10 @@ export async function fetchArticle(
     }
   }
   if (!heroImageUrl) {
-    heroImageUrl = extractHeroFromHtml(articleHtml, finalUrl);
+    heroImageUrl = extractHeroFromHtml(html, finalUrl);
   }
   if (!heroImageUrl) {
-    heroImageUrl = extractHeroFromMeta($, finalUrl);
+    heroImageUrl = extractHeroFromHtml(articleHtml, finalUrl);
   }
 
   return {

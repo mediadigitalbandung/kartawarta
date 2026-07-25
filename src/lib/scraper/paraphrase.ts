@@ -23,7 +23,7 @@ import { callAI } from "@/lib/ai-client";
 import { sanitizeHtml, cleanAIShortText, cleanAILongText } from "@/lib/sanitize";
 import { slugify } from "@/lib/utils";
 import { downloadImageToUploads } from "./download-image";
-import { generateOrFetchFallbackImage } from "./fallback-image";
+import { scrapeRealPhotoFromSourceUrl } from "./fallback-image";
 import { sourceLabelFromUrl } from "./source-label";
 import type { ScrapedArticle } from "./types";
 
@@ -350,10 +350,11 @@ Format output WAJIB JSON valid (tanpa teks lain di luar JSON):
     featuredImage = source.heroImageUrl;
   }
 
-  // Automatic Fallback: If no hero image was found or download failed, generate/fetch a high quality news photo!
-  if (!featuredImage) {
+  // Automatic Scrape Fallback: If no hero image was extracted or download failed, scrape the real photo directly from source page!
+  if (!featuredImage && source.url) {
     try {
-      featuredImage = await generateOrFetchFallbackImage({
+      featuredImage = await scrapeRealPhotoFromSourceUrl({
+        sourceUrl: source.url,
         title: parsed.title,
         authorId,
         authorName: input.authorName,

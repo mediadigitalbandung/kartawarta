@@ -11,7 +11,7 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole, successResponse, errorResponse } from "@/lib/api-utils";
-import { generateOrFetchFallbackImage } from "@/lib/scraper/fallback-image";
+import { scrapeRealPhotoFromSourceUrl } from "@/lib/scraper/fallback-image";
 import { Role } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
         id: true,
         title: true,
         slug: true,
-        category: { select: { name: true } },
+        content: true,
       },
       take: 50,
     });
@@ -48,9 +48,18 @@ export async function POST(req: NextRequest) {
     let fixedCount = 0;
     for (const article of missingArticles) {
       try {
-        const imageUrl = await generateOrFetchFallbackImage({
+        // Extract original source URL from attribution footer link if present
+        let sourceUrl: string | undefined;
+        const match = article.content?.match(/href="(https?:\/\/[^"]+)"/i);
+        if (match) {
+          sourceUrl = match[1];
+        }
+
+        if (!sourceUrl) continue;
+
+        const imageUrl = await scrapeRealPhotoFromSourceUrl({
+          sourceUrl,
           title: article.title,
-          categoryName: article.category?.name,
           authorId: session.user.id,
           authorName: session.user.name || "Editor",
         });

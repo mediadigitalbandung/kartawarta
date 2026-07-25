@@ -1,80 +1,108 @@
 /**
- * Helper to fetch or generate a relevant featured image for articles
- * that have missing or failed hero images.
+ * Scrape the real featured photo directly from the original news article's webpage.
  *
- * Sources:
- * 1. Pollinations AI photo-realistic news illustration generator.
- * 2. Unsplash Source curated news/editorial queries.
- *
- * Downloads the resulting image to local `/uploads` and registers it in `Media`.
+ * NO AI generated images or stock illustrations are used.
+ * Fetches the upstream source URL, extracts og:image / twitter:image / main <img>,
+ * downloads it to local /uploads, and registers it in the Media library.
  */
 
+import * as cheerio from "cheerio";
+import { fetchHtml } from "./fetch";
 import { downloadImageToUploads } from "./download-image";
 
-const CATEGORY_KEYWORDS: Record<string, string> = {
-  olahraga: "sports stadium football match athlete competition",
-  bisnis: "business finance economy corporate stock market office",
-  ekonomi: "finance economy market business money banking",
-  hukum: "law court justice gavel legal hammer courtroom",
-  pemerintahan: "government parliament building flag official meeting",
-  teknologi: "technology artificial intelligence computer digital network",
-  hiburan: "entertainment music concert cinema movie stage",
-  kesehatan: "medical healthcare doctor hospital health science",
-  lingkungan: "nature environment forest river climate green",
-  pendidikan: "education university school student library study",
-};
-
-/** Extract clean search keywords from article title */
-function extractTitleKeywords(title: string): string {
-  const words = title
-    .replace(/[^\w\s]/gi, " ")
-    .split(/\s+/)
-    .filter((w) => w.length > 3)
-    .slice(0, 5);
-  return words.join(" ");
+function absolutise(href: string, base: string): string | null {
+  try {
+    return new URL(href, base).toString();
+  } catch {
+    return null;
+  }
 }
 
 /**
- * Generate or fetch a high-resolution fallback featured image for an article.
+ * Scrape the real, original featured image directly from a source article URL.
  */
-export async function generateOrFetchFallbackImage(input: {
+export async function scrapeRealPhotoFromSourceUrl(input: {
+  sourceUrl: string;
   title: string;
-  categoryName?: string;
   authorId: string;
   authorName: string;
 }): Promise<string | undefined> {
-  const { title, categoryName, authorId, authorName } = input;
-  const catKey = (categoryName || "").toLowerCase();
-  const catKeywords = CATEGORY_KEYWORDS[catKey] || "news editorial headline media";
-  const titleKeywords = extractTitleKeywords(title);
+  const { sourceUrl, title, authorId, authorName } = input;
+  if (!sourceUrl || !/^https?:\/\//i.test(sourceUrl)) return undefined;
 
-  const prompt = `editorial news photo of ${titleKeywords} ${catKeywords}, high quality 4k journalistic photography`;
-  const seed = Math.floor(Math.random() * 1_000_000);
+  try {
+    const { html, finalUrl } = await fetchHtml(sourceUrl, { timeoutMs: 15_000 });
+    const $ = cheerio.load(html);
 
-  // Candidate URLs to try downloading
-  const candidates = [
-    // Pollinations AI generator (realistic news style)
-    `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1200&height=675&nologo=true&seed=${seed}`,
-    // Unsplash Source curated search
-    `https://source.unsplash.com/1200x675/?${encodeURIComponent(catKeywords.split(" ")[0])}`,
-  ];
+    // Meta tag candidates (og:image, twitter:image, thumbnail, link rel=image_src)
+    const metaCandidates = [
+      $('meta[property="og:image:secure_url"]').attr("content"),
+      $('meta[property="og:image"]').attr("content"),
+      $('meta[name="og:image"]').attr("content"),
+      $('meta[name="twitter:image"]').attr("content"),
+      $('meta[name="twitter:image:src"]').attr("content"),
+      $('meta[name="thumbnail"]').attr("content"),
+      $('meta[itemprop="image"]').attr("content"),
+      $('link[rel="image_src"]').attr("href"),
+    ].filter((s): s is string => typeof s === "string" && s.trim().length > 0);
 
-  for (const url of candidates) {
-    try {
-      const dl = await downloadImageToUploads(url, {
-        title: title.slice(0, 200),
-        caption: `Foto ilustrasi: ${title}`,
-        credit: "Dok. Ilustrasi AI / Unsplash",
-        uploadedBy: authorId,
-        uploaderName: authorName,
-      });
-      if (dl?.url) {
-        return dl.url;
+    let realPhotoUrl: string | undefined;
+
+    for (const cand of metaCandidates) {
+      const abs = absolutise(cand.trim(), finalUrl);
+      if (abs && /^https?:/i.test(abs)) {
+        realPhotoUrl = abs;
+        break;
       }
-    } catch {
-      // try next candidate
     }
-  }
 
-  return undefined;
+    // Fallback to body <img> tags in the source webpage if meta tags were missing
+    if (!realPhotoUrl) {
+      const imgSelectors = [
+        "figure img",
+        ".featured-image img",
+        ".lead-image img",
+        ".post-thumbnail img",
+        ".entry-thumb img",
+        ".article-image img",
+        "article img",
+        "main img",
+        "img",
+      ];
+      for (const sel of imgSelectors) {
+        const el = $(sel).first();
+        if (el.length > 0) {
+          const src =
+            el.attr("src") ||
+            el.attr("data-src") ||
+            el.attr("data-original") ||
+            el.attr("data-lazy-src") ||
+            el.attr("srcset")?.split(",")[0]?.trim()?.split(" ")[0];
+          if (src && !src.startsWith("data:")) {
+            const abs = absolutise(src, finalUrl);
+            if (abs && /^https?:/i.test(abs)) {
+              realPhotoUrl = abs;
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    if (!realPhotoUrl) return undefined;
+
+    // Download the real scraped photo to local /uploads
+    const dl = await downloadImageToUploads(realPhotoUrl, {
+      title: title.slice(0, 200),
+      caption: `Foto: ${title}`,
+      credit: "Dok. Sumber Berita Asli",
+      uploadedBy: authorId,
+      uploaderName: authorName,
+    });
+
+    return dl?.url || undefined;
+  } catch (err) {
+    console.error(`Failed to scrape real photo from ${sourceUrl}:`, err);
+    return undefined;
+  }
 }
