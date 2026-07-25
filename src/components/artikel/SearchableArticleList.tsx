@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Search, SlidersHorizontal, Clock, Eye, ChevronLeft, ChevronRight } from "lucide-react";
 import ClientDate from "@/components/ClientDate";
+import { NativeAd } from "@/components/ads/BannerAd";
 
 interface Article {
   title: string;
@@ -99,55 +100,64 @@ export default function SearchableArticleList({ articles, categoryName }: Search
 
       {/* Article list — 1 article per row */}
       <div className="space-y-0 divide-y divide-border">
-        {paginated.map((article) => (
-          <article key={article.slug} className="group flex gap-4 py-4 first:pt-0">
-            {/* Thumbnail */}
-            {article.featuredImage && (
-              <Link href={`/berita/${article.slug}`} className="shrink-0">
-                <div className="relative h-[80px] w-[120px] sm:h-[90px] sm:w-[140px] overflow-hidden rounded-lg">
-                  <Image
-                    src={article.featuredImage}
-                    alt={article.title}
-                    fill
-                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                  />
-                </div>
-              </Link>
-            )}
-
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-              <Link href={`/berita/${article.slug}`}>
-                <h3 className="text-sm sm:text-base font-bold text-txt-primary leading-snug line-clamp-2 group-hover:text-primary transition-colors">
-                  {article.title}
-                </h3>
-              </Link>
-              {article.excerpt && (
-                <p className="mt-1 text-xs text-txt-secondary line-clamp-1 hidden sm:block">
-                  {article.excerpt}
-                </p>
+        {paginated.map((article, idx) => (
+          <div key={article.slug}>
+            <article className="group flex gap-4 py-4 first:pt-0">
+              {/* Thumbnail */}
+              {article.featuredImage && (
+                <Link href={`/berita/${article.slug}`} className="shrink-0">
+                  <div className="relative h-[80px] w-[120px] sm:h-[90px] sm:w-[140px] overflow-hidden rounded-lg">
+                    <Image
+                      src={article.featuredImage}
+                      alt={article.title}
+                      fill
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
+                  </div>
+                </Link>
               )}
-              <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[11px] text-txt-muted">
-                <span className="text-primary font-semibold">{article.category.name}</span>
-                <span className="h-2.5 w-px bg-border" />
-                <span>{article.author.name}</span>
-                <span className="h-2.5 w-px bg-border" />
-                <span className="flex items-center gap-1">
-                  <Clock size={10} />
-                  <ClientDate date={article.publishedAt} format="long" />
-                </span>
-                {article.viewCount !== undefined && article.viewCount > 0 && (
-                  <>
-                    <span className="h-2.5 w-px bg-border" />
-                    <span className="flex items-center gap-1">
-                      <Eye size={10} />
-                      {article.viewCount.toLocaleString("id-ID")}
-                    </span>
-                  </>
+
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                <Link href={`/berita/${article.slug}`}>
+                  <h3 className="text-sm sm:text-base font-bold text-txt-primary leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+                    {article.title}
+                  </h3>
+                </Link>
+                {article.excerpt && (
+                  <p className="mt-1 text-xs text-txt-secondary line-clamp-1 hidden sm:block">
+                    {article.excerpt}
+                  </p>
                 )}
+                <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[11px] text-txt-muted">
+                  <span className="text-primary font-semibold">{article.category.name}</span>
+                  <span className="h-2.5 w-px bg-border" />
+                  <span>{article.author.name}</span>
+                  <span className="h-2.5 w-px bg-border" />
+                  <span className="flex items-center gap-1">
+                    <Clock size={10} />
+                    <ClientDate date={article.publishedAt} format="long" />
+                  </span>
+                  {article.viewCount !== undefined && article.viewCount > 0 && (
+                    <>
+                      <span className="h-2.5 w-px bg-border" />
+                      <span className="flex items-center gap-1">
+                        <Eye size={10} />
+                        {article.viewCount.toLocaleString("id-ID")}
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          </article>
+            </article>
+
+            {/* In-feed native ad every 5 articles */}
+            {(idx + 1) % 5 === 0 && idx < paginated.length - 1 && (
+              <div className="my-3 overflow-hidden rounded-md">
+                <NativeAd />
+              </div>
+            )}
+          </div>
         ))}
       </div>
 

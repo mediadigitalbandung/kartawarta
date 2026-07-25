@@ -16,7 +16,7 @@ import { FeaturedImage } from "@/components/artikel/FeaturedImage";
 import { ArticleImageFallback } from "@/components/artikel/ArticleImageFallback";
 import Sidebar from "@/components/layout/Sidebar";
 import ArticleCard from "@/components/artikel/ArticleCard";
-import BannerAd, { SidebarAd } from "@/components/ads/BannerAd";
+import BannerAd, { SidebarAd, MultiplexAd } from "@/components/ads/BannerAd";
 import CommentSection from "@/components/artikel/CommentSection";
 import BookmarkButton from "@/components/artikel/BookmarkButton";
 import ReactionBar from "@/components/artikel/ReactionBar";
@@ -812,6 +812,9 @@ export default async function ArticlePage({ params: paramsPromise, searchParams:
                   </div>
                 </section>
               )}
+
+              {/* Multiplex Ad Grid — Recommendations + Sponsored */}
+              <MultiplexAd />
 
               {/* Baca Lainnya — bottom grid */}
               {bacaLainnyaGrid.length > 0 && (

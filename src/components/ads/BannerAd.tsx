@@ -256,3 +256,19 @@ export function NativeAd({ className = "" }: { className?: string }) {
     </div>
   );
 }
+
+/* ── Multiplex Ad (Matched Content Grid) ──
+   Multi-column recommendation grid combining articles & ads */
+export function MultiplexAd({ className = "" }: { className?: string }) {
+  const ad = useAd("BETWEEN_SECTIONS");
+
+  return (
+    <div className={`my-8 ${className}`}>
+      {ad ? (
+        <AdContent ad={ad} />
+      ) : (
+        <AdSenseUnit format="autorelaxed" minHeight="280px" />
+      )}
+    </div>
+  );
+}
