@@ -16,6 +16,7 @@ import { purgeCache } from "./cloudflare/purge";
 import { invalidateCachePrefix } from "./cache";
 import { invalidateInternalStatsCache } from "./stats/internal";
 import { sendPushToSubscribers } from "./push/send";
+import { generateSorotanIfMissing } from "./seo/sorotan-generator";
 
 const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://kartawarta.com";
 
@@ -225,10 +226,7 @@ export async function onArticlePublished(
   const [googleRes, indexNowRes, sorotanRes, socialRes, cloudflareRes, pushRes] = await Promise.allSettled([
     submitUrlToGoogle(url, "URL_UPDATED"),
     pingIndexNow(indexNowUrls),
-    // Sorotan auto-generation DISABLED for AdSense compliance: it produced up
-    // to 10 AI re-framings per article ("scaled content"). Existing Sorotan
-    // pages are now noindexed; no new ones are created on publish.
-    Promise.resolve(),
+    resolvedId ? generateSorotanIfMissing(resolvedId) : Promise.resolve(),
     resolvedId ? publishArticleToSocial(resolvedId) : Promise.resolve({ results: [] }),
     purgeCache(purgeUrls),
     sendPushToSubscribers(

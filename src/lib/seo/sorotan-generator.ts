@@ -26,6 +26,7 @@ const ANGLES: SorotanAngle[] = [
   "HUKUM",
   "EKONOMI",
   "PROYEKSI",
+  "FAQ",
 ];
 
 const ANGLE_LABEL: Record<SorotanAngle, string> = {
@@ -38,7 +39,7 @@ const ANGLE_LABEL: Record<SorotanAngle, string> = {
   HUKUM: "Sudut Hukum",
   EKONOMI: "Sudut Ekonomi",
   PROYEKSI: "Proyeksi",
-  FAQ: "Tanya Jawab",
+  FAQ: "Tanya Jawab (FAQ)",
 };
 
 const ANGLE_PROMPTS: Record<SorotanAngle, string> = {
@@ -60,10 +61,8 @@ const ANGLE_PROMPTS: Record<SorotanAngle, string> = {
     "Rangkum artikel berikut dari sudut EKONOMI — angka, transaksi, kerugian/keuntungan, sektor industri, dampak fiskal/moneter. Tulis 300–500 kata bahasa Indonesia. Hanya gunakan angka dan klaim ekonomi yang ada di artikel. Kalau artikel tidak punya sudut ekonomi langsung, fokus pada implikasi ekonomi tidak langsung dari peristiwa.",
   PROYEKSI:
     "Rangkum artikel berikut dari sudut PROYEKSI — apa yang mungkin terjadi setelah peristiwa ini, langkah selanjutnya, agenda publik, kemungkinan keputusan/sidang/regulasi berikutnya. Tulis 300–500 kata bahasa Indonesia. Tetap berbasis fakta artikel — proyeksi yang masuk akal saja, hindari spekulasi liar.",
-  // FAQ — legacy value, no longer generated. ANGLE_PROMPTS satisfied via
-  // Record<SorotanAngle> type by including a stub. ANGLES array doesn't
-  // include FAQ, so this prompt is never actually used at runtime.
-  FAQ: "",
+  FAQ:
+    "Rangkum artikel berikut dari sudut TANYA JAWAB (FAQ) — 3 sampai 5 pertanyaan paling sering ditanyakan pembaca beserta jawabannya yang jelas dan informatif. Tulis 300–500 kata dalam Bahasa Indonesia. Format dalam bentuk paragraf atau tanya-jawab yang rapi. Jangan mengarang fakta baru di luar isi artikel.",
 };
 
 const SYSTEM_PROMPT =

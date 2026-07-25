@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
         take: cap * 3,
       });
       targets = candidates
-        .filter((c) => c._count.sorotan < 3)
+        .filter((c) => c._count.sorotan < 10)
         .slice(0, cap)
         .map((c) => c.id);
     }

@@ -55,6 +55,7 @@ describe("generateSorotan", () => {
       "HUKUM",
       "EKONOMI",
       "PROYEKSI",
+      "FAQ",
     ];
     mockArticleFindUnique.mockResolvedValue({
       id: "a1",
@@ -88,6 +89,7 @@ describe("generateSorotan", () => {
         { angle: "HUKUM" },
         { angle: "EKONOMI" },
         { angle: "PROYEKSI" },
+        { angle: "FAQ" },
       ],
     });
     mockCallAI.mockResolvedValue({ text: "too short" });
@@ -107,7 +109,7 @@ describe("generateSorotanIfMissing", () => {
   });
 
   it("is a no-op when sorotan count already meets the active-angles total", async () => {
-    mockSorotanCount.mockResolvedValue(9); // == ANGLES.length
+    mockSorotanCount.mockResolvedValue(10); // == ANGLES.length
     const { generateSorotanIfMissing } = await import("../seo/sorotan-generator");
     await expect(generateSorotanIfMissing("a")).resolves.toBeUndefined();
     expect(mockArticleFindUnique).not.toHaveBeenCalled();
