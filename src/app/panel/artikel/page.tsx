@@ -514,6 +514,51 @@ export default function ArtikelPage() {
     }
   }
 
+  const [generatingMissingImages, setGeneratingMissingImages] = useState(false);
+
+  async function handleFixMissingImages() {
+    setGeneratingMissingImages(true);
+    try {
+      const previewRes = await fetch("/api/admin/fix-missing-images", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apply: false }),
+      });
+      const previewJson = await previewRes.json();
+      if (!previewRes.ok || !previewJson?.success) {
+        throw new Error(previewJson?.error || "Gagal memeriksa artikel tanpa foto");
+      }
+      const count = previewJson.data.missingCount || 0;
+      if (count === 0) {
+        success("Semua artikel sudah memiliki foto featured image!");
+        return;
+      }
+
+      const ok = await confirm({
+        title: "Generate Gambar Kosong",
+        message: `Ditemukan ${count} artikel tanpa foto. Sistem akan secara otomatis menghasilkan foto ilustrasi berita relevan dan mengunggahnya. Lanjutkan?`,
+        variant: "warning",
+      });
+      if (!ok) return;
+
+      const applyRes = await fetch("/api/admin/fix-missing-images", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apply: true }),
+      });
+      const applyJson = await applyRes.json();
+      if (!applyRes.ok || !applyJson?.success) {
+        throw new Error(applyJson?.error || "Gagal membuat gambar");
+      }
+      success(`Selesai — ${applyJson.data.fixed} artikel berhasil dibuatkan foto baru.`);
+      fetchArticles();
+    } catch (err) {
+      showError(err instanceof Error ? err.message : "Gagal generate foto.");
+    } finally {
+      setGeneratingMissingImages(false);
+    }
+  }
+
   // Filtering (status/origin/search) is done server-side; render as returned.
   const filtered = articles;
 
@@ -607,6 +652,22 @@ export default function ArtikelPage() {
                 <Camera size={14} />
               )}
               Perbaiki Sumber Foto
+            </button>
+          )}
+          {(userRole === "SUPER_ADMIN" || userRole === "CHIEF_EDITOR") && (
+            <button
+              onClick={handleFixMissingImages}
+              disabled={generatingMissingImages}
+              className="btn-secondary flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-semibold whitespace-nowrap text-primary border-primary/30 hover:bg-primary/5 disabled:opacity-60"
+              title="Secara otomatis buat/ambil foto berita relevan untuk semua artikel yang belum memiliki gambar"
+              aria-label="Generate foto berita untuk artikel tanpa gambar"
+            >
+              {generatingMissingImages ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Sparkles size={14} />
+              )}
+              Generate Gambar Kosong
             </button>
           )}
           <button

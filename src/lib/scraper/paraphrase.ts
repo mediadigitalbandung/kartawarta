@@ -23,6 +23,7 @@ import { callAI } from "@/lib/ai-client";
 import { sanitizeHtml, cleanAIShortText, cleanAILongText } from "@/lib/sanitize";
 import { slugify } from "@/lib/utils";
 import { downloadImageToUploads } from "./download-image";
+import { generateOrFetchFallbackImage } from "./fallback-image";
 import { sourceLabelFromUrl } from "./source-label";
 import type { ScrapedArticle } from "./types";
 
@@ -347,6 +348,19 @@ Format output WAJIB JSON valid (tanpa teks lain di luar JSON):
     }
   } else if (source.heroImageUrl) {
     featuredImage = source.heroImageUrl;
+  }
+
+  // Automatic Fallback: If no hero image was found or download failed, generate/fetch a high quality news photo!
+  if (!featuredImage) {
+    try {
+      featuredImage = await generateOrFetchFallbackImage({
+        title: parsed.title,
+        authorId,
+        authorName: input.authorName,
+      });
+    } catch {
+      // Non-fatal
+    }
   }
 
   // Pull body images from the upstream article and download each to
