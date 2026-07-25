@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import AdSenseUnit from "@/components/ads/AdSenseUnit";
 
 interface Ad {
   id: string;
@@ -114,12 +115,15 @@ function AdContent({ ad }: { ad: Ad }) {
   return content;
 }
 
-function AdPlaceholder({ label = "Iklan" }: { label?: string }) {
-  return (
-    <div className="flex items-center justify-center bg-surface-container-low py-5">
-      <span className="text-label-sm uppercase tracking-wider text-on-surface-variant/30">{label}</span>
-    </div>
-  );
+function AdPlaceholder({
+  minHeight = "90px",
+  format = "auto",
+}: {
+  label?: string;
+  minHeight?: string;
+  format?: string;
+}) {
+  return <AdSenseUnit format={format} minHeight={minHeight} responsive={true} />;
 }
 
 /* ── Main Banner Ad ──
@@ -128,7 +132,7 @@ export default function BannerAd({ size = "banner", slot, className = "", noWrap
   const resolvedSlot = slot || sizeToSlot[size] || "BETWEEN_SECTIONS";
   const ad = useAd(resolvedSlot);
 
-  const inner = ad ? <AdContent ad={ad} /> : showPlaceholder ? <AdPlaceholder /> : null;
+  const inner = ad ? <AdContent ad={ad} /> : showPlaceholder ? <AdPlaceholder format="horizontal" minHeight="90px" /> : null;
   if (!inner) return null;
   if (noWrapper) return inner;
 
@@ -219,7 +223,7 @@ export function SidebarAd({ slot = "SIDEBAR", index }: { slot?: string; index?: 
     return content;
   }
 
-  return <AdPlaceholder label="Iklan Sidebar" />;
+  return <AdPlaceholder label="Iklan Sidebar" minHeight="250px" format="rectangle" />;
 }
 
 /* ── Inline Ad ──
@@ -230,7 +234,7 @@ export function InlineAd({ className = "" }: { className?: string }) {
   return (
     <div className={className}>
       <div className="container-main py-6">
-        {ad ? <AdContent ad={ad} /> : <AdPlaceholder label="Sponsored Content" />}
+        {ad ? <AdContent ad={ad} /> : <AdSenseUnit format="fluid" minHeight="120px" />}
       </div>
     </div>
   );
@@ -247,13 +251,7 @@ export function NativeAd({ className = "" }: { className?: string }) {
       {ad ? (
         <AdContent ad={ad} />
       ) : (
-        <div className="flex items-center gap-4">
-          <div className="h-16 w-24 shrink-0 bg-surface-container animate-pulse" />
-          <div className="flex-1 space-y-2">
-            <div className="h-3 w-3/4 rounded-lg bg-surface-container animate-pulse" />
-            <div className="h-3 w-1/2 rounded-lg bg-surface-container animate-pulse" />
-          </div>
-        </div>
+        <AdSenseUnit format="auto" minHeight="120px" />
       )}
     </div>
   );

@@ -580,4 +580,13 @@ header.sticky {
   transition: bottom 0.15s ease-in-out;
 }
 
+/* Ensure AdSense containers never clip or hide ad units */
+ins.adsbygoogle {
+  overflow: visible !important;
+}
+ins.adsbygoogle[data-ad-status="unfilled"] {
+  display: none !important;
+}
+
+
 

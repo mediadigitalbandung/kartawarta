@@ -28,7 +28,7 @@ export default function AdSenseOffsetFix() {
       // Strategy 1: Scan DOM directly for fixed/absolute Google AdSense elements near edges
       try {
         const elements = document.querySelectorAll(
-          "ins.adsbygoogle, .google-auto-placed, iframe[id^='google_ads'], iframe[id^='aswift']"
+          "ins.adsbygoogle, .google-auto-placed, iframe[id^='google_ads'], iframe[id^='aswift'], .adsbygoogle-noablate, div[id^='google_ads_iframe']"
         );
         
         const viewportHeight = window.innerHeight;
