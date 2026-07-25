@@ -17,6 +17,7 @@ import { useEffect } from "react";
 export default function AdSenseOffsetFix() {
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (window.location.pathname.startsWith("/panel")) return;
 
     const html = document.documentElement;
     const body = document.body;

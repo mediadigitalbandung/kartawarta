@@ -10,6 +10,7 @@ import PublicFooter from "@/components/layout/PublicFooter";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import SideRailAds from "@/components/ads/SideRailAds";
 import AdSenseOffsetFix from "@/components/ads/AdSenseOffsetFix";
+import AdSenseScript from "@/components/ads/AdSenseScript";
 import InstallPrompt from "@/components/pwa/InstallPrompt";
 import InstallTracker from "@/components/pwa/InstallTracker";
 import InstallTeaser from "@/components/pwa/InstallTeaser";
@@ -162,13 +163,8 @@ export default async function RootLayout({
               "(function(){function signalGooglefcPresent(){if(!window.frames['googlefcPresent']){if(document.body){const e=document.createElement('iframe');e.style='width:0;height:0;border:none;z-index:-1000;left:-1000px;top:-1000px;';e.style.display='none';e.name='googlefcPresent';document.body.appendChild(e);}else{setTimeout(signalGooglefcPresent,0);}}}signalGooglefcPresent();})();",
           }}
         />
-        {/* Google AdSense Verification Script in Head */}
-        <script
-          async
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`}
-          crossOrigin="anonymous"
-          data-cfasync="false"
-        />
+        {/* Google AdSense Verification & Script */}
+        <AdSenseScript adsenseClientId={adsenseClientId} />
         {/* Google AdSense Meta Tag Verification */}
         <meta name="google-adsense-account" content={adsenseClientId} />
         {/* Google Reader Revenue Manager (Subscribe with Google Basic) */}
