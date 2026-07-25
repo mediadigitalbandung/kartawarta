@@ -95,8 +95,10 @@ async function handler(req: NextRequest) {
       error?: string;
     };
 
-    const summary: SourceResult[] = [];
-    let totalOk = 0;
+    const autoPublishRow = await prisma.systemSetting.findUnique({
+      where: { key: "auto_publish_enabled" },
+    });
+    const autoPublish = autoPublishRow?.value === "true";
 
     for (const source of eligible) {
       if (totalOk >= TOTAL_RUN_LIMIT) break;
@@ -191,6 +193,7 @@ async function handler(req: NextRequest) {
               categoryId,
               defaultTags: source.defaultTags,
               downloadImage: true,
+              autoPublish,
             });
             await finalizeClaim(claim.claimId, claim.claimToken, draft.articleId);
             sourceResult.drafts.push({

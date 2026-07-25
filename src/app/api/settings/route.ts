@@ -83,6 +83,9 @@ const ALLOWED_KEYS = [
   "auto_article_interval_minutes",
   "auto_article_batch_size",
   "auto_article_author_id",
+  "auto_scrape_enabled",
+  "auto_publish_enabled",
+  "auto_scrape_interval_minutes",
   // Deprecated keys kept so existing DB rows remain readable via GET,
   // but the UI no longer writes them (uses batch_size/interval_minutes).
   "auto_article_count",

@@ -127,12 +127,17 @@ export default function SumberBeritaPage() {
   const { success, error: showError } = useToast();
   const { confirm } = useConfirm();
 
+  const [autoScrapeEnabled, setAutoScrapeEnabled] = useState(false);
+  const [autoPublishEnabled, setAutoPublishEnabled] = useState(false);
+  const [savingAutoSettings, setSavingAutoSettings] = useState(false);
+
   const fetchSources = useCallback(async () => {
     try {
       setLoading(true);
-      const [sRes, cRes] = await Promise.all([
+      const [sRes, cRes, settRes] = await Promise.all([
         fetch("/api/news-sources"),
         fetch("/api/categories"),
+        fetch("/api/settings"),
       ]);
       if (sRes.ok) {
         const json = await sRes.json();
@@ -142,6 +147,12 @@ export default function SumberBeritaPage() {
         const json = await cRes.json();
         setCategories(json.data || []);
       }
+      if (settRes.ok) {
+        const json = await settRes.json();
+        const data = json.data || {};
+        setAutoScrapeEnabled(data.auto_scrape_enabled === "true");
+        setAutoPublishEnabled(data.auto_publish_enabled === "true");
+      }
     } finally {
       setLoading(false);
     }
@@ -150,6 +161,50 @@ export default function SumberBeritaPage() {
   useEffect(() => {
     fetchSources();
   }, [fetchSources]);
+
+  async function handleToggleAutoScrape() {
+    setSavingAutoSettings(true);
+    try {
+      const newVal = !autoScrapeEnabled;
+      const res = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: "auto_scrape_enabled", value: newVal ? "true" : "false" }),
+      });
+      if (res.ok) {
+        setAutoScrapeEnabled(newVal);
+        success(newVal ? "Auto Scrape (30 menit) diaktifkan." : "Auto Scrape dinonaktifkan.");
+      }
+    } catch {
+      showError("Gagal memperbarui pengaturan");
+    } finally {
+      setSavingAutoSettings(false);
+    }
+  }
+
+  async function handleToggleAutoPublish() {
+    setSavingAutoSettings(true);
+    try {
+      const newVal = !autoPublishEnabled;
+      const res = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: "auto_publish_enabled", value: newVal ? "true" : "false" }),
+      });
+      if (res.ok) {
+        setAutoPublishEnabled(newVal);
+        success(
+          newVal
+            ? "⚡ Auto Publish Langsung diaktifkan! Artikel baru akan langsung terbit ke publik."
+            : "Auto Publish dinonaktifkan (artikel disimpan sebagai Draf).",
+        );
+      }
+    } catch {
+      showError("Gagal memperbarui pengaturan");
+    } finally {
+      setSavingAutoSettings(false);
+    }
+  }
 
   async function handlePreview(s: NewsSource) {
     setBusyId(s.id);
@@ -299,6 +354,60 @@ export default function SumberBeritaPage() {
           </div>
         </div>
       </div>
+      {/* Auto Scrape & Auto Publish Control Panel */}
+      {isSuperAdmin && (
+        <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 p-5 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <Sparkles className="text-primary" size={20} />
+                <h2 className="text-base font-bold text-txt-primary">
+                  Otomatisasi Content Engine (Rutin Tiap 30 Menit Tanpa Batas)
+                </h2>
+              </div>
+              <p className="mt-1 text-xs text-txt-secondary max-w-2xl">
+                Secara otomatis mengambil berita baru dari situs sumber aktif, memproses via AI (Qwen), mengekstrak foto resmi asli, dan langsung mempublikasikannya secara kontinyu tanpa batas.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex items-center gap-2.5 rounded-lg border border-border bg-surface px-3.5 py-2">
+                <span className="text-xs font-semibold text-txt-primary">Auto Scrape (30 Min)</span>
+                <button
+                  type="button"
+                  onClick={handleToggleAutoScrape}
+                  disabled={savingAutoSettings}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    autoScrapeEnabled ? "bg-primary" : "bg-surface-tertiary"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                      autoScrapeEnabled ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
+              <div className="flex items-center gap-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-2">
+                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">⚡ Auto Publish Langsung</span>
+                <button
+                  type="button"
+                  onClick={handleToggleAutoPublish}
+                  disabled={savingAutoSettings}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    autoPublishEnabled ? "bg-emerald-600" : "bg-surface-tertiary"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                      autoPublishEnabled ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <div className="flex justify-center py-12">
