@@ -12,14 +12,14 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole, successResponse, errorResponse } from "@/lib/api-utils";
 import { generateOrFetchFallbackImage } from "@/lib/scraper/fallback-image";
-import { ADMIN_ROLES } from "@/lib/roles";
+import { Role } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 180;
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await requireRole(ADMIN_ROLES);
+    const session = await requireRole([Role.SUPER_ADMIN, Role.CHIEF_EDITOR]);
     const raw = await req.json().catch(() => ({}));
     const apply = raw?.apply === true;
 
