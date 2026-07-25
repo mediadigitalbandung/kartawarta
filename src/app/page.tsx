@@ -499,6 +499,9 @@ export default async function HomePage() {
 
         return (
           <div key={catSlug}>
+            {idx > 0 && idx % 3 === 0 && (
+              <BannerAd size="banner" slot="BETWEEN_SECTIONS" className="bg-surface py-2" />
+            )}
             <section className={`py-8 sm:py-10 md:py-12 lg:py-14 2xl:py-20 ${isEven ? "bg-surface" : "bg-surface-container-low"}`}>
               <div className="container-main">
                 {/* Header */}

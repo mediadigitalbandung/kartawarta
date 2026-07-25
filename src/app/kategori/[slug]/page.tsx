@@ -325,8 +325,9 @@ export default async function CategoryPage({ params: paramsPromise }: { params: 
 
           <div className="lg:col-span-1 flex flex-col">
             <Sidebar trending={sidebarTrending} />
-            <div className="mt-5">
-              <SidebarAd />
+            <div className="mt-5 space-y-6">
+              <SidebarAd index={0} />
+              <SidebarAd index={1} />
             </div>
           </div>
         </div>

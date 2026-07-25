@@ -840,7 +840,14 @@ export default async function ArticlePage({ params: paramsPromise, searchParams:
               )}
 
               {/* Comments — only on published articles */}
-              {isPublished && <CommentSection articleId={article.id} />}
+              {isPublished && (
+                <>
+                  <div className="my-8">
+                    <BannerAd slot="BETWEEN_SECTIONS" />
+                  </div>
+                  <CommentSection articleId={article.id} />
+                </>
+              )}
 
               {/* Print-only footer */}
               <div className="print-footer hidden">
@@ -853,8 +860,9 @@ export default async function ArticlePage({ params: paramsPromise, searchParams:
             {/* Sidebar */}
             <div className="hidden lg:block lg:col-span-1">
               <Sidebar trending={sidebarTrending} />
-              <div className="mt-5">
-                <SidebarAd />
+              <div className="mt-5 space-y-6">
+                <SidebarAd index={0} />
+                <SidebarAd index={1} />
               </div>
             </div>
           </div>
