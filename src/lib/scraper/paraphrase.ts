@@ -17,7 +17,6 @@
  *      record it in the audit log + content footer).
  */
 
-import * as cheerio from "cheerio";
 import { prisma } from "@/lib/prisma";
 import { callAI } from "@/lib/ai-client";
 import { sanitizeHtml, cleanAIShortText, cleanAILongText } from "@/lib/sanitize";
@@ -27,153 +26,6 @@ import { scrapeRealPhotoFromSourceUrl } from "./fallback-image";
 import { sourceLabelFromUrl } from "./source-label";
 import { onArticlePublished } from "@/lib/seo-auto";
 import type { ScrapedArticle } from "./types";
-
-const MAX_BODY_IMAGES = 5;
-
-/**
- * Pull every `<img>` URL from the source body in document order, dedup,
- * resolve relative URLs against `baseUrl`, and skip the hero image so we
- * don't duplicate what's already used as featuredImage.
- */
-/**
- * Reject URLs that look like logos, icons, avatars, or chrome — i.e.
- * NOT body images. We can't inspect dimensions from a URL alone, so we
- * filter on filename + path tokens that are reliably non-content.
- */
-const NON_BODY_IMAGE_PATTERNS = [
-  /logo/i,
-  /favicon/i,
-  /\bicon[s]?\b/i,
-  /watermark/i,
-  /placeholder/i,
-  /spinner/i,
-  /loading/i,
-  /\bavatar\b/i,
-  /\bsprite\b/i,
-  /\bbutton\b/i,
-  /\bbadge\b/i,
-  /\.svg(\?|$)/i,
-  /\bblank\b/i,
-];
-
-function looksLikeBodyImage(url: string): boolean {
-  return !NON_BODY_IMAGE_PATTERNS.some((re) => re.test(url));
-}
-
-function extractBodyImageUrls(
-  html: string,
-  baseUrl: string,
-  excludeHeroUrl?: string,
-): string[] {
-  const $ = cheerio.load(html);
-  const seen = new Set<string>();
-  const out: string[] = [];
-  $("img").each((_, el) => {
-    const $img = $(el);
-    const raw =
-      $img.attr("src") ||
-      $img.attr("data-src") ||
-      $img.attr("data-lazy-src") ||
-      $img.attr("data-original");
-    if (!raw) return;
-    let abs: string;
-    try {
-      abs = new URL(raw, baseUrl).toString();
-    } catch {
-      return;
-    }
-    if (!/^https?:\/\//i.test(abs)) return;
-    if (excludeHeroUrl && abs === excludeHeroUrl) return;
-    if (!looksLikeBodyImage(abs)) return;
-    if (seen.has(abs)) return;
-    seen.add(abs);
-    out.push(abs);
-  });
-  return out.slice(0, MAX_BODY_IMAGES);
-}
-
-/**
- * Inject `<figure><img/></figure>` markers into the AI-paraphrased body
- * at evenly-spaced paragraph boundaries. We split on `</p>` so images
- * always land between full paragraphs, never inside one.
- *
- * Layout: image #1 lands after the first paragraph (right under the
- * lead), the rest are spaced through the body.
- */
-function injectImagesIntoBody(
-  bodyHtml: string,
-  imageUrls: string[],
-  altText: string,
-  sourceName?: string,
-): string {
-  if (imageUrls.length === 0) return bodyHtml;
-
-  const captionHtml = sourceName
-    ? `<figcaption class="text-xs text-txt-muted mt-1.5 text-center">Foto: ${escapeAttr(sourceName)}</figcaption>`
-    : "";
-
-  // Split on closing </p> so we keep paragraph integrity.
-  const parts = bodyHtml.split(/(<\/p>)/i);
-  const paragraphCloses: number[] = [];
-  parts.forEach((seg, i) => {
-    if (/<\/p>/i.test(seg)) paragraphCloses.push(i);
-  });
-
-  if (paragraphCloses.length === 0) {
-    // Fallback: just append figures at the end.
-    const figures = imageUrls
-      .map(
-        (url) =>
-          `<figure><img src="${url}" alt="${escapeAttr(altText)}" />${captionHtml}</figure>`,
-      )
-      .join("\n");
-    return `${bodyHtml}\n${figures}`;
-  }
-
-  // Pick insertion indexes: spread over paragraph closes, capped by image count.
-  // E.g. 6 paragraphs + 3 images → indexes [1, 3, 5] (after p1, p3, p5).
-  const insertAt: number[] = [];
-  const N = paragraphCloses.length;
-  const M = Math.min(imageUrls.length, N);
-  for (let k = 1; k <= M; k++) {
-    const pos = Math.floor((k * N) / (M + 1));
-    insertAt.push(paragraphCloses[pos]);
-  }
-  const insertSet = new Map<number, string>();
-  insertAt.forEach((idx, k) => {
-    const url = imageUrls[k];
-    insertSet.set(
-      idx,
-      `<figure><img src="${url}" alt="${escapeAttr(altText)}" />${captionHtml}</figure>`,
-    );
-  });
-
-  // Always put image #0 right after the first paragraph (lead) when there's
-  // at least one. This makes the article feel illustrated from the start.
-  if (imageUrls.length > 0) {
-    const firstClose = paragraphCloses[0];
-    insertSet.set(
-      firstClose,
-      `<figure><img src="${imageUrls[0]}" alt="${escapeAttr(altText)}" />${captionHtml}</figure>`,
-    );
-  }
-
-  // Re-assemble.
-  const rebuilt: string[] = [];
-  parts.forEach((seg, i) => {
-    rebuilt.push(seg);
-    if (insertSet.has(i)) rebuilt.push(insertSet.get(i)!);
-  });
-  return rebuilt.join("");
-}
-
-function escapeAttr(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
 
 interface AiParaphrase {
   title: string;
@@ -304,6 +156,7 @@ ATURAN WAJIB:
 - Lead paragraf wajib menjawab 5W+1H.
 - Hasil HTML rapi: <p>, <h2>, <ul>, <strong> seperlunya.
 - DILARANG KERAS menyertakan kalimat atau pernyataan bahwa artikel ini dibuat, ditulis ulang, disarikan, atau didukung oleh AI/bot/penulis AI. Tulis artikel murni seolah-olah dibuat langsung oleh tim redaksi.
+- DILARANG KERAS menyertakan tag gambar (<img>) atau foto/media tambahan di dalam teks artikel.
 
 JUDUL SUMBER: "${source.title}"
 
@@ -334,7 +187,7 @@ Format output WAJIB JSON valid (tanpa teks lain di luar JSON):
     );
   }
 
-  // Image: download hero + body images to /uploads if requested.
+  // Image: download hero image to /uploads if requested.
   let featuredImage: string | undefined;
   if (downloadImage && source.heroImageUrl) {
     try {
@@ -367,41 +220,8 @@ Format output WAJIB JSON valid (tanpa teks lain di luar JSON):
     }
   }
 
-  // Pull body images from the upstream article and download each to
-  // /uploads. We then inject them into the AI-paraphrased body so the
-  // resulting draft is fully illustrated, not just hero + walls of text.
-  const localBodyImageUrls: string[] = [];
-  if (downloadImage) {
-    const upstreamBodyImageUrls = extractBodyImageUrls(
-      source.contentHtml,
-      source.url,
-      source.heroImageUrl,
-    );
-    for (const upstreamUrl of upstreamBodyImageUrls) {
-      try {
-        const dl = await downloadImageToUploads(upstreamUrl, {
-          title: parsed.title.slice(0, 200),
-          caption: parsed.excerpt || source.excerpt,
-          credit: creditLabel,
-          uploadedBy: authorId,
-          uploaderName: input.authorName,
-        });
-        localBodyImageUrls.push(dl.url);
-      } catch {
-        // Skip individual failures — still want the rest of the
-        // images to make it through.
-      }
-    }
-  }
-
-  const bodyWithImages = injectImagesIntoBody(
-    parsed.content,
-    localBodyImageUrls,
-    parsed.title,
-    creditLabel,
-  );
   const attributionHtml = buildAttribution(source.url, creditLabel, source.title);
-  const finalContent = sanitizeHtml(bodyWithImages + attributionHtml);
+  const finalContent = sanitizeHtml(parsed.content + attributionHtml);
 
   const slug = await uniqueSlug(parsed.title);
 
