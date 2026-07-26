@@ -144,7 +144,7 @@ Format output WAJIB JSON valid (tanpa teks lain di luar JSON):
             where: { id: article.id },
             data: {
               tags: {
-                connectOrCreate: tagsToConnect.map((t) => ({
+                connectOrCreate: tagsToConnect.map((t: { name: string; slug: string }) => ({
                   where: { slug: t.slug },
                   create: { name: t.name, slug: t.slug },
                 })),
