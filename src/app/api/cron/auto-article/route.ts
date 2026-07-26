@@ -2,7 +2,7 @@
  * POST/GET /api/cron/auto-article
  *
  * Cron endpoint & Admin Trigger: produce auto-generated article drafts per chosen
- * TargetKeyword by RESEARCHING THE LIVE WEB with Perplexity (sonar), falling back to callAI (Claude/DeepSeek/Local AI).
+ * TargetKeyword using Qwen / Local AI / callAI (Claude/DeepSeek).
  * Protected by `Authorization: Bearer ${CRON_SECRET}` or SUPER_ADMIN session.
  */
 
@@ -15,35 +15,12 @@ import { verifyCronSecret, errorResponse, logAudit, getSession, ApiError } from 
 import { trackCron } from "@/lib/cron-tracker";
 import { tryAdvisoryLock, releaseAdvisoryLock } from "@/lib/cron-lock";
 import { extractFirstImageUrl } from "@/lib/image-extract";
-import { generateArticleViaPerplexity, type PerplexityArticle } from "@/lib/perplexity-article";
+import { callLocalAI, getLocalAiConfig, isLocalAiReady } from "@/lib/local-ai";
 import { callAI } from "@/lib/ai-client";
 import * as Sentry from "@sentry/nextjs";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
-
-/** Hostname (sans www) for use as a Source.name. */
-function hostnameOf(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return "sumber";
-  }
-}
-
-/** Dedupe cited sources by URL, preserving order. */
-function dedupeSources(
-  sources: { url: string; title: string | null }[],
-): { url: string; title: string | null }[] {
-  const seen = new Set<string>();
-  const out: { url: string; title: string | null }[] = [];
-  for (const s of sources) {
-    if (!s.url || seen.has(s.url)) continue;
-    seen.add(s.url);
-    out.push(s);
-  }
-  return out;
-}
 
 async function uniqueSlug(base: string): Promise<string> {
   const root = slugify(base).slice(0, 90) || "artikel";
@@ -82,6 +59,15 @@ type GenerateResult =
   | { ok: true; articleId: string; slug: string; title: string; keyword: string; provider: string; tokens: number }
   | { ok: false; reason: string; keyword?: string };
 
+interface GeneratedArticleData {
+  title: string;
+  excerpt: string;
+  content: string;
+  suggestedTags: string[];
+  seoTitle: string;
+  metaDescription: string;
+}
+
 async function generateOne(): Promise<GenerateResult> {
   // Pick keyword (random from top-10 active by priority).
   const keywords = await prisma.targetKeyword.findMany({
@@ -94,20 +80,10 @@ async function generateOne(): Promise<GenerateResult> {
   }
   const kw = keywords[Math.floor(Math.random() * keywords.length)];
 
-  let gen: PerplexityArticle | null = null;
-  let usedProvider = "perplexity";
+  let gen: GeneratedArticleData | null = null;
+  let usedProvider = "qwen";
 
-  // 1. Primary: Perplexity web research
-  try {
-    gen = await generateArticleViaPerplexity(kw.keyword);
-  } catch (e) {
-    console.warn(`[auto-article] Perplexity research skipped/failed for "${kw.keyword}", attempting callAI fallback:`, e);
-  }
-
-  // 2. Fallback: callAI (Claude / DeepSeek / Local AI) if Perplexity not configured or failed
-  if (!gen) {
-    try {
-      const userPrompt = `Anda jurnalis senior Kartawarta (media berita digital Bandung dengan fokus bisnis, ekonomi, pemerintahan, dan hukum, plus topik general lain).
+  const userPrompt = `Anda jurnalis senior Kartawarta (media berita digital Bandung dengan fokus bisnis, ekonomi, pemerintahan, dan hukum, plus topik general lain).
 Tulis sebuah artikel berita lengkap yang fresh, faktual, informatif, dan SEO-friendly tentang topik: "${kw.keyword}".
 
 ATURAN WAJIB:
@@ -123,6 +99,39 @@ Format output WAJIB JSON valid (tanpa teks lain di luar JSON):
   "suggestedTags": ["tag1", "tag2", "tag3"]
 }`;
 
+  // 1. Try Local AI / Qwen if configured & ready
+  const localConfig = await getLocalAiConfig();
+  if (isLocalAiReady(localConfig)) {
+    try {
+      const localRes = await callLocalAI({
+        systemPrompt: "Anda jurnalis senior Kartawarta. Jawab HANYA dengan JSON valid sesuai format yang diminta.",
+        userPrompt,
+        maxTokens: 2500,
+        temperature: 0.65,
+      });
+
+      const jsonStr = localRes.text.trim().match(/\{[\s\S]*\}/)?.[0] || localRes.text;
+      const parsed = JSON.parse(jsonStr);
+
+      if (parsed && typeof parsed.title === "string" && typeof parsed.content === "string") {
+        gen = {
+          title: parsed.title,
+          excerpt: parsed.excerpt || "",
+          content: parsed.content,
+          suggestedTags: Array.isArray(parsed.suggestedTags) ? parsed.suggestedTags : [],
+          seoTitle: parsed.title.slice(0, 60),
+          metaDescription: (parsed.excerpt || "").slice(0, 155),
+        };
+        usedProvider = `local-${localRes.model || "qwen"}`;
+      }
+    } catch (e) {
+      console.warn(`[auto-article] Qwen / Local AI failed for "${kw.keyword}", falling back to callAI:`, e);
+    }
+  }
+
+  // 2. Primary / Fallback: callAI (Claude / DeepSeek)
+  if (!gen) {
+    try {
       const aiRes = await callAI({
         feature: "article_draft",
         userPrompt,
@@ -141,20 +150,18 @@ Format output WAJIB JSON valid (tanpa teks lain di luar JSON):
           suggestedTags: Array.isArray(parsed.suggestedTags) ? parsed.suggestedTags : [],
           seoTitle: parsed.title.slice(0, 60),
           metaDescription: (parsed.excerpt || "").slice(0, 155),
-          sources: [],
-          images: [],
         };
         usedProvider = aiRes.provider || "ai";
       }
-    } catch (fallbackErr) {
-      console.error(`[auto-article] Both Perplexity and callAI failed for "${kw.keyword}":`, fallbackErr);
+    } catch (e) {
+      console.error(`[auto-article] AI draft generation failed for "${kw.keyword}":`, e);
     }
   }
 
   if (!gen) {
     return {
       ok: false,
-      reason: `generation-failed (Perplexity and callAI both failed)`,
+      reason: `generation-failed (Qwen & callAI both failed)`,
       keyword: kw.keyword,
     };
   }
@@ -205,8 +212,7 @@ Format output WAJIB JSON valid (tanpa teks lain di luar JSON):
   }
 
   // Featured image
-  const pplxImage = gen.images.find((im) => /^https?:\/\//i.test(im.imageUrl))?.imageUrl ?? null;
-  const featuredImage = pplxImage || extractFirstImageUrl(gen.content) || null;
+  const featuredImage = extractFirstImageUrl(gen.content) || null;
 
   // Clean content HTML (paraphrase text ONLY)
   const bodyHtml = cleanArticleContent(sanitizeHtml(gen.content));
@@ -230,18 +236,6 @@ Format output WAJIB JSON valid (tanpa teks lain di luar JSON):
         sourceArticleId: null,
         authorId,
         categoryId,
-        sources:
-          gen.sources.length > 0
-            ? {
-                create: dedupeSources(gen.sources)
-                  .slice(0, 8)
-                  .map((s) => ({
-                    name: hostnameOf(s.url),
-                    title: s.title ? s.title.slice(0, 250) : null,
-                    url: s.url.slice(0, 500),
-                  })),
-              }
-            : undefined,
       },
       select: { id: true, slug: true, title: true },
     });
@@ -291,7 +285,6 @@ Format output WAJIB JSON valid (tanpa teks lain di luar JSON):
       JSON.stringify({
         keyword: kw.keyword,
         provider: usedProvider,
-        sources: gen.sources.length,
         tags: gen.suggestedTags.length,
       }),
     );
