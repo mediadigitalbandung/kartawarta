@@ -81,6 +81,7 @@ const ALLOWED_KEYS = [
   "twitter_bearer_token",
   // Auto-article cron knobs (auto_article_author_id configures the draft author)
   "auto_article_enabled",
+  "auto_article_auto_publish",
   "auto_article_interval_minutes",
   "auto_article_batch_size",
   "auto_article_author_id",
