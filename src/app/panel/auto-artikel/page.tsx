@@ -129,17 +129,23 @@ export default function AutoArtikelPage() {
   async function handleGenerateNow() {
     try {
       setGeneratingNow(true);
-      const res = await fetch("/api/cron/auto-article?force=true", {
+      const res = await fetch("/api/admin/auto-article/trigger", {
         method: "POST",
       });
-      const json = await res.json();
-      if (!json.success && json.error) {
-        throw new Error(json.error);
+      const text = await res.text();
+      let json;
+      try {
+        json = JSON.parse(text);
+      } catch {
+        throw new Error("Server mengembalikan respon non-JSON. Harap lakukan build & restart server (npm run build && pm2 restart all) di VPS.");
       }
-      if (json.created > 0) {
-        showSuccess(`Berhasil membuat ${json.created} draf auto-article baru!`);
-      } else if (json.skips && json.skips.length > 0) {
-        showError(`Skip: ${json.skips[0].reason || "Gagal generate"}`);
+      if (!res.ok || (json && json.success === false)) {
+        throw new Error(json?.error || json?.reason || `Gagal generate (Status ${res.status})`);
+      }
+      if (json.data?.created > 0 || json.created > 0) {
+        showSuccess(`Berhasil membuat draf auto-article baru dengan Qwen AI!`);
+      } else if (json.data?.reason || json.reason) {
+        showError(`Notice: ${json.data?.reason || json.reason}`);
       } else {
         showSuccess("Generate selesai.");
       }
