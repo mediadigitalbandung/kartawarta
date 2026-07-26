@@ -131,6 +131,11 @@ export default function SumberBeritaPage() {
   const [autoPublishEnabled, setAutoPublishEnabled] = useState(false);
   const [savingAutoSettings, setSavingAutoSettings] = useState(false);
   const [scrapingAll, setScrapingAll] = useState(false);
+  const [scrapeAllProgress, setScrapeAllProgress] = useState<{
+    current: number;
+    total: number;
+    sourceName: string;
+  } | null>(null);
 
   // Tab & Progress Generator state
   type ScrapeProgressItem = {
@@ -275,43 +280,79 @@ export default function SumberBeritaPage() {
 
     const ok = await confirm({
       title: "Jalankan Scrape Semua Sumber?",
-      message: `Akan mengambil artikel baru dari ${activeSources.length} sumber berita aktif secara bersamaan, paraphrase via AI, dan memprosesnya.\n\n⚡ Status Auto Publish: ${
+      message: `Akan mengambil artikel baru dari ${activeSources.length} sumber berita aktif secara berurutan, paraphrase via AI, dan memprosesnya.\n\n⚡ Status Auto Publish: ${
         autoPublishEnabled
           ? "AKTIF (Artikel langsung terbit ke publik)"
           : "NONAKTIF (Artikel disimpan sebagai Draf)"
-      }.\n\nLanjutkan?`,
+      }.\n\nProses ini berjalan secara bertahap (bebas timeout). Lanjutkan?`,
       variant: "default",
     });
     if (!ok) return;
 
     setScrapingAll(true);
+    let totalOkCount = 0;
+    let totalPublishedCount = 0;
+    let totalDraftCount = 0;
+    let successSourcesCount = 0;
+    let failedSourcesCount = 0;
+
     try {
-      const res = await fetch("/api/news-sources/scrape-all", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ limitPerSource: 2 }),
-      });
-      const json = await res.json();
-      if (!res.ok || !json.success) {
-        showError(json.error || "Gagal scrape semua sumber");
-        return;
+      for (let i = 0; i < activeSources.length; i++) {
+        const source = activeSources[i];
+        setScrapeAllProgress({
+          current: i + 1,
+          total: activeSources.length,
+          sourceName: source.name,
+        });
+
+        try {
+          const res = await fetch(`/api/news-sources/${source.id}/scrape`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ limit: 2, autoPublish: autoPublishEnabled }),
+          });
+
+          if (res.ok) {
+            const json = await res.json();
+            if (json.success && json.data) {
+              const d = json.data;
+              const okNum = d.ok || 0;
+              totalOkCount += okNum;
+              if (autoPublishEnabled) {
+                totalPublishedCount += okNum;
+              } else {
+                totalDraftCount += okNum;
+              }
+              successSourcesCount++;
+            } else {
+              failedSourcesCount++;
+            }
+          } else {
+            failedSourcesCount++;
+          }
+        } catch {
+          failedSourcesCount++;
+        }
       }
-      const d = json.data;
-      if (d.totalArticlesCreated === 0) {
-        success("Selesai Scrape All — Tidak ada artikel baru yang perlu di-scrape.");
+
+      if (totalOkCount === 0) {
+        success(`Selesai Scrape All (${successSourcesCount}/${activeSources.length} sumber) — Semua artikel sudah up-to-date.`);
       } else {
-        const pubText = d.publishedCount > 0 ? `, ${d.publishedCount} langsung terbit` : "";
-        const draftText = d.draftCount > 0 ? `, ${d.draftCount} draf baru` : "";
-        success(`⚡ Selesai Scrape All! Total ${d.totalArticlesCreated} artikel berhasil diproses${pubText}${draftText}.`);
+        const pubText = totalPublishedCount > 0 ? `, ${totalPublishedCount} langsung terbit` : "";
+        const draftText = totalDraftCount > 0 ? `, ${totalDraftCount} draf baru` : "";
+        const failNote = failedSourcesCount > 0 ? ` (${failedSourcesCount} sumber ada kendala)` : "";
+        success(`⚡ Selesai Scrape All! Total ${totalOkCount} artikel berhasil diproses dari ${successSourcesCount} sumber${pubText}${draftText}${failNote}.`);
       }
+
       fetchSources();
       if (activeTab === "progress") {
         fetchProgress();
       }
     } catch {
-      showError("Gagal menjalankan Scrape All");
+      showError("Gagal menyelesaikan Scrape All");
     } finally {
       setScrapingAll(false);
+      setScrapeAllProgress(null);
     }
   }
 
@@ -446,12 +487,17 @@ export default function SumberBeritaPage() {
             className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2 text-sm font-bold text-white shadow-md transition-all hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50"
             title="Ambil berita baru dari SELURUH sumber aktif sekaligus"
           >
-            {scrapingAll ? (
-              <Loader2 size={16} className="animate-spin" />
+            {scrapingAll && scrapeAllProgress ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                ⚡ Scraping ({scrapeAllProgress.current}/{scrapeAllProgress.total})...
+              </>
             ) : (
-              <Sparkles size={16} className="animate-pulse" />
+              <>
+                <Sparkles size={16} className="animate-pulse" />
+                ⚡ Scrape All ({sources.filter((s) => s.isActive).length} Sumber)
+              </>
             )}
-            ⚡ Scrape All ({sources.filter((s) => s.isActive).length} Sumber)
           </button>
           {canAdd && (
             <button
@@ -500,6 +546,31 @@ export default function SumberBeritaPage() {
       {/* Tab 1: Daftar Sumber Berita */}
       {activeTab === "sources" && (
         <>
+          {/* Live Progress Banner when Scrape All is running */}
+          {scrapingAll && scrapeAllProgress && (
+            <div className="mb-6 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 shadow-sm">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <Loader2 size={20} className="animate-spin text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <div>
+                    <p className="text-sm font-bold text-txt-primary">
+                      ⚡ Men-scrape semua sumber ({scrapeAllProgress.current} dari {scrapeAllProgress.total})
+                    </p>
+                    <p className="text-xs text-txt-secondary">
+                      Sedang memproses: <strong className="text-emerald-700 dark:text-emerald-400">{scrapeAllProgress.sourceName}</strong>
+                    </p>
+                  </div>
+                </div>
+                <div className="w-full sm:w-48 bg-surface-tertiary rounded-full h-2.5 overflow-hidden">
+                  <div
+                    className="bg-emerald-600 h-2.5 rounded-full transition-all duration-300"
+                    style={{ width: `${Math.round((scrapeAllProgress.current / scrapeAllProgress.total) * 100)}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Legal banner */}
           <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-900">
             <div className="flex items-start gap-2">
@@ -537,12 +608,17 @@ export default function SumberBeritaPage() {
                   disabled={scrapingAll || loading || sources.filter((s) => s.isActive).length === 0}
                   className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow hover:bg-emerald-700 disabled:opacity-50 transition-colors"
                 >
-                  {scrapingAll ? (
-                    <Loader2 size={14} className="animate-spin" />
+                  {scrapingAll && scrapeAllProgress ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      ⚡ Scraping ({scrapeAllProgress.current}/{scrapeAllProgress.total})...
+                    </>
                   ) : (
-                    <Sparkles size={14} />
+                    <>
+                      <Sparkles size={14} />
+                      ⚡ Scrape All Sekarang
+                    </>
                   )}
-                  ⚡ Scrape All Sekarang
                 </button>
                 <div className="flex items-center gap-2.5 rounded-lg border border-border bg-surface px-3.5 py-1.5">
                   <span className="text-xs font-semibold text-txt-primary">Auto Scrape (30 Min)</span>
