@@ -6,6 +6,7 @@ interface AdSenseUnitProps {
   client?: string;
   slot?: string;
   format?: string;
+  layout?: string;
   responsive?: boolean;
   className?: string;
   style?: React.CSSProperties;
@@ -25,6 +26,7 @@ export default function AdSenseUnit({
   client,
   slot,
   format = "auto",
+  layout,
   responsive = true,
   className = "",
   style,
@@ -61,6 +63,7 @@ export default function AdSenseUnit({
         style={{ display: "block", ...style }}
         data-ad-client={adsenseClientId}
         {...(slot ? { "data-ad-slot": slot } : {})}
+        {...(layout ? { "data-ad-layout": layout } : {})}
         data-ad-format={format}
         data-full-width-responsive={responsive ? "true" : "false"}
       />

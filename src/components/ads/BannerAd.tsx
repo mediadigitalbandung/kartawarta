@@ -236,7 +236,7 @@ export function InlineAd({ className = "" }: { className?: string }) {
   return (
     <div className={className}>
       <div className="container-main py-6">
-        {ad ? <AdContent ad={ad} /> : <AdSenseUnit slot="1163613860" format="fluid" minHeight="120px" />}
+        {ad ? <AdContent ad={ad} /> : <AdSenseUnit slot="2418642714" layout="in-article" format="fluid" minHeight="120px" />}
       </div>
     </div>
   );
@@ -253,7 +253,7 @@ export function NativeAd({ className = "" }: { className?: string }) {
       {ad ? (
         <AdContent ad={ad} />
       ) : (
-        <AdSenseUnit slot="1163613860" format="fluid" minHeight="120px" />
+        <AdSenseUnit slot="2418642714" layout="in-article" format="fluid" minHeight="120px" />
       )}
     </div>
   );
