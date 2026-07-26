@@ -130,6 +130,7 @@ export default function SumberBeritaPage() {
   const [autoScrapeEnabled, setAutoScrapeEnabled] = useState(false);
   const [autoPublishEnabled, setAutoPublishEnabled] = useState(false);
   const [savingAutoSettings, setSavingAutoSettings] = useState(false);
+  const [scrapingAll, setScrapingAll] = useState(false);
 
   // Tab & Progress Generator state
   type ScrapeProgressItem = {
@@ -265,6 +266,55 @@ export default function SumberBeritaPage() {
     }
   }
 
+  async function handleScrapeAll() {
+    const activeSources = sources.filter((s) => s.isActive);
+    if (activeSources.length === 0) {
+      showError("Tidak ada sumber berita yang aktif untuk di-scrape.");
+      return;
+    }
+
+    const ok = await confirm({
+      title: "Jalankan Scrape Semua Sumber?",
+      message: `Akan mengambil artikel baru dari ${activeSources.length} sumber berita aktif secara bersamaan, paraphrase via AI, dan memprosesnya.\n\n⚡ Status Auto Publish: ${
+        autoPublishEnabled
+          ? "AKTIF (Artikel langsung terbit ke publik)"
+          : "NONAKTIF (Artikel disimpan sebagai Draf)"
+      }.\n\nLanjutkan?`,
+      variant: "default",
+    });
+    if (!ok) return;
+
+    setScrapingAll(true);
+    try {
+      const res = await fetch("/api/news-sources/scrape-all", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ limitPerSource: 2 }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        showError(json.error || "Gagal scrape semua sumber");
+        return;
+      }
+      const d = json.data;
+      if (d.totalArticlesCreated === 0) {
+        success("Selesai Scrape All — Tidak ada artikel baru yang perlu di-scrape.");
+      } else {
+        const pubText = d.publishedCount > 0 ? `, ${d.publishedCount} langsung terbit` : "";
+        const draftText = d.draftCount > 0 ? `, ${d.draftCount} draf baru` : "";
+        success(`⚡ Selesai Scrape All! Total ${d.totalArticlesCreated} artikel berhasil diproses${pubText}${draftText}.`);
+      }
+      fetchSources();
+      if (activeTab === "progress") {
+        fetchProgress();
+      }
+    } catch {
+      showError("Gagal menjalankan Scrape All");
+    } finally {
+      setScrapingAll(false);
+    }
+  }
+
   async function handlePreview(s: NewsSource) {
     setBusyId(s.id);
     setBusyAction("preview");
@@ -388,14 +438,30 @@ export default function SumberBeritaPage() {
             )}
           </p>
         </div>
-        {canAdd && (
+        <div className="flex flex-wrap items-center gap-2">
           <button
-            onClick={() => setShowAdd(true)}
-            className="btn-primary flex items-center gap-1.5"
+            type="button"
+            onClick={handleScrapeAll}
+            disabled={scrapingAll || loading || sources.filter((s) => s.isActive).length === 0}
+            className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2 text-sm font-bold text-white shadow-md transition-all hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50"
+            title="Ambil berita baru dari SELURUH sumber aktif sekaligus"
           >
-            <Plus size={16} /> Tambah Sumber
+            {scrapingAll ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Sparkles size={16} className="animate-pulse" />
+            )}
+            ⚡ Scrape All ({sources.filter((s) => s.isActive).length} Sumber)
           </button>
-        )}
+          {canAdd && (
+            <button
+              onClick={() => setShowAdd(true)}
+              className="btn-primary flex items-center gap-1.5"
+            >
+              <Plus size={16} /> Tambah Sumber
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Navigation Tabs */}
@@ -449,60 +515,72 @@ export default function SumberBeritaPage() {
               </div>
             </div>
           </div>
+
           {/* Auto Scrape & Auto Publish Control Panel */}
-          {isSuperAdmin && (
-            <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 p-5 shadow-sm">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="text-primary" size={20} />
-                    <h2 className="text-base font-bold text-txt-primary">
-                      Otomatisasi Content Engine (Rutin Tiap 30 Menit Tanpa Batas)
-                    </h2>
-                  </div>
-                  <p className="mt-1 text-xs text-txt-secondary max-w-2xl">
-                    Secara otomatis mengambil berita baru dari situs sumber aktif, memproses via AI (Qwen), mengekstrak foto resmi asli, dan langsung mempublikasikannya secara kontinyu tanpa batas.
-                  </p>
+          <div className="mb-6 rounded-xl border border-primary/20 bg-primary/5 p-5 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Sparkles className="text-primary" size={20} />
+                  <h2 className="text-base font-bold text-txt-primary">
+                    Otomatisasi Content Engine (Rutin Tiap 30 Menit Tanpa Batas)
+                  </h2>
                 </div>
-                <div className="flex flex-wrap items-center gap-4">
-                  <div className="flex items-center gap-2.5 rounded-lg border border-border bg-surface px-3.5 py-2">
-                    <span className="text-xs font-semibold text-txt-primary">Auto Scrape (30 Min)</span>
-                    <button
-                      type="button"
-                      onClick={handleToggleAutoScrape}
-                      disabled={savingAutoSettings}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        autoScrapeEnabled ? "bg-primary" : "bg-surface-tertiary"
+                <p className="mt-1 text-xs text-txt-secondary max-w-2xl">
+                  Secara otomatis mengambil berita baru dari situs sumber aktif, memproses via AI, mengekstrak foto resmi asli, dan langsung mempublikasikannya (jika <strong>Auto Publish</strong> aktif).
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleScrapeAll}
+                  disabled={scrapingAll || loading || sources.filter((s) => s.isActive).length === 0}
+                  className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+                >
+                  {scrapingAll ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Sparkles size={14} />
+                  )}
+                  ⚡ Scrape All Sekarang
+                </button>
+                <div className="flex items-center gap-2.5 rounded-lg border border-border bg-surface px-3.5 py-1.5">
+                  <span className="text-xs font-semibold text-txt-primary">Auto Scrape (30 Min)</span>
+                  <button
+                    type="button"
+                    onClick={handleToggleAutoScrape}
+                    disabled={savingAutoSettings}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      autoScrapeEnabled ? "bg-primary" : "bg-surface-tertiary"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                        autoScrapeEnabled ? "translate-x-6" : "translate-x-1"
                       }`}
-                    >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-                          autoScrapeEnabled ? "translate-x-6" : "translate-x-1"
-                        }`}
-                      />
-                    </button>
-                  </div>
-                  <div className="flex items-center gap-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-2">
-                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">⚡ Auto Publish Langsung</span>
-                    <button
-                      type="button"
-                      onClick={handleToggleAutoPublish}
-                      disabled={savingAutoSettings}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        autoPublishEnabled ? "bg-emerald-600" : "bg-surface-tertiary"
+                    />
+                  </button>
+                </div>
+                <div className="flex items-center gap-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1.5">
+                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">⚡ Auto Publish Langsung</span>
+                  <button
+                    type="button"
+                    onClick={handleToggleAutoPublish}
+                    disabled={savingAutoSettings}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      autoPublishEnabled ? "bg-emerald-600" : "bg-surface-tertiary"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                        autoPublishEnabled ? "translate-x-6" : "translate-x-1"
                       }`}
-                    >
-                      <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-                          autoPublishEnabled ? "translate-x-6" : "translate-x-1"
-                        }`}
-                      />
-                    </button>
-                  </div>
+                    />
+                  </button>
                 </div>
               </div>
             </div>
-          )}
+          </div>
 
           {loading ? (
             <div className="flex justify-center py-12">

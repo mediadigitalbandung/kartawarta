@@ -39,6 +39,7 @@ import { SCRAPER_ROLES } from "@/lib/roles";
 
 const bodySchema = z.object({
   limit: z.number().int().min(1).max(10).optional(),
+  autoPublish: z.boolean().optional(),
 });
 
 export const dynamic = "force-dynamic";
@@ -66,6 +67,14 @@ export async function POST(
       .then((b) => bodySchema.parse(b))
       .catch(() => ({} as z.infer<typeof bodySchema>));
     const limit = parsedBody.limit ?? 3;
+
+    let autoPublish = parsedBody.autoPublish;
+    if (autoPublish === undefined) {
+      const autoPublishRow = await prisma.systemSetting.findUnique({
+        where: { key: "auto_publish_enabled" },
+      });
+      autoPublish = autoPublishRow?.value === "true";
+    }
 
     // Resolve category — prefer source's, else first category.
     let categoryId = source.categoryId;
@@ -188,6 +197,7 @@ export async function POST(
           categoryId,
           defaultTags: source.defaultTags,
           downloadImage: true,
+          autoPublish,
         });
         await finalizeClaim(claim.claimId, claim.claimToken, draft.articleId);
         results.push({

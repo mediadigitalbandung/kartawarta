@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { requireRole, successResponse, errorResponse, logAudit } from "@/lib/api-utils";
 import { prisma } from "@/lib/prisma";
+import { SCRAPER_ROLES } from "@/lib/roles";
 import {
   encryptSecret,
   decryptSecret,
@@ -120,7 +121,7 @@ const settingSchema = z.object({
 
 export async function GET() {
   try {
-    await requireRole(["SUPER_ADMIN"]);
+    await requireRole([...SCRAPER_ROLES]);
 
     const settings = await prisma.systemSetting.findMany();
     const keyValue: Record<string, string> = {};
@@ -148,10 +149,11 @@ export async function GET() {
 
 export async function PUT(req: NextRequest) {
   try {
-    const session = await requireRole(["SUPER_ADMIN"]);
-
     const body = await req.json();
     const data = settingSchema.parse(body);
+
+    const isToggleKey = data.key === "auto_scrape_enabled" || data.key === "auto_publish_enabled";
+    const session = await requireRole(isToggleKey ? [...SCRAPER_ROLES] : ["SUPER_ADMIN"]);
 
     // Encrypt sensitive values before persisting.
     const storedValue = isSensitiveKey(data.key)
