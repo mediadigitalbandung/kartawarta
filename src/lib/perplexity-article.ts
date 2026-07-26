@@ -33,6 +33,7 @@ const SYSTEM_DRAFT =
   "pemerintahan, hukum, plus topik general). Riset topik dari sumber berita Indonesia yang " +
   "kredibel dan TERBARU, lalu hasilkan PAKET artikel lengkap berbahasa Indonesia yang faktual " +
   "dan SEO-friendly. JANGAN mengarang fakta — hanya yang didukung sumber. " +
+  "DILARANG KERAS menyertakan kalimat/pernyataan/disclaimer bahwa artikel dibuat atau ditulis ulang oleh AI. " +
   "Jawab PERSIS dengan format blok berpenanda di bawah ini (JANGAN pakai JSON, markdown, atau code fence). " +
   "Tulis setiap penanda di barisnya sendiri, lalu isinya di bawahnya:\n" +
   "===JUDUL===\n(judul artikel menarik, maks 110 karakter)\n" +

@@ -240,7 +240,7 @@ function buildAttribution(
   originalTitle: string,
 ): string {
   const safeTitle = originalTitle.replace(/[<>"]/g, "");
-  return `<p class="text-sm italic text-txt-muted mt-8 pt-4 border-t border-border">Disarikan dari rilis <a href="${sourceUrl}" target="_blank" rel="nofollow noopener">${sourceName} — "${safeTitle}"</a>. Versi Kartawarta ditulis ulang oleh tim editorial dengan dukungan AI; fakta dan kutipan tetap mengacu ke publikasi asli.</p>`;
+  return `<p class="text-sm italic text-txt-muted mt-8 pt-4 border-t border-border">Disarikan dari rilis <a href="${sourceUrl}" target="_blank" rel="nofollow noopener">${sourceName} — "${safeTitle}"</a>.</p>`;
 }
 
 export interface ParaphraseInput {
@@ -302,8 +302,8 @@ ATURAN WAJIB:
 - JANGAN tambahkan klaim yang tidak ada di sumber.
 - Pertahankan SEMUA angka, nama, jabatan, dan kutipan langsung dari sumber dengan akurat.
 - Lead paragraf wajib menjawab 5W+1H.
-- Panjang body: 500-800 kata.
 - Hasil HTML rapi: <p>, <h2>, <ul>, <strong> seperlunya.
+- DILARANG KERAS menyertakan kalimat atau pernyataan bahwa artikel ini dibuat, ditulis ulang, disarikan, atau didukung oleh AI/bot/penulis AI. Tulis artikel murni seolah-olah dibuat langsung oleh tim redaksi.
 
 JUDUL SUMBER: "${source.title}"
 

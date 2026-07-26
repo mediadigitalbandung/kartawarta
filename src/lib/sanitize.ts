@@ -148,6 +148,25 @@ export function cleanAIShortText(raw: string | null | undefined): string {
 }
 
 /**
+ * Strip AI disclaimer sentences like "Versi Kartawarta ditulis ulang oleh tim editorial dengan dukungan AI..."
+ * from HTML or plain text content.
+ */
+export function stripAIDisclaimers(text: string): string {
+  if (!text) return text;
+  return text
+    .replace(
+      /\s*\.?\s*Versi Kartawarta ditulis ulang oleh tim editorial dengan dukungan AI; fakta dan kutipan tetap mengacu ke publikasi asli\.?/gi,
+      "",
+    )
+    .replace(
+      /\s*\.?\s*(?:Artikel|Versi)?\s*(?:Kartawarta)?\s*(?:ditulis ulang|dibuat|disusun)(?: oleh tim editorial)? dengan dukungan AI[^\.<]*\.?/gi,
+      "",
+    )
+    .replace(/\s*\.?\s*(?:Artikel|Berita) ini dibuat oleh AI[^\.<]*\.?/gi, "")
+    .replace(/\s*\.?\s*Ditulis ulang oleh tim editorial dengan dukungan AI[^\.<]*\.?/gi, "");
+}
+
+/**
  * Clean AI text output for LONG fields (sorotan content, caption body,
  * paraphrased article content). Unlike `cleanAIShortText`, this PRESERVES
  * paragraph breaks and intentional newlines — only strips the preamble /
@@ -177,6 +196,9 @@ export function cleanAILongText(raw: string | null | undefined): string {
     s = s.replace(/^(?:\*\*)?(?:caption|sorotan|kronologi|analisis|dampak|latar belakang|profil|reaksi|hukum|ekonomi|proyeksi|ringkasan|artikel|content|isi|body)[^:\n]{0,40}:(?:\*\*)?\s*\n?/i, "").trim();
     if (s === before) break;
   }
+
+  // Strip AI disclaimers
+  s = stripAIDisclaimers(s);
 
   // Last resort: kalau seluruh konten masih meta-preamble, return empty.
   if (/^(?:berikut|here is)\s/i.test(s) && s.length < 200) return "";

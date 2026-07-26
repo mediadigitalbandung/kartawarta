@@ -1505,7 +1505,7 @@ export default function PengaturanPage() {
                 markDirty("ai");
               }}
               className="input resize-none"
-              placeholder={"Contoh: Tulis dengan gaya jurnalistik ringkas dan tegas. Gunakan kalimat aktif, hindari jargon. Sertakan konteks lokal Bandung bila relevan. Buka dengan lead yang kuat (5W1H) di paragraf pertama. Hindari bahasa promosi/clickbait."}
+              placeholder={"Contoh: Tulis dengan gaya jurnalistik ringkas dan tegas. Gunakan kalimat aktif, hindari jargon. Sertakan konteks lokal Bandung bila relevan. Buka dengan lead yang kuat (5W1H) di paragraf pertama. Hindari bahasa promosi/clickbait. DILARANG KERAS menyertakan kalimat atau disclaimer bahwa artikel ini dibuat atau ditulis ulang oleh AI."}
             />
           </Field>
           <Field

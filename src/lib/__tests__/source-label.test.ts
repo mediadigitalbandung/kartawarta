@@ -61,14 +61,14 @@ describe("rewriteCreditsInContent", () => {
     );
   });
 
-  it("rewrites the attribution footer link text", () => {
+  it("rewrites the attribution footer link text and strips AI rewrite disclaimer", () => {
     const html =
       '<p class="x">Disarikan dari rilis <a href="https://www.bola.com/news/123" rel="nofollow">Kartawarta — "Judul Asli"</a>. Versi Kartawarta ditulis ulang.</p>';
     const out = rewriteCreditsInContent(html, "Bola");
     expect(out).toContain('>Bola — "Judul Asli"');
     expect(out).not.toContain(">Kartawarta —");
-    // The trailing "Versi Kartawarta" sentence must stay untouched.
-    expect(out).toContain("Versi Kartawarta ditulis ulang");
+    // The trailing "Versi Kartawarta" sentence must be stripped.
+    expect(out).not.toContain("Versi Kartawarta ditulis ulang");
   });
 
   it("leaves non-credit body mentions of Kartawarta alone", () => {

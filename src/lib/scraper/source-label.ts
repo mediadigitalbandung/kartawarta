@@ -99,8 +99,17 @@ function escapeHtml(s: string): string {
 export function rewriteCreditsInContent(html: string, label: string): string {
   if (!html) return html;
   const esc = escapeHtml(label);
+  const cleaned = html
+    .replace(
+      /\s*\.?\s*Versi Kartawarta ditulis ulang oleh tim editorial dengan dukungan AI; fakta dan kutipan tetap mengacu ke publikasi asli\.?/gi,
+      "",
+    )
+    .replace(
+      /\s*\.?\s*Versi Kartawarta ditulis ulang[^\.<]*\.?/gi,
+      "",
+    );
   return (
-    html
+    cleaned
       // 1. photo credit phrase "Foto: Kartawarta" (scraper figcaptions).
       //    Tag-agnostic so it matches regardless of how the figcaption is
       //    wrapped or whether sanitize stripped its classes.
@@ -108,7 +117,6 @@ export function rewriteCreditsInContent(html: string, label: string): string {
       // 2. image credit phrase "Sumber: Kartawarta" (rich-text inserts).
       .replace(/(\bSumber:\s*)Kartawarta\b/gi, `$1${esc}`)
       // 3. attribution footer link text: Disarikan dari rilis <a ...>Kartawarta — "…"
-      //    Only the link's leading name — never the trailing "Versi Kartawarta" sentence.
       .replace(
         /(Disarikan dari rilis\s*<a\b[^>]*>\s*)Kartawarta(\s*—)/gi,
         `$1${esc}$2`,
