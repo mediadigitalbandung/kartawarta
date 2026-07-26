@@ -36,6 +36,9 @@ const COMMON_LISTING_SELECTORS = [
   ".post-item",
   ".card-news",
   ".news-card",
+  "a.card",
+  "a[class*='card']",
+  ".card",
   // Bootstrap-y layouts
   ".row .col article",
   // CMS-specific
@@ -55,13 +58,18 @@ function scoreCards(
   let score = 0;
   cards.each((_, el) => {
     const $el = $(el);
-    const linkCount = $el.find("a[href]").length;
+    const hasLink = $el.is("a[href]") || $el.find("a[href]").length > 0;
     const imgCount = $el.find("img").length;
-    const headingText = $el.find("h1,h2,h3,h4").first().text().trim();
+    const headingText =
+      $el
+        .find("h1,h2,h3,h4, .headline, .title, .card-title, .cardHeadline, [class*='headline'], [class*='title']")
+        .first()
+        .text()
+        .trim() || $el.text().trim();
     const anyText = $el.text().trim();
-    if (linkCount > 0 && headingText.length > 8) score += 3;
+    if (hasLink && headingText.length > 8) score += 3;
     if (imgCount > 0) score += 2;
-    if (anyText.length > 40) score += 1;
+    if (anyText.length > 30) score += 1;
   });
   return score;
 }
@@ -91,7 +99,11 @@ function detectCards(
     let goodChildren = 0;
     directChildren.each((__, c) => {
       const $c = $(c);
-      if ($c.find("a[href]").length > 0 && $c.find("h1,h2,h3,h4").length > 0) {
+      const hasLink = $c.is("a[href]") || $c.find("a[href]").length > 0;
+      const hasHeadingOrText =
+        $c.find("h1,h2,h3,h4, .headline, .title, .card-title, [class*='headline'], [class*='title']").length > 0 ||
+        $c.text().trim().length > 20;
+      if (hasLink && hasHeadingOrText) {
         goodChildren++;
       }
     });
@@ -214,14 +226,22 @@ function extractFromCard(
 ): ListingItem | null {
   const $card = $(card);
 
-  // Title: explicit selector wins, else first heading, else first long anchor
+  // Title: explicit selector wins, else first heading/headline, else card/anchor text
   let title = "";
   if (options.titleSelector) {
     title = $card.find(options.titleSelector).first().text().trim();
   }
-  if (!title) title = $card.find("h1,h2,h3,h4").first().text().trim();
   if (!title) {
-    const anchorText = $card.find("a[href]").first().text().trim();
+    title = $card
+      .find("h1,h2,h3,h4, .headline, .title, .card-title, [class*='headline'], [class*='title']")
+      .first()
+      .text()
+      .trim();
+  }
+  if (!title) {
+    const anchorText = $card.is("a")
+      ? $card.text().trim()
+      : $card.find("a[href]").first().text().trim();
     if (anchorText.length > 8) title = anchorText;
   }
   if (!title || title.length < 8) return null;
