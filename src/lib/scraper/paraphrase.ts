@@ -220,8 +220,7 @@ Format output WAJIB JSON valid (tanpa teks lain di luar JSON):
     }
   }
 
-  const attributionHtml = buildAttribution(source.url, creditLabel, source.title);
-  const finalContent = sanitizeHtml(parsed.content + attributionHtml);
+  const finalContent = sanitizeHtml(parsed.content);
 
   const slug = await uniqueSlug(parsed.title);
 
