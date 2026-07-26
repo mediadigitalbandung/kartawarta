@@ -124,6 +124,33 @@ export default function AutoArtikelPage() {
   const [newCategoryId, setNewCategoryId] = useState<string>("");
   const [newPriority, setNewPriority] = useState<number>(0);
   const [creatingKw, setCreatingKw] = useState<boolean>(false);
+  const [generatingNow, setGeneratingNow] = useState<boolean>(false);
+
+  async function handleGenerateNow() {
+    try {
+      setGeneratingNow(true);
+      const res = await fetch("/api/cron/auto-article?force=true", {
+        method: "POST",
+      });
+      const json = await res.json();
+      if (!json.success && json.error) {
+        throw new Error(json.error);
+      }
+      if (json.created > 0) {
+        showSuccess(`Berhasil membuat ${json.created} draf auto-article baru!`);
+      } else if (json.skips && json.skips.length > 0) {
+        showError(`Skip: ${json.skips[0].reason || "Gagal generate"}`);
+      } else {
+        showSuccess("Generate selesai.");
+      }
+      fetchArticles();
+      fetchKeywords();
+    } catch (err) {
+      showError(err instanceof Error ? err.message : "Gagal men-generate artikel");
+    } finally {
+      setGeneratingNow(false);
+    }
+  }
 
   if (sessionStatus !== "loading" && session && userRole !== "SUPER_ADMIN") {
     redirect("/panel/dashboard");
@@ -578,16 +605,30 @@ export default function AutoArtikelPage() {
             Generator artikel otomatis via AI berdasarkan Target Keyword.
           </p>
         </div>
-        <button
-          onClick={() => {
-            fetchSettings();
-            fetchArticles();
-            fetchKeywords();
-          }}
-          className="btn-ghost flex items-center gap-2 px-3 py-2.5 text-sm"
-        >
-          <RefreshCw size={14} /> Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleGenerateNow}
+            disabled={generatingNow}
+            className="btn-primary flex items-center gap-2 px-4 py-2.5 text-sm font-medium disabled:opacity-50"
+          >
+            {generatingNow ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Sparkles size={16} />
+            )}
+            Generate Draf Sekarang
+          </button>
+          <button
+            onClick={() => {
+              fetchSettings();
+              fetchArticles();
+              fetchKeywords();
+            }}
+            className="btn-ghost flex items-center gap-2 px-3 py-2.5 text-sm"
+          >
+            <RefreshCw size={14} /> Refresh
+          </button>
+        </div>
       </div>
 
       {/* Master Toggle */}
