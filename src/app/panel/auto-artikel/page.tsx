@@ -98,6 +98,8 @@ export default function AutoArtikelPage() {
   const { confirm } = useConfirm();
 
   const [enabled, setEnabled] = useState<boolean>(false);
+  const [autoPublish, setAutoPublish] = useState<boolean>(false);
+  const [savingAutoPublish, setSavingAutoPublish] = useState<boolean>(false);
   const [intervalMinutes, setIntervalMinutes] = useState<number>(60);
   const [batchSize, setBatchSize] = useState<number>(1);
   const [savingInterval, setSavingInterval] = useState<boolean>(false);
