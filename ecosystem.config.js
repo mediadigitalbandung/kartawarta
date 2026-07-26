@@ -70,5 +70,27 @@ module.exports = {
       max_restarts: 10,
       min_uptime: "60s",
     },
+    {
+      // Internal Cron Worker — pings auto-article and sorotan cron routes every 60s
+      name: "kartawarta-cron-worker",
+      script: "tools/cron-worker.mjs",
+      cwd: "/var/www/kartawarta",
+      exec_mode: "fork",
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: "200M",
+      env: {
+        NODE_ENV: "production",
+        APP_URL: "http://127.0.0.1:3000",
+      },
+      out_file: "/root/.pm2/logs/kartawarta-cron-worker-out.log",
+      error_file: "/root/.pm2/logs/kartawarta-cron-worker-error.log",
+      merge_logs: true,
+      log_date_format: "YYYY-MM-DD HH:mm:ss Z",
+      kill_timeout: 5000,
+      max_restarts: 10,
+      min_uptime: "60s",
+    },
   ],
 };
