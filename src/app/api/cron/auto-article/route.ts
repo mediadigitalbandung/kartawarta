@@ -32,6 +32,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
 import { sanitizeHtml } from "@/lib/sanitize";
+import { cleanArticleContent } from "@/lib/scraper/clean-content";
 import { verifyCronSecret, errorResponse, logAudit } from "@/lib/api-utils";
 import { trackCron } from "@/lib/cron-tracker";
 import { tryAdvisoryLock, releaseAdvisoryLock } from "@/lib/cron-lock";
@@ -195,14 +196,8 @@ async function generateOne(): Promise<GenerateResult> {
   const pplxImage = gen.images.find((im) => /^https?:\/\//i.test(im.imageUrl))?.imageUrl ?? null;
   const featuredImage = pplxImage || extractFirstImageUrl(gen.content) || null;
 
-  // Embed the featured image as the FIRST <img> in the content so it shows at
-  // the top of the editor + public page. URL/alt are HTML-attribute-escaped.
-  let bodyHtml = sanitizeHtml(gen.content);
-  if (featuredImage && !/<img[^>]*src=/i.test(bodyHtml)) {
-    bodyHtml =
-      `<p><img src="${escapeHtmlAttr(featuredImage)}" alt="${escapeHtmlAttr(gen.title.slice(0, 200))}" /></p>` +
-      bodyHtml;
-  }
+  // Clean content HTML to ensure ONLY paraphrased text remains (no body <img> or disclaimers)
+  const bodyHtml = cleanArticleContent(sanitizeHtml(gen.content));
 
   const slug = await uniqueSlug(gen.title);
 

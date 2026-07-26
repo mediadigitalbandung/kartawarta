@@ -20,6 +20,7 @@
 import { prisma } from "@/lib/prisma";
 import { callAI } from "@/lib/ai-client";
 import { sanitizeHtml, cleanAIShortText, cleanAILongText } from "@/lib/sanitize";
+import { cleanArticleContent } from "./clean-content";
 import { slugify } from "@/lib/utils";
 import { downloadImageToUploads } from "./download-image";
 import { scrapeRealPhotoFromSourceUrl } from "./fallback-image";
@@ -220,7 +221,7 @@ Format output WAJIB JSON valid (tanpa teks lain di luar JSON):
     }
   }
 
-  const finalContent = sanitizeHtml(parsed.content);
+  const finalContent = cleanArticleContent(sanitizeHtml(parsed.content));
 
   const slug = await uniqueSlug(parsed.title);
 
