@@ -169,6 +169,7 @@ export default function AutoArtikelPage() {
       if (res.ok) {
         const json = await res.json();
         setEnabled(String(json.data?.auto_article_enabled ?? "false") === "true");
+        setAutoPublish(String(json.data?.auto_article_auto_publish ?? "false") === "true");
         const iv = Number(json.data?.auto_article_interval_minutes ?? "60");
         setIntervalMinutes([5, 10, 15, 20, 30, 60].includes(iv) ? iv : 60);
         const bs = Math.floor(Number(json.data?.auto_article_batch_size ?? "1"));
@@ -395,6 +396,33 @@ export default function AutoArtikelPage() {
       showError(err instanceof Error ? err.message : "Gagal menyimpan");
     } finally {
       setSavingToggle(false);
+    }
+  }
+
+  async function handleToggleAutoPublish() {
+    try {
+      setSavingAutoPublish(true);
+      const newValue = !autoPublish;
+      const res = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          key: "auto_article_auto_publish",
+          value: newValue ? "true" : "false",
+        }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || "Gagal menyimpan");
+      setAutoPublish(newValue);
+      showSuccess(
+        newValue
+          ? "Auto Publish diaktifkan (artikel langsung tayang)."
+          : "Auto Publish dinonaktifkan (artikel masuk draf).",
+      );
+    } catch (err) {
+      showError(err instanceof Error ? err.message : "Gagal menyimpan");
+    } finally {
+      setSavingAutoPublish(false);
     }
   }
 
@@ -719,6 +747,37 @@ export default function AutoArtikelPage() {
               0 = pause sementara tanpa nonaktifkan toggle. Maks 3 — paraphrase dibatasi 3 draft per cron tick agar tidak terlalu banyak menumpuk.
             </p>
           </div>
+        </div>
+
+        {/* Auto Publish Toggle */}
+        <div className="mt-5 flex items-center justify-between border-t border-border pt-5">
+          <div className="pr-4">
+            <h3 className="text-sm font-bold text-txt-primary flex items-center gap-2">
+              Auto Publish Langsung Tayang
+              {autoPublish && (
+                <span className="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                  Aktif (Published)
+                </span>
+              )}
+            </h3>
+            <p className="mt-0.5 text-xs text-txt-secondary">
+              Bila aktif, artikel yang di-generate via cron atau tombol instan akan langsung terbit dengan status <span className="font-semibold text-emerald-600 dark:text-emerald-400">PUBLISHED</span> dan terverifikasi tanpa perlu approval manual.
+            </p>
+          </div>
+          <button
+            onClick={handleToggleAutoPublish}
+            disabled={loadingSettings || savingAutoPublish}
+            className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${
+              autoPublish ? "bg-emerald-600" : "bg-surface-tertiary"
+            }`}
+            aria-label="Toggle auto publish"
+          >
+            <span
+              className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+                autoPublish ? "translate-x-6" : "translate-x-1"
+              }`}
+            />
+          </button>
         </div>
       </div>
 
