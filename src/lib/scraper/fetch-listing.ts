@@ -39,6 +39,13 @@ const COMMON_LISTING_SELECTORS = [
   "a.card",
   "a[class*='card']",
   ".card",
+  // ASP.NET / Government portals (OJK, Lembaga Negara, Pemda)
+  "ul.dfwp-list > li",
+  ".ms-listviewtable tr",
+  ".ms-WPBody tr",
+  ".news-item-list li",
+  ".list-news li",
+  ".list-berita li",
   // Bootstrap-y layouts
   ".row .col article",
   // CMS-specific
