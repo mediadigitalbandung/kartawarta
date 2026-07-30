@@ -508,7 +508,7 @@ export default function PengaturanPage() {
   const [deepseekKey, setDeepseekKey] = useState("");
   const [qwenKey, setQwenKey] = useState("");
   const [qwenEndpoint, setQwenEndpoint] = useState("https://ws-0yaoz0jn6a2nc9ah.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1");
-  const [qwenModel, setQwenModel] = useState("qwen-plus");
+  const [qwenModel, setQwenModel] = useState("qwen-max");
   const [geminiKey, setGeminiKey] = useState("");
   const [perplexityKey, setPerplexityKey] = useState("");
   const [perplexityInstructions, setPerplexityInstructions] = useState("");
@@ -616,7 +616,7 @@ export default function PengaturanPage() {
         setDeepseekKey(map.deepseek_api_key || "");
         setQwenKey(map.qwen_api_key || "");
         setQwenEndpoint(map.qwen_endpoint || "https://ws-0yaoz0jn6a2nc9ah.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1");
-        setQwenModel(map.qwen_model || "qwen-plus");
+        setQwenModel(map.qwen_model || "qwen-max");
         setGeminiKey(map.gemini_api_key || "");
         setPerplexityKey(map.perplexity_api_key || "");
         setPerplexityInstructions(map.perplexity_instructions || "");
@@ -1382,18 +1382,21 @@ export default function PengaturanPage() {
             </Field>
             <Field
               label="Qwen Model"
-              hint="Model yang digunakan. Contoh: qwen-plus, qwen-max, qwen-turbo, qwen2.5-72b-instruct"
+              hint="Model yang digunakan untuk penulisan & riset. 'qwen-max' adalah model flagship paling cerdas & terbaik."
             >
-              <input
-                type="text"
+              <select
                 value={qwenModel}
                 onChange={(e) => {
                   setQwenModel(e.target.value);
                   markDirty("ai");
                 }}
                 className="input"
-                placeholder="qwen-plus"
-              />
+              >
+                <option value="qwen-max">qwen-max (Disarankan — Flagship Model Terhebat & Paling Cerdas)</option>
+                <option value="qwen-plus">qwen-plus (Model Standar & Seimbang)</option>
+                <option value="qwen-turbo">qwen-turbo (Ultra Cepat)</option>
+                <option value="qwen2.5-72b-instruct">qwen2.5-72b-instruct</option>
+              </select>
             </Field>
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <button
@@ -1654,7 +1657,7 @@ export default function PengaturanPage() {
           </Field>
           <Field
             label="Penyedia Suara Reel (TTS)"
-            hint="Otomatis = pakai ElevenLabs bila key terisi, jika tidak pakai Gemini."
+            hint="Otomatis = pakai Qwen bila key terisi, lalu ElevenLabs → Gemini."
           >
             <select
               value={ttsProvider}
@@ -1664,7 +1667,8 @@ export default function PengaturanPage() {
               }}
               className="input"
             >
-              <option value="auto">Otomatis (ElevenLabs → Gemini)</option>
+              <option value="auto">Otomatis (Qwen → ElevenLabs → Gemini)</option>
+              <option value="qwen">Qwen / CosyVoice (Alibaba Cloud)</option>
               <option value="elevenlabs">ElevenLabs</option>
               <option value="gemini">Gemini</option>
               <option value="off">Nonaktif (tanpa suara)</option>

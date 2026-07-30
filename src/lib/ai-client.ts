@@ -40,6 +40,10 @@ export interface CallAIOptions {
   forceProvider?: "anthropic" | "deepseek" | "qwen";
   /** Override the 60s default per-call timeout (ms). */
   timeoutMs?: number;
+  /** Enable web search grounding (supported by Qwen & DashScope). */
+  enableSearch?: boolean;
+  /** Override default model (e.g. qwen-max vs qwen-plus). */
+  modelOverride?: string;
 }
 
 export interface CallAIResult {
@@ -49,6 +53,7 @@ export interface CallAIResult {
   outputTokens: number;
   totalTokens: number;
   durationMs: number;
+  sources?: Array<{ title: string | null; url: string; date: string | null }>;
 }
 
 const DEFAULT_MAX_TOKENS = 1000;
@@ -57,7 +62,7 @@ const DEFAULT_TIMEOUT_MS = 60_000;
 const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL || "claude-haiku-4-5";
 const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || "deepseek-chat";
 const DEEPSEEK_ENDPOINT = "https://api.deepseek.com/chat/completions";
-const QWEN_MODEL = process.env.QWEN_MODEL || "qwen-plus";
+const QWEN_MODEL = process.env.QWEN_MODEL || "qwen-max";
 const QWEN_DEFAULT_ENDPOINT =
   "https://ws-0yaoz0jn6a2nc9ah.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1/chat/completions";
 const DEFAULT_SYSTEM_PROMPT =
@@ -375,14 +380,37 @@ export async function callQwen(
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
 
-  const [endpoint, model, system, maxTokens] = await Promise.all([
+  const [endpoint, defaultModel, system, maxTokens] = await Promise.all([
     getQwenEndpoint(),
     getQwenModel(),
     getGeneralSystemPrompt(opts.systemPrompt),
     opts.maxTokens ?? getMaxTokens(),
   ]);
 
+  const model = opts.modelOverride || defaultModel;
+
   try {
+    const payload: Record<string, unknown> = {
+      model,
+      messages: [
+        {
+          role: "system",
+          content: system,
+        },
+        { role: "user", content: opts.userPrompt },
+      ],
+      max_tokens: maxTokens,
+      temperature: opts.temperature ?? DEFAULT_TEMPERATURE,
+    };
+
+    if (opts.enableSearch) {
+      payload.enable_search = true;
+      payload.search_options = {
+        enable_citation: true,
+        enable_source: true,
+      };
+    }
+
     const response = await fetch(endpoint, {
       method: "POST",
       signal: controller.signal,
@@ -390,18 +418,7 @@ export async function callQwen(
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model,
-        messages: [
-          {
-            role: "system",
-            content: system,
-          },
-          { role: "user", content: opts.userPrompt },
-        ],
-        max_tokens: maxTokens,
-        temperature: opts.temperature ?? DEFAULT_TEMPERATURE,
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
@@ -413,12 +430,32 @@ export async function callQwen(
 
     const data = (await response.json()) as {
       choices?: Array<{ message?: { content?: string } }>;
+      search_results?: Array<{ title?: string; url?: string; date?: string; site_name?: string }>;
+      citations?: string[];
       usage?: { prompt_tokens?: number; completion_tokens?: number };
     };
 
     const text = data.choices?.[0]?.message?.content?.trim() ?? "";
     const inputTokens = data.usage?.prompt_tokens ?? 0;
     const outputTokens = data.usage?.completion_tokens ?? 0;
+
+    const sources: Array<{ title: string | null; url: string; date: string | null }> = [];
+    if (Array.isArray(data.search_results)) {
+      for (const s of data.search_results) {
+        if (s?.url) {
+          sources.push({
+            title: s.title || s.site_name || null,
+            url: s.url,
+            date: s.date || null,
+          });
+        }
+      }
+    }
+    if (sources.length === 0 && Array.isArray(data.citations)) {
+      for (const url of data.citations) {
+        if (url) sources.push({ title: null, url, date: null });
+      }
+    }
 
     return {
       text,
@@ -427,6 +464,7 @@ export async function callQwen(
       outputTokens,
       totalTokens: inputTokens + outputTokens,
       durationMs: Date.now() - start,
+      sources,
     };
   } finally {
     clearTimeout(timeout);

@@ -1,22 +1,16 @@
 "use client";
 
 /**
- * Perplexity "Riset & Tulis" — shared by the new-article and edit-article pages
+ * AI "Riset & Tulis" — shared by the new-article and edit-article pages
  * so the research UI + fill logic live in ONE place. Renders as a trigger button
  * that opens an elegant modal (Editorial-Authority navy) with the research
- * controls. Calls /api/ai/research, fills ONLY the empty fields (never
- * overwrites the editor's input), appends the drafted HTML + web images to the
- * body, and (optionally) merges the cited sources.
- *
- * Options:
- *   - Foto referensi (web images → featured + inline illustrations)
- *   - Rentang berita (recency: minggu/bulan/tahun/semua)
- *   - Sumber & narasumber: include or HIDE; and how many to include (pick
- *     "Semua" when the auto-found references feel too few)
+ * controls. Calls /api/ai/research (supporting Qwen AI & Perplexity), fills ONLY
+ * the empty fields (never overwrites the editor's input), appends the drafted HTML
+ * + web images to the body, and (optionally) merges cited sources.
  */
 
 import { useState, type Dispatch, type SetStateAction } from "react";
-import { Search, X, Sparkles, Loader2, AlertCircle, Clock, ImageIcon, BookOpen } from "lucide-react";
+import { Search, X, Sparkles, Loader2, AlertCircle, Clock, ImageIcon, BookOpen, Cpu } from "lucide-react";
 import { PERPLEXITY_PERSONAS, PERPLEXITY_NOTE_HINTS } from "@/lib/perplexity-personas";
 
 export interface ResearchSource {
@@ -83,6 +77,8 @@ export default function PerplexityResearchPanel({
   onSuccess,
 }: PerplexityResearchPanelProps) {
   const [open, setOpen] = useState(false);
+  const [provider, setProvider] = useState<"qwen" | "perplexity" | "auto">("qwen");
+  const [qwenModel, setQwenModel] = useState("qwen-max");
   const [researchMode, setResearchMode] = useState<"draft" | "research">("draft");
   const [researchPersona, setResearchPersona] = useState("");
   const [researchImages, setResearchImages] = useState(true);
@@ -112,17 +108,18 @@ export default function PerplexityResearchPanel({
           persona: researchPersona,
           includeImages: researchImages,
           recency,
+          provider,
+          qwenModel,
         }),
       });
       const data = await res.json();
       if (!data.success) {
-        onError(data.error || "Gagal menjalankan riset Perplexity");
+        onError(data.error || "Gagal menjalankan riset AI");
         return;
       }
       const d = data.data || {};
 
-      // Fill EVERY field directly — empty fields are filled; existing user input
-      // is kept (never overwritten).
+      // Fill EVERY field directly — empty fields are filled; existing user input is kept.
       const f = d.fields;
       const html = (f?.content ?? d.content ?? "").toString();
       if (f) {
@@ -139,8 +136,7 @@ export default function PerplexityResearchPanel({
           setShowSeo(true);
       }
 
-      // Optional web images (2-3). First fills the featured image (if empty); the
-      // rest are appended into the body as captioned figures (with source credit).
+      // Optional web images (2-3)
       const imgs: { url: string; origin: string | null; title: string | null }[] = d.images || [];
       let imgHtml = "";
       if (imgs.length > 0) {
@@ -165,8 +161,7 @@ export default function PerplexityResearchPanel({
       const bodyHtml = `${html || ""}${imgHtml}`;
       if (bodyHtml) setContent((prev) => (prev.trim() ? `${prev}\n${bodyHtml}` : bodyHtml));
 
-      // Cited sources — only when the editor opted to include them, capped at the
-      // chosen count (999 = all). Hidden entirely when the toggle is off.
+      // Cited sources
       const cited: { title: string | null; url: string }[] = d.sources || [];
       let addedSources = 0;
       if (includeSources && cited.length > 0) {
@@ -195,13 +190,14 @@ export default function PerplexityResearchPanel({
         });
       }
 
+      const providerLabel = d.provider === "qwen" ? `Qwen AI (${d.model || "qwen-max"})` : "Perplexity AI";
       onSuccess(
-        `Selesai — kolom artikel terisi dari riset${addedSources ? ` + ${addedSources} sumber` : includeSources ? "" : " (sumber disembunyikan)"}${imgs.length ? ` + ${imgs.length} foto` : ""}. Tinjau & sunting sebelum publikasi.`,
+        `Selesai [${providerLabel}] — draf terisi${addedSources ? ` + ${addedSources} sumber` : includeSources ? "" : " (sumber disembunyikan)"}${imgs.length ? ` + ${imgs.length} foto` : ""}. Tinjau & sunting sebelum publikasi.`,
       );
       setOpen(false);
       setResearchNotes("");
     } catch {
-      onError("Gagal menghubungi layanan riset Perplexity");
+      onError("Gagal menghubungi layanan riset AI");
     } finally {
       setResearching(false);
     }
@@ -224,9 +220,9 @@ export default function PerplexityResearchPanel({
           className="flex w-full items-center gap-2 text-sm font-semibold text-primary hover:underline"
         >
           <Search size={16} />
-          Riset &amp; Tulis dengan Perplexity AI
+          Riset &amp; Tulis dengan Qwen AI / Perplexity
           <span className="hidden text-[10px] font-normal text-txt-muted sm:inline">
-            — riset web real-time + sumber otomatis
+            — riset web real-time + draf &amp; sumber otomatis
           </span>
         </button>
       </div>
@@ -236,7 +232,7 @@ export default function PerplexityResearchPanel({
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Riset & Tulis dengan Perplexity"
+          aria-label="Riset & Tulis dengan AI"
           className="fixed inset-0 z-[60] flex items-center justify-center p-4"
         >
           <div
@@ -250,8 +246,8 @@ export default function PerplexityResearchPanel({
                 <Search size={18} />
               </span>
               <div className="min-w-0 flex-1">
-                <h3 className="font-serif text-lg font-bold leading-tight">Riset &amp; Tulis dengan Perplexity</h3>
-                <p className="text-xs text-white/60">Riset web real-time → mengisi draf + sumber otomatis</p>
+                <h3 className="font-serif text-lg font-bold leading-tight">Riset &amp; Tulis Artikel dengan AI</h3>
+                <p className="text-xs text-white/60">Riset web real-time (Qwen AI / Perplexity) → mengisi draf + sumber otomatis</p>
               </div>
               <button
                 type="button"
@@ -265,6 +261,41 @@ export default function PerplexityResearchPanel({
 
             {/* Body */}
             <div className="flex-1 space-y-4 overflow-y-auto px-5 py-4">
+              {/* Provider & Model Selection */}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1.5 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-txt-muted">
+                    <Cpu size={12} /> Mesin AI Riset
+                  </label>
+                  <select
+                    value={provider}
+                    onChange={(e) => setProvider(e.target.value as "qwen" | "perplexity" | "auto")}
+                    className="input w-full text-xs font-medium"
+                  >
+                    <option value="qwen">Qwen AI (Alibaba Cloud — Utama)</option>
+                    <option value="perplexity">Perplexity AI (Sonar)</option>
+                    <option value="auto">Otomatis (Ikuti Pengaturan Global)</option>
+                  </select>
+                </div>
+
+                {provider === "qwen" && (
+                  <div>
+                    <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-txt-muted">
+                      Model Qwen
+                    </label>
+                    <select
+                      value={qwenModel}
+                      onChange={(e) => setQwenModel(e.target.value)}
+                      className="input w-full text-xs font-medium"
+                    >
+                      <option value="qwen-max">qwen-max (Flagship — Terhebat)</option>
+                      <option value="qwen-plus">qwen-plus (Standar &amp; Seimbang)</option>
+                      <option value="qwen-turbo">qwen-turbo (Ultra Cepat)</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+
               {/* Mode */}
               <div>
                 <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-txt-muted">
